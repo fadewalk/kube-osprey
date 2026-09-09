@@ -20,8 +20,7 @@ import (
 var (
 	DB *gorm.DB
 
-	once    sync.Once
-	initErr error
+	once sync.Once
 )
 
 type Model struct {
