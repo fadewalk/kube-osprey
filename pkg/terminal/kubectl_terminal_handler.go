@@ -80,7 +80,6 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 			ws.SendErrorMessage(fmt.Sprintf("Failed to create kubectl agent pod: %v", err))
 			_ = h.cleanupSessionAccess(cs, sessionSA, instanceID)
 			return
-
 		}
 
 		defer func() {
@@ -177,7 +176,7 @@ func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *clu
 	return podName, nil
 }
 
-// cleanupPod deletes only the per-session pod (the admin SA/CRB are permanent).
+// cleanupPod deletes only the per-session pod.
 func (h *KubectlTerminalHandler) cleanupPod(cs *cluster.ClientSet, instanceID string) error {
 	ctx := context.TODO()
 	opts := []client.DeleteAllOfOption{
