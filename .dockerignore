@@ -1,0 +1,30 @@
+# Git and local tooling
+action-tmp
+.git
+.codegraph
+.zcode
+
+# Local dependencies and build output
+node_modules
+ui/node_modules
+docs/node_modules
+e2e/node_modules
+static
+bin
+kite
+ui/dist
+docs/.vitepress/dist
+docs/.vitepress/cache
+
+# Local data and secrets
+*.db
+*.sqlite
+.env
+.env.*
+
+# OS and editor files
+.DS_Store
+.vscode
+.idea
+*.swp
+*.swo
