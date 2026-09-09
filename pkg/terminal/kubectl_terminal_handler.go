@@ -22,9 +22,15 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 )
 
-const (
-	kubectlAdminSA = "kite-kubectl-admin"
-)
+const kubectlSessionRole = "kite-kubectl-session"
+
+func kubectlSessionServiceAccountName(instanceID string) string {
+	name := instanceID + "-sa"
+	if len(name) > 63 {
+		name = strings.TrimRight(name[:63], "-.")
+	}
+	return name
+}
 
 type KubectlTerminalHandler struct {
 }
@@ -60,27 +66,27 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 
 		ctx := ws.Context
 
-		// Ensure the shared admin ServiceAccount + ClusterRoleBinding exist
-		if err := h.ensureAdminServiceAccount(ctx, cs); err != nil {
-			klog.Errorf("Failed to ensure kubectl admin SA: %v", err)
+		instanceID := utils.GenerateKubectlAgentName(user.Key())
+		sessionSA := kubectlSessionServiceAccountName(instanceID)
+		if err := h.ensureSessionAccess(ctx, cs, sessionSA, instanceID); err != nil {
+			klog.Errorf("Failed to setup kubectl session access: %v", err)
 			ws.SendErrorMessage(fmt.Sprintf("Failed to setup kubectl terminal: %v", err))
 			return
 		}
 
-		instanceID := utils.GenerateKubectlAgentName(user.Key())
-
-		podName, err := h.createKubectlAgent(ctx, cs, instanceID, kubectlImage)
+		podName, err := h.createKubectlAgent(ctx, cs, instanceID, sessionSA, kubectlImage)
 		if err != nil {
 			klog.Errorf("Failed to create kubectl agent pod: %v", err)
 			ws.SendErrorMessage(fmt.Sprintf("Failed to create kubectl agent pod: %v", err))
-			_ = h.cleanupPod(cs, instanceID)
+			_ = h.cleanupSessionAccess(cs, sessionSA, instanceID)
 			return
+
 		}
 
 		defer func() {
 			klog.Infof("Cleaning up kubectl pod %s", instanceID)
-			if err := h.cleanupPod(cs, instanceID); err != nil {
-				klog.Errorf("Failed to cleanup kubectl pod %s: %v", instanceID, err)
+			if err := h.cleanupSessionAccess(cs, sessionSA, instanceID); err != nil {
+				klog.Errorf("Failed to cleanup kubectl session access: %v", err)
 			}
 		}()
 
@@ -97,50 +103,40 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 	})
 }
 
-// ensureAdminServiceAccount creates a cluster-admin ServiceAccount once if it doesn't exist.
-func (h *KubectlTerminalHandler) ensureAdminServiceAccount(ctx context.Context, cs *cluster.ClientSet) error {
+func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cluster.ClientSet, serviceAccountName, sessionID string) error {
 	labels := map[string]string{
 		"app.kubernetes.io/managed-by": "kite",
 		"kite.io/component":            "kubectl-terminal",
+		"kite.io/kubectl-session":      sessionID,
 	}
-
-	sa := &corev1.ServiceAccount{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      kubectlAdminSA,
-			Namespace: common.AgentPodNamespace,
-			Labels:    labels,
-		},
+	sa := &corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: serviceAccountName, Namespace: common.AgentPodNamespace, Labels: labels}}
+	if err := cs.K8sClient.Create(ctx, sa); err != nil {
+		return fmt.Errorf("failed to create session ServiceAccount: %w", err)
 	}
-	if err := cs.K8sClient.Create(ctx, sa); client.IgnoreAlreadyExists(err) != nil {
-		return fmt.Errorf("failed to create ServiceAccount: %w", err)
-	}
-
 	crb := &rbacv1.ClusterRoleBinding{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:   kubectlAdminSA,
-			Labels: labels,
-		},
-		Subjects: []rbacv1.Subject{
-			{
-				Kind:      "ServiceAccount",
-				Name:      kubectlAdminSA,
-				Namespace: common.AgentPodNamespace,
-			},
-		},
-		RoleRef: rbacv1.RoleRef{
-			Kind:     "ClusterRole",
-			Name:     "cluster-admin",
-			APIGroup: "rbac.authorization.k8s.io",
-		},
+		ObjectMeta: metav1.ObjectMeta{Name: sessionID, Labels: labels},
+		Subjects:   []rbacv1.Subject{{Kind: "ServiceAccount", Name: serviceAccountName, Namespace: common.AgentPodNamespace}},
+		RoleRef:    rbacv1.RoleRef{Kind: "ClusterRole", Name: "cluster-admin", APIGroup: "rbac.authorization.k8s.io"},
 	}
-	if err := cs.K8sClient.Create(ctx, crb); client.IgnoreAlreadyExists(err) != nil {
-		return fmt.Errorf("failed to create ClusterRoleBinding: %w", err)
+	if err := cs.K8sClient.Create(ctx, crb); err != nil {
+		_ = cs.K8sClient.Delete(ctx, sa)
+		return fmt.Errorf("failed to create session ClusterRoleBinding: %w", err)
 	}
-
 	return nil
 }
 
-func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *cluster.ClientSet, instanceID, image string) (string, error) {
+func (h *KubectlTerminalHandler) cleanupSessionAccess(cs *cluster.ClientSet, serviceAccountName, sessionID string) error {
+	ctx := context.TODO()
+	if err := cs.K8sClient.Delete(ctx, &rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: sessionID}}); client.IgnoreNotFound(err) != nil {
+		return err
+	}
+	if err := cs.K8sClient.Delete(ctx, &corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: serviceAccountName, Namespace: common.AgentPodNamespace}}); client.IgnoreNotFound(err) != nil {
+		return err
+	}
+	return h.cleanupPod(cs, sessionID)
+}
+
+func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *cluster.ClientSet, instanceID, serviceAccountName, image string) (string, error) {
 	podName := instanceID
 
 	gracePeriod := int64(0)
@@ -156,7 +152,7 @@ func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *clu
 		},
 		Spec: corev1.PodSpec{
 			RestartPolicy:                 corev1.RestartPolicyNever,
-			ServiceAccountName:            kubectlAdminSA,
+			ServiceAccountName:            serviceAccountName,
 			AutomountServiceAccountToken:  &[]bool{true}[0],
 			Hostname:                      "kubectl",
 			TerminationGracePeriodSeconds: &gracePeriod,

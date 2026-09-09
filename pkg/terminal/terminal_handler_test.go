@@ -126,25 +126,24 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	}
 
 	kubectlHandler := &KubectlTerminalHandler{}
-	if err := kubectlHandler.ensureAdminServiceAccount(ctx, clientSet); err != nil {
-		t.Fatalf("ensureAdminServiceAccount() error = %v", err)
-	}
-	if err := kubectlHandler.ensureAdminServiceAccount(ctx, clientSet); err != nil {
-		t.Fatalf("ensureAdminServiceAccount() was not idempotent: %v", err)
+	sessionID := "session-a"
+	sessionSA := sessionID + "-sa"
+	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, sessionSA, sessionID); err != nil {
+		t.Fatalf("ensureSessionAccess() error = %v", err)
 	}
 	var serviceAccount corev1.ServiceAccount
-	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: kubectlAdminSA}, &serviceAccount); err != nil {
-		t.Fatalf("loading ServiceAccount: %v", err)
+	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: sessionSA}, &serviceAccount); err != nil {
+		t.Fatalf("loading session ServiceAccount: %v", err)
 	}
 	var binding rbacv1.ClusterRoleBinding
-	if err := client.Get(ctx, types.NamespacedName{Name: kubectlAdminSA}, &binding); err != nil {
-		t.Fatalf("loading ClusterRoleBinding: %v", err)
+	if err := client.Get(ctx, types.NamespacedName{Name: sessionID}, &binding); err != nil {
+		t.Fatalf("loading session ClusterRoleBinding: %v", err)
 	}
-	if binding.RoleRef.Name != "cluster-admin" || len(binding.Subjects) != 1 || binding.Subjects[0].Name != kubectlAdminSA {
+	if binding.RoleRef.Name != "cluster-admin" || len(binding.Subjects) != 1 || binding.Subjects[0].Name != sessionSA {
 		t.Fatalf("kubectl ClusterRoleBinding = %#v", binding)
 	}
 
-	kubectlPodName, err := kubectlHandler.createKubectlAgent(ctx, clientSet, "session-a", "kubectl:v1")
+	kubectlPodName, err := kubectlHandler.createKubectlAgent(ctx, clientSet, sessionID, sessionSA, "kubectl:v1")
 	if err != nil {
 		t.Fatalf("createKubectlAgent() error = %v", err)
 	}
@@ -152,7 +151,7 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: kubectlPodName}, &kubectlPod); err != nil {
 		t.Fatalf("loading kubectl agent: %v", err)
 	}
-	if kubectlPod.Spec.ServiceAccountName != kubectlAdminSA || kubectlPod.Spec.AutomountServiceAccountToken == nil || !*kubectlPod.Spec.AutomountServiceAccountToken {
+	if kubectlPod.Spec.ServiceAccountName != sessionSA || kubectlPod.Spec.AutomountServiceAccountToken == nil || !*kubectlPod.Spec.AutomountServiceAccountToken {
 		t.Fatalf("kubectl agent service account configuration = %#v", kubectlPod.Spec)
 	}
 	if len(kubectlPod.Spec.Containers) != 1 || kubectlPod.Spec.Containers[0].Image != "kubectl:v1" {
@@ -166,11 +165,14 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	if err := client.Create(ctx, unrelated); err != nil {
 		t.Fatalf("creating unrelated pod: %v", err)
 	}
-	if err := kubectlHandler.cleanupPod(clientSet, "session-a"); err != nil {
-		t.Fatalf("cleanupPod() error = %v", err)
+	if err := kubectlHandler.cleanupSessionAccess(clientSet, sessionSA, sessionID); err != nil {
+		t.Fatalf("cleanupSessionAccess() error = %v", err)
 	}
-	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: kubectlPodName}, &corev1.Pod{}); !apierrors.IsNotFound(err) {
-		t.Fatalf("session pod still exists or unexpected error: %v", err)
+	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: sessionSA}, &corev1.ServiceAccount{}); !apierrors.IsNotFound(err) {
+		t.Fatalf("session ServiceAccount still exists or unexpected error: %v", err)
+	}
+	if err := client.Get(ctx, types.NamespacedName{Name: sessionID}, &rbacv1.ClusterRoleBinding{}); !apierrors.IsNotFound(err) {
+		t.Fatalf("session ClusterRoleBinding still exists or unexpected error: %v", err)
 	}
 	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: unrelated.Name}, &corev1.Pod{}); err != nil {
 		t.Fatalf("cleanup removed unrelated pod: %v", err)
