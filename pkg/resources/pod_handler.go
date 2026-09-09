@@ -6,10 +6,13 @@ import (
 	"fmt"
 	"mime"
 	"net/http"
+	"net/url"
+	pathpkg "path"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	semver "github.com/blang/semver/v4"
 	"github.com/gin-gonic/gin"
@@ -285,13 +288,73 @@ type FileInfo struct {
 	GID     string `json:"gid,omitempty"`
 }
 
+func validatePodPath(rawPath string) (string, error) {
+	if strings.Contains(rawPath, "->") {
+		rawPath = strings.TrimSpace(strings.SplitN(rawPath, "->", 2)[0])
+	}
+	if rawPath == "" {
+		return "", errors.New("path is required")
+	}
+
+	decoded := rawPath
+	for i := 0; i < 8; i++ {
+		next, err := url.PathUnescape(decoded)
+		if err != nil {
+			return "", fmt.Errorf("invalid path encoding: %w", err)
+		}
+		if next == decoded {
+			break
+		}
+		decoded = next
+		if i == 7 {
+			return "", errors.New("path encoding is too deeply nested")
+		}
+	}
+
+	if strings.Contains(decoded, "\\") || strings.ContainsRune(decoded, '\x00') {
+		return "", errors.New("path contains an invalid separator or NUL byte")
+	}
+	for _, r := range decoded {
+		if unicode.IsControl(r) {
+			return "", errors.New("path contains a control character")
+		}
+	}
+	if strings.Contains(strings.ToLower(decoded), "%2e") || strings.Contains(strings.ToLower(decoded), "%2f") || strings.Contains(strings.ToLower(decoded), "%5c") {
+		return "", errors.New("path contains encoded traversal")
+	}
+
+	for _, component := range strings.Split(decoded, "/") {
+		if component == ".." {
+			return "", errors.New("path traversal is not allowed")
+		}
+	}
+	return pathpkg.Clean(decoded), nil
+}
+
+func validateUploadFilename(rawFilename string) (string, error) {
+	if rawFilename == "" || strings.ContainsAny(rawFilename, `/\\`) {
+		return "", errors.New("invalid filename")
+	}
+	for _, r := range rawFilename {
+		if unicode.IsControl(r) {
+			return "", errors.New("invalid filename")
+		}
+	}
+	filename := pathpkg.Base(rawFilename)
+	if filename == "." || filename == ".." || filename == "" {
+		return "", errors.New("invalid filename")
+	}
+	return filename, nil
+}
+
 func (h *PodHandler) ListFiles(c *gin.Context) {
 	namespace := c.Param("namespace")
 	podName := c.Param("name")
 	container := c.Query("container")
-	path := c.Query("path")
-	if path == "" {
-		path = "/"
+	path, err := validatePodPath(c.Query("path"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	cs := c.MustGet("cluster").(*cluster.ClientSet)
 	cmd := []string{"ls", "-lah", "--full-time", path}
@@ -303,7 +366,7 @@ func (h *PodHandler) ListFiles(c *gin.Context) {
 			})
 			return
 		}
-		c.JSON(http.StatusOK, nil)
+		c.JSON(http.StatusBadGateway, gin.H{"error": fmt.Sprintf("failed to list files: %v", err)})
 		return
 	}
 
@@ -364,15 +427,12 @@ func (h *PodHandler) PreviewFile(c *gin.Context) {
 	namespace := c.Param("namespace")
 	podName := c.Param("name")
 	container := c.Query("container")
-	path := c.Query("path")
-	cs := c.MustGet("cluster").(*cluster.ClientSet)
-	if path == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "path is required"})
+	path, err := validatePodPath(c.Query("path"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if strings.Contains(path, "->") {
-		path = strings.TrimSpace(strings.SplitN(path, "->", 2)[0])
-	}
+	cs := c.MustGet("cluster").(*cluster.ClientSet)
 
 	cmd := []string{"cat", path}
 
@@ -383,7 +443,7 @@ func (h *PodHandler) PreviewFile(c *gin.Context) {
 	c.Header("Content-Type", contentType)
 	c.Header("Content-Disposition", fmt.Sprintf("inline; filename=\"%s\"", filepath.Base(path)))
 
-	err := cs.K8sClient.ExecCommand(c.Request.Context(), kube.ExecOptions{
+	err = cs.K8sClient.ExecCommand(c.Request.Context(), kube.ExecOptions{
 		Namespace:     namespace,
 		PodName:       podName,
 		ContainerName: container,
@@ -402,18 +462,15 @@ func (h *PodHandler) DownloadFile(c *gin.Context) {
 	namespace := c.Param("namespace")
 	podName := c.Param("name")
 	container := c.Query("container")
-	path := c.Query("path")
+	path, err := validatePodPath(c.Query("path"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	cs := c.MustGet("cluster").(*cluster.ClientSet)
 
-	if path == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "path is required"})
-		return
-	}
-	if strings.Contains(path, "->") {
-		path = strings.TrimSpace(strings.SplitN(path, "->", 2)[0])
-	}
-	_, _, err := cs.K8sClient.ExecCommandBuffered(c.Request.Context(), namespace, podName, container, []string{"test", "-d", path})
+	_, _, err = cs.K8sClient.ExecCommandBuffered(c.Request.Context(), namespace, podName, container, []string{"test", "-d", path})
 	isDir := err == nil
 
 	var cmd []string
@@ -446,12 +503,12 @@ func (h *PodHandler) UploadFile(c *gin.Context) {
 	namespace := c.Param("namespace")
 	podName := c.Param("name")
 	container := c.Query("container")
-	path := c.Query("path")
-	cs := c.MustGet("cluster").(*cluster.ClientSet)
-	if path == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "path is required"})
+	path, err := validatePodPath(c.Query("path"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	cs := c.MustGet("cluster").(*cluster.ClientSet)
 
 	file, header, err := c.Request.FormFile("file")
 	if err != nil {
@@ -464,13 +521,13 @@ func (h *PodHandler) UploadFile(c *gin.Context) {
 		}
 	}()
 
-	filename := filepath.Base(header.Filename)
-	if filename == "." || filename == ".." || strings.Contains(filename, "/") || strings.Contains(filename, "\\") {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid filename"})
+	filename, err := validateUploadFilename(header.Filename)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	destPath := filepath.Join(path, header.Filename)
+	destPath := pathpkg.Join(path, filename)
 	cmd := []string{"tee", destPath}
 
 	err = cs.K8sClient.ExecCommand(c.Request.Context(), kube.ExecOptions{
