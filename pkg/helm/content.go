@@ -1,7 +1,10 @@
 package helm
 
 import (
+	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -12,6 +15,7 @@ import (
 	"github.com/zxh326/kite/pkg/model"
 	"helm.sh/helm/v4/pkg/chart/common"
 	chart "helm.sh/helm/v4/pkg/chart/v2"
+	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
 	"helm.sh/helm/v4/pkg/registry"
 	repo "helm.sh/helm/v4/pkg/repo/v1"
 	"sigs.k8s.io/yaml"
@@ -150,7 +154,63 @@ func (h *HelmChartHandler) GetChartContent(c *gin.Context) {
 	c.JSON(http.StatusOK, helmChartContentResponse{Templates: content.Templates})
 }
 
-// IndexFile.Get skips prereleases when no version is requested.
+func (h *HelmChartHandler) ExportChart(c *gin.Context) {
+	repositoryName := c.Param("repository")
+	chartName := c.Param("name")
+	version := c.Query("version")
+
+	var repository model.HelmRepository
+	if err := model.DB.Where("name = ?", repositoryName).First(&repository).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "repository not found"})
+		return
+	}
+	indexFile, err := h.loadRepositoryIndex(repository)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+	entry, err := getChartEntry(indexFile, chartName, version)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+	loadedChart, err := helmutil.LoadRepositoryArchive(repository, entry)
+	if err != nil {
+		c.JSON(http.StatusBadGateway, gin.H{"error": err.Error()})
+		return
+	}
+
+	tmpDir, err := os.MkdirTemp("", "kite-helm-export-")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create export workspace"})
+		return
+	}
+	defer func() {
+		_ = os.RemoveAll(tmpDir)
+	}()
+
+	archivePath, err := chartutil.Save(loadedChart, tmpDir)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to create chart archive: %v", err)})
+		return
+	}
+	const maxExportSize = 64 << 20
+	info, err := os.Stat(archivePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to inspect chart archive"})
+		return
+	}
+	if info.Size() > maxExportSize {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "chart archive exceeds the 64 MiB export limit"})
+		return
+	}
+
+	filename := filepath.Base(archivePath)
+	c.Header("Content-Type", "application/gzip")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%q", filename))
+	c.File(archivePath)
+}
+
 func getChartEntry(indexFile *repo.IndexFile, chartName, version string) (*repo.ChartVersion, error) {
 	entry, err := indexFile.Get(chartName, version)
 	if err != nil && version == "" {

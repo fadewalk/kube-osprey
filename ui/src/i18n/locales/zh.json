@@ -1299,6 +1299,7 @@
     "actions": {
       "addRepository": "添加 Helm Repository",
       "deleteRepository": "删除 Helm Repository",
+      "export": "导出",
       "install": "安装"
     },
     "fields": {

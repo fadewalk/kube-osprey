@@ -12,6 +12,7 @@ import type {
   HelmChartVersion,
 } from '@/types/api'
 import { useHelmChart, useHelmChartContent } from '@/lib/api'
+import { apiClient } from '@/lib/api-client'
 import { cn, formatDate } from '@/lib/utils'
 import { usePageTitle } from '@/hooks/use-page-title'
 import { Badge } from '@/components/ui/badge'
@@ -411,6 +412,23 @@ export function HelmChartDetailPage() {
     data ? `${data.name} (${t('nav.helmCharts')})` : t('nav.helmCharts')
   )
 
+  const handleExport = async () => {
+    const params = new URLSearchParams()
+    if (version) params.set('version', version)
+    const response = await apiClient.request(
+      `/charts/${encodeURIComponent(repository || '')}/${encodeURIComponent(name || '')}/export?${params.toString()}`
+    )
+    if (!response.ok)
+      throw new Error((await response.json()).error || 'Export failed')
+    const blob = await response.blob()
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${name || 'chart'}-${version || 'latest'}.tgz`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
   const tabs = useMemo(
     () =>
       data
@@ -516,6 +534,15 @@ export function HelmChartDetailPage() {
               </div>
             </div>
             <div className="flex w-full flex-wrap gap-2 md:w-auto md:justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => void handleExport()}
+                disabled={data.source === artifactHubSource}
+              >
+                <Download className="size-4" />
+                {t('helmCharts.actions.export', { defaultValue: 'Export' })}
+              </Button>
               <Button
                 disabled={!data.chartUrl}
                 size="sm"

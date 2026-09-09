@@ -29,6 +29,7 @@ func (h *HelmChartHandler) RegisterRoutes(group *gin.RouterGroup) {
 	g.GET("/artifacthub/:repository/:name/content/:content", h.GetArtifactHubChartContent)
 	g.GET("/artifacthub/:repository/:name", h.GetArtifactHubChart)
 	g.GET("/:repository/:name/content/:content", h.GetChartContent)
+	g.GET("/:repository/:name/export", h.ExportChart)
 	g.GET("/:repository/:name", h.GetChart)
 }
 

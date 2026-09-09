@@ -1212,6 +1212,7 @@
     "actions": {
       "addRepository": "Add Repository",
       "deleteRepository": "Delete Repository",
+      "export": "Export",
       "install": "Install"
     },
     "fields": {
