@@ -96,6 +96,7 @@ export default defineConfig({
             { text: "Environment Variables", link: "/config/env" },
             { text: "Configuration File", link: "/config/config-file" },
             { text: "Chart Values", link: "/config/chart-values" },
+            { text: "Security Hardening", link: "/config/security-hardening" },
           ],
         },
         {
@@ -160,6 +161,7 @@ export default defineConfig({
             { text: "环境变量", link: "/zh/config/env" },
             { text: "配置文件", link: "/zh/config/config-file" },
             { text: "Chart Values", link: "/zh/config/chart-values" },
+            { text: "安全加固", link: "/zh/config/security-hardening" },
           ],
         },
         {
