@@ -950,6 +950,12 @@
       "external": "外部",
       "clusterAgent": "Cluster Agent"
     },
+    "permission": {
+      "readOnly": "只读",
+      "operator": "运维操作",
+      "admin": "管理员（cluster-admin）",
+      "custom": "已有 ClusterRole"
+    },
     "status": {
       "waiting": "等待 Cluster Agent",
       "connected": "已连接"
@@ -1003,6 +1009,9 @@
       "prometheusUrl": "Prometheus URL",
       "prometheusUrlPlaceholder": "https://prometheus.example.com",
       "clusterAgentDescription": "先创建集群，然后在目标集群内运行生成的命令。",
+      "agentPermission": "Cluster Agent 权限",
+      "agentPermissionWarning": "所选 Kubernetes 权限会写入生成的 Manifest，应用前请仔细检查。",
+      "agentRolePlaceholder": "已有 ClusterRole 名称",
       "enabled": "启用",
       "isDefault": "设为默认"
     }

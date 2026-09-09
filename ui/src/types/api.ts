@@ -635,6 +635,7 @@ export interface Cluster {
   enabled: boolean
   inCluster: boolean
   clusterAgent: boolean
+  clusterAgentPermission?: string
   clusterAgentVersion?: string
   connected: boolean
   isDefault: boolean

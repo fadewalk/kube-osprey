@@ -939,6 +939,12 @@
       "external": "External",
       "clusterAgent": "Cluster Agent"
     },
+    "permission": {
+      "readOnly": "Read only",
+      "operator": "Operator",
+      "admin": "Administrator (cluster-admin)",
+      "custom": "Existing ClusterRole"
+    },
     "status": {
       "waiting": "Waiting for Cluster Agent",
       "connected": "Connected"
@@ -992,6 +998,9 @@
       "prometheusUrl": "Prometheus URL",
       "prometheusUrlPlaceholder": "https://prometheus.example.com",
       "clusterAgentDescription": "Create the cluster first, then run the generated command inside the target cluster.",
+      "agentPermission": "Cluster Agent permission",
+      "agentPermissionWarning": "The selected Kubernetes permission is embedded in the generated manifest. Review it before applying.",
+      "agentRolePlaceholder": "Existing ClusterRole name",
       "enabled": "Enabled",
       "isDefault": "Set as Default"
     }

@@ -72,6 +72,21 @@ func NewToken() (string, string, error) {
 	return token, tokenHash(token), nil
 }
 
+func (m *Manager) RegistrationPermission(token string) (string, string, error) {
+	cluster, err := resolveToken(token)
+	if err != nil {
+		return "", "", err
+	}
+	if cluster == nil {
+		return "", "", nil
+	}
+	permission := cluster.ClusterAgentPermission
+	if permission == "" {
+		permission = model.ClusterAgentPermissionAdmin
+	}
+	return permission, cluster.ClusterAgentRole, nil
+}
+
 func (m *Manager) RegistrationPublicKey(token string) (string, error) {
 	cluster, err := resolveToken(token)
 	if err != nil {

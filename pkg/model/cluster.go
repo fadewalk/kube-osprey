@@ -1,5 +1,12 @@
 package model
 
+const (
+	ClusterAgentPermissionReadOnly = "readOnly"
+	ClusterAgentPermissionOperator = "operator"
+	ClusterAgentPermissionAdmin    = "admin"
+	ClusterAgentPermissionCustom   = "custom"
+)
+
 type Cluster struct {
 	Model
 	Name                   string       `json:"name" gorm:"type:varchar(100);uniqueIndex;not null"`
@@ -8,6 +15,8 @@ type Cluster struct {
 	PrometheusURL          string       `json:"prometheus_url,omitempty" gorm:"type:text"`
 	InCluster              bool         `json:"in_cluster" gorm:"type:boolean;default:false"`
 	ClusterAgent           bool         `json:"clusterAgent" gorm:"type:boolean;default:false"`
+	ClusterAgentPermission string       `json:"clusterAgentPermission,omitempty" gorm:"type:varchar(20);default:'admin'"`
+	ClusterAgentRole       string       `json:"clusterAgentRole,omitempty" gorm:"type:varchar(253)"`
 	ClusterAgentTokenHash  string       `json:"-" gorm:"type:varchar(64);index"`
 	ClusterAgentPublicKey  string       `json:"-" gorm:"type:varchar(64)"`
 	ClusterAgentPrivateKey SecretString `json:"-" gorm:"type:text"`

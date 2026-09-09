@@ -80,16 +80,17 @@ func (cm *ClusterManager) GetClusterList(c *gin.Context) {
 	result := make([]gin.H, 0, len(clusters))
 	for _, cluster := range clusters {
 		clusterInfo := gin.H{
-			"id":            cluster.ID,
-			"name":          cluster.Name,
-			"description":   cluster.Description,
-			"enabled":       cluster.Enable,
-			"inCluster":     cluster.InCluster,
-			"clusterAgent":  cluster.ClusterAgent,
-			"connected":     cluster.ClusterAgent && cm.clusterAgentManager.Connected(cluster.ID),
-			"isDefault":     cluster.IsDefault,
-			"prometheusURL": cluster.PrometheusURL,
-			"config":        "",
+			"id":                     cluster.ID,
+			"name":                   cluster.Name,
+			"description":            cluster.Description,
+			"enabled":                cluster.Enable,
+			"inCluster":              cluster.InCluster,
+			"clusterAgent":           cluster.ClusterAgent,
+			"clusterAgentPermission": cluster.ClusterAgentPermission,
+			"connected":              cluster.ClusterAgent && cm.clusterAgentManager.Connected(cluster.ID),
+			"isDefault":              cluster.IsDefault,
+			"prometheusURL":          cluster.PrometheusURL,
+			"config":                 "",
 		}
 		if cluster.ClusterAgent {
 			clusterInfo["clusterAgentVersion"] = cm.clusterAgentManager.Version(cluster.ID)
@@ -115,13 +116,15 @@ func (cm *ClusterManager) CreateCluster(c *gin.Context) {
 	}
 
 	var req struct {
-		Name          string `json:"name" binding:"required"`
-		Description   string `json:"description"`
-		Config        string `json:"config"`
-		PrometheusURL string `json:"prometheusURL"`
-		InCluster     bool   `json:"inCluster"`
-		ClusterAgent  bool   `json:"clusterAgent"`
-		IsDefault     bool   `json:"isDefault"`
+		Name                   string `json:"name" binding:"required"`
+		Description            string `json:"description"`
+		Config                 string `json:"config"`
+		PrometheusURL          string `json:"prometheusURL"`
+		InCluster              bool   `json:"inCluster"`
+		ClusterAgent           bool   `json:"clusterAgent"`
+		ClusterAgentPermission string `json:"clusterAgentPermission"`
+		ClusterAgentRole       string `json:"clusterAgentRole"`
+		IsDefault              bool   `json:"isDefault"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -131,6 +134,17 @@ func (cm *ClusterManager) CreateCluster(c *gin.Context) {
 	if req.ClusterAgent {
 		req.InCluster = false
 		req.Config = ""
+		if req.ClusterAgentPermission == "" {
+			req.ClusterAgentPermission = model.ClusterAgentPermissionReadOnly
+		}
+		if req.ClusterAgentPermission != model.ClusterAgentPermissionReadOnly && req.ClusterAgentPermission != model.ClusterAgentPermissionOperator && req.ClusterAgentPermission != model.ClusterAgentPermissionAdmin && req.ClusterAgentPermission != model.ClusterAgentPermissionCustom {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid clusterAgentPermission"})
+			return
+		}
+		if req.ClusterAgentPermission == model.ClusterAgentPermissionCustom && strings.TrimSpace(req.ClusterAgentRole) == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "clusterAgentRole is required for custom permission"})
+			return
+		}
 	}
 
 	if _, err := model.GetClusterByName(req.Name); err == nil {
@@ -179,6 +193,9 @@ func (cm *ClusterManager) CreateCluster(c *gin.Context) {
 		PrometheusURL:          req.PrometheusURL,
 		InCluster:              req.InCluster,
 		ClusterAgent:           req.ClusterAgent,
+		ClusterAgentPermission: req.ClusterAgentPermission,
+		ClusterAgentRole:       req.ClusterAgentRole,
+
 		ClusterAgentTokenHash:  clusterAgentTokenHash,
 		ClusterAgentPublicKey:  clusterAgentPublicKey,
 		ClusterAgentPrivateKey: model.SecretString(clusterAgentPrivateKey),
@@ -355,12 +372,17 @@ func (cm *ClusterManager) GetClusterAgentManifest(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid or expired manifest grant"})
 		return
 	}
+	permission, customRole, err := cm.clusterAgentManager.RegistrationPermission(token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to load cluster agent permission"})
+		return
+	}
 	serverURL := clusterAgentServerURL(c)
 	image := model.DefaultGeneralClusterAgentImageValue()
 	if setting, err := model.GetGeneralSetting(); err == nil && setting != nil && setting.ClusterAgentImage != "" {
 		image = setting.ClusterAgentImage
 	}
-	manifest := clusteragent.GenerateManifest(serverURL, token, publicKey, image)
+	manifest := clusteragent.GenerateManifestWithPermission(serverURL, token, publicKey, image, permission, customRole)
 	c.Header("Cache-Control", "no-store")
 	c.Header("Content-Disposition", `attachment; filename="kite-cluster-agent.yaml"`)
 	c.Data(http.StatusOK, "text/yaml; charset=utf-8", []byte(manifest))

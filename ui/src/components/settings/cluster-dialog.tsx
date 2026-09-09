@@ -3,7 +3,7 @@ import { IconEdit, IconServer } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
 
 import { Cluster } from '@/types/api'
-import { ClusterCreateRequest } from '@/lib/api'
+import type { ClusterCreateRequest } from '@/lib/api'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -41,6 +41,8 @@ function createClusterFormData(cluster?: Cluster | null) {
     isDefault: cluster?.isDefault ?? false,
     inCluster: cluster?.inCluster ?? false,
     clusterAgent: cluster?.clusterAgent ?? false,
+    clusterAgentPermission: (cluster?.clusterAgentPermission || 'readOnly') as NonNullable<ClusterCreateRequest['clusterAgentPermission']>,
+    clusterAgentRole: '',
   }
 }
 
@@ -267,15 +269,36 @@ function ClusterDialogContent({
           </div>
         )}
         {formData.clusterAgent && (
-          <div className="p-4 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
-            <p className="text-sm text-blue-700 dark:text-blue-300">
-              {t(
-                'clusterManagement.dialog.clusterAgentDescription',
-                'Create the cluster first, then run the generated command inside the target cluster.'
-              )}
+          <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/20">
+            <div className="space-y-1">
+              <Label>{t('clusterManagement.dialog.agentPermission', 'Cluster Agent permission')}</Label>
+              <Select
+                value={formData.clusterAgentPermission}
+                onValueChange={(value) => handleChange('clusterAgentPermission', value)}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="readOnly">{t('clusterManagement.permission.readOnly', 'Read only')}</SelectItem>
+                  <SelectItem value="operator">{t('clusterManagement.permission.operator', 'Operator')}</SelectItem>
+                  <SelectItem value="admin">{t('clusterManagement.permission.admin', 'Administrator (cluster-admin)')}</SelectItem>
+                  <SelectItem value="custom">{t('clusterManagement.permission.custom', 'Existing ClusterRole')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {formData.clusterAgentPermission === 'custom' ? (
+              <Input
+                value={formData.clusterAgentRole}
+                onChange={(event) => handleChange('clusterAgentRole', event.target.value)}
+                placeholder={t('clusterManagement.dialog.agentRolePlaceholder', 'Existing ClusterRole name')}
+                required
+              />
+            ) : null}
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              {t('clusterManagement.dialog.agentPermissionWarning', 'The selected Kubernetes permission is embedded in the generated manifest. Review it before applying.')}
             </p>
           </div>
         )}
+
         <DialogFooter>
           <Button
             type="button"
