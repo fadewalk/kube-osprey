@@ -267,6 +267,28 @@ export const deleteHelmRepository = (
   )
 }
 
+export interface PromQLResponse {
+  resultType: string
+  result: unknown
+  warnings?: string[]
+}
+
+export const fetchPromQL = (options: {
+  query: string
+  range?: boolean
+  start?: string
+  end?: string
+  step?: string
+}): Promise<PromQLResponse> => {
+  const params = new URLSearchParams({ query: options.query })
+  if (options.start) params.set('start', options.start)
+  if (options.end) params.set('end', options.end)
+  if (options.step) params.set('step', options.step)
+  return fetchAPI<PromQLResponse>(
+    `/prometheus/${options.range ? 'query_range' : 'query'}?${params.toString()}`
+  )
+}
+
 export const fetchHelmCharts = (options?: {
   repository?: string
   query?: string

@@ -381,8 +381,22 @@
     "unsetGlobalError": "Failed to disable global sidebar",
     "updateAvailable": "A newer Kite version is available"
   },
+  "prometheusExplorer": {
+    "description": "Run instant or range PromQL queries against the current cluster.",
+    "query": "PromQL query",
+    "rangeQuery": "Range query",
+    "start": "Start",
+    "end": "End",
+    "step": "Step (seconds)",
+    "run": "Run query",
+    "defaults": {
+      "oneHourAgo": "Unix timestamp or RFC3339",
+      "now": "Unix timestamp or RFC3339"
+    }
+  },
   "nav": {
     "overview": "Overview",
+    "prometheusExplorer": "PromQL Explorer",
     "pods": "Pods",
     "deployments": "Deployments",
     "statefulsets": "StatefulSets",

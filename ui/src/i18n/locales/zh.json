@@ -385,8 +385,22 @@
     "collapse": "收起",
     "updateAvailable": "有新的 Kite 版本可用"
   },
+  "prometheusExplorer": {
+    "description": "针对当前集群执行即时或区间 PromQL 查询。",
+    "query": "PromQL 查询",
+    "rangeQuery": "区间查询",
+    "start": "开始时间",
+    "end": "结束时间",
+    "step": "步长（秒）",
+    "run": "执行查询",
+    "defaults": {
+      "oneHourAgo": "Unix 时间戳或 RFC3339",
+      "now": "Unix 时间戳或 RFC3339"
+    }
+  },
   "nav": {
     "overview": "概览",
+    "prometheusExplorer": "PromQL 查询",
     "workloads": "工作负载",
     "pods": "Pods",
     "deployments": "Deployments",

@@ -1,5 +1,10 @@
 import type { ComponentType } from 'react'
-import { IconBox, type Icon, type IconProps } from '@tabler/icons-react'
+import {
+  IconBox,
+  IconChartLine,
+  type Icon,
+  type IconProps,
+} from '@tabler/icons-react'
 
 import {
   DefaultMenus,
@@ -65,6 +70,11 @@ resourceCatalog
     })
   })
 
+defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.prometheusExplorer',
+  url: '/prometheus',
+  icon: IconChartLine,
+})
 defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.helmCharts',
   url: '/charts',

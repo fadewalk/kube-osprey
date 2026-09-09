@@ -10,6 +10,7 @@ import { HelmChartListPage } from './pages/helm-chart-list-page'
 import { InitializationPage } from './pages/initialization'
 import { LoginPage } from './pages/login'
 import { Overview } from './pages/overview'
+import { PrometheusExplorerPage } from './pages/prometheus-explorer-page'
 import { ResourceDetail } from './pages/resource-detail'
 import { ResourceList } from './pages/resource-list'
 import { SettingsPage } from './pages/settings'
@@ -61,6 +62,10 @@ export const router = createBrowserRouter(
         {
           path: 'settings',
           element: <SettingsPage />,
+        },
+        {
+          path: 'prometheus',
+          element: <PrometheusExplorerPage />,
         },
         {
           path: 'crds/:crd',
