@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/zxh326/kite/pkg/common"
 	"k8s.io/klog/v2"
 )
 
@@ -34,9 +35,7 @@ type Session struct {
 }
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
+	CheckOrigin: common.ValidateWebSocketOrigin,
 }
 
 func Serve(w http.ResponseWriter, r *http.Request, handle func(*Session)) {

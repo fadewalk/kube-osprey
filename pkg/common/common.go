@@ -2,6 +2,8 @@ package common
 
 import (
 	"fmt"
+	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"sync"
@@ -85,6 +87,26 @@ var (
 
 const ManagedSectionError = "This section is managed by configuration file and cannot be modified through the UI"
 
+func ValidateWebSocketOrigin(r *http.Request) bool {
+	origin := strings.TrimSpace(r.Header.Get("Origin"))
+	if origin == "" {
+		return true
+	}
+	parsedOrigin, err := url.Parse(origin)
+	if err != nil || parsedOrigin.Scheme == "" || parsedOrigin.Host == "" {
+		return false
+	}
+	for _, allowed := range CORSAllowedOrigins {
+		if strings.TrimRight(strings.TrimSpace(allowed), "/") == strings.TrimRight(origin, "/") {
+			return true
+		}
+	}
+	if parsedOrigin.Scheme != "http" && parsedOrigin.Scheme != "https" {
+		return false
+	}
+	return strings.EqualFold(parsedOrigin.Host, r.Host)
+}
+
 func ValidateEncryptionKey() error {
 	key := strings.TrimSpace(KiteEncryptKey)
 	if key == "" {
@@ -98,6 +120,7 @@ func ValidateEncryptionKey() error {
 	}
 	return nil
 }
+
 func IsSectionManaged(section string) bool {
 	managedMu.RLock()
 	defer managedMu.RUnlock()

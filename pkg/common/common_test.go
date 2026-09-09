@@ -1,6 +1,7 @@
 package common
 
 import (
+	"net/http/httptest"
 	"reflect"
 	"testing"
 )
@@ -36,41 +37,67 @@ func TestValidateEncryptionKey(t *testing.T) {
 	}
 }
 
+func TestValidateWebSocketOrigin(t *testing.T) {
+	oldOrigins := CORSAllowedOrigins
+	defer func() { CORSAllowedOrigins = oldOrigins }()
+	CORSAllowedOrigins = nil
+
+	req := httptest.NewRequest("GET", "https://kite.example.com/socket", nil)
+	req.Host = "kite.example.com"
+	req.Header.Set("Origin", "https://kite.example.com")
+	if !ValidateWebSocketOrigin(req) {
+		t.Fatal("same-origin WebSocket request was rejected")
+	}
+
+	req.Header.Set("Origin", "https://evil.example.com")
+	if ValidateWebSocketOrigin(req) {
+		t.Fatal("cross-origin WebSocket request was accepted")
+	}
+
+	CORSAllowedOrigins = []string{"https://admin.example.com"}
+	req.Header.Set("Origin", "https://admin.example.com")
+	if !ValidateWebSocketOrigin(req) {
+		t.Fatal("explicitly allowed WebSocket origin was rejected")
+	}
+}
+
 func TestLoadEnvs(t *testing.T) {
 	old := struct {
-		JwtSecret            string
-		Port                 string
-		EnableAnalytics      bool
-		AgentPodNamespace    string
-		NodeTerminalImage    string
-		KubectlTerminalImage string
-		DBDSN                string
-		DBType               string
-		KiteEncryptKey       string
-		AnonymousUserEnabled bool
-		Host                 string
-		DisableGZIP          bool
-		EnableVersionCheck   bool
-		Base                 string
-		CORSAllowedOrigins   []string
-		TrustedProxies       []string
+		JwtSecret             string
+		Port                  string
+		EnableAnalytics       bool
+		AgentPodNamespace     string
+		NodeTerminalImage     string
+		KubectlTerminalImage  string
+		DBDSN                 string
+		DBType                string
+		KiteEncryptKey        string
+		AllowInsecureDefaults bool
+		AnonymousUserEnabled  bool
+		Host                  string
+		DisableGZIP           bool
+		EnableVersionCheck    bool
+		Base                  string
+		CORSAllowedOrigins    []string
+		TrustedProxies        []string
 	}{
-		JwtSecret:            JwtSecret,
-		Port:                 Port,
-		EnableAnalytics:      EnableAnalytics,
-		AgentPodNamespace:    AgentPodNamespace,
-		NodeTerminalImage:    NodeTerminalImage,
-		KubectlTerminalImage: KubectlTerminalImage,
-		DBDSN:                DBDSN,
-		DBType:               DBType,
-		KiteEncryptKey:       KiteEncryptKey,
-		AnonymousUserEnabled: AnonymousUserEnabled,
-		Host:                 Host,
-		DisableGZIP:          DisableGZIP,
-		EnableVersionCheck:   EnableVersionCheck,
-		Base:                 Base,
-		CORSAllowedOrigins:   append([]string(nil), CORSAllowedOrigins...),
-		TrustedProxies:       append([]string(nil), TrustedProxies...),
+		JwtSecret:             JwtSecret,
+		Port:                  Port,
+		EnableAnalytics:       EnableAnalytics,
+		AgentPodNamespace:     AgentPodNamespace,
+		NodeTerminalImage:     NodeTerminalImage,
+		KubectlTerminalImage:  KubectlTerminalImage,
+		DBDSN:                 DBDSN,
+		DBType:                DBType,
+		KiteEncryptKey:        KiteEncryptKey,
+		AllowInsecureDefaults: AllowInsecureDefaults,
+		AnonymousUserEnabled:  AnonymousUserEnabled,
+		Host:                  Host,
+		DisableGZIP:           DisableGZIP,
+		EnableVersionCheck:    EnableVersionCheck,
+		Base:                  Base,
+		CORSAllowedOrigins:    append([]string(nil), CORSAllowedOrigins...),
+		TrustedProxies:        append([]string(nil), TrustedProxies...),
 	}
 	defer func() {
 		JwtSecret = old.JwtSecret
@@ -82,6 +109,7 @@ func TestLoadEnvs(t *testing.T) {
 		DBDSN = old.DBDSN
 		DBType = old.DBType
 		KiteEncryptKey = old.KiteEncryptKey
+		AllowInsecureDefaults = old.AllowInsecureDefaults
 		AnonymousUserEnabled = old.AnonymousUserEnabled
 		Host = old.Host
 		DisableGZIP = old.DisableGZIP
