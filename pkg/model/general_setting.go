@@ -53,7 +53,7 @@ type GeneralSetting struct {
 	AIAPIKey                SecretString `json:"aiApiKey" gorm:"column:ai_api_key;type:text"`
 	AIBaseURL               string       `json:"aiBaseUrl" gorm:"column:ai_base_url;type:varchar(500)"`
 	AIMaxTokens             int          `json:"aiMaxTokens" gorm:"column:ai_max_tokens;type:integer;default:16384"`
-	KubectlEnabled          bool         `json:"kubectlEnabled" gorm:"column:kubectl_enabled;type:boolean;not null;default:true"`
+	KubectlEnabled          bool         `json:"kubectlEnabled" gorm:"column:kubectl_enabled;type:boolean;not null;default:false"`
 	KubectlImage            string       `json:"kubectlImage" gorm:"column:kubectl_image;type:varchar(255);not null;default:'zzde/kubectl:latest'"`
 	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
 	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
@@ -142,7 +142,7 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 		AIProvider:         DefaultGeneralAIProvider,
 		AIModel:            DefaultGeneralAIModel,
 		AIMaxTokens:        16384,
-		KubectlEnabled:     true,
+		KubectlEnabled:     false,
 		KubectlImage:       DefaultGeneralKubectlImageValue(),
 		NodeTerminalImage:  DefaultGeneralNodeTerminalImageValue(),
 		ClusterAgentImage:  DefaultGeneralClusterAgentImageValue(),
