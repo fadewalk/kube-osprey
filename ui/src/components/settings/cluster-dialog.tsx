@@ -42,7 +42,7 @@ function createClusterFormData(cluster?: Cluster | null) {
     inCluster: cluster?.inCluster ?? false,
     clusterAgent: cluster?.clusterAgent ?? false,
     clusterAgentPermission: (cluster?.clusterAgentPermission || 'readOnly') as NonNullable<ClusterCreateRequest['clusterAgentPermission']>,
-    clusterAgentRole: '',
+    clusterAgentRole: cluster?.clusterAgentRole || '',
   }
 }
 

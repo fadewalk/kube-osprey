@@ -87,6 +87,7 @@ func (cm *ClusterManager) GetClusterList(c *gin.Context) {
 			"inCluster":              cluster.InCluster,
 			"clusterAgent":           cluster.ClusterAgent,
 			"clusterAgentPermission": cluster.ClusterAgentPermission,
+			"clusterAgentRole":       cluster.ClusterAgentRole,
 			"connected":              cluster.ClusterAgent && cm.clusterAgentManager.Connected(cluster.ID),
 			"isDefault":              cluster.IsDefault,
 			"prometheusURL":          cluster.PrometheusURL,

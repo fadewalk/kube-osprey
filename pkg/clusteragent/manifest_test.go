@@ -5,6 +5,23 @@ import (
 	"testing"
 )
 
+func TestGenerateManifestPermissionProfiles(t *testing.T) {
+	readOnly := GenerateManifestWithPermission("https://kite.example.com", "token", "key", "image:v1", "readOnly", "")
+	if !strings.Contains(readOnly, "name: kite-cluster-agent-readonly") || strings.Contains(readOnly, "name: cluster-admin") {
+		t.Fatalf("readOnly manifest contains unexpected role: %s", readOnly)
+	}
+
+	operator := GenerateManifestWithPermission("https://kite.example.com", "token", "key", "image:v1", "operator", "")
+	if !strings.Contains(operator, "name: kite-cluster-agent-operator") || strings.Contains(operator, "name: cluster-admin") {
+		t.Fatalf("operator manifest contains unexpected role: %s", operator)
+	}
+
+	custom := GenerateManifestWithPermission("https://kite.example.com", "token", "key", "image:v1", "custom", "team-kite-reader")
+	if !strings.Contains(custom, "name: team-kite-reader") || strings.Contains(custom, "kind: ClusterRole\nmetadata:\n  name: team-kite-reader") {
+		t.Fatalf("custom manifest should bind an existing role: %s", custom)
+	}
+}
+
 func TestGenerateManifest(t *testing.T) {
 	manifest := GenerateManifest("https://kite.example.com", "my-token", "public-key", "ghcr.io/kite-org/kite:v1.0")
 
