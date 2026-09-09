@@ -128,8 +128,7 @@ cat > "$TEMP_DIR/test-values-postgres.yaml" << EOF
 replicaCount: 1
 db:
     type: postgres
-    postgres:
-        dsn: "host=127.0.0.1 port=5432 user=test password=test dbname=kite sslmode=disable"
+    dsn: "host=127.0.0.1 port=5432 user=test password=test dbname=kite sslmode=disable"
 EOF
 
 if helm template test-release "$CHART_DIR" -f "$TEMP_DIR/test-values-postgres.yaml" > "$TEMP_DIR/rendered-custom-postgres.yaml"; then

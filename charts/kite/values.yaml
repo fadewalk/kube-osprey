@@ -13,18 +13,10 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag:
 
-# This will set the deployment strategy. More information can be found here: https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy
-#
-# IMPORTANT: If persistence is enabled and using SQLite with a
-# ReadWriteOnce PersistentVolumeClaim, you MUST set this to "Recreate".
-# Using "RollingUpdate" will cause pod conflicts during upgrades because multiple
-# pods cannot mount the same RWO volume simultaneously.
+# IMPORTANT: SQLite with a ReadWriteOnce PVC must use Recreate to avoid
+# mounting the same volume from two Pods during upgrades.
 deploymentStrategy:
-  type: RollingUpdate
-  # rollingUpdate:
-  #   maxSurge: 25%
-  #   maxUnavailable: 25%
-
+  type: Recreate
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 imagePullSecrets: []
 # This is to override the chart name.
@@ -53,10 +45,10 @@ anonymousUserEnabled: false
 # Ignored if using existingSecret
 jwtSecret: ""
 
-# This is the key used for encrypting sensitive data
-# Change this in production
-# Ignored if using existingSecret
-encryptKey: "kite-default-encryption-key-change-in-production"
+# This is the key used for encrypting sensitive data.
+# Leave empty to require an existing Secret or generate a value for a new Secret.
+# Never commit a real production key to values.yaml.
+encryptKey: ""
 
 # Secret handling
 # By default the chart will create a Kubernetes Secret containing sensitive values.
@@ -351,10 +343,12 @@ livenessProbe:
   periodSeconds: 10
 readinessProbe:
   httpGet:
-    path: /healthz
+    path: /readyz
     port: http
   initialDelaySeconds: 10
   periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 6
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo
