@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"sync"
@@ -53,6 +54,10 @@ var (
 	// local Vite dev server cross-origin requests.
 	CORSAllowedOrigins []string
 
+	// AllowInsecureDefaults is intended only for local development. Production
+	// deployments must provide an explicit encryption key.
+	AllowInsecureDefaults = false
+
 	// TrustedProxies controls which direct peer IPs may provide forwarding headers.
 	// Set TRUSTED_PROXIES to override the defaults, or TRUSTED_PROXIES=none to
 	// ignore all client-supplied forwarding headers.
@@ -80,6 +85,19 @@ var (
 
 const ManagedSectionError = "This section is managed by configuration file and cannot be modified through the UI"
 
+func ValidateEncryptionKey() error {
+	key := strings.TrimSpace(KiteEncryptKey)
+	if key == "" {
+		return fmt.Errorf("KITE_ENCRYPT_KEY must not be empty")
+	}
+	if key == "kite-default-encryption-key-change-in-production" && !AllowInsecureDefaults {
+		return fmt.Errorf("KITE_ENCRYPT_KEY must be explicitly configured; set KITE_ALLOW_INSECURE_DEFAULTS=true only for local development")
+	}
+	if len(key) < 32 {
+		return fmt.Errorf("KITE_ENCRYPT_KEY must be at least 32 characters")
+	}
+	return nil
+}
 func IsSectionManaged(section string) bool {
 	managedMu.RLock()
 	defer managedMu.RUnlock()
@@ -137,8 +155,10 @@ func LoadEnvs() {
 		DBType = dbType
 	}
 
+	AllowInsecureDefaults = os.Getenv("KITE_ALLOW_INSECURE_DEFAULTS") == "true"
+
 	if key := os.Getenv("KITE_ENCRYPT_KEY"); key != "" {
-		KiteEncryptKey = key
+		KiteEncryptKey = strings.TrimSpace(key)
 	} else {
 		klog.Warningf("KITE_ENCRYPT_KEY is not set, using default key, this is not secure for production!")
 	}

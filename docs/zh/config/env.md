@@ -9,7 +9,8 @@ Kite 默认支持一些环境变量，来改变一些配置项的默认值。
 - **ANONYMOUS_USER_ENABLED**：启用匿名用户访问，默认值为 `false`，当启用后所有访问将不再需要身份验证，并且默认拥有最高权限。
 
 - **JWT_SECRET**：用于签名和验证 JWT 的密钥
-- **KITE_ENCRYPT_KEY**：用于加密敏感数据的密钥, 例如用户密码，OAuth 的 clientSecret ，kubeconfig 等。
+- **KITE_ENCRYPT_KEY**：用于加密敏感数据的密钥，例如 OAuth client secret、kubeconfig 和 Cluster Agent 私钥。生产环境必须显式配置；恢复已有数据库时必须保持该密钥不变。
+- **KITE_ALLOW_INSECURE_DEFAULTS**：仅用于本地开发，设置为 `true` 后允许使用公开的开发环境加密密钥回退值。生产环境禁止设置。
 
 - **HOST**: 用户 OAuth 2.0 授权回调地址生成，默认会从请求头获取，如果您发现结果不及预期可以手动配置此环境变量。
 

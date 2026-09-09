@@ -9,7 +9,8 @@ Kite supports several environment variables by default to change the default val
 - **ANONYMOUS_USER_ENABLED**: Enable anonymous user access, default value is `false`. When enabled, all access will no longer require authentication and will have the highest permissions by default.
 
 - **JWT_SECRET**: Secret key used for signing and verifying JWT
-- **KITE_ENCRYPT_KEY**: Secret key used for encrypting sensitive data, such as user passwords, OAuth clientSecret, kubeconfig, etc.
+- **KITE_ENCRYPT_KEY**: Secret key used for encrypting sensitive data, such as OAuth client secrets, kubeconfig, and Cluster Agent private keys. It must be explicitly configured for production and must remain stable while restoring an existing database.
+- **KITE_ALLOW_INSECURE_DEFAULTS**: Set to `true` only for local development to allow the public development encryption-key fallback. Do not set this in production.
 
 - **HOST**: Used for generating OAuth 2.0 authorization callback addresses, default will be obtained from request headers. If you find the result not as expected, you can manually configure this environment variable.
 

@@ -19,11 +19,13 @@ func TestRegisterBaseRoutes(t *testing.T) {
 	oldBuildDate := version.BuildDate
 	oldCommitID := version.CommitID
 	oldEnableVersionCheck := common.EnableVersionCheck
+	oldAppReady := appReady.Load()
 	defer func() {
 		version.Version = oldVersion
 		version.BuildDate = oldBuildDate
 		version.CommitID = oldCommitID
 		common.EnableVersionCheck = oldEnableVersionCheck
+		appReady.Store(oldAppReady)
 	}()
 
 	version.Version = "v1.2.3"
@@ -44,6 +46,24 @@ func TestRegisterBaseRoutes(t *testing.T) {
 		}
 		if got := strings.TrimSpace(rec.Body.String()); got != `{"status":"ok"}` {
 			t.Fatalf("body = %q, want %q", got, `{"status":"ok"}`)
+		}
+	})
+
+	t.Run("readyz", func(t *testing.T) {
+		appReady.Store(false)
+		req := httptest.NewRequest(http.MethodGet, "/readyz", nil)
+		rec := httptest.NewRecorder()
+		r.ServeHTTP(rec, req)
+		if rec.Code != http.StatusServiceUnavailable {
+			t.Fatalf("status = %d, want %d", rec.Code, http.StatusServiceUnavailable)
+		}
+
+		appReady.Store(true)
+		req = httptest.NewRequest(http.MethodGet, "/readyz", nil)
+		rec = httptest.NewRecorder()
+		r.ServeHTTP(rec, req)
+		if rec.Code != http.StatusOK {
+			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
 		}
 	})
 

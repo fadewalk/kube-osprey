@@ -5,6 +5,37 @@ import (
 	"testing"
 )
 
+func TestValidateEncryptionKey(t *testing.T) {
+	oldKey := KiteEncryptKey
+	oldAllow := AllowInsecureDefaults
+	defer func() {
+		KiteEncryptKey = oldKey
+		AllowInsecureDefaults = oldAllow
+	}()
+
+	KiteEncryptKey = "too-short"
+	AllowInsecureDefaults = false
+	if err := ValidateEncryptionKey(); err == nil {
+		t.Fatal("ValidateEncryptionKey() accepted a short key")
+	}
+
+	KiteEncryptKey = "kite-default-encryption-key-change-in-production"
+	if err := ValidateEncryptionKey(); err == nil {
+		t.Fatal("ValidateEncryptionKey() accepted the public default key")
+	}
+
+	AllowInsecureDefaults = true
+	if err := ValidateEncryptionKey(); err != nil {
+		t.Fatalf("ValidateEncryptionKey() with explicit development override = %v", err)
+	}
+
+	KiteEncryptKey = "a-strong-development-encryption-key-123456"
+	AllowInsecureDefaults = false
+	if err := ValidateEncryptionKey(); err != nil {
+		t.Fatalf("ValidateEncryptionKey() = %v", err)
+	}
+}
+
 func TestLoadEnvs(t *testing.T) {
 	old := struct {
 		JwtSecret            string

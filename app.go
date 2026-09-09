@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"sync/atomic"
 
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
@@ -16,17 +18,25 @@ import (
 	"k8s.io/klog/v2"
 )
 
+var appReady atomic.Bool
+
 func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
+	appReady.Store(false)
 	common.LoadEnvs()
+	if err := common.ValidateEncryptionKey(); err != nil {
+		return nil, err
+	}
 	if klog.V(1).Enabled() {
 		gin.SetMode(gin.DebugMode)
 	} else {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	model.InitDB()
+	if err := model.InitDB(); err != nil {
+		return nil, err
+	}
 	if _, err := model.GetGeneralSetting(); err != nil {
-		klog.Warningf("Failed to load general setting: %v", err)
+		return nil, fmt.Errorf("failed to load general setting: %w", err)
 	}
 
 	rbac.InitRBAC()
@@ -44,6 +54,7 @@ func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
 		klog.Warningf("Failed to watch config file: %v", err)
 	}
 	scheduler.Start(ctx, cm)
+	appReady.Store(true)
 	return cm, nil
 }
 

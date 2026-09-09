@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -19,7 +20,8 @@ import (
 var (
 	DB *gorm.DB
 
-	once sync.Once
+	once    sync.Once
+	initErr error
 )
 
 type Model struct {
@@ -28,7 +30,7 @@ type Model struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
-func InitDB() {
+func InitDB() error {
 	dsn := common.DBDSN
 	level := logger.Silent
 	if klog.V(10).Enabled() {
@@ -51,7 +53,8 @@ func InitDB() {
 		if common.DBType == "sqlite" {
 			DB, err = gorm.Open(sqlite.Open(dsn), cfg)
 			if err != nil {
-				panic("failed to connect database: " + err.Error())
+				err = fmt.Errorf("failed to connect database: %w", err)
+				return
 			}
 		}
 
@@ -66,20 +69,25 @@ func InitDB() {
 			}
 			DB, err = gorm.Open(mysql.Open(mysqlDSN), cfg)
 			if err != nil {
-				panic("failed to connect database: " + err.Error())
+				err = fmt.Errorf("failed to connect database: %w", err)
+				return
 			}
 		}
 
 		if common.DBType == "postgres" {
 			DB, err = gorm.Open(postgres.Open(dsn), cfg)
 			if err != nil {
-				panic("failed to connect database: " + err.Error())
+				err = fmt.Errorf("failed to connect database: %w", err)
+				return
 			}
 		}
 	})
 
+	if err != nil {
+		return err
+	}
 	if DB == nil {
-		panic("database connection is nil, check your DB_TYPE and DB_DSN settings")
+		return fmt.Errorf("database connection is nil, check your DB_TYPE and DB_DSN settings")
 	}
 
 	// For SQLite we must enable foreign key enforcement explicitly.
@@ -87,7 +95,7 @@ func InitDB() {
 	// not enforced unless PRAGMA foreign_keys = ON is set on the connection.
 	if common.DBType == "sqlite" {
 		if err := DB.Exec("PRAGMA foreign_keys = ON").Error; err != nil {
-			panic("failed to enable sqlite foreign keys: " + err.Error())
+			return fmt.Errorf("failed to enable sqlite foreign keys: %w", err)
 		}
 	}
 	models := []interface{}{
@@ -106,9 +114,8 @@ func InitDB() {
 		ScheduledTask{},
 	}
 	for _, model := range models {
-		err = DB.AutoMigrate(model)
-		if err != nil {
-			panic("failed to migrate database: " + err.Error())
+		if err := DB.AutoMigrate(model); err != nil {
+			return fmt.Errorf("failed to migrate database: %w", err)
 		}
 	}
 	sqldb, err := DB.DB()
@@ -117,4 +124,5 @@ func InitDB() {
 		sqldb.SetMaxIdleConns(common.DBMaxIdleConns)
 		sqldb.SetConnMaxLifetime(common.DBMaxIdleTime)
 	}
+	return nil
 }

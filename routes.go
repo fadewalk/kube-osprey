@@ -51,6 +51,13 @@ func registerBaseRoutes(r *gin.RouterGroup) {
 	r.GET("/healthz", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
+	r.GET("/readyz", func(c *gin.Context) {
+		if !appReady.Load() {
+			c.JSON(http.StatusServiceUnavailable, gin.H{"status": "not ready"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"status": "ready"})
+	})
 	r.GET("/api/v1/version", version.GetVersion)
 }
 
