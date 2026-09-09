@@ -2,11 +2,33 @@ package model
 
 import (
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/zxh326/kite/pkg/common"
 	"gorm.io/gorm"
 )
+
+func TestRedactResourceYAML(t *testing.T) {
+	input := `apiVersion: v1
+kind: Secret
+metadata:
+  name: demo
+  labels:
+    visible: keep
+data:
+  password: c2VjcmV0
+  nested:
+    access_token: abc
+`
+	got := RedactResourceYAML(input)
+	if strings.Contains(got, "c2VjcmV0") || strings.Contains(got, "abc") {
+		t.Fatalf("RedactResourceYAML leaked sensitive values: %s", got)
+	}
+	if !strings.Contains(got, "visible: keep") || !strings.Contains(got, "REDACTED") {
+		t.Fatalf("RedactResourceYAML removed non-sensitive data or marker: %s", got)
+	}
+}
 
 func TestSliceString_Scan(t *testing.T) {
 	tests := []struct {

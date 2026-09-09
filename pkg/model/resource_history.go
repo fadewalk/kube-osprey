@@ -1,8 +1,64 @@
 package model
 
 import (
+	"strings"
 	"time"
+
+	"sigs.k8s.io/yaml"
 )
+
+func RedactResourceYAML(value string) string {
+	if strings.TrimSpace(value) == "" {
+		return ""
+	}
+	var object interface{}
+	if err := yaml.Unmarshal([]byte(value), &object); err != nil {
+		return "[redacted: invalid resource content]"
+	}
+	if objectMap, ok := object.(map[string]interface{}); ok {
+		if kind, _ := objectMap["kind"].(string); strings.EqualFold(kind, "secret") {
+			if _, exists := objectMap["data"]; exists {
+				objectMap["data"] = "[REDACTED]"
+			}
+			if _, exists := objectMap["stringData"]; exists {
+				objectMap["stringData"] = "[REDACTED]"
+			}
+		}
+	}
+	redactSensitiveValue(object)
+	redacted, err := yaml.Marshal(object)
+	if err != nil {
+		return "[redacted: unable to serialize resource content]"
+	}
+	return string(redacted)
+}
+
+func redactSensitiveValue(value interface{}) {
+	switch current := value.(type) {
+	case map[string]interface{}:
+		for key, item := range current {
+			if isSensitiveField(key) {
+				current[key] = "[REDACTED]"
+				continue
+			}
+			redactSensitiveValue(item)
+		}
+	case []interface{}:
+		for _, item := range current {
+			redactSensitiveValue(item)
+		}
+	}
+}
+
+func isSensitiveField(key string) bool {
+	normalized := strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(key, "_", ""), "-", ""))
+	for _, marker := range []string{"password", "token", "secret", "privatekey", "clientsecret", "kubeconfig", "apikey", "accesskey", "refreshkey"} {
+		if strings.Contains(normalized, marker) {
+			return true
+		}
+	}
+	return false
+}
 
 type ResourceHistory struct {
 	ID          uint      `json:"id" gorm:"primarykey"`
