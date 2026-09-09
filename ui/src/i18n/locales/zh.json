@@ -836,7 +836,13 @@
       "title": "Kubectl",
       "description": "启用 kubectl 终端，配置运行镜像。",
       "form": {
-        "image": "镜像"
+        "image": "镜像",
+        "permissionMode": "权限模式",
+        "permissionOperator": "操作员（受限权限）",
+        "permissionAdmin": "管理员（cluster-admin）",
+        "permissionCustom": "自定义 ClusterRole",
+        "permissionModeDescription": "每次会话使用临时 ServiceAccount 并绑定所选角色。管理员模式授予完整 cluster-admin 权限，仅应用于 Break-glass 场景。",
+        "clusterRole": "ClusterRole"
       }
     },
     "nodeTerminal": {
@@ -873,6 +879,7 @@
       "modelRequired": "模型不能为空",
       "apiKeyRequired": "启用 AI Agent 时必须配置 API Key",
       "kubectlImageRequired": "启用 kubectl 时必须配置镜像",
+      "kubectlClusterRoleRequired": "自定义权限模式必须指定 ClusterRole",
       "nodeTerminalImageRequired": "节点终端镜像不能为空"
     },
     "messages": {

@@ -21,6 +21,15 @@ const GeneralAIProviderOpenAI = "openai"
 const GeneralAIProviderAnthropic = "anthropic"
 const DefaultGeneralAIProvider = GeneralAIProviderOpenAI
 
+const (
+	KubectlPermissionOperator = "operator"
+	KubectlPermissionAdmin    = "admin"
+	KubectlPermissionCustom   = "custom"
+	// Admin mode must be chosen explicitly; unknown/empty values fall back
+	// to the least privileged built-in profile.
+	DefaultKubectlPermissionMode = KubectlPermissionOperator
+)
+
 func DefaultGeneralNodeTerminalImageValue() string {
 	image := strings.TrimSpace(common.NodeTerminalImage)
 	if image == "" {
@@ -55,6 +64,8 @@ type GeneralSetting struct {
 	AIMaxTokens             int          `json:"aiMaxTokens" gorm:"column:ai_max_tokens;type:integer;default:16384"`
 	KubectlEnabled          bool         `json:"kubectlEnabled" gorm:"column:kubectl_enabled;type:boolean;not null;default:false"`
 	KubectlImage            string       `json:"kubectlImage" gorm:"column:kubectl_image;type:varchar(255);not null;default:'zzde/kubectl:latest'"`
+	KubectlPermissionMode   string       `json:"kubectlPermissionMode" gorm:"column:kubectl_permission_mode;type:varchar(20);not null;default:'operator'"`
+	KubectlClusterRole      string       `json:"kubectlClusterRole" gorm:"column:kubectl_cluster_role;type:varchar(253)"`
 	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
 	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
@@ -74,6 +85,22 @@ func NormalizeGeneralAIProvider(provider string) string {
 	default:
 		return GeneralAIProviderOpenAI
 	}
+}
+
+func NormalizeKubectlPermissionMode(mode string) string {
+	switch strings.ToLower(strings.TrimSpace(mode)) {
+	case KubectlPermissionAdmin:
+		return KubectlPermissionAdmin
+	case KubectlPermissionCustom:
+		return KubectlPermissionCustom
+	default:
+		return DefaultKubectlPermissionMode
+	}
+}
+
+func IsKubectlPermissionModeSupported(mode string) bool {
+	normalized := strings.ToLower(strings.TrimSpace(mode))
+	return normalized == KubectlPermissionAdmin || normalized == KubectlPermissionOperator || normalized == KubectlPermissionCustom
 }
 
 func IsGeneralAIProviderSupported(provider string) bool {
@@ -113,6 +140,11 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 			setting.KubectlImage = DefaultGeneralKubectlImageValue()
 			updates["kubectl_image"] = setting.KubectlImage
 		}
+		normalizedMode := NormalizeKubectlPermissionMode(setting.KubectlPermissionMode)
+		if setting.KubectlPermissionMode != normalizedMode {
+			setting.KubectlPermissionMode = normalizedMode
+			updates["kubectl_permission_mode"] = normalizedMode
+		}
 		if setting.NodeTerminalImage == "" {
 			setting.NodeTerminalImage = DefaultGeneralNodeTerminalImageValue()
 			updates["node_terminal_image"] = setting.NodeTerminalImage
@@ -137,19 +169,20 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 	}
 
 	setting = GeneralSetting{
-		Model:              Model{ID: 1},
-		AIAgentEnabled:     false,
-		AIProvider:         DefaultGeneralAIProvider,
-		AIModel:            DefaultGeneralAIModel,
-		AIMaxTokens:        16384,
-		KubectlEnabled:     false,
-		KubectlImage:       DefaultGeneralKubectlImageValue(),
-		NodeTerminalImage:  DefaultGeneralNodeTerminalImageValue(),
-		ClusterAgentImage:  DefaultGeneralClusterAgentImageValue(),
-		EnableAnalytics:    common.EnableAnalytics,
-		EnableVersionCheck: common.EnableVersionCheck,
-		EnableMFA:          true,
-		EnablePasskeyLogin: true,
+		Model:                 Model{ID: 1},
+		AIAgentEnabled:        false,
+		AIProvider:            DefaultGeneralAIProvider,
+		AIModel:               DefaultGeneralAIModel,
+		AIMaxTokens:           16384,
+		KubectlEnabled:        false,
+		KubectlImage:          DefaultGeneralKubectlImageValue(),
+		KubectlPermissionMode: DefaultKubectlPermissionMode,
+		NodeTerminalImage:     DefaultGeneralNodeTerminalImageValue(),
+		ClusterAgentImage:     DefaultGeneralClusterAgentImageValue(),
+		EnableAnalytics:       common.EnableAnalytics,
+		EnableVersionCheck:    common.EnableVersionCheck,
+		EnableMFA:             true,
+		EnablePasskeyLogin:    true,
 	}
 	if err := ensureJWTSecret(&setting, nil); err != nil {
 		return nil, err

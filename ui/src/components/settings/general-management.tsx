@@ -12,6 +12,7 @@ import { toast } from 'sonner'
 
 import {
   GeneralSettingUpdateRequest,
+  KubectlPermissionMode,
   updateGeneralSetting,
   useGeneralSetting,
 } from '@/lib/api'
@@ -46,6 +47,8 @@ interface GeneralSettingsFormData {
   aiMaxTokens: number
   kubectlEnabled: boolean
   kubectlImage: string
+  kubectlPermissionMode: KubectlPermissionMode
+  kubectlClusterRole: string
   nodeTerminalImage: string
   clusterAgentImage: string
   enableAnalytics: boolean
@@ -67,6 +70,8 @@ export function GeneralManagement() {
     aiMaxTokens: 16384,
     kubectlEnabled: false,
     kubectlImage: DEFAULT_KUBECTL_IMAGE,
+    kubectlPermissionMode: 'operator',
+    kubectlClusterRole: '',
     nodeTerminalImage: DEFAULT_NODE_TERMINAL_IMAGE,
     clusterAgentImage: DEFAULT_CLUSTER_AGENT_IMAGE,
     enableAnalytics: true,
@@ -86,6 +91,8 @@ export function GeneralManagement() {
       aiMaxTokens: data.aiMaxTokens || 16384,
       kubectlEnabled: data.kubectlEnabled ?? false,
       kubectlImage: data.kubectlImage || DEFAULT_KUBECTL_IMAGE,
+      kubectlPermissionMode: data.kubectlPermissionMode || 'operator',
+      kubectlClusterRole: data.kubectlClusterRole || '',
       nodeTerminalImage: data.nodeTerminalImage || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage: data.clusterAgentImage || DEFAULT_CLUSTER_AGENT_IMAGE,
       enableAnalytics: data.enableAnalytics ?? false,
@@ -147,6 +154,19 @@ export function GeneralManagement() {
       )
       return
     }
+    if (
+      formData.kubectlEnabled &&
+      formData.kubectlPermissionMode === 'custom' &&
+      !formData.kubectlClusterRole.trim()
+    ) {
+      toast.error(
+        t(
+          'generalManagement.errors.kubectlClusterRoleRequired',
+          'A ClusterRole is required in custom permission mode'
+        )
+      )
+      return
+    }
     if (!formData.nodeTerminalImage.trim()) {
       toast.error(
         t(
@@ -165,6 +185,8 @@ export function GeneralManagement() {
       aiMaxTokens: formData.aiMaxTokens || 16384,
       kubectlEnabled: formData.kubectlEnabled,
       kubectlImage: formData.kubectlImage.trim() || DEFAULT_KUBECTL_IMAGE,
+      kubectlPermissionMode: formData.kubectlPermissionMode,
+      kubectlClusterRole: formData.kubectlClusterRole.trim(),
       nodeTerminalImage:
         formData.nodeTerminalImage.trim() || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage:
@@ -381,6 +403,76 @@ export function GeneralManagement() {
                 }
                 placeholder={DEFAULT_KUBECTL_IMAGE}
               />
+
+              <div className="space-y-2">
+                <Label htmlFor="general-kubectl-permission-mode">
+                  {t(
+                    'generalManagement.kubectl.form.permissionMode',
+                    'Permission mode'
+                  )}
+                </Label>
+                <Select
+                  value={formData.kubectlPermissionMode}
+                  onValueChange={(value: KubectlPermissionMode) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      kubectlPermissionMode: value,
+                    }))
+                  }
+                >
+                  <SelectTrigger id="general-kubectl-permission-mode">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="operator">
+                      {t(
+                        'generalManagement.kubectl.form.permissionOperator',
+                        'Operator (limited permissions)'
+                      )}
+                    </SelectItem>
+                    <SelectItem value="admin">
+                      {t(
+                        'generalManagement.kubectl.form.permissionAdmin',
+                        'Admin (cluster-admin)'
+                      )}
+                    </SelectItem>
+                    <SelectItem value="custom">
+                      {t(
+                        'generalManagement.kubectl.form.permissionCustom',
+                        'Custom ClusterRole'
+                      )}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  {t(
+                    'generalManagement.kubectl.form.permissionModeDescription',
+                    'Each session runs with a temporary ServiceAccount bound to the selected role. Admin grants full cluster-admin access and should only be used for break-glass.'
+                  )}
+                </p>
+              </div>
+
+              {formData.kubectlPermissionMode === 'custom' && (
+                <div className="space-y-2">
+                  <Label htmlFor="general-kubectl-cluster-role">
+                    {t(
+                      'generalManagement.kubectl.form.clusterRole',
+                      'ClusterRole'
+                    )}
+                  </Label>
+                  <Input
+                    id="general-kubectl-cluster-role"
+                    value={formData.kubectlClusterRole}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        kubectlClusterRole: e.target.value,
+                      }))
+                    }
+                    placeholder="platform-operator"
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>

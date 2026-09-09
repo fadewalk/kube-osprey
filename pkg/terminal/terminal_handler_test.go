@@ -16,6 +16,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client/fake"
@@ -128,8 +129,8 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	kubectlHandler := &KubectlTerminalHandler{}
 	sessionID := "session-a"
 	sessionSA := sessionID + "-sa"
-	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, sessionSA, sessionID); err != nil {
-		t.Fatalf("ensureSessionAccess() error = %v", err)
+	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, sessionSA, sessionID, model.KubectlPermissionOperator, ""); err != nil {
+		t.Fatalf("ensureSessionAccess(operator) error = %v", err)
 	}
 	var serviceAccount corev1.ServiceAccount
 	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: sessionSA}, &serviceAccount); err != nil {
@@ -139,8 +140,51 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	if err := client.Get(ctx, types.NamespacedName{Name: sessionID}, &binding); err != nil {
 		t.Fatalf("loading session ClusterRoleBinding: %v", err)
 	}
-	if binding.RoleRef.Name != "cluster-admin" || len(binding.Subjects) != 1 || binding.Subjects[0].Name != sessionSA {
+	operatorRoleName := kubectlSessionOperatorRoleName(sessionID)
+	if binding.RoleRef.Name != operatorRoleName || len(binding.Subjects) != 1 || binding.Subjects[0].Name != sessionSA {
 		t.Fatalf("kubectl ClusterRoleBinding = %#v", binding)
+	}
+	var operatorRole rbacv1.ClusterRole
+	if err := client.Get(ctx, types.NamespacedName{Name: operatorRoleName}, &operatorRole); err != nil {
+		t.Fatalf("loading session operator ClusterRole: %v", err)
+	}
+	for _, rule := range operatorRole.Rules {
+		for _, resource := range rule.Resources {
+			if resource == "secrets" || resource == "*" {
+				t.Fatalf("operator session role must not grant %s: %#v", resource, rule)
+			}
+		}
+	}
+
+	adminSessionID := "session-admin"
+	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, adminSessionID+"-sa", adminSessionID, model.KubectlPermissionAdmin, ""); err != nil {
+		t.Fatalf("ensureSessionAccess(admin) error = %v", err)
+	}
+	var adminBinding rbacv1.ClusterRoleBinding
+	if err := client.Get(ctx, types.NamespacedName{Name: adminSessionID}, &adminBinding); err != nil {
+		t.Fatalf("loading admin session ClusterRoleBinding: %v", err)
+	}
+	if adminBinding.RoleRef.Name != "cluster-admin" {
+		t.Fatalf("admin session roleRef = %#v", adminBinding.RoleRef)
+	}
+
+	existingRole := &rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: "platform-operator"}}
+	if err := client.Create(ctx, existingRole); err != nil {
+		t.Fatalf("creating existing ClusterRole: %v", err)
+	}
+	customSessionID := "session-custom"
+	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, customSessionID+"-sa", customSessionID, model.KubectlPermissionCustom, "platform-operator"); err != nil {
+		t.Fatalf("ensureSessionAccess(custom) error = %v", err)
+	}
+	var customBinding rbacv1.ClusterRoleBinding
+	if err := client.Get(ctx, types.NamespacedName{Name: customSessionID}, &customBinding); err != nil {
+		t.Fatalf("loading custom session ClusterRoleBinding: %v", err)
+	}
+	if customBinding.RoleRef.Name != "platform-operator" {
+		t.Fatalf("custom session roleRef = %#v", customBinding.RoleRef)
+	}
+	if err := kubectlHandler.ensureSessionAccess(ctx, clientSet, "session-empty-sa", "session-empty", model.KubectlPermissionCustom, " "); err == nil {
+		t.Fatalf("custom mode without a ClusterRole should fail")
 	}
 
 	kubectlPodName, err := kubectlHandler.createKubectlAgent(ctx, clientSet, sessionID, sessionSA, "kubectl:v1")
@@ -174,7 +218,17 @@ func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testin
 	if err := client.Get(ctx, types.NamespacedName{Name: sessionID}, &rbacv1.ClusterRoleBinding{}); !apierrors.IsNotFound(err) {
 		t.Fatalf("session ClusterRoleBinding still exists or unexpected error: %v", err)
 	}
+	if err := client.Get(ctx, types.NamespacedName{Name: operatorRoleName}, &rbacv1.ClusterRole{}); !apierrors.IsNotFound(err) {
+		t.Fatalf("session ClusterRole still exists or unexpected error: %v", err)
+	}
 	if err := client.Get(ctx, types.NamespacedName{Namespace: common.AgentPodNamespace, Name: unrelated.Name}, &corev1.Pod{}); err != nil {
 		t.Fatalf("cleanup removed unrelated pod: %v", err)
+	}
+
+	if err := kubectlHandler.cleanupSessionAccess(clientSet, customSessionID+"-sa", customSessionID); err != nil {
+		t.Fatalf("cleanupSessionAccess(custom) error = %v", err)
+	}
+	if err := client.Get(ctx, types.NamespacedName{Name: "platform-operator"}, &rbacv1.ClusterRole{}); err != nil {
+		t.Fatalf("cleanup deleted the pre-existing custom ClusterRole: %v", err)
 	}
 }

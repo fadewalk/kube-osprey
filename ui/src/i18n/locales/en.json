@@ -825,7 +825,13 @@
       "title": "Kubectl",
       "description": "Enable kubectl terminal and configure runtime image.",
       "form": {
-        "image": "Image"
+        "image": "Image",
+        "permissionMode": "Permission mode",
+        "permissionOperator": "Operator (limited permissions)",
+        "permissionAdmin": "Admin (cluster-admin)",
+        "permissionCustom": "Custom ClusterRole",
+        "permissionModeDescription": "Each session runs with a temporary ServiceAccount bound to the selected role. Admin grants full cluster-admin access and should only be used for break-glass.",
+        "clusterRole": "ClusterRole"
       }
     },
     "nodeTerminal": {
@@ -862,6 +868,7 @@
       "modelRequired": "Model is required",
       "apiKeyRequired": "API Key is required when AI Agent is enabled",
       "kubectlImageRequired": "Kubectl image is required when kubectl is enabled",
+      "kubectlClusterRoleRequired": "A ClusterRole is required in custom permission mode",
       "nodeTerminalImageRequired": "Node terminal image is required"
     },
     "messages": {

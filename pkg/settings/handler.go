@@ -26,6 +26,8 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		"aiMaxTokens":           setting.AIMaxTokens,
 		"kubectlEnabled":        setting.KubectlEnabled,
 		"kubectlImage":          setting.KubectlImage,
+		"kubectlPermissionMode": setting.KubectlPermissionMode,
+		"kubectlClusterRole":    setting.KubectlClusterRole,
 		"nodeTerminalImage":     setting.NodeTerminalImage,
 		"clusterAgentImage":     setting.ClusterAgentImage,
 		"enableAnalytics":       setting.EnableAnalytics,
@@ -46,6 +48,8 @@ type UpdateGeneralSettingRequest struct {
 	AIMaxTokens           *int    `json:"aiMaxTokens"`
 	KubectlEnabled        *bool   `json:"kubectlEnabled"`
 	KubectlImage          *string `json:"kubectlImage"`
+	KubectlPermissionMode *string `json:"kubectlPermissionMode"`
+	KubectlClusterRole    *string `json:"kubectlClusterRole"`
 	NodeTerminalImage     *string `json:"nodeTerminalImage"`
 	ClusterAgentImage     *string `json:"clusterAgentImage"`
 	EnableAnalytics       *bool   `json:"enableAnalytics"`
@@ -120,6 +124,25 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if kubectlImage == "" {
 		kubectlImage = model.DefaultGeneralKubectlImageValue()
 	}
+	kubectlPermissionMode := model.NormalizeKubectlPermissionMode(currentSetting.KubectlPermissionMode)
+	if req.KubectlPermissionMode != nil {
+		incomingMode := strings.ToLower(strings.TrimSpace(*req.KubectlPermissionMode))
+		if incomingMode != "" {
+			if !model.IsKubectlPermissionModeSupported(incomingMode) {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported kubectlPermissionMode"})
+				return
+			}
+			kubectlPermissionMode = incomingMode
+		}
+	}
+	kubectlClusterRole := strings.TrimSpace(currentSetting.KubectlClusterRole)
+	if req.KubectlClusterRole != nil {
+		kubectlClusterRole = strings.TrimSpace(*req.KubectlClusterRole)
+	}
+	if kubectlPermissionMode == model.KubectlPermissionCustom && kubectlClusterRole == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "kubectlClusterRole is required when kubectlPermissionMode is custom"})
+		return
+	}
 	nodeTerminalImage := strings.TrimSpace(currentSetting.NodeTerminalImage)
 	if req.NodeTerminalImage != nil {
 		nodeTerminalImage = strings.TrimSpace(*req.NodeTerminalImage)
@@ -164,6 +187,12 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	}
 	if req.KubectlImage != nil {
 		updates["kubectl_image"] = kubectlImage
+	}
+	if req.KubectlPermissionMode != nil {
+		updates["kubectl_permission_mode"] = kubectlPermissionMode
+	}
+	if req.KubectlClusterRole != nil {
+		updates["kubectl_cluster_role"] = kubectlClusterRole
 	}
 	if req.NodeTerminalImage != nil {
 		updates["node_terminal_image"] = nodeTerminalImage
@@ -210,6 +239,8 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		"aiMaxTokens":           updated.AIMaxTokens,
 		"kubectlEnabled":        updated.KubectlEnabled,
 		"kubectlImage":          updated.KubectlImage,
+		"kubectlPermissionMode": updated.KubectlPermissionMode,
+		"kubectlClusterRole":    updated.KubectlClusterRole,
 		"nodeTerminalImage":     updated.NodeTerminalImage,
 		"clusterAgentImage":     updated.ClusterAgentImage,
 		"enableAnalytics":       updated.EnableAnalytics,

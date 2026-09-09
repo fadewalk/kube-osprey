@@ -359,6 +359,8 @@ export interface APIKeyCreateRequest {
   name: string
 }
 
+export type KubectlPermissionMode = 'admin' | 'operator' | 'custom'
+
 export interface GeneralSetting {
   aiAgentEnabled: boolean
   aiProvider: 'openai' | 'anthropic'
@@ -369,6 +371,8 @@ export interface GeneralSetting {
   aiMaxTokens: number
   kubectlEnabled: boolean
   kubectlImage: string
+  kubectlPermissionMode: KubectlPermissionMode
+  kubectlClusterRole: string
   nodeTerminalImage: string
   clusterAgentImage: string
   enableAnalytics: boolean
@@ -388,6 +392,8 @@ export interface GeneralSettingUpdateRequest {
   aiMaxTokens?: number
   kubectlEnabled?: boolean
   kubectlImage?: string
+  kubectlPermissionMode?: KubectlPermissionMode
+  kubectlClusterRole?: string
   nodeTerminalImage?: string
   clusterAgentImage?: string
   enableAnalytics?: boolean

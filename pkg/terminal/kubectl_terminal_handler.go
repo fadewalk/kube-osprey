@@ -22,7 +22,7 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 )
 
-const kubectlSessionRole = "kite-kubectl-session"
+const clusterAdminRole = "cluster-admin"
 
 func kubectlSessionServiceAccountName(instanceID string) string {
 	name := instanceID + "-sa"
@@ -30,6 +30,61 @@ func kubectlSessionServiceAccountName(instanceID string) string {
 		name = strings.TrimRight(name[:63], "-.")
 	}
 	return name
+}
+
+// kubectlSessionOperatorRoleName is the per-session ClusterRole bound in
+// operator mode. Session-scoped names avoid races between concurrent sessions.
+func kubectlSessionOperatorRoleName(sessionID string) string {
+	name := sessionID
+	if len(name) > 58 {
+		name = strings.TrimRight(name[:58], "-.")
+	}
+	return name + "-role"
+}
+
+// kubectlOperatorSessionRules mirrors the Cluster Agent operator profile:
+// read/write on common workload resources plus read-only cluster visibility.
+// Secrets, RBAC, and node mutation are intentionally excluded.
+func kubectlOperatorSessionRules() []rbacv1.PolicyRule {
+	readWrite := []string{"get", "list", "watch", "create", "update", "patch", "delete"}
+	readOnly := []string{"get", "list", "watch"}
+	return []rbacv1.PolicyRule{
+		{
+			APIGroups: []string{""},
+			Resources: []string{"pods", "pods/log", "pods/exec", "pods/attach", "pods/portforward", "services", "endpoints", "configmaps", "persistentvolumeclaims", "events"},
+			Verbs:     readWrite,
+		},
+		{
+			APIGroups: []string{"apps"},
+			Resources: []string{"deployments", "statefulsets", "daemonsets", "replicasets"},
+			Verbs:     readWrite,
+		},
+		{
+			APIGroups: []string{"batch"},
+			Resources: []string{"jobs", "cronjobs"},
+			Verbs:     readWrite,
+		},
+		{
+			APIGroups: []string{"networking.k8s.io"},
+			Resources: []string{"ingresses", "networkpolicies"},
+			Verbs:     readWrite,
+		},
+		{
+			APIGroups: []string{"policy", "autoscaling"},
+			Resources: []string{"poddisruptionbudgets", "horizontalpodautoscalers"},
+			Verbs:     readWrite,
+		},
+		{
+			APIGroups: []string{""},
+			Resources: []string{"namespaces", "nodes"},
+			Verbs:     readOnly,
+		},
+		{
+			APIGroups: []string{"metrics.k8s.io"},
+			Resources: []string{"pods", "nodes"},
+			Verbs:     []string{"get", "list"},
+		},
+	}
 }
 
 type KubectlTerminalHandler struct {
@@ -68,7 +123,7 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 
 		instanceID := utils.GenerateKubectlAgentName(user.Key())
 		sessionSA := kubectlSessionServiceAccountName(instanceID)
-		if err := h.ensureSessionAccess(ctx, cs, sessionSA, instanceID); err != nil {
+		if err := h.ensureSessionAccess(ctx, cs, sessionSA, instanceID, setting.KubectlPermissionMode, setting.KubectlClusterRole); err != nil {
 			klog.Errorf("Failed to setup kubectl session access: %v", err)
 			ws.SendErrorMessage(fmt.Sprintf("Failed to setup kubectl terminal: %v", err))
 			return
@@ -102,7 +157,7 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 	})
 }
 
-func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cluster.ClientSet, serviceAccountName, sessionID string) error {
+func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cluster.ClientSet, serviceAccountName, sessionID, permissionMode, clusterRole string) error {
 	labels := map[string]string{
 		"app.kubernetes.io/managed-by": "kite",
 		"kite.io/component":            "kubectl-terminal",
@@ -112,13 +167,37 @@ func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cl
 	if err := cs.K8sClient.Create(ctx, sa); err != nil {
 		return fmt.Errorf("failed to create session ServiceAccount: %w", err)
 	}
+
+	roleRef := rbacv1.RoleRef{Kind: "ClusterRole", APIGroup: "rbac.authorization.k8s.io"}
+	switch model.NormalizeKubectlPermissionMode(permissionMode) {
+	case model.KubectlPermissionAdmin:
+		roleRef.Name = clusterAdminRole
+	case model.KubectlPermissionCustom:
+		roleRef.Name = strings.TrimSpace(clusterRole)
+	default:
+		operatorRole := &rbacv1.ClusterRole{
+			ObjectMeta: metav1.ObjectMeta{Name: kubectlSessionOperatorRoleName(sessionID), Labels: labels},
+			Rules:      kubectlOperatorSessionRules(),
+		}
+		if err := cs.K8sClient.Create(ctx, operatorRole); err != nil {
+			_ = cs.K8sClient.Delete(ctx, sa)
+			return fmt.Errorf("failed to create session ClusterRole: %w", err)
+		}
+		roleRef.Name = operatorRole.Name
+	}
+	if roleRef.Name == "" {
+		_ = cs.K8sClient.Delete(ctx, sa)
+		return fmt.Errorf("custom kubectl permission mode requires an existing ClusterRole")
+	}
+
 	crb := &rbacv1.ClusterRoleBinding{
 		ObjectMeta: metav1.ObjectMeta{Name: sessionID, Labels: labels},
 		Subjects:   []rbacv1.Subject{{Kind: "ServiceAccount", Name: serviceAccountName, Namespace: common.AgentPodNamespace}},
-		RoleRef:    rbacv1.RoleRef{Kind: "ClusterRole", Name: "cluster-admin", APIGroup: "rbac.authorization.k8s.io"},
+		RoleRef:    roleRef,
 	}
 	if err := cs.K8sClient.Create(ctx, crb); err != nil {
 		_ = cs.K8sClient.Delete(ctx, sa)
+		_ = cs.K8sClient.Delete(ctx, &rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: kubectlSessionOperatorRoleName(sessionID)}})
 		return fmt.Errorf("failed to create session ClusterRoleBinding: %w", err)
 	}
 	return nil
@@ -127,6 +206,11 @@ func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cl
 func (h *KubectlTerminalHandler) cleanupSessionAccess(cs *cluster.ClientSet, serviceAccountName, sessionID string) error {
 	ctx := context.TODO()
 	if err := cs.K8sClient.Delete(ctx, &rbacv1.ClusterRoleBinding{ObjectMeta: metav1.ObjectMeta{Name: sessionID}}); client.IgnoreNotFound(err) != nil {
+		return err
+	}
+	// The session ClusterRole only exists in operator mode; IgnoreNotFound
+	// makes this a no-op for admin/custom sessions.
+	if err := cs.K8sClient.Delete(ctx, &rbacv1.ClusterRole{ObjectMeta: metav1.ObjectMeta{Name: kubectlSessionOperatorRoleName(sessionID)}}); client.IgnoreNotFound(err) != nil {
 		return err
 	}
 	if err := cs.K8sClient.Delete(ctx, &corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: serviceAccountName, Namespace: common.AgentPodNamespace}}); client.IgnoreNotFound(err) != nil {
