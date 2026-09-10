@@ -42,9 +42,9 @@ func kubectlSessionOperatorRoleName(sessionID string) string {
 	return name + "-role"
 }
 
-// kubectlOperatorSessionRules mirrors the Cluster Agent operator profile:
-// read/write on common workload resources plus read-only cluster visibility.
-// Secrets, RBAC, and node mutation are intentionally excluded.
+// kubectlOperatorSessionRules is the limited profile for interactive kubectl
+// sessions. Unlike the Cluster Agent operator profile it does not read
+// Secrets; Secrets, RBAC, and node mutation are intentionally excluded.
 func kubectlOperatorSessionRules() []rbacv1.PolicyRule {
 	readWrite := []string{"get", "list", "watch", "create", "update", "patch", "delete"}
 	readOnly := []string{"get", "list", "watch"}

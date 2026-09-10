@@ -51,7 +51,16 @@ Review these areas separately:
 
 Avoid wildcard rules such as `apiGroups: ["*"]`, `resources: ["*"]`, and `verbs: ["*"]` for production unless the installation is intentionally an administrator-only break-glass system.
 
-The generated Cluster Agent manifest currently represents a high-trust deployment. Review and reduce its permissions before using it in a shared or regulated cluster.
+Cluster Agent manifests support permission profiles:
+
+- `readOnly`: read-only on all resources.
+- `operator`: read/write on common workload resources (pods including exec/attach/portforward, services, configmaps, PVCs, deployments, statefulsets, daemonsets, replicasets, jobs, cronjobs, ingresses, network policies, PDBs, HPAs) plus read-only on namespaces, nodes, persistent volumes, storage classes, events, CRDs, metrics, and Secrets. Secret and RBAC mutation is excluded.
+- `admin`: binds `cluster-admin` (legacy high-trust behavior).
+- `custom`: binds an existing ClusterRole of your choice.
+
+The default profile is `admin` for backward compatibility; prefer `operator` or `readOnly` for production. Note that Secrets are readable under `operator` because the Kite console and Helm release browsing read Secret-backed data; use `custom` if that is unacceptable.
+
+ClusterRoleBinding `roleRef` is immutable in Kubernetes. When switching an existing Cluster Agent to a different profile, delete the `kite-cluster-agent` ClusterRoleBinding before applying the new manifest.
 
 ## Terminal and exec capabilities
 
@@ -85,6 +94,7 @@ The default SQLite setup is suitable for evaluation only. Without a persistent v
 - Rotate or revoke the Agent token after suspected exposure.
 - Verify the Agent image and digest before applying the manifest.
 - Inspect the ServiceAccount, ClusterRoleBinding, Secret, and Deployment before applying.
+- When changing the permission profile, delete the existing `kite-cluster-agent` ClusterRoleBinding first (`roleRef` cannot be updated in place).
 - Ensure the reverse proxy supports WebSocket upgrade and long-lived connections.
 - For multiple Kite replicas, validate session routing and shared state before production use.
 
@@ -122,7 +132,7 @@ Check readiness separately from process liveness. A process can be running while
 The following items require separate design work rather than a blind permission reduction:
 
 - Cluster Agent currently uses its registered Kubernetes credentials when forwarding requests; it does not impersonate the Kite user at the Kubernetes API.
-- kubectl and node terminal require stronger break-glass controls and more narrowly scoped identities.
+- kubectl terminal sessions now support configurable permission modes (`admin` / `operator` / `custom`) with per-session roles; node terminal still requires break-glass controls and a more narrowly scoped identity.
 - Encryption-key rotation needs a migration path for existing `SecretString` values.
 - Raw PromQL is not namespace-rewritten by Kite. Multi-tenant Prometheus isolation must be provided by the metrics architecture or a restricted query model.
 - Passkey ceremonies, Cluster Agent sessions, and other in-memory state need shared storage before a multi-replica deployment is considered fully supported.

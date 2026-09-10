@@ -57,7 +57,16 @@ resources: ["*"]
 verbs: ["*"]
 ```
 
-当前生成的 Cluster Agent Manifest 代表高信任部署方式。在共享或受监管集群中使用前，应审查并收紧其权限。
+Cluster Agent Manifest 支持权限档位：
+
+- `readOnly`：全资源只读。
+- `operator`：常见工作负载资源可读写（pods 含 exec/attach/portforward、services、configmaps、PVC、deployments、statefulsets、daemonsets、replicasets、jobs、cronjobs、ingresses、networkpolicies、PDB、HPA），并对 namespaces、nodes、PV、StorageClass、events、CRD、metrics、Secrets 只读；不授予 Secret 和 RBAC 的写权限。
+- `admin`：绑定 `cluster-admin`（兼容旧的高信任行为）。
+- `custom`：绑定指定的已有 ClusterRole。
+
+默认档位为 `admin`（向后兼容）；生产环境建议使用 `operator` 或 `readOnly`。注意 `operator` 档位可以读 Secrets（Kite 控制台的 Secret 页面和 Helm Release 浏览依赖 Secret 数据）；如不可接受请使用 `custom`。
+
+Kubernetes 中 ClusterRoleBinding 的 `roleRef` 不可修改。切换已有 Cluster Agent 的权限档位时，必须先删除 `kite-cluster-agent` ClusterRoleBinding，再应用新 Manifest。
 
 ## 终端与 exec 能力
 
@@ -91,6 +100,7 @@ PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Pro
 - 怀疑泄露后及时轮换或吊销 Agent Token；
 - 应用 Manifest 前验证 Agent 镜像和 digest；
 - 应用前检查 ServiceAccount、ClusterRoleBinding、Secret 和 Deployment；
+- 切换权限档位时，先删除已有的 `kite-cluster-agent` ClusterRoleBinding（`roleRef` 无法原地更新）；
 - 确保反向代理支持 WebSocket Upgrade 和长连接；
 - 多副本部署前验证会话路由和共享状态。
 

@@ -117,8 +117,20 @@ func agentRole(permission, customRole string) (string, string) {
   verbs: ["get", "list", "watch"]`)
 	case "operator":
 		return "kite-cluster-agent-operator", clusterRoleManifest("kite-cluster-agent-operator", `- apiGroups: [""]
-  resources: ["pods", "pods/log", "services", "endpoints", "configmaps", "persistentvolumeclaims"]
+  resources: ["pods"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["pods/log", "pods/exec", "pods/attach", "pods/portforward"]
+  verbs: ["get", "create"]
+- apiGroups: [""]
+  resources: ["services", "endpoints", "configmaps", "persistentvolumeclaims"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: [""]
+  resources: ["events", "namespaces", "nodes", "persistentvolumes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
   resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
@@ -130,7 +142,16 @@ func agentRole(permission, customRole string) (string, string) {
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: ["policy", "autoscaling"]
   resources: ["poddisruptionbudgets", "horizontalpodautoscalers"]
-  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]`)
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["pods", "nodes"]
+  verbs: ["get", "list"]
+- apiGroups: ["apiextensions.k8s.io"]
+  resources: ["customresourcedefinitions"]
+  verbs: ["get", "list", "watch"]`)
 	case "custom":
 		role := strings.TrimSpace(customRole)
 		if role != "" {
