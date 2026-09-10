@@ -66,6 +66,7 @@ type GeneralSetting struct {
 	KubectlImage            string       `json:"kubectlImage" gorm:"column:kubectl_image;type:varchar(255);not null;default:'zzde/kubectl:latest'"`
 	KubectlPermissionMode   string       `json:"kubectlPermissionMode" gorm:"column:kubectl_permission_mode;type:varchar(20);not null;default:'operator'"`
 	KubectlClusterRole      string       `json:"kubectlClusterRole" gorm:"column:kubectl_cluster_role;type:varchar(253)"`
+	NodeTerminalEnabled     bool         `json:"nodeTerminalEnabled" gorm:"column:node_terminal_enabled;type:boolean;not null;default:false"`
 	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
 	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`

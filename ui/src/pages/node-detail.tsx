@@ -23,6 +23,7 @@ import {
   useResources,
   useResourcesEvents,
 } from '@/lib/api'
+import { useAuth } from '@/contexts/auth-context'
 import { getEventTime } from '@/lib/k8s'
 import {
   cn,
@@ -91,6 +92,9 @@ export function NodeDetail(props: { name: string }) {
   })
 
   const [untaintKey, setUntaintKey] = useState('')
+
+  const { user, capabilities } = useAuth()
+  const nodeTerminalAvailable = (user?.isAdmin() ?? false) && capabilities.nodeTerminalEnabled
 
   const { data, isLoading, isError, error, refetch } = useResource(
     'nodes',
@@ -213,11 +217,15 @@ export function NodeDetail(props: { name: string }) {
       label: t('common.tabs.monitor'),
       content: <NodeMonitoring name={name} />,
     },
-    {
-      value: 'terminal',
-      label: t('common.tabs.terminal'),
-      content: <Terminal type="node" nodeName={name} />,
-    },
+    ...(nodeTerminalAvailable
+      ? [
+          {
+            value: 'terminal',
+            label: t('common.tabs.terminal'),
+            content: <Terminal type="node" nodeName={name} />,
+          },
+        ]
+      : []),
     {
       value: 'events',
       label: t('common.tabs.events'),

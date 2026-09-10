@@ -49,6 +49,7 @@ interface GeneralSettingsFormData {
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
   kubectlClusterRole: string
+  nodeTerminalEnabled: boolean
   nodeTerminalImage: string
   clusterAgentImage: string
   enableAnalytics: boolean
@@ -72,6 +73,7 @@ export function GeneralManagement() {
     kubectlImage: DEFAULT_KUBECTL_IMAGE,
     kubectlPermissionMode: 'operator',
     kubectlClusterRole: '',
+    nodeTerminalEnabled: false,
     nodeTerminalImage: DEFAULT_NODE_TERMINAL_IMAGE,
     clusterAgentImage: DEFAULT_CLUSTER_AGENT_IMAGE,
     enableAnalytics: true,
@@ -93,6 +95,7 @@ export function GeneralManagement() {
       kubectlImage: data.kubectlImage || DEFAULT_KUBECTL_IMAGE,
       kubectlPermissionMode: data.kubectlPermissionMode || 'operator',
       kubectlClusterRole: data.kubectlClusterRole || '',
+      nodeTerminalEnabled: data.nodeTerminalEnabled ?? false,
       nodeTerminalImage: data.nodeTerminalImage || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage: data.clusterAgentImage || DEFAULT_CLUSTER_AGENT_IMAGE,
       enableAnalytics: data.enableAnalytics ?? false,
@@ -187,6 +190,7 @@ export function GeneralManagement() {
       kubectlImage: formData.kubectlImage.trim() || DEFAULT_KUBECTL_IMAGE,
       kubectlPermissionMode: formData.kubectlPermissionMode,
       kubectlClusterRole: formData.kubectlClusterRole.trim(),
+      nodeTerminalEnabled: formData.nodeTerminalEnabled,
       nodeTerminalImage:
         formData.nodeTerminalImage.trim() || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage:
@@ -477,36 +481,55 @@ export function GeneralManagement() {
           )}
         </div>
 
-        <div className="rounded-lg border p-3">
-          <div className="space-y-1">
-            <Label className="flex items-center gap-2 text-sm font-medium">
-              <IconTerminal2 className="h-4 w-4" />
-              {t('generalManagement.nodeTerminal.title', 'Node Terminal')}
-            </Label>
-            <p className="text-xs text-muted-foreground">
-              {t(
-                'generalManagement.nodeTerminal.description',
-                'Configure runtime image used for node terminal sessions.'
-              )}
-            </p>
-          </div>
-
-          <div className="mt-3 space-y-2">
-            <Label htmlFor="general-node-terminal-image">
-              {t('generalManagement.nodeTerminal.form.image', 'Image')}
-            </Label>
-            <Input
-              id="general-node-terminal-image"
-              value={formData.nodeTerminalImage}
-              onChange={(e) =>
+        <div className="rounded-lg border">
+          <div className="flex items-center justify-between p-3">
+            <div className="space-y-1">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <IconTerminal2 className="h-4 w-4" />
+                {t('generalManagement.nodeTerminal.title', 'Node Terminal')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.nodeTerminal.description',
+                  'Node terminal grants a privileged host shell and is disabled by default.'
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={formData.nodeTerminalEnabled}
+              onCheckedChange={(checked) =>
                 setFormData((prev) => ({
                   ...prev,
-                  nodeTerminalImage: e.target.value,
+                  nodeTerminalEnabled: checked,
                 }))
               }
-              placeholder={DEFAULT_NODE_TERMINAL_IMAGE}
             />
           </div>
+
+          {formData.nodeTerminalEnabled && (
+            <div className="space-y-2 border-t p-3">
+              <Label htmlFor="general-node-terminal-image">
+                {t('generalManagement.nodeTerminal.form.image', 'Image')}
+              </Label>
+              <Input
+                id="general-node-terminal-image"
+                value={formData.nodeTerminalImage}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    nodeTerminalImage: e.target.value,
+                  }))
+                }
+                placeholder={DEFAULT_NODE_TERMINAL_IMAGE}
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.nodeTerminal.form.enabledWarning',
+                  'Sessions run as a privileged root shell on the node. Only admins can open them; keep this off unless required.'
+                )}
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="rounded-lg border p-3">

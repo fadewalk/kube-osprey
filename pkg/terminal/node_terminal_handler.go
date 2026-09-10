@@ -46,6 +46,12 @@ func (h *NodeTerminalHandler) HandleNodeTerminalWebSocket(c *gin.Context) {
 			ws.SendErrorMessage(rbac.NoAccess(user.Key(), string(common.VerbExec), string(common.Nodes), "", cs.Name))
 			return
 		}
+		// Node terminal grants a privileged host shell: restrict it to
+		// admins who explicitly enabled the capability.
+		if !rbac.UserHasRole(user, model.DefaultAdminRole.Name) {
+			ws.SendErrorMessage("node terminal is only available to admin users")
+			return
+		}
 		node, err := cs.K8sClient.ClientSet.CoreV1().Nodes().Get(ctx, nodeName, metav1.GetOptions{})
 		if err != nil {
 			klog.Errorf("Failed to get node %s: %v", nodeName, err)
@@ -61,6 +67,10 @@ func (h *NodeTerminalHandler) HandleNodeTerminalWebSocket(c *gin.Context) {
 		if err != nil {
 			klog.Errorf("Failed to load general setting: %v", err)
 			ws.SendErrorMessage(fmt.Sprintf("Failed to load settings: %v", err))
+			return
+		}
+		if !setting.NodeTerminalEnabled {
+			ws.SendErrorMessage("node terminal is disabled")
 			return
 		}
 		nodeTerminalImage := strings.TrimSpace(setting.NodeTerminalImage)

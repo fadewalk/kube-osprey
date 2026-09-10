@@ -836,9 +836,10 @@
     },
     "nodeTerminal": {
       "title": "Node Terminal",
-      "description": "Configure runtime image used for node terminal sessions.",
+      "description": "Node terminal grants a privileged host shell and is disabled by default.",
       "form": {
-        "image": "Image"
+        "image": "Image",
+        "enabledWarning": "Sessions run as a privileged root shell on the node. Only admins can open them; keep this off unless required."
       }
     },
     "clusterAgent": {

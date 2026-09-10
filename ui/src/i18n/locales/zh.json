@@ -847,9 +847,10 @@
     },
     "nodeTerminal": {
       "title": "节点终端",
-      "description": "配置 Node Terminal 使用的运行镜像。",
+      "description": "节点终端会获得节点上的特权 root shell，默认关闭。",
       "form": {
-        "image": "镜像"
+        "image": "镜像",
+        "enabledWarning": "会话以特权 root shell 运行在节点上，仅管理员可打开；除非确有需要，请保持关闭。"
       }
     },
     "clusterAgent": {

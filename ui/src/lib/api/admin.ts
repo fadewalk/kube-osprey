@@ -373,6 +373,7 @@ export interface GeneralSetting {
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
   kubectlClusterRole: string
+  nodeTerminalEnabled: boolean
   nodeTerminalImage: string
   clusterAgentImage: string
   enableAnalytics: boolean
@@ -394,6 +395,7 @@ export interface GeneralSettingUpdateRequest {
   kubectlImage?: string
   kubectlPermissionMode?: KubectlPermissionMode
   kubectlClusterRole?: string
+  nodeTerminalEnabled?: boolean
   nodeTerminalImage?: string
   clusterAgentImage?: string
   enableAnalytics?: boolean

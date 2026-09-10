@@ -28,6 +28,7 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		"kubectlImage":          setting.KubectlImage,
 		"kubectlPermissionMode": setting.KubectlPermissionMode,
 		"kubectlClusterRole":    setting.KubectlClusterRole,
+		"nodeTerminalEnabled":   setting.NodeTerminalEnabled,
 		"nodeTerminalImage":     setting.NodeTerminalImage,
 		"clusterAgentImage":     setting.ClusterAgentImage,
 		"enableAnalytics":       setting.EnableAnalytics,
@@ -50,6 +51,7 @@ type UpdateGeneralSettingRequest struct {
 	KubectlImage          *string `json:"kubectlImage"`
 	KubectlPermissionMode *string `json:"kubectlPermissionMode"`
 	KubectlClusterRole    *string `json:"kubectlClusterRole"`
+	NodeTerminalEnabled   *bool   `json:"nodeTerminalEnabled"`
 	NodeTerminalImage     *string `json:"nodeTerminalImage"`
 	ClusterAgentImage     *string `json:"clusterAgentImage"`
 	EnableAnalytics       *bool   `json:"enableAnalytics"`
@@ -194,6 +196,9 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if req.KubectlClusterRole != nil {
 		updates["kubectl_cluster_role"] = kubectlClusterRole
 	}
+	if req.NodeTerminalEnabled != nil {
+		updates["node_terminal_enabled"] = *req.NodeTerminalEnabled
+	}
 	if req.NodeTerminalImage != nil {
 		updates["node_terminal_image"] = nodeTerminalImage
 	}
@@ -241,6 +246,7 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		"kubectlImage":          updated.KubectlImage,
 		"kubectlPermissionMode": updated.KubectlPermissionMode,
 		"kubectlClusterRole":    updated.KubectlClusterRole,
+		"nodeTerminalEnabled":   updated.NodeTerminalEnabled,
 		"nodeTerminalImage":     updated.NodeTerminalImage,
 		"clusterAgentImage":     updated.ClusterAgentImage,
 		"enableAnalytics":       updated.EnableAnalytics,

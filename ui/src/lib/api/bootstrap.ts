@@ -11,6 +11,7 @@ export interface BootstrapSetup {
 export interface BootstrapCapabilities {
   aiEnabled: boolean
   kubectlEnabled: boolean
+  nodeTerminalEnabled: boolean
 }
 
 export interface AuthProviderCatalog {

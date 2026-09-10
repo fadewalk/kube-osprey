@@ -53,6 +53,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 const defaultCapabilities: BootstrapCapabilities = {
   aiEnabled: false,
   kubectlEnabled: false,
+  nodeTerminalEnabled: false,
 }
 
 export function useAuth() {
