@@ -1,12 +1,13 @@
-import { useMemo, type ReactNode } from 'react'
-import type { ObjectMeta } from 'kubernetes-types/meta/v1'
+import { useMemo } from 'react'
+import type { ResourceOverviewProps as PluginResourceOverviewProps } from '@kite-dev/plugin-sdk/ui'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import type { ResourceType } from '@/types/api'
 import { useRelatedResources, useResourcesEvents } from '@/lib/api'
-import { getEventTime, getOwnerInfo } from '@/lib/k8s'
+import { getEventTime } from '@/lib/k8s'
 import { formatDate } from '@/lib/utils'
+import { useOwnerInfo } from '@/hooks/use-owner-info'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   WorkloadInfoBlock,
@@ -19,11 +20,11 @@ import {
   MetadataListCard,
 } from './pod-overview-sidebar'
 
-export interface ResourceOverviewField {
-  label: ReactNode
-  value: ReactNode
-  mono?: boolean
-  truncate?: boolean
+interface ResourceOverviewProps extends Omit<
+  PluginResourceOverviewProps,
+  'resource'
+> {
+  resourceType: ResourceType
 }
 
 export function ResourceOverview({
@@ -33,14 +34,8 @@ export function ResourceOverview({
   metadata,
   fields,
   children,
-}: {
-  resourceType: ResourceType
-  name: string
-  namespace?: string
-  metadata?: ObjectMeta
-  fields?: ResourceOverviewField[]
-  children?: ReactNode
-}) {
+  relatedResources,
+}: ResourceOverviewProps) {
   const { t } = useTranslation()
   const labels = metadata?.labels || {}
   const annotations = metadata?.annotations || {}
@@ -49,8 +44,6 @@ export function ResourceOverview({
     name,
     namespace
   )
-  const { data: relatedResources, isLoading: isRelatedLoading } =
-    useRelatedResources(resourceType, name, namespace)
   const sortedEvents = useMemo(() => {
     return (events || []).slice().sort((a, b) => {
       const timeDiff = getEventTime(b).getTime() - getEventTime(a).getTime()
@@ -63,7 +56,7 @@ export function ResourceOverview({
       )
     })
   }, [events])
-  const ownerInfo = getOwnerInfo(metadata)
+  const ownerInfo = useOwnerInfo(metadata)
 
   return (
     <div className="@container/resource-overview">
@@ -88,12 +81,18 @@ export function ResourceOverview({
                     truncate={!!ownerInfo}
                   >
                     {ownerInfo ? (
-                      <Link
-                        to={ownerInfo.path}
-                        className="app-link inline-block max-w-full truncate"
-                      >
-                        {ownerInfo.kind}/{ownerInfo.name}
-                      </Link>
+                      ownerInfo.path ? (
+                        <Link
+                          to={ownerInfo.path}
+                          className="app-link inline-block max-w-full truncate"
+                        >
+                          {ownerInfo.kind}/{ownerInfo.name}
+                        </Link>
+                      ) : (
+                        <span>
+                          {ownerInfo.kind}/{ownerInfo.name}
+                        </span>
+                      )
                     ) : (
                       <span className="text-muted-foreground">
                         {t('common.values.none')}
@@ -117,12 +116,6 @@ export function ResourceOverview({
                   </div>
                 ) : null}
 
-                {children ? (
-                  <div className="border-t border-border/60 pt-3">
-                    {children}
-                  </div>
-                ) : null}
-
                 <div className="border-t border-border/60 pt-2">
                   <WorkloadInfoRow
                     label={t('common.fields.uid')}
@@ -136,6 +129,7 @@ export function ResourceOverview({
               </div>
             </CardContent>
           </Card>
+          {children}
         </div>
 
         <div className="space-y-3">
@@ -143,10 +137,15 @@ export function ResourceOverview({
             events={sortedEvents}
             isLoading={isEventsLoading}
           />
-          <CompactRelatedResourcesCard
-            resources={relatedResources || []}
-            isLoading={isRelatedLoading}
-          />
+          {relatedResources === undefined ? (
+            <RelatedResourcesCard
+              resourceType={resourceType}
+              name={name}
+              namespace={namespace}
+            />
+          ) : (
+            relatedResources
+          )}
           {Object.keys(labels).length > 0 ? (
             <MetadataListCard title="common.fields.labels" entries={labels} />
           ) : null}
@@ -159,5 +158,20 @@ export function ResourceOverview({
         </div>
       </div>
     </div>
+  )
+}
+
+function RelatedResourcesCard({
+  resourceType,
+  name,
+  namespace,
+}: {
+  resourceType: ResourceType
+  name: string
+  namespace?: string
+}) {
+  const { data, isLoading } = useRelatedResources(resourceType, name, namespace)
+  return (
+    <CompactRelatedResourcesCard resources={data ?? []} isLoading={isLoading} />
   )
 }

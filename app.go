@@ -12,8 +12,10 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/middleware"
 	"github.com/zxh326/kite/pkg/model"
+	"github.com/zxh326/kite/pkg/plugins"
 	"github.com/zxh326/kite/pkg/rbac"
 	"github.com/zxh326/kite/pkg/scheduler"
+	"github.com/zxh326/kite/pkg/telemetry"
 	"github.com/zxh326/kite/pkg/templates"
 	"k8s.io/klog/v2"
 )
@@ -54,6 +56,8 @@ func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
 		klog.Warningf("Failed to watch config file: %v", err)
 	}
 	scheduler.Start(ctx, cm)
+	plugins.Start(ctx)
+	telemetry.Start(ctx, cm)
 	appReady.Store(true)
 	return cm, nil
 }

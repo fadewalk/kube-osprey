@@ -69,6 +69,7 @@ export type ResourceIconName = keyof typeof resourceIconMap
 
 interface ResourceCatalogEntryBase {
   type: string
+  apiGroup?: string
   singular: string
   singularLabel: string
   pluralLabel: string
@@ -97,6 +98,7 @@ export const sidebarGroupOrder = [
 export const resourceCatalog = [
   {
     type: 'pods',
+    apiGroup: '',
     singular: 'pod',
     singularLabel: 'Pod',
     pluralLabel: 'Pods',
@@ -107,6 +109,7 @@ export const resourceCatalog = [
   },
   {
     type: 'deployments',
+    apiGroup: 'apps',
     singular: 'deployment',
     singularLabel: 'Deployment',
     pluralLabel: 'Deployments',
@@ -118,6 +121,7 @@ export const resourceCatalog = [
   },
   {
     type: 'statefulsets',
+    apiGroup: 'apps',
     singular: 'statefulset',
     singularLabel: 'StatefulSet',
     pluralLabel: 'StatefulSets',
@@ -129,6 +133,7 @@ export const resourceCatalog = [
   },
   {
     type: 'daemonsets',
+    apiGroup: 'apps',
     singular: 'daemonset',
     singularLabel: 'DaemonSet',
     pluralLabel: 'DaemonSets',
@@ -140,6 +145,7 @@ export const resourceCatalog = [
   },
   {
     type: 'jobs',
+    apiGroup: 'batch',
     singular: 'job',
     singularLabel: 'Job',
     pluralLabel: 'Jobs',
@@ -151,6 +157,7 @@ export const resourceCatalog = [
   },
   {
     type: 'cronjobs',
+    apiGroup: 'batch',
     singular: 'cronjob',
     singularLabel: 'CronJob',
     pluralLabel: 'CronJobs',
@@ -161,6 +168,7 @@ export const resourceCatalog = [
   },
   {
     type: 'services',
+    apiGroup: '',
     singular: 'service',
     singularLabel: 'Service',
     pluralLabel: 'Services',
@@ -170,27 +178,8 @@ export const resourceCatalog = [
     sidebar: { groupKey: 'sidebar.groups.traffic', order: 2 },
   },
   {
-    type: 'gateways',
-    singular: 'gateway',
-    singularLabel: 'Gateway',
-    pluralLabel: 'Gateways',
-    clusterScope: false,
-    titleKey: 'nav.gateways',
-    icon: 'IconLoadBalancer',
-    sidebar: { groupKey: 'sidebar.groups.traffic', order: 3 },
-  },
-  {
-    type: 'httproutes',
-    singular: 'httproute',
-    singularLabel: 'HTTPRoute',
-    pluralLabel: 'HTTPRoutes',
-    clusterScope: false,
-    titleKey: 'nav.httproutes',
-    icon: 'IconRoute',
-    sidebar: { groupKey: 'sidebar.groups.traffic', order: 4 },
-  },
-  {
     type: 'configmaps',
+    apiGroup: '',
     singular: 'configmap',
     singularLabel: 'ConfigMap',
     pluralLabel: 'ConfigMaps',
@@ -201,6 +190,7 @@ export const resourceCatalog = [
   },
   {
     type: 'secrets',
+    apiGroup: '',
     singular: 'secret',
     singularLabel: 'Secret',
     pluralLabel: 'Secrets',
@@ -211,6 +201,7 @@ export const resourceCatalog = [
   },
   {
     type: 'ingresses',
+    apiGroup: 'networking.k8s.io',
     singular: 'ingress',
     singularLabel: 'Ingress',
     pluralLabel: 'Ingresses',
@@ -221,6 +212,7 @@ export const resourceCatalog = [
   },
   {
     type: 'networkpolicies',
+    apiGroup: 'networking.k8s.io',
     singular: 'networkpolicy',
     singularLabel: 'NetworkPolicy',
     pluralLabel: 'NetworkPolicies',
@@ -231,6 +223,7 @@ export const resourceCatalog = [
   },
   {
     type: 'namespaces',
+    apiGroup: '',
     singular: 'namespace',
     singularLabel: 'Namespace',
     pluralLabel: 'Namespaces',
@@ -260,6 +253,7 @@ export const resourceCatalog = [
   },
   {
     type: 'endpoints',
+    apiGroup: '',
     singular: 'endpoints',
     singularLabel: 'Endpoints',
     pluralLabel: 'Endpoints',
@@ -274,6 +268,7 @@ export const resourceCatalog = [
   },
   {
     type: 'endpointslices',
+    apiGroup: 'discovery.k8s.io',
     singular: 'endpointslice',
     singularLabel: 'EndpointSlice',
     pluralLabel: 'EndpointSlices',
@@ -288,6 +283,7 @@ export const resourceCatalog = [
   },
   {
     type: 'podtemplates',
+    apiGroup: '',
     singular: 'podtemplate',
     singularLabel: 'PodTemplate',
     pluralLabel: 'PodTemplates',
@@ -302,6 +298,7 @@ export const resourceCatalog = [
   },
   {
     type: 'replicationcontrollers',
+    apiGroup: '',
     singular: 'replicationcontroller',
     singularLabel: 'ReplicationController',
     pluralLabel: 'ReplicationControllers',
@@ -317,6 +314,7 @@ export const resourceCatalog = [
   },
   {
     type: 'limitranges',
+    apiGroup: '',
     singular: 'limitrange',
     singularLabel: 'LimitRange',
     pluralLabel: 'LimitRanges',
@@ -331,6 +329,7 @@ export const resourceCatalog = [
   },
   {
     type: 'resourcequotas',
+    apiGroup: '',
     singular: 'resourcequota',
     singularLabel: 'ResourceQuota',
     pluralLabel: 'ResourceQuotas',
@@ -345,6 +344,7 @@ export const resourceCatalog = [
   },
   {
     type: 'componentstatuses',
+    apiGroup: '',
     singular: 'componentstatus',
     singularLabel: 'ComponentStatus',
     pluralLabel: 'ComponentStatuses',
@@ -359,6 +359,7 @@ export const resourceCatalog = [
   },
   {
     type: 'controllerrevisions',
+    apiGroup: 'apps',
     singular: 'controllerrevision',
     singularLabel: 'ControllerRevision',
     pluralLabel: 'ControllerRevisions',
@@ -373,6 +374,7 @@ export const resourceCatalog = [
   },
   {
     type: 'ingressclasses',
+    apiGroup: 'networking.k8s.io',
     singular: 'ingressclass',
     singularLabel: 'IngressClass',
     pluralLabel: 'IngressClasses',
@@ -387,6 +389,7 @@ export const resourceCatalog = [
   },
   {
     type: 'ipaddresses',
+    apiGroup: 'networking.k8s.io',
     singular: 'ipaddress',
     singularLabel: 'IPAddress',
     pluralLabel: 'IPAddresses',
@@ -401,6 +404,7 @@ export const resourceCatalog = [
   },
   {
     type: 'servicecidrs',
+    apiGroup: 'networking.k8s.io',
     singular: 'servicecidr',
     singularLabel: 'ServiceCIDR',
     pluralLabel: 'ServiceCIDRs',
@@ -415,6 +419,7 @@ export const resourceCatalog = [
   },
   {
     type: 'volumeattachments',
+    apiGroup: 'storage.k8s.io',
     singular: 'volumeattachment',
     singularLabel: 'VolumeAttachment',
     pluralLabel: 'VolumeAttachments',
@@ -429,6 +434,7 @@ export const resourceCatalog = [
   },
   {
     type: 'csidrivers',
+    apiGroup: 'storage.k8s.io',
     singular: 'csidriver',
     singularLabel: 'CSIDriver',
     pluralLabel: 'CSIDrivers',
@@ -443,6 +449,7 @@ export const resourceCatalog = [
   },
   {
     type: 'csinodes',
+    apiGroup: 'storage.k8s.io',
     singular: 'csinode',
     singularLabel: 'CSINode',
     pluralLabel: 'CSINodes',
@@ -457,6 +464,7 @@ export const resourceCatalog = [
   },
   {
     type: 'csistoragecapacities',
+    apiGroup: 'storage.k8s.io',
     singular: 'csistoragecapacity',
     singularLabel: 'CSIStorageCapacity',
     pluralLabel: 'CSIStorageCapacities',
@@ -471,6 +479,7 @@ export const resourceCatalog = [
   },
   {
     type: 'volumeattributesclasses',
+    apiGroup: 'storage.k8s.io',
     singular: 'volumeattributesclass',
     singularLabel: 'VolumeAttributesClass',
     pluralLabel: 'VolumeAttributesClasses',
@@ -485,6 +494,7 @@ export const resourceCatalog = [
   },
   {
     type: 'certificatesigningrequests',
+    apiGroup: 'certificates.k8s.io',
     singular: 'certificatesigningrequest',
     singularLabel: 'CertificateSigningRequest',
     pluralLabel: 'CertificateSigningRequests',
@@ -500,6 +510,7 @@ export const resourceCatalog = [
   },
   {
     type: 'clustertrustbundles',
+    apiGroup: 'certificates.k8s.io',
     singular: 'clustertrustbundle',
     singularLabel: 'ClusterTrustBundle',
     pluralLabel: 'ClusterTrustBundles',
@@ -514,6 +525,7 @@ export const resourceCatalog = [
   },
   {
     type: 'podcertificaterequests',
+    apiGroup: 'certificates.k8s.io',
     singular: 'podcertificaterequest',
     singularLabel: 'PodCertificateRequest',
     pluralLabel: 'PodCertificateRequests',
@@ -528,6 +540,7 @@ export const resourceCatalog = [
   },
   {
     type: 'leases',
+    apiGroup: 'coordination.k8s.io',
     singular: 'lease',
     singularLabel: 'Lease',
     pluralLabel: 'Leases',
@@ -542,6 +555,7 @@ export const resourceCatalog = [
   },
   {
     type: 'leasecandidates',
+    apiGroup: 'coordination.k8s.io',
     singular: 'leasecandidate',
     singularLabel: 'LeaseCandidate',
     pluralLabel: 'LeaseCandidates',
@@ -556,6 +570,7 @@ export const resourceCatalog = [
   },
   {
     type: 'runtimeclasses',
+    apiGroup: 'node.k8s.io',
     singular: 'runtimeclass',
     singularLabel: 'RuntimeClass',
     pluralLabel: 'RuntimeClasses',
@@ -570,6 +585,7 @@ export const resourceCatalog = [
   },
   {
     type: 'priorityclasses',
+    apiGroup: 'scheduling.k8s.io',
     singular: 'priorityclass',
     singularLabel: 'PriorityClass',
     pluralLabel: 'PriorityClasses',
@@ -584,6 +600,7 @@ export const resourceCatalog = [
   },
   {
     type: 'workloads',
+    apiGroup: 'scheduling.k8s.io',
     singular: 'workload',
     singularLabel: 'Workload',
     pluralLabel: 'Workloads',
@@ -598,6 +615,7 @@ export const resourceCatalog = [
   },
   {
     type: 'podgroups',
+    apiGroup: 'scheduling.k8s.io',
     singular: 'podgroup',
     singularLabel: 'PodGroup',
     pluralLabel: 'PodGroups',
@@ -612,6 +630,7 @@ export const resourceCatalog = [
   },
   {
     type: 'flowschemas',
+    apiGroup: 'flowcontrol.apiserver.k8s.io',
     singular: 'flowschema',
     singularLabel: 'FlowSchema',
     pluralLabel: 'FlowSchemas',
@@ -626,6 +645,7 @@ export const resourceCatalog = [
   },
   {
     type: 'prioritylevelconfigurations',
+    apiGroup: 'flowcontrol.apiserver.k8s.io',
     singular: 'prioritylevelconfiguration',
     singularLabel: 'PriorityLevelConfiguration',
     pluralLabel: 'PriorityLevelConfigurations',
@@ -640,6 +660,7 @@ export const resourceCatalog = [
   },
   {
     type: 'validatingadmissionpolicies',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'validatingadmissionpolicy',
     singularLabel: 'ValidatingAdmissionPolicy',
     pluralLabel: 'ValidatingAdmissionPolicies',
@@ -654,6 +675,7 @@ export const resourceCatalog = [
   },
   {
     type: 'validatingadmissionpolicybindings',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'validatingadmissionpolicybinding',
     singularLabel: 'ValidatingAdmissionPolicyBinding',
     pluralLabel: 'ValidatingAdmissionPolicyBindings',
@@ -668,6 +690,7 @@ export const resourceCatalog = [
   },
   {
     type: 'validatingwebhookconfigurations',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'validatingwebhookconfiguration',
     singularLabel: 'ValidatingWebhookConfiguration',
     pluralLabel: 'ValidatingWebhookConfigurations',
@@ -682,6 +705,7 @@ export const resourceCatalog = [
   },
   {
     type: 'mutatingwebhookconfigurations',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'mutatingwebhookconfiguration',
     singularLabel: 'MutatingWebhookConfiguration',
     pluralLabel: 'MutatingWebhookConfigurations',
@@ -696,6 +720,7 @@ export const resourceCatalog = [
   },
   {
     type: 'mutatingadmissionpolicies',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'mutatingadmissionpolicy',
     singularLabel: 'MutatingAdmissionPolicy',
     pluralLabel: 'MutatingAdmissionPolicies',
@@ -710,6 +735,7 @@ export const resourceCatalog = [
   },
   {
     type: 'mutatingadmissionpolicybindings',
+    apiGroup: 'admissionregistration.k8s.io',
     singular: 'mutatingadmissionpolicybinding',
     singularLabel: 'MutatingAdmissionPolicyBinding',
     pluralLabel: 'MutatingAdmissionPolicyBindings',
@@ -724,6 +750,7 @@ export const resourceCatalog = [
   },
   {
     type: 'resourceslices',
+    apiGroup: 'resource.k8s.io',
     singular: 'resourceslice',
     singularLabel: 'ResourceSlice',
     pluralLabel: 'ResourceSlices',
@@ -738,6 +765,7 @@ export const resourceCatalog = [
   },
   {
     type: 'resourceclaims',
+    apiGroup: 'resource.k8s.io',
     singular: 'resourceclaim',
     singularLabel: 'ResourceClaim',
     pluralLabel: 'ResourceClaims',
@@ -752,6 +780,7 @@ export const resourceCatalog = [
   },
   {
     type: 'deviceclasses',
+    apiGroup: 'resource.k8s.io',
     singular: 'deviceclass',
     singularLabel: 'DeviceClass',
     pluralLabel: 'DeviceClasses',
@@ -766,6 +795,7 @@ export const resourceCatalog = [
   },
   {
     type: 'resourceclaimtemplates',
+    apiGroup: 'resource.k8s.io',
     singular: 'resourceclaimtemplate',
     singularLabel: 'ResourceClaimTemplate',
     pluralLabel: 'ResourceClaimTemplates',
@@ -780,6 +810,7 @@ export const resourceCatalog = [
   },
   {
     type: 'devicetaintrules',
+    apiGroup: 'resource.k8s.io',
     singular: 'devicetaintrule',
     singularLabel: 'DeviceTaintRule',
     pluralLabel: 'DeviceTaintRules',
@@ -794,6 +825,7 @@ export const resourceCatalog = [
   },
   {
     type: 'resourcepoolstatusrequests',
+    apiGroup: 'resource.k8s.io',
     singular: 'resourcepoolstatusrequest',
     singularLabel: 'ResourcePoolStatusRequest',
     pluralLabel: 'ResourcePoolStatusRequests',
@@ -808,6 +840,7 @@ export const resourceCatalog = [
   },
   {
     type: 'storageversions',
+    apiGroup: 'internal.apiserver.k8s.io',
     singular: 'storageversion',
     singularLabel: 'StorageVersion',
     pluralLabel: 'StorageVersions',
@@ -822,6 +855,7 @@ export const resourceCatalog = [
   },
   {
     type: 'storageversionmigrations',
+    apiGroup: 'storagemigration.k8s.io',
     singular: 'storageversionmigration',
     singularLabel: 'StorageVersionMigration',
     pluralLabel: 'StorageVersionMigrations',
@@ -836,6 +870,7 @@ export const resourceCatalog = [
   },
   {
     type: 'nodes',
+    apiGroup: '',
     singular: 'node',
     singularLabel: 'Node',
     pluralLabel: 'Nodes',
@@ -846,6 +881,7 @@ export const resourceCatalog = [
   },
   {
     type: 'events',
+    apiGroup: '',
     singular: 'event',
     singularLabel: 'Event',
     pluralLabel: 'Events',
@@ -856,6 +892,7 @@ export const resourceCatalog = [
   },
   {
     type: 'persistentvolumes',
+    apiGroup: '',
     singular: 'persistentvolume',
     singularLabel: 'PersistentVolume',
     pluralLabel: 'PersistentVolumes',
@@ -871,6 +908,7 @@ export const resourceCatalog = [
   },
   {
     type: 'persistentvolumeclaims',
+    apiGroup: '',
     singular: 'persistentvolumeclaim',
     singularLabel: 'PersistentVolumeClaim',
     pluralLabel: 'PersistentVolumeClaims',
@@ -886,6 +924,7 @@ export const resourceCatalog = [
   },
   {
     type: 'storageclasses',
+    apiGroup: 'storage.k8s.io',
     singular: 'storageclass',
     singularLabel: 'StorageClass',
     pluralLabel: 'StorageClasses',
@@ -904,6 +943,7 @@ export const resourceCatalog = [
   },
   {
     type: 'replicasets',
+    apiGroup: 'apps',
     singular: 'replicaset',
     singularLabel: 'ReplicaSet',
     pluralLabel: 'ReplicaSets',
@@ -918,6 +958,7 @@ export const resourceCatalog = [
   },
   {
     type: 'serviceaccounts',
+    apiGroup: '',
     singular: 'serviceaccount',
     singularLabel: 'ServiceAccount',
     pluralLabel: 'ServiceAccounts',
@@ -929,6 +970,7 @@ export const resourceCatalog = [
   },
   {
     type: 'roles',
+    apiGroup: 'rbac.authorization.k8s.io',
     singular: 'role',
     singularLabel: 'Role',
     pluralLabel: 'Roles',
@@ -939,6 +981,7 @@ export const resourceCatalog = [
   },
   {
     type: 'rolebindings',
+    apiGroup: 'rbac.authorization.k8s.io',
     singular: 'rolebinding',
     singularLabel: 'RoleBinding',
     pluralLabel: 'RoleBindings',
@@ -949,6 +992,7 @@ export const resourceCatalog = [
   },
   {
     type: 'clusterroles',
+    apiGroup: 'rbac.authorization.k8s.io',
     singular: 'clusterrole',
     singularLabel: 'ClusterRole',
     pluralLabel: 'ClusterRoles',
@@ -959,6 +1003,7 @@ export const resourceCatalog = [
   },
   {
     type: 'clusterrolebindings',
+    apiGroup: 'rbac.authorization.k8s.io',
     singular: 'clusterrolebinding',
     singularLabel: 'ClusterRoleBinding',
     pluralLabel: 'ClusterRoleBindings',
@@ -969,6 +1014,7 @@ export const resourceCatalog = [
   },
   {
     type: 'horizontalpodautoscalers',
+    apiGroup: 'autoscaling',
     singular: 'horizontalpodautoscaler',
     singularLabel: 'HorizontalPodAutoscaler',
     pluralLabel: 'HorizontalPodAutoscalers',
@@ -980,6 +1026,7 @@ export const resourceCatalog = [
   },
   {
     type: 'poddisruptionbudgets',
+    apiGroup: 'policy',
     singular: 'poddisruptionbudget',
     singularLabel: 'PodDisruptionBudget',
     pluralLabel: 'PodDisruptionBudgets',
@@ -1012,6 +1059,7 @@ export type ResourceMetadata = Omit<ResourceCatalogEntryBase, 'type'> & {
 export const resourceMetadataList: readonly ResourceMetadata[] =
   resourceCatalog.map((item) => ({
     type: item.type,
+    apiGroup: 'apiGroup' in item ? item.apiGroup : undefined,
     singular: item.singular,
     singularLabel: item.singularLabel,
     pluralLabel: item.pluralLabel,

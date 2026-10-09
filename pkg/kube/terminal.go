@@ -58,20 +58,22 @@ func (session *TerminalSession) Start(ctx context.Context, subResource string) e
 		SubResource(subResource)
 
 	if attach {
+		// NB: apiserver rejects tty+stderr together; with TTY, stderr
+		// is multiplexed into the stdout stream.
 		req.VersionedParams(&corev1.PodAttachOptions{
 			Container: session.container,
 			Stdin:     true,
 			Stdout:    true,
-			Stderr:    true,
+			Stderr:    false,
 			TTY:       true,
 		}, scheme.ParameterCodec)
 	} else {
 		req.VersionedParams(&corev1.PodExecOptions{
 			Container: session.container,
-			Command:   []string{"sh", "-c", "bash || sh"},
+			Command:   []string{"sh", "-c", "command -v bash >/dev/null 2>&1 && exec bash || exec sh"},
 			Stdin:     true,
 			Stdout:    true,
-			Stderr:    true,
+			Stderr:    false,
 			TTY:       true,
 		}, scheme.ParameterCodec)
 	}

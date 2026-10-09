@@ -376,6 +376,7 @@ export interface GeneralSetting {
   nodeTerminalEnabled: boolean
   nodeTerminalImage: string
   clusterAgentImage: string
+  pluginCatalogUrl: string
   enableAnalytics: boolean
   enableVersionCheck: boolean
   passwordLoginDisabled: boolean
@@ -398,6 +399,7 @@ export interface GeneralSettingUpdateRequest {
   nodeTerminalEnabled?: boolean
   nodeTerminalImage?: string
   clusterAgentImage?: string
+  pluginCatalogUrl?: string
   enableAnalytics?: boolean
   enableVersionCheck?: boolean
   passwordLoginDisabled?: boolean

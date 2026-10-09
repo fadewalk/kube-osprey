@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/zxh326/kite/pkg/common"
 	"gorm.io/gorm"
@@ -69,7 +70,10 @@ type GeneralSetting struct {
 	NodeTerminalEnabled     bool         `json:"nodeTerminalEnabled" gorm:"column:node_terminal_enabled;type:boolean;not null;default:false"`
 	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
 	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
+	PluginCatalogURL        string       `json:"pluginCatalogUrl" gorm:"column:plugin_catalog_url;type:varchar(2048)"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
+	AnalyticsInstallationID string       `json:"-" gorm:"type:varchar(32)"`
+	AnalyticsLastAttemptAt  *time.Time   `json:"-"`
 	EnableVersionCheck      bool         `json:"enableVersionCheck" gorm:"column:enable_version_check;type:boolean;not null;default:true"`
 	PasswordLoginDisabled   bool         `json:"passwordLoginDisabled" gorm:"column:password_login_disabled;type:boolean;not null;default:false"`
 	EnableMFA               bool         `json:"enableMFA" gorm:"column:enable_mfa;type:boolean;not null;default:true"`

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   IconLink,
   IconMessage,
+  IconPuzzle,
   IconRobot,
   IconSettings,
   IconTerminal2,
@@ -52,6 +53,7 @@ interface GeneralSettingsFormData {
   nodeTerminalEnabled: boolean
   nodeTerminalImage: string
   clusterAgentImage: string
+  pluginCatalogUrl: string
   enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
@@ -76,6 +78,7 @@ export function GeneralManagement() {
     nodeTerminalEnabled: false,
     nodeTerminalImage: DEFAULT_NODE_TERMINAL_IMAGE,
     clusterAgentImage: DEFAULT_CLUSTER_AGENT_IMAGE,
+    pluginCatalogUrl: '',
     enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
@@ -98,6 +101,7 @@ export function GeneralManagement() {
       nodeTerminalEnabled: data.nodeTerminalEnabled ?? false,
       nodeTerminalImage: data.nodeTerminalImage || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage: data.clusterAgentImage || DEFAULT_CLUSTER_AGENT_IMAGE,
+      pluginCatalogUrl: data.pluginCatalogUrl,
       enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
@@ -107,13 +111,17 @@ export function GeneralManagement() {
   const mutation = useMutation({
     mutationFn: (payload: GeneralSettingUpdateRequest) =>
       updateGeneralSetting(payload),
-    onSuccess: () => {
+    onSuccess: (_, payload) => {
       queryClient.invalidateQueries({
         predicate: (query) =>
           query.queryKey[0] === 'general-setting' ||
           query.queryKey[0] === 'ai-status' ||
           query.queryKey[0] === 'bootstrap',
       })
+      if (payload.pluginCatalogUrl !== data?.pluginCatalogUrl) {
+        queryClient.invalidateQueries({ queryKey: ['plugins', 'catalog'] })
+        queryClient.invalidateQueries({ queryKey: ['plugins', 'readme'] })
+      }
       toast.success(
         t('generalManagement.messages.updated', 'General settings updated')
       )
@@ -195,6 +203,7 @@ export function GeneralManagement() {
         formData.nodeTerminalImage.trim() || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage:
         formData.clusterAgentImage.trim() || DEFAULT_CLUSTER_AGENT_IMAGE,
+      pluginCatalogUrl: formData.pluginCatalogUrl.trim(),
       enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
@@ -560,6 +569,40 @@ export function GeneralManagement() {
                 }))
               }
               placeholder={DEFAULT_CLUSTER_AGENT_IMAGE}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-lg border p-3">
+          <div className="space-y-1">
+            <Label className="flex items-center gap-2 text-sm font-medium">
+              <IconPuzzle className="h-4 w-4" />
+              {t('generalManagement.pluginCatalog.title')}
+            </Label>
+            <p
+              id="general-plugin-catalog-description"
+              className="text-xs text-muted-foreground"
+            >
+              {t('generalManagement.pluginCatalog.description')}
+            </p>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            <Label htmlFor="general-plugin-catalog-url">
+              {t('generalManagement.pluginCatalog.url')}
+            </Label>
+            <Input
+              id="general-plugin-catalog-url"
+              type="url"
+              value={formData.pluginCatalogUrl}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pluginCatalogUrl: e.target.value,
+                }))
+              }
+              placeholder="https://plugins.kitehq.dev/catalog.json"
+              aria-describedby="general-plugin-catalog-description"
             />
           </div>
         </div>

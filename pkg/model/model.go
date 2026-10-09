@@ -111,6 +111,8 @@ func InitDB() error {
 		PendingSession{},
 		HelmRepository{},
 		ScheduledTask{},
+		Plugin{},
+		PluginSetting{},
 	}
 	for _, model := range models {
 		if err := DB.AutoMigrate(model); err != nil {

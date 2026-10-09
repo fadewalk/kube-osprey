@@ -19,6 +19,9 @@ const (
 	NodeTerminalPodName    = "kite-node-terminal-agent"
 	KubectlTerminalPodName = "kite-kubectl-agent"
 
+	// DefaultPluginCatalogURL is used when no catalog URL is configured in settings.
+	DefaultPluginCatalogURL = "https://plugins.kitehq.dev/catalog.json"
+
 	KubectlAnnotation = "kubectl.kubernetes.io/last-applied-configuration"
 
 	// db connection max idle time
@@ -39,6 +42,8 @@ var (
 	ClusterAgentImage    = "ghcr.io/kite-org/kite:latest"
 	DBType               = "sqlite"
 	DBDSN                = "dev.db"
+	PluginDir            = "data/plugins"
+	PluginDevURL         = ""
 
 	KiteEncryptKey = "kite-default-encryption-key-change-in-production"
 
@@ -170,6 +175,10 @@ func LoadEnvs() {
 	if dbDSN := os.Getenv("DB_DSN"); dbDSN != "" {
 		DBDSN = dbDSN
 	}
+	if v := os.Getenv("PLUGIN_DIR"); v != "" {
+		PluginDir = v
+	}
+	PluginDevURL = strings.TrimSpace(os.Getenv("PLUGIN_DEV_URL"))
 
 	if dbType := os.Getenv("DB_TYPE"); dbType != "" {
 		if dbType != "sqlite" && dbType != "mysql" && dbType != "postgres" {
