@@ -377,6 +377,8 @@ export interface GeneralSetting {
   nodeTerminalImage: string
   clusterAgentImage: string
   pluginCatalogUrl: string
+  mcpEnabled: boolean
+  mcpRateLimitPerMinute: number
   enableAnalytics: boolean
   enableVersionCheck: boolean
   passwordLoginDisabled: boolean
@@ -400,6 +402,8 @@ export interface GeneralSettingUpdateRequest {
   nodeTerminalImage?: string
   clusterAgentImage?: string
   pluginCatalogUrl?: string
+  mcpEnabled?: boolean
+  mcpRateLimitPerMinute?: number
   enableAnalytics?: boolean
   enableVersionCheck?: boolean
   passwordLoginDisabled?: boolean

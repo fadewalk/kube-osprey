@@ -28,3 +28,6 @@ Kite 默认支持一些环境变量，来改变一些配置项的默认值。
 - **ENABLE_ANALYTICS**：启用数据分析功能，默认值为 `false`。当启用后，Kite 将收集有限数据以帮助改进产品。
 
 - **PORT**：Kite 运行的端口，默认值为 `8080`。
+
+- **KITE_MCP_ENABLED**：内置 MCP 服务（`POST /api/v1/mcp`）的初始默认值，默认为 `false`。该值仅在首次运行时写入通用设置，之后管理员可在 设置 → 通用 中调整。
+- **KITE_MCP_RATE_LIMIT_PER_MINUTE**：MCP 工具调用每用户每分钟的限流次数，默认值为 `60`。

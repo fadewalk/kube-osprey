@@ -51,3 +51,10 @@ kite
 .gocache/
 
 /data/plugins/
+
+# Local working/reference material, not part of the repository
+/codegraph/
+.codegraph/
+.zcode/
+/kuboard-reference/
+/architecture-diagrams/

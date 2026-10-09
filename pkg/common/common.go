@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -50,6 +51,12 @@ var (
 	AllNamespaces = "_all"
 
 	AnonymousUserEnabled = false
+
+	// MCPEnabled is the bootstrap default for the built-in MCP server,
+	// seeded into the general setting on first run; runtime state is DB-driven.
+	MCPEnabled = false
+	// MCPRateLimitPerMinute bounds tool calls per user per minute.
+	MCPRateLimitPerMinute = 60
 
 	CookieExpirationSeconds = 2 * JWTExpirationSeconds // double jwt
 
@@ -144,6 +151,19 @@ func SetManagedSections(sections map[string]bool) {
 	}
 }
 
+func loadMCPEnvs() {
+	if v := os.Getenv("KITE_MCP_ENABLED"); v != "" {
+		MCPEnabled = v == "true"
+	}
+	if v := os.Getenv("KITE_MCP_RATE_LIMIT_PER_MINUTE"); v != "" {
+		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && n > 0 {
+			MCPRateLimitPerMinute = n
+		} else {
+			klog.Warningf("Invalid KITE_MCP_RATE_LIMIT_PER_MINUTE %q, keeping default %d", v, MCPRateLimitPerMinute)
+		}
+	}
+}
+
 func LoadEnvs() {
 	if secret := os.Getenv("JWT_SECRET"); secret != "" {
 		JwtSecret = secret
@@ -221,6 +241,8 @@ func LoadEnvs() {
 	if v := os.Getenv("KITE_CONFIG_FILE"); v != "" {
 		ConfigFilePath = v
 	}
+
+	loadMCPEnvs()
 
 	if v := os.Getenv("CORS_ALLOWED_ORIGINS"); v != "" {
 		origins := strings.Split(v, ",")

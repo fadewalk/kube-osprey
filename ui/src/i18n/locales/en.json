@@ -857,6 +857,17 @@
       "description": "Catalog URL for browsing and installing plugins. Leave empty to use the official Kite catalog.",
       "url": "Catalog URL"
     },
+    "mcp": {
+      "title": "MCP Server",
+      "description": "Let external MCP clients operate clusters read-only with API Keys under each user’s RBAC.",
+      "form": {
+        "rateLimit": "Rate limit (calls per user per minute)",
+        "endpoint": "Endpoint URL",
+        "auth": "Authentication header",
+        "hint": "Every tool call is audited and evaluated against the API key owner’s RBAC permissions.",
+        "createApiKey": "Create an API Key"
+      }
+    },
     "runtime": {
       "title": "Runtime",
       "description": "Configure analytics and version checking behavior.",

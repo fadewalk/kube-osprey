@@ -122,6 +122,14 @@ plugins:
       - ReadWriteOnce
     size: 1Gi
 
+# Built-in MCP server (POST /api/v1/mcp) for external MCP clients.
+# These values seed the runtime settings on first run; enablement can also be
+# changed later by administrators in Settings -> General.
+mcp:
+  enabled: false
+  # Per-user tool call budget per minute.
+  rateLimitPerMinute: 60
+
 extraEnvs:
   # - name: "EXAMPLE_ENV"
   #   value: "example_value"

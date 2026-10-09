@@ -238,7 +238,7 @@ func TestAuthorizeToolCustomResourceGroups(t *testing.T) {
 			if isError != tc.wantError {
 				t.Fatalf("AuthorizeTool() error = %v, want %v; result=%q", isError, tc.wantError, result)
 			}
-			if tc.wantError && (!strings.Contains(result, "Forbidden:") || !strings.Contains(result, tc.wantErrorResource)) {
+			if tc.wantError && (!strings.Contains(strings.ToLower(result), "forbidden:") || !strings.Contains(result, tc.wantErrorResource)) {
 				t.Fatalf("unexpected authorization error: %q", result)
 			}
 		})

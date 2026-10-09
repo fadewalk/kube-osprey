@@ -108,6 +108,7 @@ func InitDB() error {
 		RoleAssignment{},
 		ResourceHistory{},
 		ResourceTemplate{},
+		MCPAuditLog{},
 		PendingSession{},
 		HelmRepository{},
 		ScheduledTask{},

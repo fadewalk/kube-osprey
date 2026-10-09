@@ -33,6 +33,8 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		"nodeTerminalImage":     setting.NodeTerminalImage,
 		"clusterAgentImage":     setting.ClusterAgentImage,
 		"pluginCatalogUrl":      setting.PluginCatalogURL,
+		"mcpEnabled":            setting.MCPEnabled,
+		"mcpRateLimitPerMinute": setting.MCPRateLimitPerMinute,
 		"enableAnalytics":       setting.EnableAnalytics,
 		"enableVersionCheck":    setting.EnableVersionCheck,
 		"passwordLoginDisabled": setting.PasswordLoginDisabled,
@@ -57,6 +59,8 @@ type UpdateGeneralSettingRequest struct {
 	NodeTerminalImage     *string `json:"nodeTerminalImage"`
 	ClusterAgentImage     *string `json:"clusterAgentImage"`
 	PluginCatalogURL      *string `json:"pluginCatalogUrl"`
+	MCPEnabled            *bool   `json:"mcpEnabled"`
+	MCPRateLimitPerMinute *int    `json:"mcpRateLimitPerMinute"`
 	EnableAnalytics       *bool   `json:"enableAnalytics"`
 	EnableVersionCheck    *bool   `json:"enableVersionCheck"`
 	PasswordLoginDisabled *bool   `json:"passwordLoginDisabled"`
@@ -219,6 +223,17 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		}
 		updates["plugin_catalog_url"] = address
 	}
+	if req.MCPEnabled != nil {
+		updates["mcp_enabled"] = *req.MCPEnabled
+	}
+	if req.MCPRateLimitPerMinute != nil {
+		limit := *req.MCPRateLimitPerMinute
+		if limit <= 0 || limit > 10000 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "mcpRateLimitPerMinute must be between 1 and 10000"})
+			return
+		}
+		updates["mcp_rate_limit_per_minute"] = limit
+	}
 	if req.EnableAnalytics != nil {
 		updates["enable_analytics"] = *req.EnableAnalytics
 	}
@@ -264,6 +279,8 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		"nodeTerminalImage":     updated.NodeTerminalImage,
 		"clusterAgentImage":     updated.ClusterAgentImage,
 		"pluginCatalogUrl":      updated.PluginCatalogURL,
+		"mcpEnabled":            updated.MCPEnabled,
+		"mcpRateLimitPerMinute": updated.MCPRateLimitPerMinute,
 		"enableAnalytics":       updated.EnableAnalytics,
 		"enableVersionCheck":    updated.EnableVersionCheck,
 		"passwordLoginDisabled": updated.PasswordLoginDisabled,

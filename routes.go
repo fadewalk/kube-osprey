@@ -13,6 +13,7 @@ import (
 	"github.com/zxh326/kite/pkg/cluster"
 	"github.com/zxh326/kite/pkg/helm"
 	"github.com/zxh326/kite/pkg/images"
+	"github.com/zxh326/kite/pkg/mcpserver"
 	"github.com/zxh326/kite/pkg/metrics"
 	"github.com/zxh326/kite/pkg/middleware"
 	"github.com/zxh326/kite/pkg/plugins"
@@ -164,6 +165,12 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 	api.GET("/plugins", authHandler.RequireAuth(), plugins.ListActive)
 	api.GET("/plugins/:id/settings", authHandler.RequireAuth(), plugins.GetSetting)
 	api.PUT("/plugins/:id/settings", authHandler.RequireAuth(), authHandler.RequireAdmin(), plugins.UpdateSetting)
+
+	mcpHandler := mcpserver.NewHandler(cm)
+	api.GET("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
+	api.POST("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
+	api.DELETE("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
+
 	defaultAPI := api.Group("")
 	defaultAPI.Use(authHandler.RequireAuth(), middleware.ClusterMiddleware(cm))
 	registerClusterProtectedRoutes(defaultAPI, helmChartsHandler)

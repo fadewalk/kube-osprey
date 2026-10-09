@@ -868,6 +868,17 @@
       "description": "用于浏览和安装插件的 Catalog 地址。留空时使用 Kite 官方 Catalog。",
       "url": "Catalog URL"
     },
+    "mcp": {
+      "title": "MCP 服务",
+      "description": "允许外部 MCP 客户端通过 API Key 按用户 RBAC 只读操作集群。",
+      "form": {
+        "rateLimit": "限流（每用户每分钟调用次数）",
+        "endpoint": "服务端地址",
+        "auth": "认证请求头",
+        "hint": "每次工具调用都会记录审计，并按 API Key 所属用户的 RBAC 权限校验。",
+        "createApiKey": "去创建 API Key"
+      }
+    },
     "runtime": {
       "title": "运行时",
       "description": "配置数据统计和版本检查。",

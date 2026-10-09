@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useAuth } from '@/contexts/auth-context'
 import {
   IconBan,
   IconCircleCheckFilled,
@@ -23,7 +24,6 @@ import {
   useResources,
   useResourcesEvents,
 } from '@/lib/api'
-import { useAuth } from '@/contexts/auth-context'
 import { getEventTime } from '@/lib/k8s'
 import {
   cn,
@@ -92,7 +92,8 @@ export function NodeDetail(props: { name: string }) {
   const [untaintKey, setUntaintKey] = useState('')
 
   const { user, capabilities } = useAuth()
-  const nodeTerminalAvailable = (user?.isAdmin() ?? false) && capabilities.nodeTerminalEnabled
+  const nodeTerminalAvailable =
+    (user?.isAdmin() ?? false) && capabilities.nodeTerminalEnabled
 
   const { data, isLoading, isError, error, refetch } = useResource(
     'nodes',

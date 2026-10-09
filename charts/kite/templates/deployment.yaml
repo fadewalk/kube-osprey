@@ -81,6 +81,14 @@ spec:
             - name: KITE_CONFIG_FILE
               value: /etc/kite/config.yaml
             {{- end }}
+            {{- if .Values.mcp.enabled }}
+            - name: KITE_MCP_ENABLED
+              value: "true"
+            {{- end }}
+            {{- if .Values.mcp.rateLimitPerMinute }}
+            - name: KITE_MCP_RATE_LIMIT_PER_MINUTE
+              value: {{ .Values.mcp.rateLimitPerMinute | quote }}
+            {{- end }}
           {{- with .Values.extraEnvs }}
           {{- toYaml . | nindent 12 }}
           {{- end }}

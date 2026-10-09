@@ -466,7 +466,7 @@ func (cm *ClusterManager) syncClustersUntilReady(readyCh chan<- struct{}) error 
 	return syncClusters(cm, readyCh)
 }
 
-func (cm *ClusterManager) snapshotState() (map[string]*ClientSet, map[string]string, string) {
+func (cm *ClusterManager) SnapshotState() (map[string]*ClientSet, map[string]string, string) {
 	cm.mu.RLock()
 	defer cm.mu.RUnlock()
 

@@ -39,7 +39,7 @@ func clusterAgentServerURL(c *gin.Context) string {
 }
 
 func (cm *ClusterManager) GetClusters(c *gin.Context) {
-	clusters, errors, defaultContext := cm.snapshotState()
+	clusters, errors, defaultContext := cm.SnapshotState()
 	result := make([]common.ClusterInfo, 0, len(clusters))
 	user := c.MustGet("user").(model.User)
 	for name, cluster := range clusters {
@@ -76,7 +76,7 @@ func (cm *ClusterManager) GetClusterList(c *gin.Context) {
 		return
 	}
 
-	clusterState, errorState, _ := cm.snapshotState()
+	clusterState, errorState, _ := cm.SnapshotState()
 	result := make([]gin.H, 0, len(clusters))
 	for _, cluster := range clusters {
 		clusterInfo := gin.H{

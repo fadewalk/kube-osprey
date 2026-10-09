@@ -2,6 +2,7 @@ package ai
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -184,6 +185,27 @@ func currentUserFromGin(c *gin.Context) (pkgmodel.User, bool) {
 	return user, ok
 }
 
+// AuthorizeToolForUser authorizes a tool call made on behalf of an explicit
+// user without a gin context, so non-HTTP surfaces (the MCP endpoint) share
+// the same permission semantics as the chat assistant.
+func AuthorizeToolForUser(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, toolName string, args map[string]interface{}) error {
+	if cs == nil {
+		return errors.New("cluster client is required")
+	}
+	permissions, err := requiredToolPermissions(ctx, cs, toolName, args)
+	if err != nil {
+		return err
+	}
+
+	for _, permission := range permissions {
+		if rbac.CanAccess(user, permission.Resource, permission.Verb, cs.Name, permission.Namespace) {
+			continue
+		}
+		return fmt.Errorf("forbidden: %s", rbac.NoAccess(user.Key(), permission.Verb, permission.Resource, permission.Namespace, cs.Name))
+	}
+	return nil
+}
+
 func AuthorizeTool(c *gin.Context, cs *cluster.ClientSet, toolName string, args map[string]interface{}) (string, bool) {
 	if c == nil {
 		return "Error: authorization context is required", true
@@ -195,19 +217,37 @@ func AuthorizeTool(c *gin.Context, cs *cluster.ClientSet, toolName string, args 
 	if !ok {
 		return "Error: authenticated user not found in context", true
 	}
-
-	permissions, err := requiredToolPermissions(c.Request.Context(), cs, toolName, args)
-	if err != nil {
+	if err := AuthorizeToolForUser(c.Request.Context(), cs, user, toolName, args); err != nil {
 		return "Error: " + err.Error(), true
 	}
-
-	for _, permission := range permissions {
-		if rbac.CanAccess(user, permission.Resource, permission.Verb, cs.Name, permission.Namespace) {
-			continue
-		}
-		return "Forbidden: " + rbac.NoAccess(user.Key(), permission.Verb, permission.Resource, permission.Namespace, cs.Name), true
-	}
 	return "", false
+}
+
+// readOnlyTools lists built-in tools that may run without the change-plan
+// approval gate. Write tools stay chat-only until the plan workflow lands.
+var readOnlyTools = map[string]struct{}{
+	"get_resource":         {},
+	"describe_resource":    {},
+	"list_resources":       {},
+	"get_pod_logs":         {},
+	"get_cluster_overview": {},
+	"query_prometheus":     {},
+}
+
+// RunTool authorizes and executes a read-only built-in tool for an explicit
+// user and returns its textual result. It backs the MCP tool surface.
+func RunTool(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, toolName string, args map[string]interface{}) (string, error) {
+	if _, ok := readOnlyTools[toolName]; !ok {
+		return "", fmt.Errorf("tool %q is not available on this surface", toolName)
+	}
+	if err := AuthorizeToolForUser(ctx, cs, user, toolName, args); err != nil {
+		return "", err
+	}
+	result, isError := executeBuiltinTool(ctx, cs, user, toolName, args)
+	if isError {
+		return "", errors.New(result)
+	}
+	return result, nil
 }
 
 // ExecuteTool runs a tool and returns the result as a string.
@@ -217,7 +257,10 @@ func ExecuteTool(ctx context.Context, c *gin.Context, cs *cluster.ClientSet, too
 	}
 
 	user, _ := currentUserFromGin(c)
+	return executeBuiltinTool(ctx, cs, user, toolName, args)
+}
 
+func executeBuiltinTool(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, toolName string, args map[string]interface{}) (string, bool) {
 	switch toolName {
 	case "get_resource":
 		return executeGetResource(ctx, cs, args)

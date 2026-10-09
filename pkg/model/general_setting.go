@@ -71,6 +71,8 @@ type GeneralSetting struct {
 	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
 	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
 	PluginCatalogURL        string       `json:"pluginCatalogUrl" gorm:"column:plugin_catalog_url;type:varchar(2048)"`
+	MCPEnabled              bool         `json:"mcpEnabled" gorm:"column:mcp_enabled;type:boolean;not null;default:false"`
+	MCPRateLimitPerMinute   int          `json:"mcpRateLimitPerMinute" gorm:"column:mcp_rate_limit_per_minute;type:integer;not null;default:60"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
 	AnalyticsInstallationID string       `json:"-" gorm:"type:varchar(32)"`
 	AnalyticsLastAttemptAt  *time.Time   `json:"-"`
@@ -158,6 +160,10 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 			setting.ClusterAgentImage = DefaultGeneralClusterAgentImageValue()
 			updates["cluster_agent_image"] = setting.ClusterAgentImage
 		}
+		if setting.MCPRateLimitPerMinute <= 0 {
+			setting.MCPRateLimitPerMinute = common.MCPRateLimitPerMinute
+			updates["mcp_rate_limit_per_minute"] = setting.MCPRateLimitPerMinute
+		}
 		if err := ensureJWTSecret(&setting, updates); err != nil {
 			return nil, err
 		}
@@ -184,6 +190,8 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 		KubectlPermissionMode: DefaultKubectlPermissionMode,
 		NodeTerminalImage:     DefaultGeneralNodeTerminalImageValue(),
 		ClusterAgentImage:     DefaultGeneralClusterAgentImageValue(),
+		MCPEnabled:            common.MCPEnabled,
+		MCPRateLimitPerMinute: common.MCPRateLimitPerMinute,
 		EnableAnalytics:       common.EnableAnalytics,
 		EnableVersionCheck:    common.EnableVersionCheck,
 		EnableMFA:             true,

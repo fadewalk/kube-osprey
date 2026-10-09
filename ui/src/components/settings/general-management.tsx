@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  IconApi,
   IconLink,
   IconMessage,
   IconPuzzle,
@@ -9,6 +10,7 @@ import {
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import {
@@ -54,6 +56,8 @@ interface GeneralSettingsFormData {
   nodeTerminalImage: string
   clusterAgentImage: string
   pluginCatalogUrl: string
+  mcpEnabled: boolean
+  mcpRateLimitPerMinute: number
   enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
@@ -79,6 +83,8 @@ export function GeneralManagement() {
     nodeTerminalImage: DEFAULT_NODE_TERMINAL_IMAGE,
     clusterAgentImage: DEFAULT_CLUSTER_AGENT_IMAGE,
     pluginCatalogUrl: '',
+    mcpEnabled: false,
+    mcpRateLimitPerMinute: 60,
     enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
@@ -102,6 +108,8 @@ export function GeneralManagement() {
       nodeTerminalImage: data.nodeTerminalImage || DEFAULT_NODE_TERMINAL_IMAGE,
       clusterAgentImage: data.clusterAgentImage || DEFAULT_CLUSTER_AGENT_IMAGE,
       pluginCatalogUrl: data.pluginCatalogUrl,
+      mcpEnabled: data.mcpEnabled ?? false,
+      mcpRateLimitPerMinute: data.mcpRateLimitPerMinute || 60,
       enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
@@ -204,6 +212,11 @@ export function GeneralManagement() {
       clusterAgentImage:
         formData.clusterAgentImage.trim() || DEFAULT_CLUSTER_AGENT_IMAGE,
       pluginCatalogUrl: formData.pluginCatalogUrl.trim(),
+      mcpEnabled: formData.mcpEnabled,
+      mcpRateLimitPerMinute:
+        formData.mcpRateLimitPerMinute > 0
+          ? formData.mcpRateLimitPerMinute
+          : 60,
       enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
@@ -537,6 +550,93 @@ export function GeneralManagement() {
                   'Sessions run as a privileged root shell on the node. Only admins can open them; keep this off unless required.'
                 )}
               </p>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-lg border">
+          <div className="flex items-center justify-between p-3">
+            <div className="space-y-1">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <IconApi className="h-4 w-4" />
+                {t('generalManagement.mcp.title', 'MCP Server')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.mcp.description',
+                  'Let external MCP clients operate clusters read-only with API Keys under each user’s RBAC.'
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={formData.mcpEnabled}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({ ...prev, mcpEnabled: checked }))
+              }
+            />
+          </div>
+
+          {formData.mcpEnabled && (
+            <div className="space-y-4 border-t p-3">
+              <div className="space-y-2">
+                <Label htmlFor="general-mcp-rate-limit">
+                  {t(
+                    'generalManagement.mcp.form.rateLimit',
+                    'Rate limit (calls per user per minute)'
+                  )}
+                </Label>
+                <Input
+                  id="general-mcp-rate-limit"
+                  type="number"
+                  min="1"
+                  max="10000"
+                  value={formData.mcpRateLimitPerMinute}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      mcpRateLimitPerMinute: parseInt(e.target.value) || 60,
+                    }))
+                  }
+                  placeholder="60"
+                />
+              </div>
+
+              <div className="space-y-2 rounded-md bg-muted/50 p-3 text-xs">
+                <div className="space-y-1">
+                  <span className="font-medium">
+                    {t('generalManagement.mcp.form.endpoint', 'Endpoint URL')}
+                  </span>
+                  <code className="block break-all font-mono text-muted-foreground">
+                    {`${window.location.origin}${import.meta.env.BASE_URL}api/v1/mcp`}
+                  </code>
+                </div>
+                <div className="space-y-1">
+                  <span className="font-medium">
+                    {t(
+                      'generalManagement.mcp.form.auth',
+                      'Authentication header'
+                    )}
+                  </span>
+                  <code className="block break-all font-mono text-muted-foreground">
+                    Authorization: kite&lt;your-api-key&gt;
+                  </code>
+                </div>
+                <p className="text-muted-foreground">
+                  {t(
+                    'generalManagement.mcp.form.hint',
+                    'Every tool call is audited and evaluated against the API key owner’s RBAC permissions.'
+                  )}
+                </p>
+                <Link
+                  to="/settings?tab=apikeys"
+                  className="inline-block font-medium text-primary underline-offset-4 hover:underline"
+                >
+                  {t(
+                    'generalManagement.mcp.form.createApiKey',
+                    'Create an API Key'
+                  )}
+                </Link>
+              </div>
             </div>
           )}
         </div>

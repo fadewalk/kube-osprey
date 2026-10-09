@@ -28,3 +28,6 @@ Kite supports several environment variables by default to change the default val
 - **ENABLE_ANALYTICS**: Enable data analytics functionality, default value is `false`. When enabled, Kite will collect limited data to help improve the product.
 
 - **PORT**: Port on which Kite runs, default value is `8080`.
+
+- **KITE_MCP_ENABLED**: Bootstrap default for the built-in MCP server (`POST /api/v1/mcp`). Defaults to `false`. This value seeds the general setting on first run; administrators can toggle MCP later in Settings → General.
+- **KITE_MCP_RATE_LIMIT_PER_MINUTE**: Per-user MCP tool call budget per minute. Defaults to `60`.
