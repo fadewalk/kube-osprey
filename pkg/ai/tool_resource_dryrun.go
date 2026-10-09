@@ -27,6 +27,13 @@ func DryRunMutation(ctx context.Context, cs *cluster.ClientSet, toolName string,
 		return dryRunPatch(ctx, cs, args)
 	case "delete_resource":
 		beforeObj, err := currentObject(ctx, cs, args)
+		if apierrors.IsNotFound(err) {
+			// The target does not exist yet — common when an earlier plan
+			// step creates it. Nothing to snapshot; report as unsupported
+			// so the plan can still proceed (apply fails honestly if the
+			// object is absent at execution time).
+			return nil, nil, false, nil
+		}
 		if err != nil {
 			return nil, nil, false, err
 		}
