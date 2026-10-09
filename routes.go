@@ -188,8 +188,6 @@ func registerClusterProtectedRoutes(api *gin.RouterGroup, helmChartsHandler *hel
 	api.GET("/prometheus/query_range", metricsHandler.QueryPrometheus)
 	api.GET("/prometheus/resource-usage-history", metricsHandler.GetResourceUsageHistory)
 	api.GET("/prometheus/pods/:namespace/:podName/metrics", metricsHandler.GetPodMetrics)
-	api.GET("/prometheus/query", metricsHandler.QueryPromQL)
-	api.GET("/prometheus/query_range", metricsHandler.QueryPromQLRange)
 
 	logsHandler := resources.NewLogsHandler()
 	api.GET("/logs/:namespace/:podName/ws", logsHandler.HandleLogsWebSocket)
