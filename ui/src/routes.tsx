@@ -4,6 +4,7 @@ import App, { StandaloneAIChatApp } from './App'
 import { InitCheckRoute } from './components/init-check-route'
 import { ProtectedRoute } from './components/protected-route'
 import { getSubPath } from './lib/subpath'
+import { ChangePlansPage } from './pages/change-plans'
 import { CRListPage } from './pages/cr-list-page'
 import { HelmChartDetailPage } from './pages/helm-chart-detail-page'
 import { HelmChartListPage } from './pages/helm-chart-list-page'
@@ -60,6 +61,10 @@ export const router = createBrowserRouter(
         {
           path: 'dashboard',
           element: <Overview />,
+        },
+        {
+          path: 'change-plans',
+          element: <ChangePlansPage />,
         },
         {
           path: 'plugins',

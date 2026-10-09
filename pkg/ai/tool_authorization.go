@@ -250,6 +250,39 @@ func RunTool(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, too
 	return result, nil
 }
 
+// planMutationTools lists the built-in write tools a change plan step may
+// carry. Execution goes exclusively through ExecuteMutation, which re-checks
+// RBAC at apply time; nothing else may trigger these against a cluster.
+var planMutationTools = map[string]struct{}{
+	"create_resource": {},
+	"apply_resource":  {},
+	"update_resource": {},
+	"patch_resource":  {},
+	"delete_resource": {},
+}
+
+// IsPlanMutationTool reports whether toolName is an approvable write tool.
+func IsPlanMutationTool(toolName string) bool {
+	_, ok := planMutationTools[toolName]
+	return ok
+}
+
+// ExecuteMutation authorizes and executes a plan-approved write tool for the
+// plan creator's user. It is the single execution path for change plan steps.
+func ExecuteMutation(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, toolName string, args map[string]interface{}) (string, error) {
+	if _, ok := planMutationTools[toolName]; !ok {
+		return "", fmt.Errorf("tool %q is not allowed in change plans", toolName)
+	}
+	if err := AuthorizeToolForUser(ctx, cs, user, toolName, args); err != nil {
+		return "", err
+	}
+	result, isError := executeBuiltinTool(ctx, cs, user, toolName, args)
+	if isError {
+		return "", errors.New(result)
+	}
+	return result, nil
+}
+
 // ExecuteTool runs a tool and returns the result as a string.
 func ExecuteTool(ctx context.Context, c *gin.Context, cs *cluster.ClientSet, toolName string, args map[string]interface{}) (string, bool) {
 	if result, isError := AuthorizeTool(c, cs, toolName, args); isError {

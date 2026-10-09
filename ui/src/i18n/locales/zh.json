@@ -473,7 +473,8 @@
     "storageversions": "StorageVersions",
     "storageversionmigrations": "StorageVersionMigrations",
     "helmReleases": "Helm Release",
-    "helmCharts": "App Catalog"
+    "helmCharts": "App Catalog",
+    "changePlans": "变更计划"
   },
   "overview": {
     "title": "概览",
@@ -1542,5 +1543,45 @@
   "secret": {
     "showBase64": "显示 Base64",
     "decodeValues": "解码值"
+  },
+  "changePlans": {
+    "title": "变更计划",
+    "filter": {
+      "all": "全部状态"
+    },
+    "table": {
+      "plan": "计划",
+      "creator": "创建者",
+      "danger": "风险",
+      "steps": "步骤",
+      "status": "状态",
+      "updated": "更新时间",
+      "empty": "暂无变更计划"
+    },
+    "danger": {
+      "LOW": "低",
+      "MEDIUM": "中",
+      "HIGH": "高"
+    },
+    "actions": {
+      "approve": "批准",
+      "reject": "拒绝"
+    },
+    "messages": {
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "detail": {
+      "title": "变更计划 #{{id}}",
+      "creator": "创建者：{{name}}",
+      "approver": "审批人：{{name}}",
+      "expires": "{{time}} 过期",
+      "noDryRun": "该操作不支持服务端 dry-run，仅记录当前对象快照。",
+      "notExists": "（当前不存在）",
+      "deleted": "（将被删除）"
+    },
+    "badge": {
+      "pending": "{{count}} 个变更计划待审批"
+    }
   }
 }

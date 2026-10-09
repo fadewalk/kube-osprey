@@ -10,6 +10,7 @@ import (
 	"github.com/zxh326/kite/pkg/apikeys"
 	"github.com/zxh326/kite/pkg/audit"
 	"github.com/zxh326/kite/pkg/auth"
+	"github.com/zxh326/kite/pkg/changeplan"
 	"github.com/zxh326/kite/pkg/cluster"
 	"github.com/zxh326/kite/pkg/helm"
 	"github.com/zxh326/kite/pkg/images"
@@ -170,6 +171,15 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 	api.GET("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
 	api.POST("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
 	api.DELETE("/mcp", authHandler.RequireAuth(), mcpHandler.GinHandler())
+
+	changePlanService := changeplan.NewService(cm)
+	changePlanAPI := api.Group("/change-plans")
+	changePlanAPI.Use(authHandler.RequireAuth())
+	changePlanAPI.GET("/", changePlanService.ListChangePlans)
+	changePlanAPI.GET("/pending-count", changePlanService.PendingChangePlanCount)
+	changePlanAPI.GET("/:id", changePlanService.GetChangePlan)
+	changePlanAPI.POST("/:id/approve", changePlanService.ApproveChangePlan)
+	changePlanAPI.POST("/:id/reject", changePlanService.RejectChangePlan)
 
 	defaultAPI := api.Group("")
 	defaultAPI.Use(authHandler.RequireAuth(), middleware.ClusterMiddleware(cm))

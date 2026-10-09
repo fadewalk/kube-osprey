@@ -326,7 +326,7 @@ func TestAllToolsRegisteredOnServer(t *testing.T) {
 	})
 	tools, _ := listResp["result"].(map[string]any)["tools"].([]any)
 	registered := map[string]bool{}
-	for _, def := range toolDefs() {
+	for _, def := range append(toolDefs(), planTools(handler.cm)...) {
 		registered[def.name] = false
 	}
 	for _, raw := range tools {

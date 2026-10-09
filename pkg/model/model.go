@@ -109,6 +109,8 @@ func InitDB() error {
 		ResourceHistory{},
 		ResourceTemplate{},
 		MCPAuditLog{},
+		ChangePlan{},
+		ChangePlanStep{},
 		PendingSession{},
 		HelmRepository{},
 		ScheduledTask{},

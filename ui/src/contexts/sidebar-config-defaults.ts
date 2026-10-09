@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 import {
   IconBox,
   IconChartLine,
+  IconClipboardCheck,
   type Icon,
   type IconProps,
 } from '@tabler/icons-react'
@@ -76,12 +77,17 @@ defaultMenus['sidebar.groups.application'].push({
   icon: IconChartLine,
 })
 defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.changePlans',
+  url: '/change-plans',
+  icon: IconClipboardCheck,
+})
+defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.helmCharts',
   url: '/charts',
   icon: getResourceIconComponent('IconPackage'),
 })
 
-export const SIDEBAR_CONFIG_VERSION = 5
+export const SIDEBAR_CONFIG_VERSION = 6
 
 function getIconName(iconComponent: ComponentType<{ className?: string }>) {
   const entry = Object.entries(sidebarIconMap).find(

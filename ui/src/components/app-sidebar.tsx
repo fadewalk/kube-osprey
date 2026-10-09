@@ -28,6 +28,7 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
+import { ChangePlanBadge } from './change-plans/change-plan-badge'
 import { ClusterSelector } from './cluster-selector'
 import { PluginIndicator } from './plugins/plugin-indicator'
 import { SidebarItemIcon } from './sidebar-item-icon'
@@ -239,6 +240,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <Link to={item.url} onClick={handleMenuItemClick}>
             <SidebarItemIcon item={item} className="text-sidebar-primary" />
             <span className="truncate">{title}</span>
+            {item.url === '/change-plans' && <ChangePlanBadge />}
             <PluginIndicator pluginId={item.pluginId} />
           </Link>
         </SidebarMenuButton>

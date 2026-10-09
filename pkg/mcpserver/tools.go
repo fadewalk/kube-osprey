@@ -56,6 +56,11 @@ type toolDef struct {
 	// resolveCluster resolves args["cluster"] (default cluster when empty)
 	// into toolContext.cs before permissions and execution.
 	resolveCluster bool
+	// readOnly marks the tool as non-mutating for MCP annotations and the
+	// default LOW danger level of its result envelope.
+	readOnly bool
+	// danger overrides the envelope danger level for non-read-only tools.
+	danger string
 	// permissions returns the RBAC checks for this call; an empty list means
 	// every authenticated user may run it (delegated tools enforce access in
 	// ai.RunTool instead).
@@ -64,12 +69,12 @@ type toolDef struct {
 }
 
 func registerTools(server *mcp.Server, cm *cluster.ClusterManager) {
-	for _, def := range toolDefs() {
+	for _, def := range append(toolDefs(), planTools(cm)...) {
 		server.AddTool(&mcp.Tool{
 			Name:        def.name,
 			Description: def.description,
 			InputSchema: json.RawMessage(def.schema),
-			Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true},
+			Annotations: &mcp.ToolAnnotations{ReadOnlyHint: def.readOnly},
 		}, func(ctx context.Context, req *mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 			return dispatchTool(ctx, cm, def, req)
 		})
@@ -106,7 +111,7 @@ func dispatchTool(ctx context.Context, cm *cluster.ClusterManager, def toolDef, 
 		data, err = def.run(ctx, tctx, args)
 		if err == nil {
 			recordAudit(user, clusterName, def.name, args, start, true, "")
-			return toolResult(data), nil
+			return toolResultFor(def, data), nil
 		}
 	}
 	recordAudit(user, clusterName, def.name, args, start, false, err.Error())
@@ -140,8 +145,12 @@ type toolPayload struct {
 	Data        any    `json:"data"`
 }
 
-func toolResult(data any) *mcp.CallToolResult {
-	payload := toolPayload{DangerLevel: dangerLevelReadOnly, Data: data}
+func toolResultFor(def toolDef, data any) *mcp.CallToolResult {
+	danger := def.danger
+	if def.readOnly || danger == "" {
+		danger = dangerLevelReadOnly
+	}
+	payload := toolPayload{DangerLevel: danger, Data: data}
 	b, err := json.Marshal(payload)
 	if err != nil {
 		return toolError(fmt.Sprintf("failed to encode result: %v", err))

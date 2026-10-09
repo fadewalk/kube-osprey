@@ -397,6 +397,7 @@
   "nav": {
     "overview": "Overview",
     "prometheusExplorer": "PromQL Explorer",
+    "changePlans": "Change Plans",
     "pods": "Pods",
     "deployments": "Deployments",
     "statefulsets": "StatefulSets",
@@ -1455,5 +1456,45 @@
   "secret": {
     "showBase64": "Show Base64",
     "decodeValues": "Decode Values"
+  },
+  "changePlans": {
+    "title": "Change Plans",
+    "filter": {
+      "all": "All statuses"
+    },
+    "table": {
+      "plan": "Plan",
+      "creator": "Creator",
+      "danger": "Danger",
+      "steps": "Steps",
+      "status": "Status",
+      "updated": "Updated",
+      "empty": "No change plans"
+    },
+    "danger": {
+      "LOW": "LOW",
+      "MEDIUM": "MEDIUM",
+      "HIGH": "HIGH"
+    },
+    "actions": {
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "messages": {
+      "approved": "Plan approved",
+      "rejected": "Plan rejected"
+    },
+    "detail": {
+      "title": "Change Plan #{{id}}",
+      "creator": "Created by {{name}}",
+      "approver": "Approved by {{name}}",
+      "expires": "Expires {{time}}",
+      "noDryRun": "This operation has no server-side dry-run; only the current object snapshot is recorded.",
+      "notExists": "(not present)",
+      "deleted": "(deleted)"
+    },
+    "badge": {
+      "pending": "{{count}} change plan(s) awaiting approval"
+    }
   }
 }

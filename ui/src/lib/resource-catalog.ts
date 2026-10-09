@@ -4,6 +4,7 @@ import {
   IconBox,
   IconBoxMultiple,
   IconChartLine,
+  IconClipboardCheck,
   IconClockHour4,
   IconCode,
   IconDatabase,
@@ -63,6 +64,7 @@ export const resourceIconMap = {
   IconServer2,
   IconBell,
   IconCode,
+  IconClipboardCheck,
 } as const
 
 export type ResourceIconName = keyof typeof resourceIconMap
