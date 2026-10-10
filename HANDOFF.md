@@ -1,8 +1,8 @@
 # Kite 项目交接文档
 
-> 更新时间：2026-09-10
+> 更新时间：2026-10-10
 > 当前分支：`feat/kubepi-value-mvp`
-> 当前 HEAD：`94aa104 fix: add node terminal break-glass controls`（已推送 fadewalk/kite）
+> 当前 HEAD：`dfd2905 feat: add workload quick operations`（**未推送**，领先 origin/main 12 个提交，fadewalk/kite 上游无此分支更新）
 
 本文档用于把当前 Kite / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
 
@@ -242,16 +242,22 @@ GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -trimpath -o /tmp/kite/kite .
 
 ## 5. 当前工作区状态
 
-源码分支干净，仅有本地工具目录未跟踪：
+源码分支干净。以下本地目录已加入 `.gitignore`，**不要提交**：
 
 ```text
-?? .codegraph/
-?? .zcode/
+.codegraph/  .zcode/  /kuboard-reference/  /architecture-diagrams/  .playwright-mcp/
 ```
 
-不要提交这两个目录。
+`kuboard-reference/` 是 Kuboard 逆向参考材料（clean-room 红线：只读对标语义，
+不进仓库、不复制代码/UI/文案/API 路径）。本地开发库 `dev.db` 的 admin 密码
+在 2026-10-10 被重置为 `KiteDev#2026`（bcrypt 直接写库，用户可在 UI 改回）。
+另外注意：Kite 的角色变更会使已发 JWT 立即失效（上游行为），改完 RBAC 后需重新登录。
 
 ## 6. 下一阶段优先级
+
+> 2026-10-10 更新：第 9 节的 Kuboard 三阶段与缺口分析 G1/G2/G3/G4/G9 均已交付
+>（见第 10 节）。剩余为 G5/G6/G7/G8/G10 低优先级项与长期多集群观察，
+> 详见 `KUBOARD-GAP-ANALYSIS.md`。
 
 ### P0：先完成高权限治理 ✅ A/B/C 基础项均已完成
 
@@ -394,3 +400,53 @@ node_modules/
 
 注意 clean-room 红线：只对标语义，不复制 Kuboard 的代码、UI、文案或 API 路径命名。
 开工前先读计划的"0. 背景与决策"和"1. 技术选型决策"两节。
+
+
+## 10. Kuboard 吸收交付（2026-10-10 本轮）
+
+上游 main（v0.16.0，含插件系统 #728）已合并进本分支（`e42ac1c`，冲突解法见提交）。
+Kuboard 三阶段全部交付并真实集群（colima-xwssd k3s v1.35）验收通过。合并时工作区
+曾出现文件损坏（NUL 字节 + 无关项目代码拼接），确认非有效工作后已 stash 并 drop。
+
+### 提交清单
+
+| Commit | 内容 |
+| --- | --- |
+| `e42ac1c` | 合并 origin/main（v0.16.0 插件系统等 15 提交），解决 4 处冲突 |
+| `ac6282f` | 修复合并引入的 `/prometheus/query` 路由重复注册（gin 启动 panic），保留上游 QueryPrometheus 对（插件 SDK 契约） |
+| `e7ccef3` | **P1 内置 MCP Server**：`pkg/mcpserver`（官方 go-sdk v1.3 Streamable HTTP，`POST/GET/DELETE /api/v1/mcp`），16 个只读工具，复用 API Key + RBAC（`ai.RunTool` 限定只读白名单），审计落 `mcp_audit_logs`，限流默认 60 次/分/用户，默认关闭 |
+| `bf5b4c8` | **P2 计划式审批**：`pkg/changeplan` + 5 个 MCP 计划工具（create/append 即 dry-run/finalize CAS/status/apply 一次性 token），审批中心 `/change-plans`（Monaco diff、危险等级、侧边栏待审徽章），审批人≠创建人、apply 前逐步 RBAC 复查 |
+| `d473ac7` | 顺序计划修复：delete 步骤目标由前序步骤创建时快照 NotFound 不再拒绝（降级 DRY_RUN_UNSUPPORTED） |
+| `56803da` | **P3 资源同步引擎**：`pkg/syncengine` no-store reflector（手写分页 LIST + WATCH 续传 + 410 重建 + 退避），事件直接落 `sync_objects`/`sync_tasks`（内存零驻留），白名单默认关；泛型列表/详情/搜索优先走库、自动 fallback 直连；拓扑 API；集群连接预热 informer |
+| `64f68c3` | 默认白名单补 replicasets/jobs（拓扑 owner 链曾断在第一层，浏览器实测发现） |
+| `d5cae5a` | 聊天助手写路径接入审批（`aiChangePlanMode` 开关，kite-chat 计划审批即自动执行）；拓扑前端页 `/topology` |
+| `0a74cf1` | `KUBOARD-GAP-ANALYSIS.md`（menu.yaml × OpenAPI × Kite 注册表深度对比，10 缺口排序）+ ReplicaSets 进工作负载侧边栏 |
+| `6e2ea3b` | **G9** 同步引擎自观测（`/api/v1/admin/sync-engine/status` + restart-full-sync + 设置页面板）；**G4** 计划回滚（APPLIED → ROLLING_BACK → ROLLED_BACK，按快照逆序撤销，审批权限门槛） |
+| `ec16e31` | **G1** Gateway API：sigs.k8s.io/gateway-api v1.3.0，gateways/httproutes/grpcroutes/referencegrants 注册进 scheme/registry/handlers/流量分组；NoMatch 泛型列表统一返回空（可选 CRD 缺失不再 500） |
+| `dfd2905` | **G2** 快捷操作：`/api/v1/workload-ops/update-image` 与 `/restart`（deploy/sts/ds，非结构化对象 + update RBAC + 历史审计），Deployment/StatefulSet 详情页「编辑镜像」对话框 |
+
+### 关键实现位置
+
+- MCP：`pkg/mcpserver/{server,auth,tools,plan_tools}.go`；工具层复用 `pkg/ai`（`RunTool` 只读 / `ExecuteMutation` 写、`DryRunMutation`）
+- 审批：`pkg/changeplan/{service,handler,chat_router,rollback}.go`，模型 `pkg/model/change_plan.go`
+- 同步：`pkg/syncengine/{manager,reflector,store,status}.go`，模型 `pkg/model/sync.go`
+- 快捷操作：`pkg/resources/workload_ops_handler.go`；前端 `ui/src/components/workload-image-dialog.tsx`、`ui/src/pages/{change-plans,topology}.tsx`
+
+### 设计要点（不要回退）
+
+- 计划审批三红线：apply 之外的路径不得写集群；approval_token 一次性消费；apply 前逐步 RBAC 复查。聊天计划（client=kite-chat）审批即自动执行（审批本身是闸门）
+- 同步引擎 no-store：watch 事件直接落库，内存不驻留对象——几千 pod 规模下占用恒定，勿改回 informer 内存 Store
+- 泛型列表 NoMatch 返回空列表是有意行为（可选 CRD 缺失的集群），不要改回 500
+
+### 遗留（按 `KUBOARD-GAP-ANALYSIS.md` 优先级）
+
+- G7 拓扑跨类关系边（service→pod selector、ingress→service，labels 已入库）
+- G5 用户组管理 UI（后端已支持 group subject）、G6 审计策略、G10 Pod 调试容器注入（ephemeral containers）、G8 多集群聚合首页
+- pods 的 `spec.nodeName` 内存索引仍在（节点页关联 pod 依赖），其内存卸载需先把该查询切到 sync 表
+- 已知上游行为：角色变更会使已发 JWT 立即失效（改 RBAC 后被登出属预期，重新登录即可）
+
+### 本地验证环境
+
+`make dev` 起后端(8080)+vite(5173，若被占用顺延 5174)；登录 `admin` / `KiteDev#2026`
+（dev.db 密码已重置）。真实集群 colima-xwssd 已导入；同步引擎/MCP 均可在
+Settings → General 打开后按各卡片说明验证。
