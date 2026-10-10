@@ -169,6 +169,17 @@ export const resourceCatalog = [
     sidebar: { groupKey: 'sidebar.groups.workloads', order: 5 },
   },
   {
+    type: 'replicasets',
+    apiGroup: 'apps',
+    singular: 'replicaset',
+    singularLabel: 'ReplicaSet',
+    pluralLabel: 'ReplicaSets',
+    clusterScope: false,
+    titleKey: 'nav.replicasets',
+    icon: 'IconStack2',
+    sidebar: { groupKey: 'sidebar.groups.workloads', order: 6 },
+  },
+  {
     type: 'services',
     apiGroup: '',
     singular: 'service',
