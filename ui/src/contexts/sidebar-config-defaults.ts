@@ -3,6 +3,7 @@ import {
   IconBox,
   IconChartLine,
   IconClipboardCheck,
+  IconTopologyBus,
   type Icon,
   type IconProps,
 } from '@tabler/icons-react'
@@ -80,6 +81,11 @@ defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.changePlans',
   url: '/change-plans',
   icon: IconClipboardCheck,
+})
+defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.topology',
+  url: '/topology',
+  icon: IconTopologyBus,
 })
 defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.helmCharts',

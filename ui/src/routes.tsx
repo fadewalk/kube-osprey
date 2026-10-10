@@ -16,6 +16,7 @@ import { PrometheusExplorerPage } from './pages/prometheus-explorer-page'
 import { ResourceDetail } from './pages/resource-detail'
 import { ResourceList } from './pages/resource-list'
 import { SettingsPage } from './pages/settings'
+import { TopologyPage } from './pages/topology'
 import { PluginPage } from './plugins/plugin-page'
 
 const subPath = getSubPath()
@@ -65,6 +66,10 @@ export const router = createBrowserRouter(
         {
           path: 'change-plans',
           element: <ChangePlansPage />,
+        },
+        {
+          path: 'topology',
+          element: <TopologyPage />,
         },
         {
           path: 'plugins',

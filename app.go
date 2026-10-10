@@ -8,6 +8,8 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"github.com/zxh326/kite/internal"
+	"github.com/zxh326/kite/pkg/ai"
+	"github.com/zxh326/kite/pkg/changeplan"
 	"github.com/zxh326/kite/pkg/cluster"
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/middleware"
@@ -60,6 +62,7 @@ func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
 	plugins.Start(ctx)
 	telemetry.Start(ctx, cm)
 	syncengine.Init(cm)
+	ai.SetChangePlanRouter(changeplan.NewService(cm).ChatRouter())
 	appReady.Store(true)
 	go func() {
 		syncengine.ReloadFromSetting()

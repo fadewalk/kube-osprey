@@ -474,7 +474,8 @@
     "storageversionmigrations": "StorageVersionMigrations",
     "helmReleases": "Helm Release",
     "helmCharts": "App Catalog",
-    "changePlans": "变更计划"
+    "changePlans": "变更计划",
+    "topology": "拓扑视图"
   },
   "overview": {
     "title": "概览",
@@ -833,7 +834,9 @@
         "apiKey": "API Key",
         "apiKeyPlaceholder": "留空则保持当前 API Key 不变",
         "baseUrl": "Base URL",
-        "maxTokens": "最大 Token 数"
+        "maxTokens": "最大 Token 数",
+        "changePlanMode": "写操作走审批流程",
+        "changePlanModeHint": "助手写操作将生成变更计划：先 dry-run，经人工在变更计划页批准后才会执行。"
       }
     },
     "kubectl": {
@@ -1591,5 +1594,11 @@
     "badge": {
       "pending": "{{count}} 个变更计划待审批"
     }
+  },
+  "topology": {
+    "title": "拓扑视图",
+    "empty": "该命名空间暂无可展示的对象。",
+    "syncUnavailable": "同步引擎数据不可用 — 请在 设置 → 通用 中开启",
+    "hint": "来自同步引擎的从属关系图：工作负载指向其 ReplicaSet 和 Pod。点击节点可打开对应资源。"
   }
 }

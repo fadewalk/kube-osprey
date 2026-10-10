@@ -76,7 +76,10 @@ type GeneralSetting struct {
 	SyncEngineEnabled     bool         `json:"syncEngineEnabled" gorm:"column:sync_engine_enabled;type:boolean;not null;default:false"`
 	// SyncEngineResources is a comma-separated whitelist of resource plurals;
 	// empty means the built-in default whitelist.
-	SyncEngineResources     string       `json:"syncEngineResources" gorm:"column:sync_engine_resources;type:text"`
+	SyncEngineResources string `json:"syncEngineResources" gorm:"column:sync_engine_resources;type:text"`
+	// AIChangePlanMode routes chat-assistant mutations through the change
+	// plan approval flow instead of the in-chat single-step confirmation.
+	AIChangePlanMode        bool         `json:"aiChangePlanMode" gorm:"column:ai_change_plan_mode;type:boolean;not null;default:false"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
 	AnalyticsInstallationID string       `json:"-" gorm:"type:varchar(32)"`
 	AnalyticsLastAttemptAt  *time.Time   `json:"-"`

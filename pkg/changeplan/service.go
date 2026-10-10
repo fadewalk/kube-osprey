@@ -226,6 +226,11 @@ func (s *Service) ApprovePlan(approver model.User, planID uint) error {
 		return fmt.Errorf("plan %d is not pending approval", planID)
 	}
 	klog.Infof("Change plan %d approved by %s", planID, approver.Username)
+	// Reload so the chat auto-apply sees the post-CAS APPROVED state.
+	var fresh model.ChangePlan
+	if err := model.DB.First(&fresh, planID).Error; err == nil {
+		s.autoApplyChatPlan(fresh)
+	}
 	return nil
 }
 
@@ -285,6 +290,28 @@ func (s *Service) ApplyPlan(ctx context.Context, user model.User, planID uint, t
 	if res.RowsAffected == 0 {
 		return nil, fmt.Errorf("plan %d was already applied or its token was consumed", planID)
 	}
+	return s.applyPlanSteps(ctx, planID, user)
+}
+
+// applyPlanSteps runs an APPLYING/APPROVED plan's steps in order as the plan
+// creator, stopping at the first failure. Used by the token flow and by the
+// chat-plan auto-apply after approval.
+func (s *Service) applyPlanSteps(ctx context.Context, planID uint, creator model.User) (*model.ChangePlan, error) {
+	var plan model.ChangePlan
+	if err := model.DB.First(&plan, planID).Error; err != nil {
+		return nil, err
+	}
+	if plan.Status == model.ChangePlanApproved {
+		res := model.DB.Model(&model.ChangePlan{}).
+			Where("id = ? AND status = ?", planID, model.ChangePlanApproved).
+			Update("status", model.ChangePlanApplying)
+		if res.Error != nil {
+			return nil, res.Error
+		}
+		if res.RowsAffected == 0 {
+			return nil, fmt.Errorf("plan %d was already applied or its token was consumed", planID)
+		}
+	}
 
 	if err := model.DB.Preload("Steps", func(db *gorm.DB) *gorm.DB { return db.Order("seq ASC") }).First(&plan, planID).Error; err != nil {
 		return nil, err
@@ -309,7 +336,7 @@ func (s *Service) ApplyPlan(ctx context.Context, user model.User, planID uint, t
 			failed = true
 			continue
 		}
-		result, err := s.execute(ctx, cs, user, step.ToolName, args)
+		result, err := s.execute(ctx, cs, creator, step.ToolName, args)
 		if err != nil {
 			s.markStep(step, model.ChangeStepFailed, result, err.Error())
 			failed = true
@@ -325,7 +352,7 @@ func (s *Service) ApplyPlan(ctx context.Context, user model.User, planID uint, t
 		errMsg = "one or more steps failed"
 	}
 	if err := model.DB.Model(&model.ChangePlan{}).Where("id = ?", planID).
-		Updates(map[string]any{"status": finalStatus}).Error; err != nil {
+		Updates(map[string]any{"status": finalStatus, "approval_token": ""}).Error; err != nil {
 		return nil, err
 	}
 	if err := model.DB.Preload("Steps", func(db *gorm.DB) *gorm.DB { return db.Order("seq ASC") }).First(&plan, planID).Error; err != nil {

@@ -26,6 +26,7 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		"aiApiKeyConfigured":    hasAIAPIKey,
 		"aiBaseUrl":             setting.AIBaseURL,
 		"aiMaxTokens":           setting.AIMaxTokens,
+		"aiChangePlanMode":      setting.AIChangePlanMode,
 		"kubectlEnabled":        setting.KubectlEnabled,
 		"kubectlImage":          setting.KubectlImage,
 		"kubectlPermissionMode": setting.KubectlPermissionMode,
@@ -64,6 +65,7 @@ type UpdateGeneralSettingRequest struct {
 	PluginCatalogURL      *string `json:"pluginCatalogUrl"`
 	MCPEnabled            *bool   `json:"mcpEnabled"`
 	MCPRateLimitPerMinute *int    `json:"mcpRateLimitPerMinute"`
+	AIChangePlanMode      *bool   `json:"aiChangePlanMode"`
 	SyncEngineEnabled     *bool   `json:"syncEngineEnabled"`
 	SyncEngineResources   *string `json:"syncEngineResources"`
 	EnableAnalytics       *bool   `json:"enableAnalytics"`
@@ -231,6 +233,9 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if req.MCPEnabled != nil {
 		updates["mcp_enabled"] = *req.MCPEnabled
 	}
+	if req.AIChangePlanMode != nil {
+		updates["ai_change_plan_mode"] = *req.AIChangePlanMode
+	}
 	if req.SyncEngineEnabled != nil {
 		updates["sync_engine_enabled"] = *req.SyncEngineEnabled
 	}
@@ -283,6 +288,7 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		"aiApiKeyConfigured":    hasAIAPIKey,
 		"aiBaseUrl":             updated.AIBaseURL,
 		"aiMaxTokens":           updated.AIMaxTokens,
+		"aiChangePlanMode":      updated.AIChangePlanMode,
 		"kubectlEnabled":        updated.KubectlEnabled,
 		"kubectlImage":          updated.KubectlImage,
 		"kubectlPermissionMode": updated.KubectlPermissionMode,

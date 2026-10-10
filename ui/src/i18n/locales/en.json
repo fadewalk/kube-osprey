@@ -469,7 +469,8 @@
     "storageversions": "StorageVersions",
     "storageversionmigrations": "StorageVersionMigrations",
     "helmReleases": "Helm Release",
-    "helmCharts": "App Catalog"
+    "helmCharts": "App Catalog",
+    "topology": "Topology"
   },
   "overview": {
     "title": "Overview",
@@ -822,7 +823,9 @@
         "apiKey": "API Key",
         "apiKeyPlaceholder": "Leave empty to keep current API Key",
         "baseUrl": "Base URL",
-        "maxTokens": "Max Tokens"
+        "maxTokens": "Max Tokens",
+        "changePlanMode": "Route write operations through approval",
+        "changePlanModeHint": "Assistant mutations become change plans: dry-run first, then a human approves in Change Plans before anything is applied."
       }
     },
     "kubectl": {
@@ -1504,5 +1507,11 @@
     "badge": {
       "pending": "{{count}} change plan(s) awaiting approval"
     }
+  },
+  "topology": {
+    "title": "Topology",
+    "empty": "No objects to display in this namespace.",
+    "syncUnavailable": "Sync engine data unavailable - enable it in Settings, General",
+    "hint": "Ownership graph from the sync engine: workloads point to their ReplicaSets and pods. Click a node to open the resource."
   }
 }

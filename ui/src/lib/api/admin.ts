@@ -369,6 +369,7 @@ export interface GeneralSetting {
   aiApiKeyConfigured: boolean
   aiBaseUrl: string
   aiMaxTokens: number
+  aiChangePlanMode: boolean
   kubectlEnabled: boolean
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
@@ -396,6 +397,7 @@ export interface GeneralSettingUpdateRequest {
   aiApiKey?: string
   aiBaseUrl?: string
   aiMaxTokens?: number
+  aiChangePlanMode?: boolean
   kubectlEnabled?: boolean
   kubectlImage?: string
   kubectlPermissionMode?: KubectlPermissionMode

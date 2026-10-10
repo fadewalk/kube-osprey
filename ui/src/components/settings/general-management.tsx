@@ -49,6 +49,7 @@ interface GeneralSettingsFormData {
   aiApiKeyConfigured: boolean
   aiBaseUrl: string
   aiMaxTokens: number
+  aiChangePlanMode: boolean
   kubectlEnabled: boolean
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
@@ -78,6 +79,7 @@ export function GeneralManagement() {
     aiApiKeyConfigured: false,
     aiBaseUrl: '',
     aiMaxTokens: 16384,
+    aiChangePlanMode: false,
     kubectlEnabled: false,
     kubectlImage: DEFAULT_KUBECTL_IMAGE,
     kubectlPermissionMode: 'operator',
@@ -105,6 +107,7 @@ export function GeneralManagement() {
       aiApiKeyConfigured: data.aiApiKeyConfigured ?? false,
       aiBaseUrl: data.aiBaseUrl || '',
       aiMaxTokens: data.aiMaxTokens || 16384,
+      aiChangePlanMode: data.aiChangePlanMode ?? false,
       kubectlEnabled: data.kubectlEnabled ?? false,
       kubectlImage: data.kubectlImage || DEFAULT_KUBECTL_IMAGE,
       kubectlPermissionMode: data.kubectlPermissionMode || 'operator',
@@ -209,6 +212,7 @@ export function GeneralManagement() {
       aiModel: formData.aiModel.trim() || defaultModel,
       aiBaseUrl: formData.aiBaseUrl.trim(),
       aiMaxTokens: formData.aiMaxTokens || 16384,
+      aiChangePlanMode: formData.aiChangePlanMode,
       kubectlEnabled: formData.kubectlEnabled,
       kubectlImage: formData.kubectlImage.trim() || DEFAULT_KUBECTL_IMAGE,
       kubectlPermissionMode: formData.kubectlPermissionMode,
@@ -394,6 +398,36 @@ export function GeneralManagement() {
                     }))
                   }
                   placeholder="16384"
+                />
+              </div>
+
+              <div className="flex items-start justify-between gap-3 rounded-md border p-3">
+                <div className="space-y-1">
+                  <Label
+                    htmlFor="general-ai-change-plan-mode"
+                    className="text-sm font-medium"
+                  >
+                    {t(
+                      'generalManagement.aiAgent.form.changePlanMode',
+                      'Route write operations through approval'
+                    )}
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    {t(
+                      'generalManagement.aiAgent.form.changePlanModeHint',
+                      'Assistant mutations become change plans: dry-run first, then a human approves in Change Plans before anything is applied.'
+                    )}
+                  </p>
+                </div>
+                <Switch
+                  id="general-ai-change-plan-mode"
+                  checked={formData.aiChangePlanMode}
+                  onCheckedChange={(checked) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      aiChangePlanMode: checked,
+                    }))
+                  }
                 />
               </div>
             </div>

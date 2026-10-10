@@ -290,6 +290,17 @@ func ExecuteTool(ctx context.Context, c *gin.Context, cs *cluster.ClientSet, too
 	}
 
 	user, _ := currentUserFromGin(c)
+
+	// Plan mode: chat mutations become approval-gated change plans instead
+	// of direct execution.
+	if changePlanRouter != nil && IsPlanMutationTool(toolName) && changePlanModeEnabled() {
+		msg, err := changePlanRouter.SubmitMutation(ctx, cs, user, toolName, args, c.GetString("ai_session_id"))
+		if err != nil {
+			return "Error: " + err.Error(), true
+		}
+		return msg, false
+	}
+
 	return executeBuiltinTool(ctx, cs, user, toolName, args)
 }
 

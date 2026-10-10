@@ -270,6 +270,7 @@ func (a *Agent) ContinuePending(
 	values map[string]interface{},
 	sendEvent func(AgentEvent),
 ) error {
+	c.Set("ai_session_id", sessionID)
 	session, err := agentPendingSessions.load(sessionID)
 	if err != nil {
 		return err
@@ -454,6 +455,22 @@ func (a *Agent) processToolBatch(
 		}
 
 		if MutationTools[toolCall.Name] {
+			// Plan mode: route mutations to the approval flow directly —
+			// the plan approval is the single human gate, no in-chat
+			// confirmation on top.
+			if router := ChangePlanRouterIfEnabled(); router != nil {
+				content, isError := ExecuteTool(c.Request.Context(), c, a.cs, toolCall.Name, toolCall.Arguments)
+				result := ToolResult{
+					ToolCallID: toolCall.ID,
+					ToolName:   toolCall.Name,
+					Content:    content,
+					IsError:    isError,
+				}
+				sendEvent(AgentEvent{Type: "tool_result", Data: ToolResultEvent{ToolResult: result}})
+				session.ToolResults = append(session.ToolResults, toolResultBlock(result))
+				session.NextToolIndex++
+				continue
+			}
 			content, isError := AuthorizeTool(c, a.cs, toolCall.Name, toolCall.Arguments)
 			if isError {
 				result := ToolResult{
