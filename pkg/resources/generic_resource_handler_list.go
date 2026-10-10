@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
 	"sort"
@@ -12,6 +13,7 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/model"
 	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/zxh326/kite/pkg/syncengine"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -20,6 +22,56 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
+// listFromSync serves a list from the sync engine tables, mirroring the
+// direct path's RBAC filtering and ordering. Any error returns the caller to
+// the direct path.
+func (h *GenericResourceHandler[T, V]) listFromSync(c *gin.Context, objectList V, namespace string, allNamespaces bool) (V, error) {
+	var zero V
+	cs := c.MustGet("cluster").(*cluster.ClientSet)
+	user := c.MustGet("user").(model.User)
+
+	raws, err := syncengine.ListObjects(cs.Name, h.name, namespace)
+	if err != nil {
+		return zero, err
+	}
+	items := make([]runtime.Object, 0, len(raws))
+	for _, raw := range raws {
+		item := reflect.New(h.objectType).Interface().(T)
+		if err := json.Unmarshal(raw, item); err != nil {
+			return zero, err
+		}
+		obj, err := meta.Accessor(item)
+		if err != nil {
+			return zero, err
+		}
+		if h.Name() == string(common.Namespaces) && !rbac.CanAccessNamespace(user, cs.Name, obj.GetName()) {
+			continue
+		}
+		if allNamespaces && obj.GetNamespace() != "" &&
+			!rbac.CanAccess(user, h.Name(), string(common.VerbGet), cs.Name, obj.GetNamespace()) {
+			continue
+		}
+		items = append(items, item)
+	}
+	sort.Slice(items, func(i, j int) bool {
+		o1, _ := meta.Accessor(items[i])
+		o2, _ := meta.Accessor(items[j])
+		if o1 == nil || o2 == nil {
+			return false
+		}
+		t1 := o1.GetCreationTimestamp()
+		t2 := o2.GetCreationTimestamp()
+		if t1.Equal(&t2) {
+			return o1.GetName() < o2.GetName()
+		}
+		return t1.After(t2.Time)
+	})
+	if err := meta.SetList(objectList, items); err != nil {
+		return zero, err
+	}
+	return objectList, nil
+}
+
 func (h *GenericResourceHandler[T, V]) list(c *gin.Context) (V, error) {
 	var zero V
 	cs := c.MustGet("cluster").(*cluster.ClientSet)
@@ -27,9 +79,20 @@ func (h *GenericResourceHandler[T, V]) list(c *gin.Context) (V, error) {
 
 	ctx := c.Request.Context()
 
-	var listOpts []client.ListOption
 	namespace := c.Param("namespace")
 	allNamespaces := namespace == "" || namespace == common.AllNamespaces
+
+	// Sync engine fast path: whitelisted types with fresh data are served
+	// from the database; any failure falls back to the direct path.
+	if syncengine.Handles(h.name) && syncengine.Active(cs.Name, h.name) {
+		if served, err := h.listFromSync(c, objectList, namespace, allNamespaces); err == nil {
+			return served, nil
+		} else {
+			klog.V(2).Infof("sync path for %s failed, falling back to direct: %v", h.name, err)
+		}
+	}
+
+	var listOpts []client.ListOption
 	if !h.isClusterScoped {
 		if !allNamespaces {
 			listOpts = append(listOpts, client.InNamespace(namespace))
@@ -147,6 +210,38 @@ func (h *GenericResourceHandler[T, V]) Search(c *gin.Context, q string, limit in
 	user := c.MustGet("user").(model.User)
 	ctx := c.Request.Context()
 	objectList := reflect.New(h.listType).Interface().(V)
+	isLabelQuery := strings.Contains(q, ":") || strings.Contains(q, "=")
+
+	// Sync engine fast path for plain name searches.
+	if !isLabelQuery && syncengine.Handles(h.name) && syncengine.Active(cs.Name, h.name) {
+		if rows, err := syncengine.SearchObjectRows(cs.Name, h.name, q, limit); err == nil {
+			results := make([]common.SearchResult, 0, len(rows))
+			for _, row := range rows {
+				if h.Name() == string(common.Namespaces) {
+					if !rbac.CanAccessNamespace(user, cs.Name, row.Name) {
+						continue
+					}
+				} else {
+					ns := row.Namespace
+					if ns == "" {
+						ns = common.AllNamespaces
+					}
+					if !rbac.CanAccess(user, h.Name(), string(common.VerbGet), cs.Name, ns) {
+						continue
+					}
+				}
+				results = append(results, common.SearchResult{
+					ID:           row.UID,
+					Name:         row.Name,
+					Namespace:    row.Namespace,
+					ResourceType: h.name,
+					CreatedAt:    row.CreationTimestamp.String(),
+				})
+			}
+			return results, nil
+		}
+	}
+
 	var listOpts []client.ListOption
 	if idx := strings.Index(q, ":"); idx > 0 {
 		labelKey := strings.TrimSpace(q[:idx])
@@ -161,7 +256,7 @@ func (h *GenericResourceHandler[T, V]) Search(c *gin.Context, q string, limit in
 		klog.Errorf("failed to list %s: %v", h.name, err)
 		return nil, err
 	}
-	isLabelSearch := strings.Contains(q, ":") || strings.Contains(q, "=")
+	isLabelSearch := isLabelQuery
 	items, err := meta.ExtractList(objectList)
 	if err != nil {
 		klog.Errorf("failed to extract items from list: %v", err)

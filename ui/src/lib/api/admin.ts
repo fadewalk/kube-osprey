@@ -379,6 +379,8 @@ export interface GeneralSetting {
   pluginCatalogUrl: string
   mcpEnabled: boolean
   mcpRateLimitPerMinute: number
+  syncEngineEnabled: boolean
+  syncEngineResources: string
   enableAnalytics: boolean
   enableVersionCheck: boolean
   passwordLoginDisabled: boolean
@@ -404,6 +406,8 @@ export interface GeneralSettingUpdateRequest {
   pluginCatalogUrl?: string
   mcpEnabled?: boolean
   mcpRateLimitPerMinute?: number
+  syncEngineEnabled?: boolean
+  syncEngineResources?: string
   enableAnalytics?: boolean
   enableVersionCheck?: boolean
   passwordLoginDisabled?: boolean

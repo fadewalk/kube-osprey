@@ -905,6 +905,14 @@
     },
     "messages": {
       "updated": "通用设置已更新"
+    },
+    "syncEngine": {
+      "title": "资源同步引擎",
+      "description": "将白名单内的资源类型镜像到数据库，列表、搜索和拓扑不再依赖 API Server 实时访问。",
+      "form": {
+        "resources": "资源白名单（逗号分隔）",
+        "hint": "留空使用默认白名单。Secrets 默认排除；如显式添加，将按原样存储。"
+      }
     }
   },
   "authenticationManagement": {

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
   IconApi,
+  IconDatabase,
   IconLink,
   IconMessage,
   IconPuzzle,
@@ -58,6 +59,8 @@ interface GeneralSettingsFormData {
   pluginCatalogUrl: string
   mcpEnabled: boolean
   mcpRateLimitPerMinute: number
+  syncEngineEnabled: boolean
+  syncEngineResources: string
   enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
@@ -85,6 +88,8 @@ export function GeneralManagement() {
     pluginCatalogUrl: '',
     mcpEnabled: false,
     mcpRateLimitPerMinute: 60,
+    syncEngineEnabled: false,
+    syncEngineResources: '',
     enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
@@ -110,6 +115,8 @@ export function GeneralManagement() {
       pluginCatalogUrl: data.pluginCatalogUrl,
       mcpEnabled: data.mcpEnabled ?? false,
       mcpRateLimitPerMinute: data.mcpRateLimitPerMinute || 60,
+      syncEngineEnabled: data.syncEngineEnabled ?? false,
+      syncEngineResources: data.syncEngineResources || '',
       enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
@@ -217,6 +224,8 @@ export function GeneralManagement() {
         formData.mcpRateLimitPerMinute > 0
           ? formData.mcpRateLimitPerMinute
           : 60,
+      syncEngineEnabled: formData.syncEngineEnabled,
+      syncEngineResources: formData.syncEngineResources.trim(),
       enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
@@ -637,6 +646,63 @@ export function GeneralManagement() {
                   )}
                 </Link>
               </div>
+            </div>
+          )}
+        </div>
+
+        <div className="rounded-lg border">
+          <div className="flex items-center justify-between p-3">
+            <div className="space-y-1">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <IconDatabase className="h-4 w-4" />
+                {t(
+                  'generalManagement.syncEngine.title',
+                  'Resource Sync Engine'
+                )}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.syncEngine.description',
+                  'Mirror whitelisted resource types into the database so lists, search and topology stay available without touching the API server.'
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={formData.syncEngineEnabled}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  syncEngineEnabled: checked,
+                }))
+              }
+            />
+          </div>
+
+          {formData.syncEngineEnabled && (
+            <div className="space-y-2 border-t p-3">
+              <Label htmlFor="general-sync-resources">
+                {t(
+                  'generalManagement.syncEngine.form.resources',
+                  'Resource whitelist (comma-separated)'
+                )}
+              </Label>
+              <Input
+                id="general-sync-resources"
+                value={formData.syncEngineResources}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    syncEngineResources: e.target.value,
+                  }))
+                }
+                placeholder="pods, deployments, statefulsets, daemonsets, services, ingresses, configmaps, nodes, namespaces, events"
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.syncEngine.form.hint',
+                  'Leave empty for the default whitelist. Secrets are excluded by default and are stored as-is if added explicitly.'
+                )}
+              </p>
             </div>
           )}
         </div>

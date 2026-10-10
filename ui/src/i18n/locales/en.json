@@ -894,6 +894,14 @@
     },
     "messages": {
       "updated": "General settings updated"
+    },
+    "syncEngine": {
+      "title": "Resource Sync Engine",
+      "description": "Mirror whitelisted resource types into the database so lists, search and topology stay available without touching the API server.",
+      "form": {
+        "resources": "Resource whitelist (comma-separated)",
+        "hint": "Leave empty for the default whitelist. Secrets are excluded by default and are stored as-is if added explicitly."
+      }
     }
   },
   "authenticationManagement": {

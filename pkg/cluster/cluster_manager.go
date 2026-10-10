@@ -1,6 +1,7 @@
 package cluster
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"maps"
@@ -115,6 +116,7 @@ func newClientSet(name string, k8sConfig *rest.Config, prometheusURL string) (*C
 		cs.Version = v.String()
 	}
 	klog.Infof("Loaded K8s client for cluster: %s, version: %s", name, cs.Version)
+	go cs.K8sClient.PrewarmInformerCache(context.Background())
 	return cs, nil
 }
 

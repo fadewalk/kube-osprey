@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"encoding/json"
 	"net/http"
 	"reflect"
 
@@ -9,6 +10,7 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/kube"
 	"github.com/zxh326/kite/pkg/model"
+	"github.com/zxh326/kite/pkg/syncengine"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -103,6 +105,17 @@ func (h *GenericResourceHandler[T, V]) Searchable() bool {
 func (h *GenericResourceHandler[T, V]) GetResource(c *gin.Context, namespace, name string) (interface{}, error) {
 	cs := c.MustGet("cluster").(*cluster.ClientSet)
 	object := reflect.New(h.objectType).Interface().(T)
+
+	// Sync engine fast path for whitelisted types with fresh data; any
+	// miss or error falls through to the direct path.
+	if syncengine.Handles(h.name) && syncengine.Active(cs.Name, h.name) {
+		if raw, err := syncengine.GetObject(cs.Name, h.name, namespace, name); err == nil {
+			if err := json.Unmarshal(raw, object); err == nil {
+				return object, nil
+			}
+		}
+	}
+
 	namespacedName := types.NamespacedName{Name: name}
 	if !h.isClusterScoped {
 		if namespace != "" && namespace != common.AllNamespaces {

@@ -111,6 +111,8 @@ func InitDB() error {
 		MCPAuditLog{},
 		ChangePlan{},
 		ChangePlanStep{},
+		SyncObject{},
+		SyncTask{},
 		PendingSession{},
 		HelmRepository{},
 		ScheduledTask{},

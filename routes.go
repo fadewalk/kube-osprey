@@ -23,6 +23,7 @@ import (
 	"github.com/zxh326/kite/pkg/resources"
 	"github.com/zxh326/kite/pkg/search"
 	"github.com/zxh326/kite/pkg/settings"
+	"github.com/zxh326/kite/pkg/syncengine"
 	"github.com/zxh326/kite/pkg/system"
 	"github.com/zxh326/kite/pkg/templates"
 	"github.com/zxh326/kite/pkg/terminal"
@@ -231,4 +232,5 @@ func registerClusterProtectedRoutes(api *gin.RouterGroup, helmChartsHandler *hel
 
 	api.Use(middleware.RBACMiddleware())
 	resources.RegisterRoutes(api)
+	api.GET("/topology", syncengine.HandleTopology)
 }

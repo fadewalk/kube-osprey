@@ -57,22 +57,26 @@ func DefaultGeneralClusterAgentImageValue() string {
 
 type GeneralSetting struct {
 	Model
-	AIAgentEnabled          bool         `json:"aiAgentEnabled" gorm:"column:ai_agent_enabled;type:boolean;not null;default:false"`
-	AIProvider              string       `json:"aiProvider" gorm:"column:ai_provider;type:varchar(50);not null;default:'openai'"`
-	AIModel                 string       `json:"aiModel" gorm:"column:ai_model;type:varchar(255);not null;default:'gpt-4o-mini'"`
-	AIAPIKey                SecretString `json:"aiApiKey" gorm:"column:ai_api_key;type:text"`
-	AIBaseURL               string       `json:"aiBaseUrl" gorm:"column:ai_base_url;type:varchar(500)"`
-	AIMaxTokens             int          `json:"aiMaxTokens" gorm:"column:ai_max_tokens;type:integer;default:16384"`
-	KubectlEnabled          bool         `json:"kubectlEnabled" gorm:"column:kubectl_enabled;type:boolean;not null;default:false"`
-	KubectlImage            string       `json:"kubectlImage" gorm:"column:kubectl_image;type:varchar(255);not null;default:'zzde/kubectl:latest'"`
-	KubectlPermissionMode   string       `json:"kubectlPermissionMode" gorm:"column:kubectl_permission_mode;type:varchar(20);not null;default:'operator'"`
-	KubectlClusterRole      string       `json:"kubectlClusterRole" gorm:"column:kubectl_cluster_role;type:varchar(253)"`
-	NodeTerminalEnabled     bool         `json:"nodeTerminalEnabled" gorm:"column:node_terminal_enabled;type:boolean;not null;default:false"`
-	NodeTerminalImage       string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
-	ClusterAgentImage       string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
-	PluginCatalogURL        string       `json:"pluginCatalogUrl" gorm:"column:plugin_catalog_url;type:varchar(2048)"`
-	MCPEnabled              bool         `json:"mcpEnabled" gorm:"column:mcp_enabled;type:boolean;not null;default:false"`
-	MCPRateLimitPerMinute   int          `json:"mcpRateLimitPerMinute" gorm:"column:mcp_rate_limit_per_minute;type:integer;not null;default:60"`
+	AIAgentEnabled        bool         `json:"aiAgentEnabled" gorm:"column:ai_agent_enabled;type:boolean;not null;default:false"`
+	AIProvider            string       `json:"aiProvider" gorm:"column:ai_provider;type:varchar(50);not null;default:'openai'"`
+	AIModel               string       `json:"aiModel" gorm:"column:ai_model;type:varchar(255);not null;default:'gpt-4o-mini'"`
+	AIAPIKey              SecretString `json:"aiApiKey" gorm:"column:ai_api_key;type:text"`
+	AIBaseURL             string       `json:"aiBaseUrl" gorm:"column:ai_base_url;type:varchar(500)"`
+	AIMaxTokens           int          `json:"aiMaxTokens" gorm:"column:ai_max_tokens;type:integer;default:16384"`
+	KubectlEnabled        bool         `json:"kubectlEnabled" gorm:"column:kubectl_enabled;type:boolean;not null;default:false"`
+	KubectlImage          string       `json:"kubectlImage" gorm:"column:kubectl_image;type:varchar(255);not null;default:'zzde/kubectl:latest'"`
+	KubectlPermissionMode string       `json:"kubectlPermissionMode" gorm:"column:kubectl_permission_mode;type:varchar(20);not null;default:'operator'"`
+	KubectlClusterRole    string       `json:"kubectlClusterRole" gorm:"column:kubectl_cluster_role;type:varchar(253)"`
+	NodeTerminalEnabled   bool         `json:"nodeTerminalEnabled" gorm:"column:node_terminal_enabled;type:boolean;not null;default:false"`
+	NodeTerminalImage     string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
+	ClusterAgentImage     string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
+	PluginCatalogURL      string       `json:"pluginCatalogUrl" gorm:"column:plugin_catalog_url;type:varchar(2048)"`
+	MCPEnabled            bool         `json:"mcpEnabled" gorm:"column:mcp_enabled;type:boolean;not null;default:false"`
+	MCPRateLimitPerMinute int          `json:"mcpRateLimitPerMinute" gorm:"column:mcp_rate_limit_per_minute;type:integer;not null;default:60"`
+	SyncEngineEnabled     bool         `json:"syncEngineEnabled" gorm:"column:sync_engine_enabled;type:boolean;not null;default:false"`
+	// SyncEngineResources is a comma-separated whitelist of resource plurals;
+	// empty means the built-in default whitelist.
+	SyncEngineResources     string       `json:"syncEngineResources" gorm:"column:sync_engine_resources;type:text"`
 	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
 	AnalyticsInstallationID string       `json:"-" gorm:"type:varchar(32)"`
 	AnalyticsLastAttemptAt  *time.Time   `json:"-"`

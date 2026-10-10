@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zxh326/kite/pkg/model"
+	"github.com/zxh326/kite/pkg/syncengine"
 )
 
 func HandleGetGeneralSetting(c *gin.Context) {
@@ -35,6 +36,8 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		"pluginCatalogUrl":      setting.PluginCatalogURL,
 		"mcpEnabled":            setting.MCPEnabled,
 		"mcpRateLimitPerMinute": setting.MCPRateLimitPerMinute,
+		"syncEngineEnabled":     setting.SyncEngineEnabled,
+		"syncEngineResources":   setting.SyncEngineResources,
 		"enableAnalytics":       setting.EnableAnalytics,
 		"enableVersionCheck":    setting.EnableVersionCheck,
 		"passwordLoginDisabled": setting.PasswordLoginDisabled,
@@ -61,6 +64,8 @@ type UpdateGeneralSettingRequest struct {
 	PluginCatalogURL      *string `json:"pluginCatalogUrl"`
 	MCPEnabled            *bool   `json:"mcpEnabled"`
 	MCPRateLimitPerMinute *int    `json:"mcpRateLimitPerMinute"`
+	SyncEngineEnabled     *bool   `json:"syncEngineEnabled"`
+	SyncEngineResources   *string `json:"syncEngineResources"`
 	EnableAnalytics       *bool   `json:"enableAnalytics"`
 	EnableVersionCheck    *bool   `json:"enableVersionCheck"`
 	PasswordLoginDisabled *bool   `json:"passwordLoginDisabled"`
@@ -226,6 +231,12 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if req.MCPEnabled != nil {
 		updates["mcp_enabled"] = *req.MCPEnabled
 	}
+	if req.SyncEngineEnabled != nil {
+		updates["sync_engine_enabled"] = *req.SyncEngineEnabled
+	}
+	if req.SyncEngineResources != nil {
+		updates["sync_engine_resources"] = strings.TrimSpace(*req.SyncEngineResources)
+	}
 	if req.MCPRateLimitPerMinute != nil {
 		limit := *req.MCPRateLimitPerMinute
 		if limit <= 0 || limit > 10000 {
@@ -261,6 +272,7 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to update general setting: %v", err)})
 		return
 	}
+	syncengine.ReloadFromSetting()
 
 	hasAIAPIKey := strings.TrimSpace(string(updated.AIAPIKey)) != ""
 	c.JSON(http.StatusOK, gin.H{
@@ -281,6 +293,8 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 		"pluginCatalogUrl":      updated.PluginCatalogURL,
 		"mcpEnabled":            updated.MCPEnabled,
 		"mcpRateLimitPerMinute": updated.MCPRateLimitPerMinute,
+		"syncEngineEnabled":     updated.SyncEngineEnabled,
+		"syncEngineResources":   updated.SyncEngineResources,
 		"enableAnalytics":       updated.EnableAnalytics,
 		"enableVersionCheck":    updated.EnableVersionCheck,
 		"passwordLoginDisabled": updated.PasswordLoginDisabled,

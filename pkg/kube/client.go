@@ -8,7 +8,9 @@ import (
 	"time"
 
 	"github.com/go-logr/logr"
+	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	networkingv1 "k8s.io/api/networking/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -225,6 +227,44 @@ func NewClient(config *rest.Config) (*K8sClient, error) {
 		CacheEnabled:  cacheEnabled,
 		cancel:        cancel,
 	}, nil
+}
+
+// prewarmLists construct the high-traffic list types whose informers are
+// started on connect so that the first page views do not trigger concurrent
+// full LISTs.
+var prewarmLists = []func() client.ObjectList{
+	func() client.ObjectList { return &corev1.PodList{} },
+	func() client.ObjectList { return &appsv1.DeploymentList{} },
+	func() client.ObjectList { return &appsv1.StatefulSetList{} },
+	func() client.ObjectList { return &appsv1.DaemonSetList{} },
+	func() client.ObjectList { return &corev1.ServiceList{} },
+	func() client.ObjectList { return &corev1.ConfigMapList{} },
+	func() client.ObjectList { return &networkingv1.IngressList{} },
+	func() client.ObjectList { return &corev1.NamespaceList{} },
+	func() client.ObjectList { return &corev1.NodeList{} },
+}
+
+// PrewarmInformerCache eagerly starts the informer for common resource types,
+// one at a time with a pause between each, so the initial LIST requests are
+// staggered instead of arriving as a burst. Failures are expected for types
+// the cluster does not serve (e.g. Ingress without a networking backend) and
+// only logged.
+func (c *K8sClient) PrewarmInformerCache(ctx context.Context) {
+	if !c.CacheEnabled {
+		return
+	}
+	for _, newList := range prewarmLists {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
+		list := newList()
+		if err := c.List(ctx, list); err != nil {
+			klog.V(2).Infof("prewarm %T skipped: %v", list, err)
+		}
+		time.Sleep(500 * time.Millisecond)
+	}
 }
 
 func (c *K8sClient) Stop(name string) {
