@@ -138,7 +138,9 @@ func (h *GenericResourceHandler[T, V]) list(c *gin.Context) (V, error) {
 	}
 
 	if err := cs.K8sClient.List(ctx, objectList, listOpts...); err != nil {
-		if h.Name() == string(common.EndpointSlices) && meta.IsNoMatchError(err) {
+		// NoMatch means the cluster does not serve this resource (optional
+		// CRDs like Gateway API) — an empty list is the honest answer.
+		if meta.IsNoMatchError(err) {
 			_ = meta.SetList(objectList, []runtime.Object{})
 			return objectList, nil
 		}

@@ -40,6 +40,10 @@ const (
 	Ingresses                         ResourceType = "ingresses"
 	NetworkPolicies                   ResourceType = "networkpolicies"
 	IngressClasses                    ResourceType = "ingressclasses"
+	Gateways                          ResourceType = "gateways"
+	HTTPRoutes                        ResourceType = "httproutes"
+	GRPCRoutes                        ResourceType = "grpcroutes"
+	ReferenceGrants                   ResourceType = "referencegrants"
 	IPAddresses                       ResourceType = "ipaddresses"
 	ServiceCIDRs                      ResourceType = "servicecidrs"
 	StorageClasses                    ResourceType = "storageclasses"
@@ -136,6 +140,10 @@ var Registry = []ResourceMeta{
 	{Kind: "Ingress", Singular: "ingress", Plural: Ingresses, Short: []string{"ing"}, Group: "networking.k8s.io", Version: "v1", Related: true},
 	{Kind: "NetworkPolicy", Singular: "networkpolicy", Plural: NetworkPolicies, Short: []string{"netpol"}, Group: "networking.k8s.io", Version: "v1"},
 	{Kind: "IngressClass", Singular: "ingressclass", Plural: IngressClasses, Group: "networking.k8s.io", Version: "v1", ClusterScoped: true},
+	{Kind: "Gateway", Singular: "gateway", Plural: Gateways, Group: "gateway.networking.k8s.io", Version: "v1", Searchable: true, Related: true},
+	{Kind: "HTTPRoute", Singular: "httproute", Plural: HTTPRoutes, Group: "gateway.networking.k8s.io", Version: "v1", Searchable: true, Related: true},
+	{Kind: "GRPCRoute", Singular: "grpcroute", Plural: GRPCRoutes, Group: "gateway.networking.k8s.io", Version: "v1"},
+	{Kind: "ReferenceGrant", Singular: "referencegrant", Plural: ReferenceGrants, Group: "gateway.networking.k8s.io", Version: "v1beta1"},
 	{Kind: "IPAddress", Singular: "ipaddress", Plural: IPAddresses, Group: "networking.k8s.io", Version: "v1", ClusterScoped: true},
 	{Kind: "ServiceCIDR", Singular: "servicecidr", Plural: ServiceCIDRs, Group: "networking.k8s.io", Version: "v1", ClusterScoped: true},
 

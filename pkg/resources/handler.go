@@ -27,6 +27,8 @@ import (
 	flowcontrolv1beta2 "k8s.io/api/flowcontrol/v1beta2"
 	flowcontrolv1beta3 "k8s.io/api/flowcontrol/v1beta3"
 	networkingv1 "k8s.io/api/networking/v1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	networkingv1beta1 "k8s.io/api/networking/v1beta1"
 	nodev1 "k8s.io/api/node/v1"
 	policyv1 "k8s.io/api/policy/v1"
@@ -126,6 +128,10 @@ func newResourceHandlers() map[string]resourceHandler {
 			newResourceVersionCandidate("networking.k8s.io/v1", string(common.IngressClasses), NewGenericResourceHandler[*networkingv1.IngressClass, *networkingv1.IngressClassList](common.IngressClasses)),
 			newResourceVersionCandidate("networking.k8s.io/v1beta1", string(common.IngressClasses), NewGenericResourceHandler[*networkingv1beta1.IngressClass, *networkingv1beta1.IngressClassList](common.IngressClasses)),
 		),
+		string(common.Gateways):          NewGenericResourceHandler[*gatewayv1.Gateway, *gatewayv1.GatewayList](common.Gateways),
+		string(common.HTTPRoutes):        NewGenericResourceHandler[*gatewayv1.HTTPRoute, *gatewayv1.HTTPRouteList](common.HTTPRoutes),
+		string(common.GRPCRoutes):        NewGenericResourceHandler[*gatewayv1.GRPCRoute, *gatewayv1.GRPCRouteList](common.GRPCRoutes),
+		string(common.ReferenceGrants):   NewGenericResourceHandler[*gatewayv1beta1.ReferenceGrant, *gatewayv1beta1.ReferenceGrantList](common.ReferenceGrants),
 		string(common.IPAddresses):       NewGenericResourceHandler[*networkingv1.IPAddress, *networkingv1.IPAddressList](common.IPAddresses),
 		string(common.ServiceCIDRs):      NewGenericResourceHandler[*networkingv1.ServiceCIDR, *networkingv1.ServiceCIDRList](common.ServiceCIDRs),
 		string(common.StorageClasses):    NewGenericResourceHandler[*storagev1.StorageClass, *storagev1.StorageClassList](common.StorageClasses),

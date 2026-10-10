@@ -475,7 +475,11 @@
     "helmReleases": "Helm Release",
     "helmCharts": "App Catalog",
     "changePlans": "变更计划",
-    "topology": "拓扑视图"
+    "topology": "拓扑视图",
+    "gateways": "Gateways",
+    "httproutes": "HTTPRoutes",
+    "grpcroutes": "GRPCRoutes",
+    "referencegrants": "ReferenceGrants"
   },
   "overview": {
     "title": "概览",

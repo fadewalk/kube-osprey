@@ -351,6 +351,10 @@ export interface ResourcesTypeMap {
   secrets: SecretList
   persistentvolumeclaims: PersistentVolumeClaimList
   ingresses: IngressList
+  gateways: KubernetesResourceList
+  httproutes: KubernetesResourceList
+  grpcroutes: KubernetesResourceList
+  referencegrants: KubernetesResourceList
   networkpolicies: NetworkPolicyList
   namespaces: NamespaceList
   crds: CustomResourceDefinitionList
@@ -471,6 +475,10 @@ export interface ResourceTypeMap {
   secrets: Secret
   persistentvolumeclaims: PersistentVolumeClaim
   ingresses: Ingress
+  gateways: KubernetesResource
+  httproutes: KubernetesResource
+  grpcroutes: KubernetesResource
+  referencegrants: KubernetesResource
   networkpolicies: NetworkPolicy
   namespaces: Namespace
   crds: CustomResourceDefinition

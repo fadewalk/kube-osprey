@@ -11,6 +11,8 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -79,6 +81,8 @@ func init() {
 	ctrllog.SetLogger(controllerRuntimeLogger(klog.NewKlogr()))
 	_ = scheme.AddToScheme(runtimeScheme)
 	_ = apiextensionsv1.AddToScheme(runtimeScheme)
+	_ = gatewayv1.AddToScheme(runtimeScheme)
+	_ = gatewayv1beta1.AddToScheme(runtimeScheme)
 	_ = metricsv1.AddToScheme(runtimeScheme)
 }
 
@@ -240,6 +244,8 @@ var prewarmLists = []func() client.ObjectList{
 	func() client.ObjectList { return &corev1.ServiceList{} },
 	func() client.ObjectList { return &corev1.ConfigMapList{} },
 	func() client.ObjectList { return &networkingv1.IngressList{} },
+	func() client.ObjectList { return &gatewayv1.GatewayList{} },
+	func() client.ObjectList { return &gatewayv1.HTTPRouteList{} },
 	func() client.ObjectList { return &corev1.NamespaceList{} },
 	func() client.ObjectList { return &corev1.NodeList{} },
 }

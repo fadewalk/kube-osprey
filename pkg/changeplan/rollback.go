@@ -71,7 +71,6 @@ func (s *Service) RollbackPlan(ctx context.Context, planID uint) (*model.ChangeP
 		return nil, err
 	}
 
-	creator := model.User{Model: model.Model{ID: plan.UserID}, Username: plan.Username}
 	failed := false
 	for i := range plan.Steps {
 		step := &plan.Steps[i]
@@ -83,7 +82,7 @@ func (s *Service) RollbackPlan(ctx context.Context, planID uint) (*model.ChangeP
 			s.markStep(step, model.ChangeStepFailed, "", "rollback aborted after earlier failure")
 			continue
 		}
-		if err := s.rollbackStep(ctx, &creator, step); err != nil {
+		if err := s.rollbackStep(ctx, step); err != nil {
 			klog.Warningf("Rollback of plan %d step %d failed: %v", planID, step.Seq, err)
 			s.markStep(step, model.ChangeStepFailed, "", fmt.Sprintf("rollback failed: %v", err))
 			failed = true
@@ -114,7 +113,7 @@ func (s *Service) RollbackPlan(ctx context.Context, planID uint) (*model.ChangeP
 //	create (before absent)      -> delete the created object
 //	delete (after absent)       -> recreate from the before snapshot
 //	update/apply/patch          -> restore the before snapshot over the live object
-func (s *Service) rollbackStep(ctx context.Context, creator *model.User, step *model.ChangePlanStep) error {
+func (s *Service) rollbackStep(ctx context.Context, step *model.ChangePlanStep) error {
 	var args map[string]any
 	_ = json.Unmarshal([]byte(step.ArgsJSON), &args)
 

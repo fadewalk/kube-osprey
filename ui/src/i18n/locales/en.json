@@ -470,7 +470,11 @@
     "storageversionmigrations": "StorageVersionMigrations",
     "helmReleases": "Helm Release",
     "helmCharts": "App Catalog",
-    "topology": "Topology"
+    "topology": "Topology",
+    "gateways": "Gateways",
+    "httproutes": "HTTPRoutes",
+    "grpcroutes": "GRPCRoutes",
+    "referencegrants": "ReferenceGrants"
   },
   "overview": {
     "title": "Overview",
