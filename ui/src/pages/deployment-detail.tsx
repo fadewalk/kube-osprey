@@ -51,6 +51,7 @@ import { ResourceYaml } from '@/components/resource-yaml'
 import { Terminal } from '@/components/terminal'
 import { VolumeTable } from '@/components/volume-table'
 import { WorkloadHistoryTabs } from '@/components/workload-history-tabs'
+import { WorkloadImageDialog } from '@/components/workload-image-dialog'
 
 import { ResourceDetailShell } from './resource-detail-shell'
 
@@ -67,6 +68,7 @@ export function DeploymentDetail(props: { namespace: string; name: string }) {
     useState<ExposeServiceType>('ClusterIP')
   const [isScalePopoverOpen, setIsScalePopoverOpen] = useState(false)
   const [isRestartPopoverOpen, setIsRestartPopoverOpen] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState(0)
   const { t } = useTranslation()
 
@@ -285,410 +287,432 @@ export function DeploymentDetail(props: { namespace: string; name: string }) {
   const initContainers = deployment?.spec?.template.spec?.initContainers || []
 
   return (
-    <ResourceDetailShell
-      resourceType="deployments"
-      resourceLabel="Deployment"
-      name={name}
-      namespace={namespace}
-      data={deployment}
-      isLoading={isLoading}
-      error={isError ? error : null}
-      onRefresh={refetch}
-      tabs={[
-        {
-          value: 'overview',
-          label: t('common.tabs.overview'),
-          content: deployment ? (
-            <DeploymentOverview
-              deployment={deployment}
-              namespace={namespace}
-              name={name}
-              pods={relatedPods}
-              isPodsLoading={isLoadingPods}
-              events={deploymentEvents}
-              isEventsLoading={isEventsLoading}
-            />
-          ) : null,
-        },
-        {
-          value: 'pods',
-          label: (
-            <>
-              {t('common.tabs.pods')}
-              <Badge variant="secondary">{pods.length}</Badge>
-            </>
-          ),
-          content: (
-            <PodTable
-              pods={pods}
-              isLoading={isLoadingPods}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-        {
-          value: 'containers',
-          label: (
-            <>
-              {t('common.tabs.containers')}
-              <Badge variant="secondary">
-                {containers.length + initContainers.length}
-              </Badge>
-            </>
-          ),
-          content: (
-            <div className="space-y-4">
-              {initContainers.length > 0 ? (
+    <>
+      <WorkloadImageDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        kind="deployments"
+        namespace={namespace}
+        name={name}
+        containers={containers.map((c) => ({
+          name: c.name,
+          image: c.image ?? '',
+        }))}
+      />
+      <ResourceDetailShell
+        resourceType="deployments"
+        resourceLabel="Deployment"
+        name={name}
+        namespace={namespace}
+        data={deployment}
+        isLoading={isLoading}
+        error={isError ? error : null}
+        onRefresh={refetch}
+        tabs={[
+          {
+            value: 'overview',
+            label: t('common.tabs.overview'),
+            content: deployment ? (
+              <DeploymentOverview
+                deployment={deployment}
+                namespace={namespace}
+                name={name}
+                pods={relatedPods}
+                isPodsLoading={isLoadingPods}
+                events={deploymentEvents}
+                isEventsLoading={isEventsLoading}
+              />
+            ) : null,
+          },
+          {
+            value: 'pods',
+            label: (
+              <>
+                {t('common.tabs.pods')}
+                <Badge variant="secondary">{pods.length}</Badge>
+              </>
+            ),
+            content: (
+              <PodTable
+                pods={pods}
+                isLoading={isLoadingPods}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+          {
+            value: 'containers',
+            label: (
+              <>
+                {t('common.tabs.containers')}
+                <Badge variant="secondary">
+                  {containers.length + initContainers.length}
+                </Badge>
+              </>
+            ),
+            content: (
+              <div className="space-y-4">
+                {initContainers.length > 0 ? (
+                  <div className="space-y-3">
+                    {initContainers.map((container) => (
+                      <ContainerInfoCard
+                        key={container.name}
+                        container={container}
+                        init
+                        onContainerUpdate={(updatedContainer) =>
+                          handleContainerUpdate(updatedContainer, true)
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : null}
                 <div className="space-y-3">
-                  {initContainers.map((container) => (
+                  {containers.map((container) => (
                     <ContainerInfoCard
                       key={container.name}
                       container={container}
-                      init
                       onContainerUpdate={(updatedContainer) =>
-                        handleContainerUpdate(updatedContainer, true)
+                        handleContainerUpdate(updatedContainer, false)
                       }
                     />
                   ))}
                 </div>
-              ) : null}
-              <div className="space-y-3">
-                {containers.map((container) => (
-                  <ContainerInfoCard
-                    key={container.name}
-                    container={container}
-                    onContainerUpdate={(updatedContainer) =>
-                      handleContainerUpdate(updatedContainer, false)
-                    }
-                  />
-                ))}
               </div>
-            </div>
-          ),
-        },
-        {
-          value: 'yaml',
-          label: t('common.tabs.yaml'),
-          content: ({ resource, refreshKey }) => (
-            <ResourceYaml
-              key={refreshKey}
-              value={resource}
-              onSave={handleSaveYaml}
-              fillHeight
-            />
-          ),
-        },
-        {
-          value: 'logs',
-          label: t('common.tabs.logs'),
-          content: (
-            <LogViewer
-              namespace={namespace}
-              pods={pods}
-              containers={containers}
-              initContainers={initContainers}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-        {
-          value: 'terminal',
-          label: t('common.tabs.terminal'),
-          content:
-            pods.length > 0 ? (
-              <Terminal
+            ),
+          },
+          {
+            value: 'yaml',
+            label: t('common.tabs.yaml'),
+            content: ({ resource, refreshKey }) => (
+              <ResourceYaml
+                key={refreshKey}
+                value={resource}
+                onSave={handleSaveYaml}
+                fillHeight
+              />
+            ),
+          },
+          {
+            value: 'logs',
+            label: t('common.tabs.logs'),
+            content: (
+              <LogViewer
                 namespace={namespace}
                 pods={pods}
                 containers={containers}
                 initContainers={initContainers}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+          {
+            value: 'terminal',
+            label: t('common.tabs.terminal'),
+            content:
+              pods.length > 0 ? (
+                <Terminal
+                  namespace={namespace}
+                  pods={pods}
+                  containers={containers}
+                  initContainers={initContainers}
+                />
+              ) : null,
+          },
+          {
+            value: 'related',
+            label: t('common.tabs.related'),
+            content: (
+              <RelatedResourcesTable
+                resource="deployments"
+                name={name}
+                namespace={namespace}
+              />
+            ),
+          },
+          {
+            value: 'history',
+            label: t('common.tabs.history'),
+            content: deployment ? (
+              <WorkloadHistoryTabs
+                resourceType="deployments"
+                namespace={namespace}
+                name={name}
+                resource={deployment}
+                onRollbackComplete={refetch}
               />
             ) : null,
-        },
-        {
-          value: 'related',
-          label: t('common.tabs.related'),
-          content: (
-            <RelatedResourcesTable
-              resource="deployments"
-              name={name}
-              namespace={namespace}
-            />
-          ),
-        },
-        {
-          value: 'history',
-          label: t('common.tabs.history'),
-          content: deployment ? (
-            <WorkloadHistoryTabs
-              resourceType="deployments"
-              namespace={namespace}
-              name={name}
-              resource={deployment}
-              onRollbackComplete={refetch}
-            />
-          ) : null,
-        },
-        ...(deployment?.spec?.template?.spec?.volumes
-          ? [
-              {
-                value: 'volumes',
-                label: (
-                  <>
-                    {t('common.tabs.volumes')}
-                    <Badge variant="secondary">
-                      {deployment.spec.template.spec.volumes.length}
-                    </Badge>
-                  </>
-                ),
-                content: (
-                  <VolumeTable
-                    namespace={namespace}
-                    volumes={deployment.spec.template.spec.volumes}
-                    containers={toSimpleContainer(
-                      deployment.spec.template.spec.initContainers,
-                      deployment.spec.template.spec.containers
-                    )}
-                    isLoading={isLoading}
-                  />
-                ),
-              },
-            ]
-          : []),
-        {
-          value: 'events',
-          label: t('common.tabs.events'),
-          content: (
-            <EventTable
-              resource="deployments"
-              name={name}
-              namespace={namespace}
-            />
-          ),
-        },
-        {
-          value: 'monitor',
-          label: t('common.tabs.monitor'),
-          content: (
-            <PodMonitoring
-              namespace={namespace}
-              pods={pods}
-              containers={containers}
-              initContainers={initContainers}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-      ]}
-      headerActions={
-        <>
-          {relatedResources && !hasRelatedService ? (
+          },
+          ...(deployment?.spec?.template?.spec?.volumes
+            ? [
+                {
+                  value: 'volumes',
+                  label: (
+                    <>
+                      {t('common.tabs.volumes')}
+                      <Badge variant="secondary">
+                        {deployment.spec.template.spec.volumes.length}
+                      </Badge>
+                    </>
+                  ),
+                  content: (
+                    <VolumeTable
+                      namespace={namespace}
+                      volumes={deployment.spec.template.spec.volumes}
+                      containers={toSimpleContainer(
+                        deployment.spec.template.spec.initContainers,
+                        deployment.spec.template.spec.containers
+                      )}
+                      isLoading={isLoading}
+                    />
+                  ),
+                },
+              ]
+            : []),
+          {
+            value: 'events',
+            label: t('common.tabs.events'),
+            content: (
+              <EventTable
+                resource="deployments"
+                name={name}
+                namespace={namespace}
+              />
+            ),
+          },
+          {
+            value: 'monitor',
+            label: t('common.tabs.monitor'),
+            content: (
+              <PodMonitoring
+                namespace={namespace}
+                pods={pods}
+                containers={containers}
+                initContainers={initContainers}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+        ]}
+        headerActions={
+          <>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setIsExposeDialogOpen(true)}
-              disabled={isExposing}
+              onClick={() => setIsImageDialogOpen(true)}
             >
-              <IconNetwork className="w-4 h-4" />
-              {t('common.actions.expose')}
+              {t('workloadOps.editImages', 'Edit Images')}
             </Button>
-          ) : null}
-          <Popover
-            open={isScalePopoverOpen}
-            onOpenChange={setIsScalePopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconScale className="w-4 h-4" />
-                {t('common.actions.scale')}
+            {relatedResources && !hasRelatedService ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsExposeDialogOpen(true)}
+                disabled={isExposing}
+              >
+                <IconNetwork className="w-4 h-4" />
+                {t('common.actions.expose')}
               </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">
-                    {t('detail.dialogs.scaleDeployment.title')}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {t('detail.dialogs.scaleDeployment.description')}
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="replicas">
-                    {t('common.fields.replicas')}
-                  </Label>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="size-9 p-0"
-                      onClick={() =>
-                        setScaleReplicas(Math.max(0, scaleReplicas - 1))
-                      }
-                      disabled={scaleReplicas <= 0}
-                    >
-                      -
-                    </Button>
-                    <Input
-                      id="replicas"
-                      type="number"
-                      min="0"
-                      value={scaleReplicas}
-                      onChange={(e) =>
-                        setScaleReplicas(parseInt(e.target.value) || 0)
-                      }
-                      className="text-center"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="size-9 p-0"
-                      onClick={() => setScaleReplicas(scaleReplicas + 1)}
-                    >
-                      +
-                    </Button>
-                  </div>
-                </div>
-                <Button onClick={handleScale} className="w-full">
-                  <IconScale className="w-4 h-4 mr-2" />
+            ) : null}
+            <Popover
+              open={isScalePopoverOpen}
+              onOpenChange={setIsScalePopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconScale className="w-4 h-4" />
                   {t('common.actions.scale')}
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Popover
-            open={isRestartPopoverOpen}
-            onOpenChange={setIsRestartPopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconReload className="w-4 h-4" />
-                {t('common.actions.restart')}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">
-                    {t('detail.dialogs.restartDeployment.title')}
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    {t('detail.dialogs.restartDeployment.description')}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsRestartPopoverOpen(false)}
-                    className="flex-1"
-                  >
-                    {t('common.actions.cancel')}
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      handleRestart()
-                      setIsRestartPopoverOpen(false)
-                    }}
-                    className="flex-1"
-                  >
-                    <IconReload className="w-4 h-4 mr-2" />
-                    {t('common.actions.restart')}
-                  </Button>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Dialog
-            open={isExposeDialogOpen}
-            onOpenChange={setIsExposeDialogOpen}
-          >
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t('deployments.exposeTitle')}</DialogTitle>
-                <DialogDescription>
-                  {t('deployments.exposeDescription')}
-                </DialogDescription>
-              </DialogHeader>
-              <form
-                className="space-y-4"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  handleExpose()
-                }}
-              >
-                <div className="space-y-2">
-                  <Label htmlFor="service-type">
-                    {t('deployments.serviceType')}
-                  </Label>
-                  <Select
-                    value={exposeServiceType}
-                    onValueChange={(value) =>
-                      setExposeServiceType(value as ExposeServiceType)
-                    }
-                  >
-                    <SelectTrigger id="service-type" className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="ClusterIP">ClusterIP</SelectItem>
-                      <SelectItem value="NodePort">NodePort</SelectItem>
-                      <SelectItem value="LoadBalancer">LoadBalancer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="service-port">
-                      {t('deployments.servicePort')}
-                    </Label>
-                    <Input
-                      id="service-port"
-                      type="number"
-                      min="1"
-                      max="65535"
-                      value={exposePort}
-                      onChange={(event) =>
-                        setExposePort(
-                          Number.parseInt(event.target.value, 10) || 0
-                        )
-                      }
-                    />
+                    <h4 className="font-medium">
+                      {t('detail.dialogs.scaleDeployment.title')}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {t('detail.dialogs.scaleDeployment.description')}
+                    </p>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="target-port">
-                      {t('deployments.targetPort')}
+                    <Label htmlFor="replicas">
+                      {t('common.fields.replicas')}
                     </Label>
-                    <Input
-                      id="target-port"
-                      type="number"
-                      min="1"
-                      max="65535"
-                      value={exposeTargetPort}
-                      onChange={(event) =>
-                        setExposeTargetPort(
-                          Number.parseInt(event.target.value, 10) || 0
-                        )
-                      }
-                    />
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="size-9 p-0"
+                        onClick={() =>
+                          setScaleReplicas(Math.max(0, scaleReplicas - 1))
+                        }
+                        disabled={scaleReplicas <= 0}
+                      >
+                        -
+                      </Button>
+                      <Input
+                        id="replicas"
+                        type="number"
+                        min="0"
+                        value={scaleReplicas}
+                        onChange={(e) =>
+                          setScaleReplicas(parseInt(e.target.value) || 0)
+                        }
+                        className="text-center"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="size-9 p-0"
+                        onClick={() => setScaleReplicas(scaleReplicas + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                  <Button onClick={handleScale} className="w-full">
+                    <IconScale className="w-4 h-4 mr-2" />
+                    {t('common.actions.scale')}
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+            <Popover
+              open={isRestartPopoverOpen}
+              onOpenChange={setIsRestartPopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconReload className="w-4 h-4" />
+                  {t('common.actions.restart')}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">
+                      {t('detail.dialogs.restartDeployment.title')}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {t('detail.dialogs.restartDeployment.description')}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsRestartPopoverOpen(false)}
+                      className="flex-1"
+                    >
+                      {t('common.actions.cancel')}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        handleRestart()
+                        setIsRestartPopoverOpen(false)
+                      }}
+                      className="flex-1"
+                    >
+                      <IconReload className="w-4 h-4 mr-2" />
+                      {t('common.actions.restart')}
+                    </Button>
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setIsExposeDialogOpen(false)}
-                  >
-                    {t('common.actions.cancel')}
-                  </Button>
-                  <Button type="submit" disabled={isExposing}>
-                    <IconNetwork className="w-4 h-4 mr-2" />
-                    {t('common.actions.expose')}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </>
-      }
-    />
+              </PopoverContent>
+            </Popover>
+            <Dialog
+              open={isExposeDialogOpen}
+              onOpenChange={setIsExposeDialogOpen}
+            >
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>{t('deployments.exposeTitle')}</DialogTitle>
+                  <DialogDescription>
+                    {t('deployments.exposeDescription')}
+                  </DialogDescription>
+                </DialogHeader>
+                <form
+                  className="space-y-4"
+                  onSubmit={(event) => {
+                    event.preventDefault()
+                    handleExpose()
+                  }}
+                >
+                  <div className="space-y-2">
+                    <Label htmlFor="service-type">
+                      {t('deployments.serviceType')}
+                    </Label>
+                    <Select
+                      value={exposeServiceType}
+                      onValueChange={(value) =>
+                        setExposeServiceType(value as ExposeServiceType)
+                      }
+                    >
+                      <SelectTrigger id="service-type" className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ClusterIP">ClusterIP</SelectItem>
+                        <SelectItem value="NodePort">NodePort</SelectItem>
+                        <SelectItem value="LoadBalancer">
+                          LoadBalancer
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="service-port">
+                        {t('deployments.servicePort')}
+                      </Label>
+                      <Input
+                        id="service-port"
+                        type="number"
+                        min="1"
+                        max="65535"
+                        value={exposePort}
+                        onChange={(event) =>
+                          setExposePort(
+                            Number.parseInt(event.target.value, 10) || 0
+                          )
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="target-port">
+                        {t('deployments.targetPort')}
+                      </Label>
+                      <Input
+                        id="target-port"
+                        type="number"
+                        min="1"
+                        max="65535"
+                        value={exposeTargetPort}
+                        onChange={(event) =>
+                          setExposeTargetPort(
+                            Number.parseInt(event.target.value, 10) || 0
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsExposeDialogOpen(false)}
+                    >
+                      {t('common.actions.cancel')}
+                    </Button>
+                    <Button type="submit" disabled={isExposing}>
+                      <IconNetwork className="w-4 h-4 mr-2" />
+                      {t('common.actions.expose')}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </>
+        }
+      />
+    </>
   )
 }

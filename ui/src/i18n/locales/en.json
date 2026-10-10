@@ -1517,5 +1517,11 @@
     "empty": "No objects to display in this namespace.",
     "syncUnavailable": "Sync engine data unavailable - enable it in Settings, General",
     "hint": "Ownership graph from the sync engine: workloads point to their ReplicaSets and pods. Click a node to open the resource."
-  }
+  },
+  "imageTitle": "Update images — {{name}}",
+  "imageUpdated": "{{count}} container image(s) updated, rollout started",
+  "imageHint": "Changing an image triggers a rollout of the workload.",
+  "applyImages": "Update {{count}} image(s)",
+  "editImages": "Edit Images",
+  "restart": "Restart"
 }

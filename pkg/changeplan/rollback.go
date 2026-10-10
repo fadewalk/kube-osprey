@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"gorm.io/gorm"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/klog/v2"
-	"gorm.io/gorm"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/zxh326/kite/pkg/cluster"

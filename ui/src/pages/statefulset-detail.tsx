@@ -32,12 +32,14 @@ import { StatefulSetOverview } from '@/components/statefulset-overview'
 import { Terminal } from '@/components/terminal'
 import { VolumeTable } from '@/components/volume-table'
 import { WorkloadHistoryTabs } from '@/components/workload-history-tabs'
+import { WorkloadImageDialog } from '@/components/workload-image-dialog'
 
 import { ResourceDetailShell } from './resource-detail-shell'
 
 export function StatefulSetDetail(props: { namespace: string; name: string }) {
   const { namespace, name } = props
   const [isRestartPopoverOpen, setIsRestartPopoverOpen] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
   const [isScalePopoverOpen, setIsScalePopoverOpen] = useState(false)
   const [scaleReplicas, setScaleReplicas] = useState(0)
   const [refreshInterval, setRefreshInterval] = useState(0)
@@ -188,281 +190,294 @@ export function StatefulSetDetail(props: { namespace: string; name: string }) {
   const allContainers = [...initContainers, ...containers]
 
   return (
-    <ResourceDetailShell
-      resourceType="statefulsets"
-      resourceLabel="StatefulSet"
-      name={name}
-      namespace={namespace}
-      data={statefulset}
-      isLoading={isLoading}
-      error={isError ? error : null}
-      onRefresh={refetch}
-      tabs={[
-        {
-          value: 'overview',
-          label: t('common.tabs.overview'),
-          content: statefulset ? (
-            <StatefulSetOverview
-              statefulset={statefulset}
-              namespace={namespace}
-              name={name}
-              pods={relatedPods}
-              isPodsLoading={isLoadingPods}
-              events={statefulSetEvents}
-              isEventsLoading={isEventsLoading}
-            />
-          ) : null,
-        },
-        {
-          value: 'pods',
-          label: (
-            <>
-              {t('common.tabs.pods', { defaultValue: 'Pods' })}
-              <Badge variant="secondary">{pods.length}</Badge>
-            </>
-          ),
-          content: (
-            <PodTable
-              pods={pods}
-              isLoading={isLoadingPods}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-        {
-          value: 'containers',
-          label: (
-            <>
-              {t('common.tabs.containers', {
-                defaultValue: 'Containers',
-              })}
-              <Badge variant="secondary">
-                {containers.length + initContainers.length}
-              </Badge>
-            </>
-          ),
-          content: (
-            <div className="space-y-4">
-              {initContainers.length > 0 ? (
+    <>
+      <WorkloadImageDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        kind="statefulsets"
+        namespace={namespace}
+        name={name}
+        containers={(containers ?? []).map((c) => ({
+          name: c.name,
+          image: c.image ?? '',
+        }))}
+      />
+      <ResourceDetailShell
+        resourceType="statefulsets"
+        resourceLabel="StatefulSet"
+        name={name}
+        namespace={namespace}
+        data={statefulset}
+        isLoading={isLoading}
+        error={isError ? error : null}
+        onRefresh={refetch}
+        tabs={[
+          {
+            value: 'overview',
+            label: t('common.tabs.overview'),
+            content: statefulset ? (
+              <StatefulSetOverview
+                statefulset={statefulset}
+                namespace={namespace}
+                name={name}
+                pods={relatedPods}
+                isPodsLoading={isLoadingPods}
+                events={statefulSetEvents}
+                isEventsLoading={isEventsLoading}
+              />
+            ) : null,
+          },
+          {
+            value: 'pods',
+            label: (
+              <>
+                {t('common.tabs.pods', { defaultValue: 'Pods' })}
+                <Badge variant="secondary">{pods.length}</Badge>
+              </>
+            ),
+            content: (
+              <PodTable
+                pods={pods}
+                isLoading={isLoadingPods}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+          {
+            value: 'containers',
+            label: (
+              <>
+                {t('common.tabs.containers', {
+                  defaultValue: 'Containers',
+                })}
+                <Badge variant="secondary">
+                  {containers.length + initContainers.length}
+                </Badge>
+              </>
+            ),
+            content: (
+              <div className="space-y-4">
+                {initContainers.length > 0 ? (
+                  <div className="space-y-3">
+                    {initContainers.map((container) => (
+                      <ContainerInfoCard
+                        key={container.name}
+                        container={container}
+                        init
+                        onContainerUpdate={(updatedContainer) =>
+                          handleContainerUpdate(updatedContainer, true)
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : null}
                 <div className="space-y-3">
-                  {initContainers.map((container) => (
+                  {containers.map((container) => (
                     <ContainerInfoCard
                       key={container.name}
                       container={container}
-                      init
                       onContainerUpdate={(updatedContainer) =>
-                        handleContainerUpdate(updatedContainer, true)
+                        handleContainerUpdate(updatedContainer, false)
                       }
                     />
                   ))}
                 </div>
-              ) : null}
-              <div className="space-y-3">
-                {containers.map((container) => (
-                  <ContainerInfoCard
-                    key={container.name}
-                    container={container}
-                    onContainerUpdate={(updatedContainer) =>
-                      handleContainerUpdate(updatedContainer, false)
-                    }
-                  />
-                ))}
               </div>
-            </div>
-          ),
-        },
-        {
-          value: 'yaml',
-          label: t('common.tabs.yaml'),
-          content: ({ resource, refreshKey }) => (
-            <ResourceYaml
-              key={refreshKey}
-              value={resource}
-              onSave={handleSaveYaml}
-              fillHeight
-            />
-          ),
-        },
-        {
-          value: 'logs',
-          label: t('common.tabs.logs', { defaultValue: 'Logs' }),
-          content: (
-            <LogViewer
-              namespace={namespace}
-              pods={pods}
-              containers={containers}
-              initContainers={initContainers}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-        {
-          value: 'terminal',
-          label: t('common.tabs.terminal', { defaultValue: 'Terminal' }),
-          content:
-            pods.length > 0 ? (
-              <Terminal
+            ),
+          },
+          {
+            value: 'yaml',
+            label: t('common.tabs.yaml'),
+            content: ({ resource, refreshKey }) => (
+              <ResourceYaml
+                key={refreshKey}
+                value={resource}
+                onSave={handleSaveYaml}
+                fillHeight
+              />
+            ),
+          },
+          {
+            value: 'logs',
+            label: t('common.tabs.logs', { defaultValue: 'Logs' }),
+            content: (
+              <LogViewer
                 namespace={namespace}
                 pods={pods}
                 containers={containers}
                 initContainers={initContainers}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+          {
+            value: 'terminal',
+            label: t('common.tabs.terminal', { defaultValue: 'Terminal' }),
+            content:
+              pods.length > 0 ? (
+                <Terminal
+                  namespace={namespace}
+                  pods={pods}
+                  containers={containers}
+                  initContainers={initContainers}
+                />
+              ) : null,
+          },
+          {
+            value: 'volumes',
+            label: (
+              <>
+                {t('common.tabs.volumes', { defaultValue: 'Volumes' })}
+                <Badge variant="secondary">{volumes.length}</Badge>
+              </>
+            ),
+            content: (
+              <VolumeTable
+                namespace={namespace}
+                volumes={volumes}
+                containers={allContainers}
+                isLoading={isLoading}
+              />
+            ),
+          },
+          {
+            value: 'related',
+            label: t('common.tabs.related', { defaultValue: 'Related' }),
+            content: (
+              <RelatedResourcesTable
+                resource="statefulsets"
+                name={name}
+                namespace={namespace}
+              />
+            ),
+          },
+          {
+            value: 'history',
+            label: t('common.tabs.history', { defaultValue: 'History' }),
+            content: statefulset ? (
+              <WorkloadHistoryTabs
+                resourceType="statefulsets"
+                namespace={namespace}
+                name={name}
+                resource={statefulset}
+                onRollbackComplete={refetch}
               />
             ) : null,
-        },
-        {
-          value: 'volumes',
-          label: (
-            <>
-              {t('common.tabs.volumes', { defaultValue: 'Volumes' })}
-              <Badge variant="secondary">{volumes.length}</Badge>
-            </>
-          ),
-          content: (
-            <VolumeTable
-              namespace={namespace}
-              volumes={volumes}
-              containers={allContainers}
-              isLoading={isLoading}
-            />
-          ),
-        },
-        {
-          value: 'related',
-          label: t('common.tabs.related', { defaultValue: 'Related' }),
-          content: (
-            <RelatedResourcesTable
-              resource="statefulsets"
-              name={name}
-              namespace={namespace}
-            />
-          ),
-        },
-        {
-          value: 'history',
-          label: t('common.tabs.history', { defaultValue: 'History' }),
-          content: statefulset ? (
-            <WorkloadHistoryTabs
-              resourceType="statefulsets"
-              namespace={namespace}
-              name={name}
-              resource={statefulset}
-              onRollbackComplete={refetch}
-            />
-          ) : null,
-        },
-        {
-          value: 'events',
-          label: t('common.tabs.events', { defaultValue: 'Events' }),
-          content: (
-            <EventTable
-              resource="statefulsets"
-              name={name}
-              namespace={namespace}
-            />
-          ),
-        },
-        {
-          value: 'monitor',
-          label: t('common.tabs.monitor', { defaultValue: 'Monitor' }),
-          content: (
-            <PodMonitoring
-              namespace={namespace}
-              pods={pods}
-              containers={containers}
-              initContainers={initContainers}
-              defaultQueryName={pods[0]?.metadata?.generateName}
-              labelSelector={labelSelector}
-            />
-          ),
-        },
-      ]}
-      headerActions={
-        <>
-          <Popover
-            open={isScalePopoverOpen}
-            onOpenChange={setIsScalePopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconScale className="w-4 h-4" />
-                Scale
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80" align="end">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium">Scale StatefulSet</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Adjust the number of replicas for this StatefulSet.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="replicas">Replicas</Label>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-9 w-9 p-0"
-                      onClick={() =>
-                        setScaleReplicas(Math.max(0, scaleReplicas - 1))
-                      }
-                      disabled={scaleReplicas <= 0}
-                    >
-                      -
-                    </Button>
-                    <Input
-                      id="replicas"
-                      type="number"
-                      min="0"
-                      value={scaleReplicas}
-                      onChange={(e) =>
-                        setScaleReplicas(parseInt(e.target.value) || 0)
-                      }
-                      className="text-center"
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-9 w-9 p-0"
-                      onClick={() => setScaleReplicas(scaleReplicas + 1)}
-                    >
-                      +
-                    </Button>
+          },
+          {
+            value: 'events',
+            label: t('common.tabs.events', { defaultValue: 'Events' }),
+            content: (
+              <EventTable
+                resource="statefulsets"
+                name={name}
+                namespace={namespace}
+              />
+            ),
+          },
+          {
+            value: 'monitor',
+            label: t('common.tabs.monitor', { defaultValue: 'Monitor' }),
+            content: (
+              <PodMonitoring
+                namespace={namespace}
+                pods={pods}
+                containers={containers}
+                initContainers={initContainers}
+                defaultQueryName={pods[0]?.metadata?.generateName}
+                labelSelector={labelSelector}
+              />
+            ),
+          },
+        ]}
+        headerActions={
+          <>
+            <Popover
+              open={isScalePopoverOpen}
+              onOpenChange={setIsScalePopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconScale className="w-4 h-4" />
+                  Scale
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80" align="end">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">Scale StatefulSet</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Adjust the number of replicas for this StatefulSet.
+                    </p>
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="replicas">Replicas</Label>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 w-9 p-0"
+                        onClick={() =>
+                          setScaleReplicas(Math.max(0, scaleReplicas - 1))
+                        }
+                        disabled={scaleReplicas <= 0}
+                      >
+                        -
+                      </Button>
+                      <Input
+                        id="replicas"
+                        type="number"
+                        min="0"
+                        value={scaleReplicas}
+                        onChange={(e) =>
+                          setScaleReplicas(parseInt(e.target.value) || 0)
+                        }
+                        className="text-center"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-9 w-9 p-0"
+                        onClick={() => setScaleReplicas(scaleReplicas + 1)}
+                      >
+                        +
+                      </Button>
+                    </div>
+                  </div>
+                  <Button onClick={handleScale} className="w-full">
+                    Scale StatefulSet
+                  </Button>
                 </div>
-                <Button onClick={handleScale} className="w-full">
-                  Scale StatefulSet
+              </PopoverContent>
+            </Popover>
+            <Popover
+              open={isRestartPopoverOpen}
+              onOpenChange={setIsRestartPopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <IconReload className="w-4 h-4" />
+                  Restart
                 </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-          <Popover
-            open={isRestartPopoverOpen}
-            onOpenChange={setIsRestartPopoverOpen}
-          >
-            <PopoverTrigger asChild>
-              <Button variant="outline" size="sm">
-                <IconReload className="w-4 h-4" />
-                Restart
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="space-y-2">
-                <p className="text-sm">
-                  This will restart all pods managed by this StatefulSet.
-                </p>
-                <Button
-                  onClick={handleRestart}
-                  className="w-full"
-                  variant="outline"
-                >
-                  Confirm Restart
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </>
-      }
-    />
+              </PopoverTrigger>
+              <PopoverContent className="w-80">
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    This will restart all pods managed by this StatefulSet.
+                  </p>
+                  <Button
+                    onClick={handleRestart}
+                    className="w-full"
+                    variant="outline"
+                  >
+                    Confirm Restart
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
+          </>
+        }
+      />
+    </>
   )
 }

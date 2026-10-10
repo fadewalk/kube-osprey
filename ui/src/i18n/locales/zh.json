@@ -1604,5 +1604,11 @@
     "empty": "该命名空间暂无可展示的对象。",
     "syncUnavailable": "同步引擎数据不可用 — 请在 设置 → 通用 中开启",
     "hint": "来自同步引擎的从属关系图：工作负载指向其 ReplicaSet 和 Pod。点击节点可打开对应资源。"
-  }
+  },
+  "imageTitle": "更新镜像 — {{name}}",
+  "imageUpdated": "已更新 {{count}} 个容器镜像，开始滚动更新",
+  "imageHint": "修改镜像将触发工作负载滚动更新。",
+  "applyImages": "更新 {{count}} 个镜像",
+  "editImages": "编辑镜像",
+  "restart": "重启"
 }

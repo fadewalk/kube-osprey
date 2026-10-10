@@ -234,6 +234,9 @@ func registerClusterProtectedRoutes(api *gin.RouterGroup, helmChartsHandler *hel
 	api.POST("/ai/chat", ai.HandleChat)
 	api.POST("/ai/continue", ai.HandleContinue)
 
+	api.POST("/workload-ops/update-image", resources.UpdateWorkloadImage)
+	api.POST("/workload-ops/restart", resources.RestartWorkload)
+
 	api.Use(middleware.RBACMiddleware())
 	resources.RegisterRoutes(api)
 	api.GET("/topology", syncengine.HandleTopology)

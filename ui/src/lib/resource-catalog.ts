@@ -221,7 +221,11 @@ export const resourceCatalog = [
     clusterScope: false,
     titleKey: 'nav.grpcroutes',
     icon: 'IconRoute',
-    sidebar: { groupKey: 'sidebar.groups.traffic', order: 5, defaultHidden: true },
+    sidebar: {
+      groupKey: 'sidebar.groups.traffic',
+      order: 5,
+      defaultHidden: true,
+    },
   },
   {
     type: 'referencegrants',
@@ -232,7 +236,11 @@ export const resourceCatalog = [
     clusterScope: false,
     titleKey: 'nav.referencegrants',
     icon: 'IconLock',
-    sidebar: { groupKey: 'sidebar.groups.traffic', order: 6, defaultHidden: true },
+    sidebar: {
+      groupKey: 'sidebar.groups.traffic',
+      order: 6,
+      defaultHidden: true,
+    },
   },
   {
     type: 'configmaps',
