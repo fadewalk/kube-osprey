@@ -35,12 +35,42 @@ import { SidebarItemIcon } from './sidebar-item-icon'
 import { Collapsible, CollapsibleTrigger } from './ui/collapsible'
 import { VersionInfo } from './version-info'
 
+// Kuboard-style two-line label: localized title with the English term as a
+// small gloss underneath, so resource names stay recognizable in zh.
+function SidebarItemLabel({ title, gloss }: { title: string; gloss?: string }) {
+  if (!gloss) return <span className="truncate">{title}</span>
+  return (
+    <span className="flex min-w-0 flex-col justify-center leading-tight">
+      <span className="truncate">{title}</span>
+      <span className="truncate text-[10px] font-normal text-muted-foreground">
+        {gloss}
+      </span>
+    </span>
+  )
+}
+
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const location = useLocation()
   const { isMobile, setOpenMobile } = useSidebar()
   const { config, isLoading } = useSidebarConfig()
   const { data: versionInfo } = useVersionInfo()
+
+  // English term shown under the localized title; omitted in English or when
+  // the localized label already carries the English word (e.g. "Pod").
+  const englishGloss = (titleKey?: string): string | undefined => {
+    if (!titleKey || !i18n.language.startsWith('zh')) return undefined
+    const localized = t(titleKey, { defaultValue: titleKey })
+    const english = i18n.t(titleKey, { lng: 'en', defaultValue: titleKey })
+    if (!english || english === localized) return undefined
+    const enBase = english
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '')
+      .replace(/e?s$/, '')
+    if (enBase && localized.toLowerCase().includes(enBase)) return undefined
+    return english
+  }
+
   const [openAPIGroupItems, setOpenAPIGroupItems] = useState<
     Record<string, boolean>
   >({})
@@ -167,6 +197,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const title = item.titleKey
       ? t(item.titleKey, { defaultValue: item.titleKey })
       : ''
+    const gloss = englishGloss(item.titleKey)
     if (item.type === 'apiGroup' || (item.type === 'link' && item.children)) {
       const children =
         item.type === 'apiGroup'
@@ -189,9 +220,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         >
           <SidebarMenuItem>
             <CollapsibleTrigger asChild>
-              <SidebarMenuButton tooltip={title} isActive={hasActiveChild}>
+              <SidebarMenuButton
+                tooltip={title}
+                isActive={hasActiveChild}
+                size={gloss ? 'lg' : 'default'}
+              >
                 <SidebarItemIcon item={item} className="text-sidebar-primary" />
-                <span className="truncate">{title}</span>
+                <SidebarItemLabel title={title} gloss={gloss} />
                 <PluginIndicator pluginId={item.pluginId} />
                 <ChevronRight className="ml-auto group-data-[state=open]/submenu:rotate-90" />
               </SidebarMenuButton>
@@ -236,10 +271,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           tooltip={title}
           asChild
           isActive={isActive(item.url)}
+          size={gloss ? 'lg' : 'default'}
         >
           <Link to={item.url} onClick={handleMenuItemClick}>
             <SidebarItemIcon item={item} className="text-sidebar-primary" />
-            <span className="truncate">{title}</span>
+            <SidebarItemLabel title={title} gloss={gloss} />
             {item.url === '/change-plans' && <ChangePlanBadge />}
             <PluginIndicator pluginId={item.pluginId} />
           </Link>

@@ -347,13 +347,13 @@
   },
   "sidebar": {
     "groups": {
-      "traffic": "traffic",
-      "storage": "storage",
-      "config": "config",
-      "other": "other",
+      "traffic": "Networking",
+      "storage": "Storage",
+      "config": "Configuration",
+      "other": "Cluster Resources",
       "security": "Security",
       "workloads": "Workloads",
-      "application": "Application"
+      "application": "Applications"
     },
     "short": {
       "pvcs": "PVCs",
@@ -379,7 +379,11 @@
     "unsetGlobal": "Unset global sidebar",
     "unsetGlobalSuccess": "Global sidebar disabled successfully",
     "unsetGlobalError": "Failed to disable global sidebar",
-    "updateAvailable": "A newer Kite version is available"
+    "updateAvailable": "A newer Kite version is available",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "customize": "Customize Sidebar",
+    "customizeTitle": "Customize Sidebar"
   },
   "prometheusExplorer": {
     "description": "Run instant or range PromQL queries against the current cluster.",
@@ -474,7 +478,8 @@
     "gateways": "Gateways",
     "httproutes": "HTTPRoutes",
     "grpcroutes": "GRPCRoutes",
-    "referencegrants": "ReferenceGrants"
+    "referencegrants": "ReferenceGrants",
+    "settings": "Settings"
   },
   "overview": {
     "title": "Overview",
