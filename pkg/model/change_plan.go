@@ -7,6 +7,7 @@ import (
 // Change plan lifecycle. Transitions:
 //
 //	CREATED -> PENDING -> (APPROVED -> APPLYING -> APPLIED | FAILED) | REJECTED | EXPIRED
+//	APPLIED -> ROLLING_BACK -> ROLLED_BACK | ROLLBACK_FAILED
 const (
 	ChangePlanCreated  = "CREATED"
 	ChangePlanPending  = "PENDING"
@@ -16,6 +17,10 @@ const (
 	ChangePlanFailed   = "FAILED"
 	ChangePlanRejected = "REJECTED"
 	ChangePlanExpired  = "EXPIRED"
+
+	ChangePlanRollingBack    = "ROLLING_BACK"
+	ChangePlanRolledBack     = "ROLLED_BACK"
+	ChangePlanRollbackFailed = "ROLLBACK_FAILED"
 )
 
 // Change plan step lifecycle:
@@ -29,6 +34,7 @@ const (
 	ChangeStepApplied           = "APPLIED"
 	ChangeStepFailed            = "FAILED"
 	ChangeStepSkipped           = "SKIPPED"
+	ChangeStepRolledBack        = "ROLLED_BACK"
 )
 
 const (

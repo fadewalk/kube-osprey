@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import {
+  IconArrowBackUp,
   IconCircleCheck,
   IconCircleX,
   IconClock,
@@ -17,6 +18,7 @@ import {
   getChangePlan,
   listChangePlans,
   rejectChangePlan,
+  rollbackChangePlan,
 } from '@/lib/api/changeplans'
 import { MonacoDiffEditor } from '@/lib/monaco-loader'
 import { translateError } from '@/lib/utils'
@@ -184,19 +186,23 @@ function PlanDetail({
   })
 
   const act = useMutation({
-    mutationFn: async (action: 'approve' | 'reject') => {
+    mutationFn: async (action: 'approve' | 'reject' | 'rollback') => {
       if (action === 'approve') {
         await approveChangePlan(planId)
-      } else {
+      } else if (action === 'reject') {
         await rejectChangePlan(planId)
+      } else {
+        await rollbackChangePlan(planId)
       }
     },
     onSuccess: (_, action) => {
-      toast.success(
-        t(
-          `changePlans.messages.${action === 'approve' ? 'approved' : 'rejected'}`
-        )
-      )
+      const key =
+        action === 'approve'
+          ? 'approved'
+          : action === 'reject'
+            ? 'rejected'
+            : 'rolledBack'
+      toast.success(t(`changePlans.messages.${key}`))
       queryClient.invalidateQueries({ queryKey: ['change-plans'] })
       onActionDone()
     },
@@ -255,6 +261,20 @@ function PlanDetail({
           >
             <IconCircleX className="size-4" />
             {t('changePlans.actions.reject')}
+          </Button>
+        </div>
+      )}
+
+      {plan.status === 'APPLIED' && canApprove && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => act.mutate('rollback')}
+            disabled={act.isPending}
+            className="gap-1"
+          >
+            <IconArrowBackUp className="size-4" />
+            {t('changePlans.actions.rollback')}
           </Button>
         </div>
       )}

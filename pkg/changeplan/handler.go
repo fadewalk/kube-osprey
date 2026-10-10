@@ -104,3 +104,28 @@ func (s *Service) PendingChangePlanCount(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"count": count})
 }
+
+// RollbackChangePlan reverts an APPLIED plan from its before/after
+// snapshots; approver permission required.
+func (s *Service) RollbackChangePlan(c *gin.Context) {
+	user, ok := userFromGin(c)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Not authenticated"})
+		return
+	}
+	if !CanApproveChangePlans(user) {
+		c.JSON(http.StatusForbidden, gin.H{"error": rbac.NoAccess(user.Key(), "approve", "change_plans", common.AllNamespaces, "")})
+		return
+	}
+	planID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid plan id"})
+		return
+	}
+	plan, err := s.RollbackPlan(c.Request.Context(), uint(planID))
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, plan)
+}

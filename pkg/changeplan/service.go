@@ -34,7 +34,9 @@ type Service struct {
 	authorize func(ctx context.Context, cs *cluster.ClientSet, user model.User, toolName string, args map[string]any) error
 	// clientSet defaults to cm.GetClientSet; injectable in tests.
 	clientSet func(name string) (*cluster.ClientSet, error)
-	ttl       time.Duration
+	// rollback holds the inverse mutations; injectable in tests.
+	rollback rollbackOps
+	ttl      time.Duration
 }
 
 func NewService(cm *cluster.ClusterManager) *Service {
@@ -44,6 +46,7 @@ func NewService(cm *cluster.ClusterManager) *Service {
 		execute:   ai.ExecuteMutation,
 		authorize: ai.AuthorizeToolForUser,
 		clientSet: cm.GetClientSet,
+		rollback:  defaultRollbackOps(),
 		ttl:       DefaultServiceTTL,
 	}
 }

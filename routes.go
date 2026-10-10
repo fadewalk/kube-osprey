@@ -153,6 +153,9 @@ func registerAdminRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *
 	generalSettingAPI.GET("/", settings.HandleGetGeneralSetting)
 	generalSettingAPI.PUT("/", settings.HandleUpdateGeneralSetting)
 
+	adminAPI.GET("/sync-engine/status", syncengine.HandleStatus)
+	adminAPI.POST("/sync-engine/restart-full-sync", syncengine.HandleRestartFullSync)
+
 	templateAPI := adminAPI.Group("/templates")
 	templateAPI.POST("/", templates.CreateTemplate)
 	templateAPI.PUT("/:id", templates.UpdateTemplate)
@@ -181,6 +184,7 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 	changePlanAPI.GET("/:id", changePlanService.GetChangePlan)
 	changePlanAPI.POST("/:id/approve", changePlanService.ApproveChangePlan)
 	changePlanAPI.POST("/:id/reject", changePlanService.RejectChangePlan)
+	changePlanAPI.POST("/:id/rollback", changePlanService.RollbackChangePlan)
 
 	defaultAPI := api.Group("")
 	defaultAPI.Use(authHandler.RequireAuth(), middleware.ClusterMiddleware(cm))

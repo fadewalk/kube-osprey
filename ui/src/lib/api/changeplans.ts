@@ -73,6 +73,10 @@ export const rejectChangePlan = async (id: number): Promise<void> => {
   await apiClient.post(`/change-plans/${id}/reject`)
 }
 
+export const rollbackChangePlan = async (id: number): Promise<void> => {
+  await apiClient.post(`/change-plans/${id}/rollback`)
+}
+
 export const usePendingChangePlanCount = (options?: {
   enabled?: boolean
   refreshInterval?: number

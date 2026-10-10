@@ -41,7 +41,8 @@ func setupPlanDB(t *testing.T) {
 func newTestService() *Service {
 	svc := NewService(&cluster.ClusterManager{})
 	svc.dryRun = func(context.Context, *cluster.ClientSet, string, map[string]any) (map[string]any, map[string]any, bool, error) {
-		return map[string]any{"old": true}, map[string]any{"new": true}, true, nil
+		snap := map[string]any{"kind": "ConfigMap", "apiVersion": "v1", "metadata": map[string]any{"name": "cm"}}
+		return snap, map[string]any{"kind": "ConfigMap", "apiVersion": "v1", "metadata": map[string]any{"name": "cm-new"}}, true, nil
 	}
 	// RBAC-at-append semantics are covered by the ai package tests; here the
 	// state machine is what's under test.
@@ -50,6 +51,9 @@ func newTestService() *Service {
 	}
 	svc.clientSet = func(string) (*cluster.ClientSet, error) {
 		return &cluster.ClientSet{Name: "test"}, nil
+	}
+	svc.execute = func(context.Context, *cluster.ClientSet, model.User, string, map[string]any) (string, error) {
+		return "ok", nil
 	}
 	return svc
 }

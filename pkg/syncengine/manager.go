@@ -73,6 +73,12 @@ func Init(cm *cluster.ClusterManager) {
 // ReloadFromSetting reads the general setting and reconciles the engine. It
 // runs at startup and after every general-setting update.
 func ReloadFromSetting() {
+	ReloadFromSettingForce(false)
+}
+
+// ReloadFromSettingForce behaves like ReloadFromSetting; force=true restarts
+// every reflector even when the configuration did not change (full re-sync).
+func ReloadFromSettingForce(force bool) {
 	if defaultManager == nil {
 		return
 	}
@@ -84,7 +90,7 @@ func ReloadFromSetting() {
 		cfg.Enabled = setting.SyncEngineEnabled
 		cfg.Resources = parseWhitelist(setting.SyncEngineResources)
 	}
-	defaultManager.reload(cfg)
+	defaultManager.reload(cfg, force)
 }
 
 func parseWhitelist(raw string) []string {
@@ -104,8 +110,8 @@ func parseWhitelist(raw string) []string {
 	return out
 }
 
-func (m *manager) reload(cfg Config) {
-	klog.Infof("syncengine: reload requested (enabled=%v, resources=%v)", cfg.Enabled, cfg.Resources)
+func (m *manager) reload(cfg Config, force bool) {
+	klog.Infof("syncengine: reload requested (enabled=%v, force=%v, resources=%v)", cfg.Enabled, force, cfg.Resources)
 	m.mu.Lock()
 
 	res := make(map[string]bool, len(cfg.Resources))
@@ -118,8 +124,9 @@ func (m *manager) reload(cfg Config) {
 		m.mu.Unlock()
 		return
 	}
-	// Same scope as before: nothing to restart, only bookkeeping changes.
-	if m.enabled && m.sameResources(res) {
+	// Same scope as before and no forced resync: nothing to restart, only
+	// bookkeeping changes.
+	if !force && m.enabled && m.sameResources(res) {
 		m.res = res
 		m.mu.Unlock()
 		return
