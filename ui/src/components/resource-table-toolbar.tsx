@@ -178,15 +178,22 @@ export function ResourceTableToolbar<T>({
               >
                 <SelectTrigger className="w-full sm:w-auto sm:min-w-[8.5rem] sm:max-w-[12rem]">
                   <SelectValue
-                    placeholder={`Filter ${typeof columnDef.header === 'string' ? columnDef.header : 'Column'}`}
+                    placeholder={t('resourceTable.filterColumn', {
+                      column:
+                        typeof columnDef.header === 'string'
+                          ? columnDef.header
+                          : t('resourceTable.columnFallback'),
+                    })}
                   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">
-                    All{' '}
-                    {typeof columnDef.header === 'string'
-                      ? columnDef.header
-                      : 'Values'}
+                    {t('resourceTable.allColumn', {
+                      column:
+                        typeof columnDef.header === 'string'
+                          ? columnDef.header
+                          : t('resourceTable.valuesFallback'),
+                    })}
                   </SelectItem>
                   {optionValues
                     .sort((a, b) => String(a).localeCompare(String(b)))
@@ -206,9 +213,7 @@ export function ResourceTableToolbar<T>({
             <div className="relative min-w-0 flex-1 sm:w-[280px]">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                aria-label={t('resourceTable.searchResources', {
-                  resource: resourceName,
-                })}
+                aria-label={t('common.actions.search')}
                 placeholder={
                   searchPlaceholder ??
                   t('resourceTable.searchResources', { resource: resourceName })

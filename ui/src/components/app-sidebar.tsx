@@ -14,7 +14,6 @@ import { useResources, useVersionInfo } from '@/lib/api'
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -29,7 +28,6 @@ import {
 } from '@/components/ui/sidebar'
 
 import { ChangePlanBadge } from './change-plans/change-plan-badge'
-import { ClusterSelector } from './cluster-selector'
 import { PluginIndicator } from './plugins/plugin-indicator'
 import { SidebarItemIcon } from './sidebar-item-icon'
 import { Collapsible, CollapsibleTrigger } from './ui/collapsible'
@@ -412,12 +410,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </Collapsible>
         ))}
       </SidebarContent>
-
-      <SidebarFooter>
-        <div className="flex items-center gap-2 rounded-md px-2 py-1.5 bg-gradient-to-r from-muted/40 to-muted/20 border border-border/60 backdrop-blur-sm">
-          <ClusterSelector />
-        </div>
-      </SidebarFooter>
     </Sidebar>
   )
 }

@@ -66,9 +66,13 @@ export function ContainerSelector({
       </PopoverTrigger>
       <PopoverContent className="w-[max(var(--radix-popover-trigger-width),18rem)] max-w-[min(300px,calc(100vw-1rem))] p-0">
         <Command>
-          <CommandInput placeholder="Search containers..." />
+          <CommandInput
+            placeholder={t('common.messages.searchPlaceholder', {
+              resource: 'Containers',
+            })}
+          />
           <CommandList>
-            <CommandEmpty>No containers found.</CommandEmpty>
+            <CommandEmpty>{t('common.messages.noContainers')}</CommandEmpty>
             <CommandGroup>
               {options.map((container) => (
                 <CommandItem

@@ -18,7 +18,10 @@ import { toast } from 'sonner'
 import { ResourceType } from '@/types/api'
 import { deleteResource } from '@/lib/api'
 import { getClusterScopedStorageKey } from '@/lib/current-cluster'
-import { getResourceMetadata } from '@/lib/resource-catalog'
+import {
+  getResourceMetadata,
+  getResourceSingularLabel,
+} from '@/lib/resource-catalog'
 import { useCluster } from '@/hooks/use-cluster'
 import { useResourceTable } from '@/hooks/use-resource-table'
 import { useResourceTableData } from '@/hooks/use-resource-table-data'
@@ -149,14 +152,15 @@ function ResourceTableContent<T>({
     if (!selectedNamespace || selectedNamespace === '_all') return []
     return selectedNamespace.split(',').filter(Boolean)
   }, [selectedNamespace])
-  const namespaceDescription =
-    selectedNamespace === '_all'
-      ? 'All Namespaces'
-      : selectedNamespaces.length > 1
-        ? `${selectedNamespaces.length} namespaces`
-        : selectedNamespace
-          ? `namespace ${selectedNamespace}`
-          : ''
+  // Raw namespace id for localized sentence templates, undefined when the
+  // view is cluster-wide or spans multiple namespaces.
+  const singleNamespace =
+    !clusterScope &&
+    selectedNamespace &&
+    selectedNamespace !== '_all' &&
+    selectedNamespaces.length <= 1
+      ? selectedNamespace
+      : undefined
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteProgress, setDeleteProgress] = useState({ done: 0, total: 0 })
   const resolvedResourceType =
@@ -191,6 +195,12 @@ function ResourceTableContent<T>({
     }
     return resource.shortLabel || resource.pluralLabel || resourceName
   })()
+  // English singular noun (e.g. "PodDisruptionBudget") used inside sentence
+  // templates so localized guidance text stays readable without mixing.
+  const resourceNoun =
+    getResourceSingularLabel(resolvedResourceType) ||
+    getResourceMetadata(resolvedResourceType)?.shortLabel ||
+    resourceName
 
   const enhancedColumns = useMemo(() => {
     const selectColumn: ColumnDef<T> = {
@@ -419,13 +429,14 @@ function ResourceTableContent<T>({
             <Database className="h-12 w-12 text-muted-foreground animate-pulse" />
           </div>
           <h3 className="text-lg font-medium mb-1">
-            Loading {displayResourceName}...
+            {t('resourceTable.loading', { name: resourceNoun })}
           </h3>
           <p className="text-muted-foreground">
-            Retrieving data
-            {!clusterScope && namespaceDescription
-              ? ` from ${namespaceDescription}`
-              : ''}
+            {singleNamespace
+              ? t('resourceTable.retrievingFromNamespace', {
+                  namespace: singleNamespace,
+                })
+              : t('resourceTable.retrieving')}
           </p>
         </div>
       )
@@ -448,16 +459,24 @@ function ResourceTableContent<T>({
             <Box className="h-12 w-12 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium mb-1">
-            No {displayResourceName} found
+            {t('resourceTable.emptyTitle', { name: resourceNoun })}
           </h3>
           <p className="text-muted-foreground">
             {searchQuery
               ? isLabelSelector
-                ? `No ${displayResourceName} match labels: "${searchQuery}"`
-                : `No results match your search query: "${searchQuery}"`
-              : clusterScope
-                ? `There are no ${displayResourceName} found`
-                : `There are no ${displayResourceName} in ${namespaceDescription}`}
+                ? t('resourceTable.emptyLabelNoMatch', {
+                    name: resourceNoun,
+                    query: searchQuery,
+                  })
+                : t('resourceTable.emptySearchNoMatch', {
+                    query: searchQuery,
+                  })
+              : singleNamespace
+                ? t('resourceTable.emptyNamespace', {
+                    name: resourceNoun,
+                    namespace: singleNamespace,
+                  })
+                : t('resourceTable.emptyHint')}
           </p>
           {searchQuery && (
             <Button
@@ -465,7 +484,7 @@ function ResourceTableContent<T>({
               className="mt-4"
               onClick={() => setSearchQuery('')}
             >
-              Clear Search
+              {t('resourceTable.clearSearch')}
             </Button>
           )}
         </div>
@@ -492,7 +511,9 @@ function ResourceTableContent<T>({
           onCreateClick={showCreateButton ? onCreateClick : undefined}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          searchPlaceholder={`Search ${displayResourceName} or app=nginx...`}
+          searchPlaceholder={t('resourceTable.searchWithSelector', {
+            name: resourceNoun,
+          })}
           namespace={
             clusterScope
               ? undefined

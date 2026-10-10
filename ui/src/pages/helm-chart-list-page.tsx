@@ -709,7 +709,9 @@ export function HelmChartListPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+                  <DropdownMenuLabel>
+                    {t('resourceTable.toggleColumns')}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {table
                     .getAllLeafColumns()

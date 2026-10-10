@@ -49,7 +49,8 @@
       "update": "Update",
       "viewDiff": "View Diff",
       "viewError": "View Error",
-      "watch": "Watch"
+      "watch": "Watch",
+      "logout": "Log out"
     },
     "fields": {
       "accessModes": "Access Modes",
@@ -280,7 +281,11 @@
       "unassigned": "Unassigned",
       "updated": "{{resource}} updated successfully",
       "updateExistingItem": "Update existing {{resource}}",
-      "yamlSaved": "YAML saved successfully"
+      "yamlSaved": "YAML saved successfully",
+      "loadingFiles": "Loading files...",
+      "noResults": "No results.",
+      "noContainers": "No containers found.",
+      "searchPlaceholder": "Search {{resource}}..."
     },
     "tabs": {
       "containers": "Containers",
@@ -783,7 +788,27 @@
       "restartResourcesDescription": "This updates each {{resource}} Pod template and triggers a rollout. Paused or OnDelete strategies may not restart immediately, and rollout health is not monitored."
     },
     "watch": "Watch",
-    "namespace": "Namespace"
+    "namespace": "Namespace",
+    "loading": "Loading {{name}}...",
+    "retrieving": "Retrieving data",
+    "retrievingFromNamespace": "Retrieving data from namespace {{namespace}}",
+    "emptyTitle": "No {{name}} found",
+    "emptyNamespace": "There are no {{name}} in namespace {{namespace}}",
+    "emptyLabelNoMatch": "No {{name}} match labels: \"{{query}}\"",
+    "emptySearchNoMatch": "No results match your search query: \"{{query}}\"",
+    "emptyHint": "Resources will appear here once they are created.",
+    "clearSearch": "Clear Search",
+    "searchWithSelector": "Search {{name}} or app=nginx...",
+    "filterColumn": "Filter {{column}}",
+    "allColumn": "All {{column}}",
+    "columnFallback": "Column",
+    "valuesFallback": "Values",
+    "showingRows": "Showing {{filtered}} of {{total}} row(s)",
+    "filteredBy": "(filtered by \"{{query}}\")",
+    "rowsTotal": "{{total}} row(s) total.",
+    "rowsPerPage": "Rows per page:",
+    "pageInfo": "Page {{page}} of {{total}}",
+    "allRows": "All"
   },
   "errors": {
     "crdNotInstalledTitle": "Resource Type Not Available",
@@ -1272,7 +1297,9 @@
         "workloadIssues": "List problematic workloads and probable root causes",
         "runbook": "Provide a prioritized troubleshooting runbook"
       }
-    }
+    },
+    "chatHistory": "Chat history",
+    "openInNewTab": "Open in new tab"
   },
   "apikeyManagement": {
     "actions": {
@@ -1528,5 +1555,11 @@
   "imageHint": "Changing an image triggers a rollout of the workload.",
   "applyImages": "Update {{count}} image(s)",
   "editImages": "Edit Images",
-  "restart": "Restart"
+  "restart": "Restart",
+  "clusterSelector": {
+    "switching": "Switching cluster...",
+    "selectCluster": "Select Cluster",
+    "default": "Default",
+    "syncError": "Sync Error"
+  }
 }

@@ -357,7 +357,7 @@ export function UserMenu() {
                 className="cursor-pointer text-red-600 focus:text-red-600"
               >
                 <LogOut className="h-4 w-4" />
-                <span>Log out</span>
+                <span>{t('common.actions.logout')}</span>
               </DropdownMenuItem>
             </>
           )}

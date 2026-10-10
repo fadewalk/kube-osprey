@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import type { NamespaceSelectorProps } from '@kite-dev/plugin-sdk/ui'
 import { Namespace } from 'kubernetes-types/core/v1'
 import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { useResources } from '@/lib/api'
 import { cn } from '@/lib/utils'
@@ -32,6 +33,7 @@ export function NamespaceSelector({
 }: NamespaceSelectorProps) {
   const [open, setOpen] = useState(false)
   const { data, isLoading } = useResources('namespaces')
+  const { t } = useTranslation()
   const selectedNamespaces = useMemo(() => {
     if (!value || value === '_all') return []
     return value.split(',').filter(Boolean)
@@ -103,16 +105,19 @@ export function NamespaceSelector({
         align="start"
       >
         <Command>
-          <CommandInput placeholder="Search..." className="h-9" />
+          <CommandInput
+            placeholder={t('common.actions.search')}
+            className="h-9"
+          />
           <CommandList className="max-h-[min(50dvh,300px)] overflow-x-hidden overflow-y-auto overscroll-contain">
             {isLoading ? (
               <div className="flex items-center justify-center p-6 text-sm">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                Loading...
+                {t('common.messages.loading')}
               </div>
             ) : (
               <>
-                <CommandEmpty>No results.</CommandEmpty>
+                <CommandEmpty>{t('common.messages.noResults')}</CommandEmpty>
                 <CommandGroup>
                   {showAll && (
                     <CommandItem

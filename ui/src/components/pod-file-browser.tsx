@@ -222,7 +222,7 @@ export function PodFileBrowser({
                   <TableCell colSpan={8} className="h-24 text-center">
                     <div className="flex items-center justify-center gap-2">
                       <IconLoader className="animate-spin" />
-                      <span>Loading files...</span>
+                      <span>{t('common.messages.loadingFiles')}</span>
                     </div>
                   </TableCell>
                 </TableRow>

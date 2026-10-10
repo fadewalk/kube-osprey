@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Pod } from 'kubernetes-types/core/v1'
 import { Check, ChevronsUpDown } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 import { cn, getAge } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ export function PodSelector({
   showAllOption = false,
 }: PodSelectorProps) {
   const [open, setOpen] = useState(false)
+  const { t } = useTranslation()
 
   const allOption: Pod = {
     metadata: {
@@ -64,9 +66,13 @@ export function PodSelector({
       </PopoverTrigger>
       <PopoverContent className="w-[max(var(--radix-popover-trigger-width),18rem)] max-w-[min(300px,calc(100vw-1rem))] p-0">
         <Command>
-          <CommandInput placeholder="Search pods..." />
+          <CommandInput
+            placeholder={t('common.messages.searchPlaceholder', {
+              resource: 'Pods',
+            })}
+          />
           <CommandList>
-            <CommandEmpty>No pods found.</CommandEmpty>
+            <CommandEmpty>{t('common.messages.noPods')}</CommandEmpty>
             <CommandGroup>
               {options.map((pod) => (
                 <CommandItem

@@ -4,6 +4,7 @@ import {
   PaginationState,
   Table as TableInstance,
 } from '@tanstack/react-table'
+import { useTranslation } from 'react-i18next'
 
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -64,6 +65,7 @@ export function ResourceTableView<T>({
   showAllPageSize = true,
   pageSizeOptions = [10, 20, 50, 100],
 }: ResourceTableViewProps<T>) {
+  const { t } = useTranslation()
   const renderRows = () => {
     const rows = table.getRowModel().rows
 
@@ -71,7 +73,7 @@ export function ResourceTableView<T>({
       return (
         <TableRow>
           <TableCell colSpan={columnCount} className="h-24 text-center">
-            No results.
+            {t('common.messages.noResults')}
           </TableCell>
         </TableRow>
       )
@@ -234,19 +236,24 @@ export function ResourceTableView<T>({
           <div className="text-muted-foreground hidden flex-1 text-sm lg:flex">
             {hasActiveFilters ? (
               <>
-                Showing {filteredRowCount} of {totalRowCount} row(s)
+                {t('resourceTable.showingRows', {
+                  filtered: filteredRowCount,
+                  total: totalRowCount,
+                })}
                 {searchQuery && (
-                  <span className="ml-1">(filtered by "{searchQuery}")</span>
+                  <span className="ml-1">
+                    {t('resourceTable.filteredBy', { query: searchQuery })}
+                  </span>
                 )}
               </>
             ) : (
-              `${totalRowCount} row(s) total.`
+              t('resourceTable.rowsTotal', { total: totalRowCount })
             )}
           </div>
           <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:gap-4 lg:w-fit">
             <div className="flex items-center justify-between gap-2 sm:justify-start">
               <span className="text-sm text-muted-foreground">
-                Rows per page:
+                {t('resourceTable.rowsPerPage')}
               </span>
               <Select
                 value={pagination.pageSize.toString()}
@@ -269,14 +276,17 @@ export function ResourceTableView<T>({
                   ))}
                   {showAllPageSize && resolvedAllPageSize > 0 && (
                     <SelectItem value={`${resolvedAllPageSize}`}>
-                      All
+                      {t('resourceTable.allRows')}
                     </SelectItem>
                   )}
                 </SelectContent>
               </Select>
             </div>
             <div className="flex items-center justify-center text-sm font-medium">
-              Page {pagination.pageIndex + 1} of {table.getPageCount() || 1}
+              {t('resourceTable.pageInfo', {
+                page: pagination.pageIndex + 1,
+                total: table.getPageCount() || 1,
+              })}
             </div>
             <div className="flex items-center justify-end gap-2 sm:justify-start lg:ml-0">
               <Button
