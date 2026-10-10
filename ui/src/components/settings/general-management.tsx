@@ -729,7 +729,7 @@ export function GeneralManagement() {
                     syncEngineResources: e.target.value,
                   }))
                 }
-                placeholder="pods, deployments, statefulsets, daemonsets, services, ingresses, configmaps, nodes, namespaces, events"
+                placeholder="pods, deployments, statefulsets, daemonsets, replicasets, jobs, services, ingresses, configmaps, nodes, namespaces, events"
               />
               <p className="text-xs text-muted-foreground">
                 {t(

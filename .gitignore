@@ -58,3 +58,4 @@ kite
 .zcode/
 /kuboard-reference/
 /architecture-diagrams/
+.playwright-mcp/

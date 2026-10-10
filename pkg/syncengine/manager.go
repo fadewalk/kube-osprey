@@ -29,6 +29,8 @@ var DefaultWhitelist = []string{
 	"deployments",
 	"statefulsets",
 	"daemonsets",
+	"replicasets",
+	"jobs",
 	"services",
 	"ingresses",
 	"configmaps",
