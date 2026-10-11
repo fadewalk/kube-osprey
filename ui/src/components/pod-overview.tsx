@@ -1,5 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react'
-import { Event as KubernetesEvent, Pod } from 'kubernetes-types/core/v1'
+import { IconCircleCheckFilled, IconCircleDashed } from '@tabler/icons-react'
+import {
+  Event as KubernetesEvent,
+  Pod,
+  type PodCondition,
+} from 'kubernetes-types/core/v1'
 import { useTranslation } from 'react-i18next'
 import { Link, useSearchParams } from 'react-router-dom'
 
@@ -110,6 +115,8 @@ export function PodOverview({
         </div>
       ) : null}
 
+      <PodConditionsCard pod={pod} />
+
       <div className="grid gap-3 @4xl/pod-overview:grid-cols-3">
         <div className="space-y-3 @4xl/pod-overview:col-span-2">
           <PodContainersCard
@@ -138,6 +145,87 @@ export function PodOverview({
           }
         }}
       />
+    </div>
+  )
+}
+
+function PodConditionsCard({ pod }: { pod: Pod }) {
+  const { t } = useTranslation()
+
+  const conditions = useMemo(() => {
+    const list = pod.status?.conditions || []
+    const order: Record<string, number> = {
+      PodScheduled: 0,
+      Initialized: 1,
+      ContainersReady: 2,
+      Ready: 3,
+    }
+    return [...list].sort(
+      (a, b) => (order[a.type] ?? 99) - (order[b.type] ?? 99)
+    )
+  }, [pod])
+
+  if (conditions.length === 0) return null
+
+  return (
+    <Card className="gap-0 overflow-hidden rounded-lg border-border/70 py-0 shadow-none">
+      <CardHeader className="px-3 py-2.5 !pb-2.5">
+        <CardTitle className="text-balance text-sm">
+          {t('pods.conditions.title')}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-3 pb-3 pt-1">
+        <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2 @2xl/pod-overview:grid-cols-4">
+          {conditions.map((condition) => (
+            <PodConditionItem key={condition.type} condition={condition} />
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+const conditionLabelKeys: Record<string, string> = {
+  PodScheduled: 'pods.conditions.podScheduled',
+  Initialized: 'pods.conditions.initialized',
+  ContainersReady: 'pods.conditions.containersReady',
+  Ready: 'pods.conditions.ready',
+}
+
+function PodConditionItem({ condition }: { condition: PodCondition }) {
+  const { t } = useTranslation()
+  const isTrue = condition.status === 'True'
+  const transitionTime = condition.lastTransitionTime
+
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      <div className="flex items-center gap-1.5 text-sm font-medium">
+        {isTrue ? (
+          <IconCircleCheckFilled className="size-4 shrink-0 fill-green-500 dark:fill-green-400" />
+        ) : (
+          <IconCircleDashed className="text-muted-foreground size-4 shrink-0" />
+        )}
+        <span className="truncate">
+          {conditionLabelKeys[condition.type]
+            ? t(conditionLabelKeys[condition.type])
+            : condition.type}
+        </span>
+      </div>
+      <div className="text-muted-foreground truncate text-xs">
+        {transitionTime
+          ? t('common.messages.timeAgo', { time: getAge(transitionTime) })
+          : '-'}
+      </div>
+      {transitionTime ? (
+        <div className="text-muted-foreground truncate text-xs">
+          {formatDate(transitionTime, true)}
+        </div>
+      ) : null}
+      {!isTrue && condition.reason ? (
+        <div className="text-muted-foreground truncate text-xs">
+          {condition.reason}
+        </div>
+      ) : null}
     </div>
   )
 }

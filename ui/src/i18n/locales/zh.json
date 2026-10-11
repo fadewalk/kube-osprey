@@ -517,6 +517,13 @@
   },
   "pods": {
     "title": "Pods",
+    "conditions": {
+      "title": "状态条件",
+      "podScheduled": "已调度",
+      "initialized": "已初始化",
+      "containersReady": "容器就绪",
+      "ready": "就绪"
+    },
     "containerDetails": "容器详情",
     "debug": "调试",
     "debugTitle": "调试 Pod",

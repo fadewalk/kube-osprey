@@ -517,6 +517,13 @@
   },
   "pods": {
     "title": "Pods",
+    "conditions": {
+      "title": "Pod Conditions",
+      "podScheduled": "Scheduled",
+      "initialized": "Initialized",
+      "containersReady": "Containers Ready",
+      "ready": "Ready"
+    },
     "containerDetails": "Container Details",
     "debug": "Debug",
     "debugTitle": "Debug Pod",
