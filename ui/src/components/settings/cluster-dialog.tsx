@@ -37,6 +37,7 @@ function createClusterFormData(cluster?: Cluster | null) {
     description: cluster?.description || '',
     config: cluster?.config || '',
     prometheusURL: cluster?.prometheusURL || '',
+    alertManagerURL: cluster?.alertManagerURL || '',
     enabled: cluster?.enabled ?? true,
     isDefault: cluster?.isDefault ?? false,
     inCluster: cluster?.inCluster ?? false,
@@ -220,6 +221,18 @@ function ClusterDialogContent({
             id="prometheus-url"
             value={formData.prometheusURL}
             onChange={(e) => handleChange('prometheusURL', e.target.value)}
+            type="url"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="alertmanager-url">
+            {t('clusterManagement.dialog.alertManagerUrl', 'AlertManager URL')}
+          </Label>
+          <Input
+            id="alertmanager-url"
+            value={formData.alertManagerURL}
+            onChange={(e) => handleChange('alertManagerURL', e.target.value)}
             type="url"
           />
         </div>

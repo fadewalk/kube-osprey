@@ -484,7 +484,8 @@
     "httproutes": "HTTPRoutes",
     "grpcroutes": "GRPCRoutes",
     "referencegrants": "ReferenceGrants",
-    "settings": "Settings"
+    "settings": "Settings",
+    "alertCenter": "Alert Center"
   },
   "overview": {
     "title": "Overview",
@@ -1075,7 +1076,8 @@
       "agentPermissionWarning": "The selected Kubernetes permission is embedded in the generated manifest. Review it before applying.",
       "agentRolePlaceholder": "Existing ClusterRole name",
       "enabled": "Enabled",
-      "isDefault": "Set as Default"
+      "isDefault": "Set as Default",
+      "alertManagerUrl": "AlertManager URL"
     }
   },
   "oauthManagement": {
@@ -1561,5 +1563,65 @@
     "selectCluster": "Select Cluster",
     "default": "Default",
     "syncError": "Sync Error"
+  },
+  "alertCenter": {
+    "description": "View and silence AlertManager alerts for the current cluster",
+    "notConfigured": "AlertManager is not configured for this cluster",
+    "configureHint": "Fill in the AlertManager URL in cluster settings. When left empty, Kite auto-discovers an AlertManager service inside the cluster.",
+    "goToSettings": "Go to cluster settings",
+    "title": "Alerts",
+    "noAlerts": "No alerts match the current filters",
+    "silence": "Silence",
+    "stats": {
+      "firing": "Firing",
+      "critical": "Critical",
+      "warning": "Warning",
+      "silenced": "Silenced"
+    },
+    "filters": {
+      "severityAll": "All severities",
+      "critical": "Critical",
+      "warning": "Warning",
+      "info": "Info",
+      "stateAll": "All states",
+      "active": "Active",
+      "suppressed": "Suppressed"
+    },
+    "alertState": {
+      "active": "Active",
+      "suppressed": "Suppressed"
+    },
+    "table": {
+      "severity": "Severity",
+      "state": "State",
+      "summary": "Summary",
+      "age": "Fired at",
+      "actions": "Actions"
+    },
+    "details": {
+      "title": "Alert details",
+      "generator": "Source",
+      "fingerprint": "Fingerprint",
+      "labels": "Labels",
+      "annotations": "Annotations"
+    },
+    "silences": {
+      "title": "Silences",
+      "new": "New silence",
+      "empty": "No silences",
+      "matchers": "Matchers",
+      "endsAt": "Ends at",
+      "createdBy": "Created by",
+      "matchersHint": "Alerts matching any of these matchers will be silenced.",
+      "matcherName": "Label name",
+      "matcherValue": "Label value",
+      "addMatcher": "Add matcher",
+      "comment": "Comment",
+      "commentPlaceholder": "Why are you silencing this alert?",
+      "submit": "Create silence",
+      "created": "Silence created",
+      "deleted": "Silence expired",
+      "confirmDelete": "Expire this silence?"
+    }
   }
 }

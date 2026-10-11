@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/zxh326/kite/pkg/alertmanager"
 	"github.com/zxh326/kite/pkg/clusteragent"
 	"github.com/zxh326/kite/pkg/kube"
 	"github.com/zxh326/kite/pkg/model"
@@ -23,15 +24,18 @@ import (
 )
 
 type ClientSet struct {
-	Name       string
-	Version    string // Kubernetes version
-	K8sClient  *kube.K8sClient
-	PromClient *prometheus.Client
+	Name        string
+	Version     string // Kubernetes version
+	K8sClient   *kube.K8sClient
+	PromClient  *prometheus.Client
+	AlertClient *alertmanager.Client
 
-	DiscoveredPrometheusURL string
-	config                  string
-	prometheusURL           string
-	clusterAgentGeneration  uint64
+	DiscoveredPrometheusURL   string
+	DiscoveredAlertManagerURL string
+	config                    string
+	prometheusURL             string
+	alertManagerURL           string
+	clusterAgentGeneration    uint64
 }
 
 type ClusterManager struct {
@@ -45,22 +49,22 @@ type ClusterManager struct {
 
 const clusterStartupSyncTimeout = 10 * time.Second
 
-func createClientSetInCluster(name, prometheusURL string) (*ClientSet, error) {
+func createClientSetInCluster(name, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 	config, err := rest.InClusterConfig()
 	if err != nil {
 		return nil, err
 	}
 
-	return newClientSet(name, config, prometheusURL)
+	return newClientSet(name, config, prometheusURL, alertManagerURL)
 }
 
-func createClientSetFromConfig(name, content, prometheusURL string) (*ClientSet, error) {
+func createClientSetFromConfig(name, content, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 	restConfig, err := clientcmd.RESTConfigFromKubeConfig([]byte(content))
 	if err != nil {
 		klog.Warningf("Failed to create REST config for cluster %s: %v", name, err)
 		return nil, err
 	}
-	cs, err := newClientSet(name, restConfig, prometheusURL)
+	cs, err := newClientSet(name, restConfig, prometheusURL, alertManagerURL)
 	if err != nil {
 		return nil, err
 	}
@@ -69,10 +73,11 @@ func createClientSetFromConfig(name, content, prometheusURL string) (*ClientSet,
 	return cs, nil
 }
 
-func newClientSet(name string, k8sConfig *rest.Config, prometheusURL string) (*ClientSet, error) {
+func newClientSet(name string, k8sConfig *rest.Config, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 	cs := &ClientSet{
-		Name:          name,
-		prometheusURL: prometheusURL,
+		Name:            name,
+		prometheusURL:   prometheusURL,
+		alertManagerURL: alertManagerURL,
 	}
 	var err error
 	cs.K8sClient, err = kube.NewClient(k8sConfig)
@@ -87,26 +92,23 @@ func newClientSet(name string, k8sConfig *rest.Config, prometheusURL string) (*C
 			klog.Infof("Discovered Prometheus URL for cluster %s: %s", name, cs.DiscoveredPrometheusURL)
 		}
 	}
-	if prometheusURL != "" {
-		var rt = http.DefaultTransport
-		var err error
-		if isClusterLocalURL(prometheusURL) {
-			rt, err = createK8sProxyTransport(k8sConfig, prometheusURL)
-			if err != nil {
-				klog.Warningf("Failed to create k8s proxy transport for cluster %s: %v, using direct connection", name, err)
-			} else {
-				klog.Infof("Using k8s API proxy for Prometheus in cluster %s", name)
-			}
-		} else if k8sConfig.Dial != nil {
-			transport := http.DefaultTransport.(*http.Transport).Clone()
-			transport.Proxy = nil
-			transport.DialContext = k8sConfig.Dial
-			rt = transport
-			klog.Infof("Using cluster agent TCP proxy for Prometheus in cluster %s", name)
+	if alertManagerURL == "" {
+		alertManagerURL = discoveryAlertManagerURL(cs.K8sClient)
+		if alertManagerURL != "" {
+			cs.DiscoveredAlertManagerURL = alertManagerURL
+			klog.Infof("Discovered AlertManager URL for cluster %s: %s", name, cs.DiscoveredAlertManagerURL)
 		}
-		cs.PromClient, err = prometheus.NewClientWithRoundTripper(prometheusURL, rt)
+	}
+	if prometheusURL != "" {
+		cs.PromClient, err = prometheus.NewClientWithRoundTripper(prometheusURL, monitoringRoundTripper(k8sConfig, prometheusURL, name, "Prometheus"))
 		if err != nil {
 			klog.Warningf("Failed to create Prometheus client for cluster %s, some features may not work as expected, err: %v", name, err)
+		}
+	}
+	if alertManagerURL != "" {
+		cs.AlertClient, err = alertmanager.NewClient(alertManagerURL, monitoringRoundTripper(k8sConfig, alertManagerURL, name, "AlertManager"))
+		if err != nil {
+			klog.Warningf("Failed to create AlertManager client for cluster %s, some features may not work as expected, err: %v", name, err)
 		}
 	}
 	v, err := cs.K8sClient.ClientSet.Discovery().ServerVersion()
@@ -122,6 +124,29 @@ func newClientSet(name string, k8sConfig *rest.Config, prometheusURL string) (*C
 
 func isClusterLocalURL(urlStr string) bool {
 	return strings.Contains(urlStr, ".svc.cluster.local") || strings.Contains(urlStr, ".svc:")
+}
+
+// monitoringRoundTripper picks the transport for reaching an in-cluster
+// monitoring endpoint: via the K8s API proxy for cluster-local URLs, via the
+// cluster agent TCP tunnel when the cluster is agent-backed, or directly.
+func monitoringRoundTripper(k8sConfig *rest.Config, rawURL, clusterName, component string) http.RoundTripper {
+	if isClusterLocalURL(rawURL) {
+		rt, err := createK8sProxyTransport(k8sConfig, rawURL)
+		if err != nil {
+			klog.Warningf("Failed to create k8s proxy transport for %s in cluster %s: %v, using direct connection", component, clusterName, err)
+			return http.DefaultTransport
+		}
+		klog.Infof("Using k8s API proxy for %s in cluster %s", component, clusterName)
+		return rt
+	}
+	if k8sConfig.Dial != nil {
+		transport := http.DefaultTransport.(*http.Transport).Clone()
+		transport.Proxy = nil
+		transport.DialContext = k8sConfig.Dial
+		klog.Infof("Using cluster agent TCP proxy for %s in cluster %s", component, clusterName)
+		return transport
+	}
+	return http.DefaultTransport
 }
 
 func createK8sProxyTransport(k8sConfig *rest.Config, prometheusURL string) (*k8sProxyTransport, error) {
@@ -417,6 +442,12 @@ func shouldUpdateCluster(cs *ClientSet, cluster *model.Cluster) bool {
 		return true
 	}
 
+	// alertmanager URL change
+	if cs.alertManagerURL != cluster.AlertManagerURL {
+		klog.Infof("AlertManager URL changed for cluster %s, updating", cluster.Name)
+		return true
+	}
+
 	// k8s version change
 	// TODO: Replace direct ClientSet.Discovery() call with a small DiscoveryInterface.
 	// current code depends on *kubernetes.Clientset, which is hard to mock in tests.
@@ -433,9 +464,9 @@ func shouldUpdateCluster(cs *ClientSet, cluster *model.Cluster) bool {
 
 func buildClientSet(cluster *model.Cluster) (*ClientSet, error) {
 	if cluster.InCluster {
-		return createClientSetInCluster(cluster.Name, cluster.PrometheusURL)
+		return createClientSetInCluster(cluster.Name, cluster.PrometheusURL, cluster.AlertManagerURL)
 	}
-	return createClientSetFromConfig(cluster.Name, string(cluster.Config), cluster.PrometheusURL)
+	return createClientSetFromConfig(cluster.Name, string(cluster.Config), cluster.PrometheusURL, cluster.AlertManagerURL)
 }
 
 func (cm *ClusterManager) buildClientSet(cluster *model.Cluster) (*ClientSet, error) {
@@ -446,7 +477,7 @@ func (cm *ClusterManager) buildClientSet(cluster *model.Cluster) (*ClientSet, er
 	if err != nil {
 		return nil, err
 	}
-	clientSet, err := newClientSet(cluster.Name, config, cluster.PrometheusURL)
+	clientSet, err := newClientSet(cluster.Name, config, cluster.PrometheusURL, cluster.AlertManagerURL)
 	if err != nil {
 		return nil, err
 	}

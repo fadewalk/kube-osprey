@@ -4,6 +4,7 @@ import App, { StandaloneAIChatApp } from './App'
 import { InitCheckRoute } from './components/init-check-route'
 import { ProtectedRoute } from './components/protected-route'
 import { getSubPath } from './lib/subpath'
+import { AlertCenterPage } from './pages/alert-center-page'
 import { ChangePlansPage } from './pages/change-plans'
 import { CRListPage } from './pages/cr-list-page'
 import { HelmChartDetailPage } from './pages/helm-chart-detail-page'
@@ -86,6 +87,10 @@ export const router = createBrowserRouter(
         {
           path: 'prometheus',
           element: <PrometheusExplorerPage />,
+        },
+        {
+          path: 'alerts',
+          element: <AlertCenterPage />,
         },
         {
           path: 'crds/:crd',

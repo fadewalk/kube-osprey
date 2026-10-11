@@ -484,7 +484,8 @@
     "gateways": "网关",
     "httproutes": "HTTP 路由",
     "grpcroutes": "gRPC 路由",
-    "referencegrants": "引用授权"
+    "referencegrants": "引用授权",
+    "alertCenter": "告警中心"
   },
   "overview": {
     "title": "概览",
@@ -1081,7 +1082,8 @@
       "agentPermissionWarning": "所选 Kubernetes 权限会写入生成的 Manifest，应用前请仔细检查。",
       "agentRolePlaceholder": "已有 ClusterRole 名称",
       "enabled": "启用",
-      "isDefault": "设为默认"
+      "isDefault": "设为默认",
+      "alertManagerUrl": "AlertManager URL"
     }
   },
   "oauthManagement": {
@@ -1643,5 +1645,65 @@
     "selectCluster": "选择集群",
     "default": "默认",
     "syncError": "同步异常"
+  },
+  "alertCenter": {
+    "description": "查看当前集群的 AlertManager 告警并进行静默管理",
+    "notConfigured": "当前集群未配置 AlertManager",
+    "configureHint": "可在集群设置中填写 AlertManager URL；未填写时 Kite 会自动发现集群内的 AlertManager 服务。",
+    "goToSettings": "前往集群设置",
+    "title": "告警列表",
+    "noAlerts": "没有符合筛选条件的告警",
+    "silence": "静默",
+    "stats": {
+      "firing": "触发中",
+      "critical": "严重",
+      "warning": "警告",
+      "silenced": "已静默"
+    },
+    "filters": {
+      "severityAll": "全部级别",
+      "critical": "严重",
+      "warning": "警告",
+      "info": "信息",
+      "stateAll": "全部状态",
+      "active": "活跃",
+      "suppressed": "已静默"
+    },
+    "alertState": {
+      "active": "活跃",
+      "suppressed": "已静默"
+    },
+    "table": {
+      "severity": "级别",
+      "state": "状态",
+      "summary": "摘要",
+      "age": "触发时间",
+      "actions": "操作"
+    },
+    "details": {
+      "title": "告警详情",
+      "generator": "来源",
+      "fingerprint": "指纹",
+      "labels": "标签",
+      "annotations": "注释"
+    },
+    "silences": {
+      "title": "静默规则",
+      "new": "新建静默",
+      "empty": "暂无静默规则",
+      "matchers": "匹配器",
+      "endsAt": "结束时间",
+      "createdBy": "创建人",
+      "matchersHint": "满足任一匹配器的告警将被静默。",
+      "matcherName": "标签名",
+      "matcherValue": "标签值",
+      "addMatcher": "添加匹配器",
+      "comment": "备注",
+      "commentPlaceholder": "为什么要静默这条告警？",
+      "submit": "创建静默",
+      "created": "静默已创建",
+      "deleted": "静默已失效",
+      "confirmDelete": "确认使该静默规则失效？"
+    }
   }
 }

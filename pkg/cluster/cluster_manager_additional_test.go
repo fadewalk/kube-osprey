@@ -322,7 +322,7 @@ func TestGetClientSet(t *testing.T) {
 func TestBuildClientSet(t *testing.T) {
 	t.Run("uses in-cluster constructor", func(t *testing.T) {
 		inClusterCalled := false
-		inClusterMock := mockey.Mock(createClientSetInCluster).To(func(name, prometheusURL string) (*ClientSet, error) {
+		inClusterMock := mockey.Mock(createClientSetInCluster).To(func(name, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 			inClusterCalled = true
 			if name != "cluster-a" {
 				t.Fatalf("name = %q, want %q", name, "cluster-a")
@@ -330,20 +330,24 @@ func TestBuildClientSet(t *testing.T) {
 			if prometheusURL != "http://prometheus" {
 				t.Fatalf("prometheusURL = %q, want %q", prometheusURL, "http://prometheus")
 			}
+			if alertManagerURL != "http://alertmanager" {
+				t.Fatalf("alertManagerURL = %q, want %q", alertManagerURL, "http://alertmanager")
+			}
 			return &ClientSet{Name: name}, nil
 		}).Build()
 		defer inClusterMock.UnPatch()
 
-		fromConfigMock := mockey.Mock(createClientSetFromConfig).To(func(name, content, prometheusURL string) (*ClientSet, error) {
+		fromConfigMock := mockey.Mock(createClientSetFromConfig).To(func(name, content, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 			t.Fatalf("createClientSetFromConfig() unexpectedly called with name=%q content=%q prometheusURL=%q", name, content, prometheusURL)
 			return nil, nil
 		}).Build()
 		defer fromConfigMock.UnPatch()
 
 		got, err := buildClientSet(&model.Cluster{
-			Name:          "cluster-a",
-			InCluster:     true,
-			PrometheusURL: "http://prometheus",
+			Name:            "cluster-a",
+			InCluster:       true,
+			PrometheusURL:   "http://prometheus",
+			AlertManagerURL: "http://alertmanager",
 		})
 		if err != nil {
 			t.Fatalf("buildClientSet() error = %v", err)
@@ -358,13 +362,13 @@ func TestBuildClientSet(t *testing.T) {
 
 	t.Run("uses kubeconfig constructor", func(t *testing.T) {
 		fromConfigCalled := false
-		inClusterMock := mockey.Mock(createClientSetInCluster).To(func(name, prometheusURL string) (*ClientSet, error) {
+		inClusterMock := mockey.Mock(createClientSetInCluster).To(func(name, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 			t.Fatalf("createClientSetInCluster() unexpectedly called with name=%q prometheusURL=%q", name, prometheusURL)
 			return nil, nil
 		}).Build()
 		defer inClusterMock.UnPatch()
 
-		fromConfigMock := mockey.Mock(createClientSetFromConfig).To(func(name, content, prometheusURL string) (*ClientSet, error) {
+		fromConfigMock := mockey.Mock(createClientSetFromConfig).To(func(name, content, prometheusURL, alertManagerURL string) (*ClientSet, error) {
 			fromConfigCalled = true
 			if name != "cluster-b" {
 				t.Fatalf("name = %q, want %q", name, "cluster-b")
@@ -375,14 +379,18 @@ func TestBuildClientSet(t *testing.T) {
 			if prometheusURL != "http://prometheus" {
 				t.Fatalf("prometheusURL = %q, want %q", prometheusURL, "http://prometheus")
 			}
+			if alertManagerURL != "http://alertmanager" {
+				t.Fatalf("alertManagerURL = %q, want %q", alertManagerURL, "http://alertmanager")
+			}
 			return &ClientSet{Name: name}, nil
 		}).Build()
 		defer fromConfigMock.UnPatch()
 
 		got, err := buildClientSet(&model.Cluster{
-			Name:          "cluster-b",
-			Config:        model.SecretString("config-data"),
-			PrometheusURL: "http://prometheus",
+			Name:            "cluster-b",
+			Config:          model.SecretString("config-data"),
+			PrometheusURL:   "http://prometheus",
+			AlertManagerURL: "http://alertmanager",
 		})
 		if err != nil {
 			t.Fatalf("buildClientSet() error = %v", err)

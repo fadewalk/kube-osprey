@@ -204,6 +204,13 @@ func registerClusterProtectedRoutes(api *gin.RouterGroup, helmChartsHandler *hel
 	api.GET("/prometheus/resource-usage-history", metricsHandler.GetResourceUsageHistory)
 	api.GET("/prometheus/pods/:namespace/:podName/metrics", metricsHandler.GetPodMetrics)
 
+	alertManagerHandler := metrics.NewAlertManagerHandler()
+	api.GET("/alertmanager/alerts", alertManagerHandler.ListAlerts)
+	api.GET("/alertmanager/silences", alertManagerHandler.ListSilences)
+	api.POST("/alertmanager/silences", alertManagerHandler.CreateSilence)
+	api.DELETE("/alertmanager/silences/:silenceId", alertManagerHandler.DeleteSilence)
+	api.GET("/alertmanager/status", alertManagerHandler.GetStatus)
+
 	logsHandler := resources.NewLogsHandler()
 	api.GET("/logs/:namespace/:podName/ws", logsHandler.HandleLogsWebSocket)
 

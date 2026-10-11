@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import {
+  IconBell,
   IconBox,
   IconChartLine,
   IconClipboardCheck,
@@ -78,6 +79,11 @@ defaultMenus['sidebar.groups.application'].push({
   icon: IconChartLine,
 })
 defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.alertCenter',
+  url: '/alerts',
+  icon: IconBell,
+})
+defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.changePlans',
   url: '/change-plans',
   icon: IconClipboardCheck,
@@ -93,7 +99,7 @@ defaultMenus['sidebar.groups.application'].push({
   icon: getResourceIconComponent('IconPackage'),
 })
 
-export const SIDEBAR_CONFIG_VERSION = 6
+export const SIDEBAR_CONFIG_VERSION = 7
 
 function getIconName(iconComponent: ComponentType<{ className?: string }>) {
   const entry = Object.entries(sidebarIconMap).find(
