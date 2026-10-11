@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { Event } from 'kubernetes-types/core/v1'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +7,13 @@ import { Link } from 'react-router-dom'
 import { createSearchFilter } from '@/lib/k8s'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ResourceTable } from '@/components/resource-table'
 
 const eventSearchFilter = createSearchFilter<Event>(
@@ -18,10 +25,63 @@ const eventSearchFilter = createSearchFilter<Event>(
   (e) => e.involvedObject?.kind
 )
 
+// An event counts as alive while its last occurrence is inside this window;
+// beyond it the API server TTL has usually removed it, hence "dead".
+const ALIVE_WINDOW_MS = 30 * 60 * 1000
+
+type AliveFilter = 'all' | 'alive' | 'dead'
+
+function eventLastSeen(event: Event): number {
+  const seen =
+    event.lastTimestamp ||
+    event.eventTime ||
+    event.series?.lastObservedTime ||
+    event.metadata?.creationTimestamp
+  if (!seen) return 0
+  return new Date(seen).getTime()
+}
+
+function matchesAliveFilter(event: Event, filter: AliveFilter): boolean {
+  if (filter === 'all') return true
+  const lastSeen = eventLastSeen(event)
+  const isAlive = lastSeen > Date.now() - ALIVE_WINDOW_MS
+  return filter === 'alive' ? isAlive : !isAlive
+}
+
 const columnHelper = createColumnHelper<Event>()
 
 export function EventListPage() {
   const { t } = useTranslation()
+  const [aliveFilter, setAliveFilter] = useState<AliveFilter>('alive')
+
+  const eventFilter = useCallback(
+    (event: Event, query: string) =>
+      eventSearchFilter(event, query) && matchesAliveFilter(event, aliveFilter),
+    [aliveFilter]
+  )
+
+  const aliveFilterToolbar = useMemo(
+    () => (
+      <Select
+        value={aliveFilter}
+        onValueChange={(value) => setAliveFilter(value as AliveFilter)}
+      >
+        <SelectTrigger
+          size="sm"
+          className="text-muted-foreground w-40"
+          aria-label={t('events.aliveFilter')}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="alive">{t('events.alive')}</SelectItem>
+          <SelectItem value="dead">{t('events.dead')}</SelectItem>
+          <SelectItem value="all">{t('common.values.all', 'All')}</SelectItem>
+        </SelectContent>
+      </Select>
+    ),
+    [aliveFilter, t]
+  )
 
   const columns = useMemo(
     () => [
@@ -122,7 +182,8 @@ export function EventListPage() {
       resourceName="Events"
       columns={columns}
       clusterScope={false}
-      searchQueryFilter={eventSearchFilter}
+      searchQueryFilter={eventFilter}
+      extraToolbars={[aliveFilterToolbar]}
     />
   )
 }

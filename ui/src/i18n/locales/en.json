@@ -665,6 +665,8 @@
   "events": {
     "title": "Events",
     "involvedObject": "Involved Object",
+    "alive": "Alive (last 30 min)",
+    "dead": "Dead",
     "loading": "Loading events...",
     "noEventsFound": "No events found",
     "noRecentEvents": "No recent events"

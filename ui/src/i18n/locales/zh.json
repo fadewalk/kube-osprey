@@ -665,6 +665,8 @@
   "events": {
     "title": "事件",
     "involvedObject": "关联对象",
+    "alive": "存活（最近 30 分钟）",
+    "dead": "已消亡",
     "loading": "事件加载中...",
     "noEventsFound": "暂无事件",
     "noRecentEvents": "暂无最近事件"
