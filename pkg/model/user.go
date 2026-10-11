@@ -10,6 +10,7 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/utils"
 	"gorm.io/gorm"
+	"k8s.io/klog/v2"
 )
 
 type User struct {
@@ -25,6 +26,11 @@ type User struct {
 	Sub         string       `json:"sub,omitempty" gorm:"type:varchar(255);index"`
 	MFAEnabled  bool         `json:"mfa_enabled" gorm:"column:mfa_enabled;type:boolean;not null;default:false"`
 	MFASecret   SecretString `json:"-" gorm:"column:mfa_secret;type:text"`
+
+	PasswordChangedAt *time.Time `json:"passwordChangedAt,omitempty" gorm:"column:password_changed_at;type:timestamp"`
+	// PasswordExpiresAt is computed from the password policy before
+	// serialization; it is never persisted.
+	PasswordExpiresAt *time.Time `json:"passwordExpiresAt,omitempty" gorm:"-"`
 
 	APIKey SecretString  `json:"apiKey,omitempty" gorm:"type:text"`
 	Roles  []common.Role `json:"roles,omitempty" gorm:"-"`
@@ -56,6 +62,8 @@ func AddUser(user *User) error {
 		return err
 	}
 	user.Password = hash
+	now := time.Now()
+	user.PasswordChangedAt = &now
 	return DB.Create(user).Error
 }
 
@@ -246,6 +254,12 @@ func ResetPasswordByID(id uint, plainPassword string) error {
 		return err
 	}
 	u.Password = hash
+	now := time.Now()
+	u.PasswordChangedAt = &now
+	if err := recordPasswordHistory(id, u.Password); err != nil {
+		// History is a governance nicety; never fail the password change on it.
+		klog.Warningf("Failed to record password history for user %d: %v", id, err)
+	}
 	err = DB.Save(&u).Error
 	InvalidateUserCache(uint64(id))
 	return err

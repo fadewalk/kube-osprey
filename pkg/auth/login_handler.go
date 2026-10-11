@@ -163,6 +163,11 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 
 	user, err := authenticate(username, req.Password)
 	if err != nil {
+		if errors.Is(err, errPasswordExpired) {
+			// Do not count as a credential failure: the credentials were right.
+			c.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
+			return
+		}
 		errMsg := fmt.Sprintf("%s login failed for %s: %v", strings.ToUpper(provider), username, err)
 		if isCredentialFailure(err) {
 			if shouldRecordCredentialLoginFailure(provider, err) && credentialLoginAttempts.recordFailure(clientIP) {
@@ -255,6 +260,11 @@ func (h *AuthHandler) authenticateAndSyncLDAPUser(username, password string) (*m
 	return syncedUser, nil
 }
 
+// errPasswordExpired signals that the credentials were valid but the password
+// is past its configured lifetime; the login is refused with a distinct
+// message so the user knows to ask for a reset.
+var errPasswordExpired = errors.New("password has expired, please ask an administrator to reset it")
+
 func (h *AuthHandler) authenticatePasswordUser(username, password string) (*model.User, error) {
 	user, err := model.GetUserByUsername(username)
 	switch {
@@ -264,6 +274,9 @@ func (h *AuthHandler) authenticatePasswordUser(username, password string) (*mode
 		}
 		if !model.CheckPassword(user.Password, password) {
 			return nil, errInvalidCredentials
+		}
+		if expired, _ := model.IsPasswordExpired(user); expired {
+			return nil, errPasswordExpired
 		}
 		return user, nil
 	case errors.Is(err, gorm.ErrRecordNotFound):

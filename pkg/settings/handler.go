@@ -17,35 +17,46 @@ func HandleGetGeneralSetting(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to load general setting: %v", err)})
 		return
 	}
+	c.JSON(http.StatusOK, generalSettingResponse(setting))
+}
+
+func generalSettingResponse(setting *model.GeneralSetting) gin.H {
 	hasAIAPIKey := strings.TrimSpace(string(setting.AIAPIKey)) != ""
-	c.JSON(http.StatusOK, gin.H{
-		"aiAgentEnabled":        setting.AIAgentEnabled,
-		"aiProvider":            setting.AIProvider,
-		"aiModel":               setting.AIModel,
-		"aiApiKey":              "",
-		"aiApiKeyConfigured":    hasAIAPIKey,
-		"aiBaseUrl":             setting.AIBaseURL,
-		"aiMaxTokens":           setting.AIMaxTokens,
-		"aiChangePlanMode":      setting.AIChangePlanMode,
-		"kubectlEnabled":        setting.KubectlEnabled,
-		"kubectlImage":          setting.KubectlImage,
-		"kubectlPermissionMode": setting.KubectlPermissionMode,
-		"kubectlClusterRole":    setting.KubectlClusterRole,
-		"nodeTerminalEnabled":   setting.NodeTerminalEnabled,
-		"nodeTerminalImage":     setting.NodeTerminalImage,
-		"clusterAgentImage":     setting.ClusterAgentImage,
-		"pluginCatalogUrl":      setting.PluginCatalogURL,
-		"mcpEnabled":            setting.MCPEnabled,
-		"mcpRateLimitPerMinute": setting.MCPRateLimitPerMinute,
-		"syncEngineEnabled":     setting.SyncEngineEnabled,
-		"syncEngineResources":   setting.SyncEngineResources,
-		"enableAnalytics":       setting.EnableAnalytics,
-		"enableVersionCheck":    setting.EnableVersionCheck,
-		"passwordLoginDisabled": setting.PasswordLoginDisabled,
-		"enableMFA":             setting.EnableMFA,
-		"enablePasskeyLogin":    setting.EnablePasskeyLogin,
-		"loginPrompt":           setting.LoginPrompt,
-	})
+	return gin.H{
+		"aiAgentEnabled":           setting.AIAgentEnabled,
+		"aiProvider":               setting.AIProvider,
+		"aiModel":                  setting.AIModel,
+		"aiApiKey":                 "",
+		"aiApiKeyConfigured":       hasAIAPIKey,
+		"aiBaseUrl":                setting.AIBaseURL,
+		"aiMaxTokens":              setting.AIMaxTokens,
+		"aiChangePlanMode":         setting.AIChangePlanMode,
+		"kubectlEnabled":           setting.KubectlEnabled,
+		"kubectlImage":             setting.KubectlImage,
+		"kubectlPermissionMode":    setting.KubectlPermissionMode,
+		"kubectlClusterRole":       setting.KubectlClusterRole,
+		"nodeTerminalEnabled":      setting.NodeTerminalEnabled,
+		"nodeTerminalImage":        setting.NodeTerminalImage,
+		"clusterAgentImage":        setting.ClusterAgentImage,
+		"pluginCatalogUrl":         setting.PluginCatalogURL,
+		"mcpEnabled":               setting.MCPEnabled,
+		"mcpRateLimitPerMinute":    setting.MCPRateLimitPerMinute,
+		"syncEngineEnabled":        setting.SyncEngineEnabled,
+		"syncEngineResources":      setting.SyncEngineResources,
+		"enableAnalytics":          setting.EnableAnalytics,
+		"enableVersionCheck":       setting.EnableVersionCheck,
+		"passwordLoginDisabled":    setting.PasswordLoginDisabled,
+		"enableMFA":                setting.EnableMFA,
+		"enablePasskeyLogin":       setting.EnablePasskeyLogin,
+		"loginPrompt":              setting.LoginPrompt,
+		"passwordExpireDays":       setting.PasswordExpireDays,
+		"passwordMinLength":        setting.PasswordMinLength,
+		"passwordRequireUppercase": setting.PasswordRequireUppercase,
+		"passwordRequireLowercase": setting.PasswordRequireLowercase,
+		"passwordRequireDigit":     setting.PasswordRequireDigit,
+		"passwordRequireSpecial":   setting.PasswordRequireSpecial,
+		"passwordHistoryCount":     setting.PasswordHistoryCount,
+	}
 }
 
 type UpdateGeneralSettingRequest struct {
@@ -74,6 +85,14 @@ type UpdateGeneralSettingRequest struct {
 	EnableMFA             *bool   `json:"enableMFA"`
 	EnablePasskeyLogin    *bool   `json:"enablePasskeyLogin"`
 	LoginPrompt           *string `json:"loginPrompt"`
+
+	PasswordExpireDays       *int  `json:"passwordExpireDays"`
+	PasswordMinLength        *int  `json:"passwordMinLength"`
+	PasswordRequireUppercase *bool `json:"passwordRequireUppercase"`
+	PasswordRequireLowercase *bool `json:"passwordRequireLowercase"`
+	PasswordRequireDigit     *bool `json:"passwordRequireDigit"`
+	PasswordRequireSpecial   *bool `json:"passwordRequireSpecial"`
+	PasswordHistoryCount     *int  `json:"passwordHistoryCount"`
 }
 
 func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
@@ -268,6 +287,27 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if req.EnablePasskeyLogin != nil {
 		updates["enable_passkey_login"] = *req.EnablePasskeyLogin
 	}
+	if req.PasswordExpireDays != nil {
+		updates["password_expire_days"] = max(0, *req.PasswordExpireDays)
+	}
+	if req.PasswordMinLength != nil {
+		updates["password_min_length"] = max(4, *req.PasswordMinLength)
+	}
+	if req.PasswordRequireUppercase != nil {
+		updates["password_require_uppercase"] = *req.PasswordRequireUppercase
+	}
+	if req.PasswordRequireLowercase != nil {
+		updates["password_require_lowercase"] = *req.PasswordRequireLowercase
+	}
+	if req.PasswordRequireDigit != nil {
+		updates["password_require_digit"] = *req.PasswordRequireDigit
+	}
+	if req.PasswordRequireSpecial != nil {
+		updates["password_require_special"] = *req.PasswordRequireSpecial
+	}
+	if req.PasswordHistoryCount != nil {
+		updates["password_history_count"] = max(0, *req.PasswordHistoryCount)
+	}
 	if shouldUpdateAIAPIKey {
 		updates["ai_api_key"] = model.SecretString(aiAPIKey)
 	}
@@ -279,33 +319,5 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	}
 	syncengine.ReloadFromSetting()
 
-	hasAIAPIKey := strings.TrimSpace(string(updated.AIAPIKey)) != ""
-	c.JSON(http.StatusOK, gin.H{
-		"aiAgentEnabled":        updated.AIAgentEnabled,
-		"aiProvider":            updated.AIProvider,
-		"aiModel":               updated.AIModel,
-		"aiApiKey":              "",
-		"aiApiKeyConfigured":    hasAIAPIKey,
-		"aiBaseUrl":             updated.AIBaseURL,
-		"aiMaxTokens":           updated.AIMaxTokens,
-		"aiChangePlanMode":      updated.AIChangePlanMode,
-		"kubectlEnabled":        updated.KubectlEnabled,
-		"kubectlImage":          updated.KubectlImage,
-		"kubectlPermissionMode": updated.KubectlPermissionMode,
-		"kubectlClusterRole":    updated.KubectlClusterRole,
-		"nodeTerminalEnabled":   updated.NodeTerminalEnabled,
-		"nodeTerminalImage":     updated.NodeTerminalImage,
-		"clusterAgentImage":     updated.ClusterAgentImage,
-		"pluginCatalogUrl":      updated.PluginCatalogURL,
-		"mcpEnabled":            updated.MCPEnabled,
-		"mcpRateLimitPerMinute": updated.MCPRateLimitPerMinute,
-		"syncEngineEnabled":     updated.SyncEngineEnabled,
-		"syncEngineResources":   updated.SyncEngineResources,
-		"enableAnalytics":       updated.EnableAnalytics,
-		"enableVersionCheck":    updated.EnableVersionCheck,
-		"passwordLoginDisabled": updated.PasswordLoginDisabled,
-		"enableMFA":             updated.EnableMFA,
-		"enablePasskeyLogin":    updated.EnablePasskeyLogin,
-		"loginPrompt":           updated.LoginPrompt,
-	})
+	c.JSON(http.StatusOK, generalSettingResponse(updated))
 }

@@ -172,6 +172,9 @@ func (h *AuthHandler) bootstrapUser(c *gin.Context, setting *model.GeneralSettin
 	currentUser := *user
 	currentUser.Roles = rbac.GetUserRoles(currentUser)
 	applyBootstrapSidebarPreference(&currentUser, setting)
+	if _, expiresAt := model.IsPasswordExpired(&currentUser); expiresAt != nil {
+		currentUser.PasswordExpiresAt = expiresAt
+	}
 
 	return &currentUser
 }

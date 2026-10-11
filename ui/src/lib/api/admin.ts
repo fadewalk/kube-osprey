@@ -389,6 +389,13 @@ export interface GeneralSetting {
   enableMFA: boolean
   enablePasskeyLogin: boolean
   loginPrompt: string
+  passwordExpireDays: number
+  passwordMinLength: number
+  passwordRequireUppercase: boolean
+  passwordRequireLowercase: boolean
+  passwordRequireDigit: boolean
+  passwordRequireSpecial: boolean
+  passwordHistoryCount: number
 }
 
 export interface GeneralSettingUpdateRequest {
@@ -417,6 +424,13 @@ export interface GeneralSettingUpdateRequest {
   enableMFA?: boolean
   enablePasskeyLogin?: boolean
   loginPrompt?: string
+  passwordExpireDays?: number
+  passwordMinLength?: number
+  passwordRequireUppercase?: boolean
+  passwordRequireLowercase?: boolean
+  passwordRequireDigit?: boolean
+  passwordRequireSpecial?: boolean
+  passwordHistoryCount?: number
 }
 
 export interface LDAPSetting {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   IconApi,
   IconDatabase,
+  IconKey,
   IconLink,
   IconMessage,
   IconPuzzle,
@@ -23,6 +24,7 @@ import {
 import { translateError } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -65,6 +67,13 @@ interface GeneralSettingsFormData {
   enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
+  passwordExpireDays: number
+  passwordMinLength: number
+  passwordRequireUppercase: boolean
+  passwordRequireLowercase: boolean
+  passwordRequireDigit: boolean
+  passwordRequireSpecial: boolean
+  passwordHistoryCount: number
 }
 
 export function GeneralManagement() {
@@ -95,6 +104,13 @@ export function GeneralManagement() {
     enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
+    passwordExpireDays: 0,
+    passwordMinLength: 8,
+    passwordRequireUppercase: false,
+    passwordRequireLowercase: false,
+    passwordRequireDigit: false,
+    passwordRequireSpecial: false,
+    passwordHistoryCount: 0,
   })
 
   useEffect(() => {
@@ -123,6 +139,13 @@ export function GeneralManagement() {
       enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
+      passwordExpireDays: data.passwordExpireDays ?? 0,
+      passwordMinLength: data.passwordMinLength ?? 8,
+      passwordRequireUppercase: data.passwordRequireUppercase ?? false,
+      passwordRequireLowercase: data.passwordRequireLowercase ?? false,
+      passwordRequireDigit: data.passwordRequireDigit ?? false,
+      passwordRequireSpecial: data.passwordRequireSpecial ?? false,
+      passwordHistoryCount: data.passwordHistoryCount ?? 0,
     })
   }, [data])
 
@@ -233,6 +256,13 @@ export function GeneralManagement() {
       enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
+      passwordExpireDays: Math.max(0, formData.passwordExpireDays || 0),
+      passwordMinLength: Math.max(4, formData.passwordMinLength || 8),
+      passwordRequireUppercase: formData.passwordRequireUppercase,
+      passwordRequireLowercase: formData.passwordRequireLowercase,
+      passwordRequireDigit: formData.passwordRequireDigit,
+      passwordRequireSpecial: formData.passwordRequireSpecial,
+      passwordHistoryCount: Math.max(0, formData.passwordHistoryCount || 0),
     }
     if (formData.aiApiKey.trim()) {
       payload.aiApiKey = formData.aiApiKey.trim()
@@ -888,6 +918,121 @@ export function GeneralManagement() {
                 'Leave empty to hide the login prompt'
               )}
             />
+          </div>
+        </div>
+
+        <div className="rounded-lg border p-3">
+          <div className="space-y-1">
+            <Label className="flex items-center gap-2 text-sm font-medium">
+              <IconKey className="h-4 w-4" />
+              {t('generalManagement.passwordPolicy.title', 'Password Policy')}
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              {t(
+                'generalManagement.passwordPolicy.description',
+                'Applies to every password set through the console. Expired passwords cannot log in until an administrator resets them.'
+              )}
+            </p>
+          </div>
+
+          <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div className="space-y-1">
+              <Label htmlFor="general-password-min-length">
+                {t(
+                  'generalManagement.passwordPolicy.minLength',
+                  'Minimum length'
+                )}
+              </Label>
+              <Input
+                id="general-password-min-length"
+                type="number"
+                min={4}
+                max={128}
+                value={formData.passwordMinLength}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    passwordMinLength: Number(e.target.value),
+                  }))
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="general-password-expire-days">
+                {t(
+                  'generalManagement.passwordPolicy.expireDays',
+                  'Expires after (days)'
+                )}
+              </Label>
+              <Input
+                id="general-password-expire-days"
+                type="number"
+                min={0}
+                value={formData.passwordExpireDays}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    passwordExpireDays: Number(e.target.value),
+                  }))
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.passwordPolicy.expireDaysHint',
+                  '0 disables expiry'
+                )}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="general-password-history">
+                {t(
+                  'generalManagement.passwordPolicy.history',
+                  'Reject last N reused passwords'
+                )}
+              </Label>
+              <Input
+                id="general-password-history"
+                type="number"
+                min={0}
+                max={24}
+                value={formData.passwordHistoryCount}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    passwordHistoryCount: Number(e.target.value),
+                  }))
+                }
+              />
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.passwordPolicy.historyHint',
+                  '0 disables the reuse check'
+                )}
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              {(
+                [
+                  ['uppercase', 'passwordRequireUppercase'],
+                  ['lowercase', 'passwordRequireLowercase'],
+                  ['digit', 'passwordRequireDigit'],
+                  ['special', 'passwordRequireSpecial'],
+                ] as const
+              ).map(([key, field]) => (
+                <label key={field} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={formData[field]}
+                    onCheckedChange={(checked) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        [field]: checked === true,
+                      }))
+                    }
+                  />
+                  {t(`generalManagement.passwordPolicy.${key}`)}
+                </label>
+              ))}
+            </div>
           </div>
         </div>
 

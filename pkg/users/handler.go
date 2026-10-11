@@ -39,6 +39,11 @@ func CreatePasswordUser(c *gin.Context) {
 		return
 	}
 
+	if err := model.ValidatePasswordPolicy(userreq.Password, 0); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	if err := model.AddUser(user); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create user"})
 		return
@@ -164,6 +169,10 @@ func ChangeCurrentUserPassword(c *gin.Context) {
 	}
 	if !model.CheckPassword(user.Password, req.CurrentPassword) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "current password is incorrect"})
+		return
+	}
+	if err := model.ValidatePasswordPolicy(req.NewPassword, user.ID); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	if err := model.ResetPasswordByID(user.ID, req.NewPassword); err != nil {
@@ -434,6 +443,10 @@ func ResetPassword(c *gin.Context) {
 		Password string `json:"password" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if err := model.ValidatePasswordPolicy(req.Password, id); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

@@ -500,7 +500,9 @@
       "title": "待办",
       "empty": "暂无需要关注的事项",
       "pendingPlans": "待审批的变更计划",
-      "firingAlerts": "触发中的告警"
+      "firingAlerts": "触发中的告警",
+      "passwordExpired": "您的密码已过期，请联系管理员重置",
+      "passwordExpiring": "您的密码将在 {{days}} 天后过期"
     },
     "health": {
       "title": "集群健康",
@@ -962,6 +964,19 @@
         "resources": "资源白名单（逗号分隔）",
         "hint": "留空使用默认白名单。Secrets 默认排除；如显式添加，将按原样存储。"
       }
+    },
+    "passwordPolicy": {
+      "title": "密码策略",
+      "description": "对通过控制台设置的所有密码生效。过期的密码将无法登录，需管理员重置。",
+      "minLength": "最小长度",
+      "expireDays": "有效期（天）",
+      "expireDaysHint": "0 表示永不过期",
+      "history": "禁止与最近 N 次密码重复",
+      "historyHint": "0 表示不检查重复",
+      "uppercase": "必须包含大写字母",
+      "lowercase": "必须包含小写字母",
+      "digit": "必须包含数字",
+      "special": "必须包含特殊字符"
     }
   },
   "authenticationManagement": {

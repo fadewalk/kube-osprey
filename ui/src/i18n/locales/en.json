@@ -500,7 +500,9 @@
       "title": "Todos",
       "empty": "Nothing needs your attention",
       "pendingPlans": "Change plans awaiting approval",
-      "firingAlerts": "Firing alerts"
+      "firingAlerts": "Firing alerts",
+      "passwordExpired": "Your password has expired — ask an administrator to reset it",
+      "passwordExpiring": "Your password expires in {{days}} day(s)"
     },
     "health": {
       "title": "Cluster Health",
@@ -956,6 +958,19 @@
         "resources": "Resource whitelist (comma-separated)",
         "hint": "Leave empty for the default whitelist. Secrets are excluded by default and are stored as-is if added explicitly."
       }
+    },
+    "passwordPolicy": {
+      "title": "Password Policy",
+      "description": "Applies to every password set through the console. Expired passwords cannot log in until an administrator resets them.",
+      "minLength": "Minimum length",
+      "expireDays": "Expires after (days)",
+      "expireDaysHint": "0 disables expiry",
+      "history": "Reject last N reused passwords",
+      "historyHint": "0 disables the reuse check",
+      "uppercase": "Requires uppercase letter",
+      "lowercase": "Requires lowercase letter",
+      "digit": "Requires digit",
+      "special": "Requires special character"
     }
   },
   "authenticationManagement": {

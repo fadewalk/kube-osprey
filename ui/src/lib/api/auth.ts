@@ -17,6 +17,7 @@ export interface AuthUser {
   mfa_enabled?: boolean
   roles?: { name: string }[]
   sidebar_preference?: string
+  passwordExpiresAt?: string
 }
 
 export interface OAuthLoginResponse {

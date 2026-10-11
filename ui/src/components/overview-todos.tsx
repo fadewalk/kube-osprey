@@ -1,4 +1,5 @@
-import { IconChecklist, IconShieldHalf } from '@tabler/icons-react'
+import { useAuth } from '@/contexts/auth-context'
+import { IconChecklist, IconKey, IconShieldHalf } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
@@ -16,8 +17,17 @@ interface TodoItem {
   tone: 'amber' | 'red'
 }
 
+const PASSWORD_EXPIRY_WARN_DAYS = 7
+
+function passwordExpiryDays(expiresAt?: string): number | null {
+  if (!expiresAt) return null
+  const diffMs = new Date(expiresAt).getTime() - Date.now()
+  return Math.ceil(diffMs / 86400000)
+}
+
 export function OverviewTodos() {
   const { t } = useTranslation()
+  const { user } = useAuth()
   const { currentCluster } = useCluster()
 
   const { data: pendingPlans } = usePendingChangePlanCount({
@@ -38,6 +48,19 @@ export function OverviewTodos() {
     : null
 
   const items: TodoItem[] = []
+  const expiryDays = passwordExpiryDays(user?.passwordExpiresAt)
+  if (expiryDays !== null && expiryDays <= PASSWORD_EXPIRY_WARN_DAYS) {
+    items.push({
+      key: 'password-expiry',
+      label:
+        expiryDays <= 0
+          ? t('overview.todos.passwordExpired')
+          : t('overview.todos.passwordExpiring', { days: expiryDays }),
+      count: 0,
+      to: '/settings',
+      tone: 'red',
+    })
+  }
   if ((pendingPlans ?? 0) > 0) {
     items.push({
       key: 'plans',
@@ -79,16 +102,22 @@ export function OverviewTodos() {
                 className="flex items-center justify-between rounded-md border px-3 py-2 text-sm hover:bg-muted"
               >
                 <span className="flex items-center gap-2">
-                  <IconShieldHalf
-                    className={`h-4 w-4 ${item.tone === 'red' ? 'text-destructive' : 'text-amber-500'}`}
-                  />
+                  {item.key === 'password-expiry' ? (
+                    <IconKey className="h-4 w-4 text-destructive" />
+                  ) : (
+                    <IconShieldHalf
+                      className={`h-4 w-4 ${item.tone === 'red' ? 'text-destructive' : 'text-amber-500'}`}
+                    />
+                  )}
                   {item.label}
                 </span>
-                <span
-                  className={`font-semibold ${item.tone === 'red' ? 'text-destructive' : 'text-amber-500'}`}
-                >
-                  {item.count}
-                </span>
+                {item.count > 0 && (
+                  <span
+                    className={`font-semibold ${item.tone === 'red' ? 'text-destructive' : 'text-amber-500'}`}
+                  >
+                    {item.count}
+                  </span>
+                )}
               </Link>
             ))}
           </div>

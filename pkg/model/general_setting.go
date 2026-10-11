@@ -90,6 +90,15 @@ type GeneralSetting struct {
 	LoginPrompt             string       `json:"loginPrompt" gorm:"column:login_prompt;type:text"`
 	JWTSecret               SecretString `json:"-" gorm:"column:jwt_secret;type:text"`
 	GlobalSidebarPreference string       `json:"-" gorm:"column:global_sidebar_preference;type:text"`
+
+	// Password policy: applied to every password set through the console.
+	PasswordExpireDays       int  `json:"passwordExpireDays" gorm:"column:password_expire_days;type:integer;not null;default:0"`
+	PasswordMinLength        int  `json:"passwordMinLength" gorm:"column:password_min_length;type:integer;not null;default:8"`
+	PasswordRequireUppercase bool `json:"passwordRequireUppercase" gorm:"column:password_require_uppercase;type:boolean;not null;default:false"`
+	PasswordRequireLowercase bool `json:"passwordRequireLowercase" gorm:"column:password_require_lowercase;type:boolean;not null;default:false"`
+	PasswordRequireDigit     bool `json:"passwordRequireDigit" gorm:"column:password_require_digit;type:boolean;not null;default:false"`
+	PasswordRequireSpecial   bool `json:"passwordRequireSpecial" gorm:"column:password_require_special;type:boolean;not null;default:false"`
+	PasswordHistoryCount     int  `json:"passwordHistoryCount" gorm:"column:password_history_count;type:integer;not null;default:0"`
 }
 
 func NormalizeGeneralAIProvider(provider string) string {
