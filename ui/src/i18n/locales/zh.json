@@ -573,6 +573,15 @@
     "openContainerDetails": "打开 {{name}}",
     "lastState": "上次状态：{{state}}"
   },
+  "namespaceDashboard": {
+    "workloads": "工作负载",
+    "network": "网络",
+    "config": "配置",
+    "storage": "存储",
+    "recentEvents": "最近事件",
+    "noEvents": "该命名空间暂无最近事件。",
+    "viewAllEvents": "查看全部事件"
+  },
   "deployments": {
     "title": "Deployments",
     "exposed": "Service {{service}} 创建成功",

@@ -13,6 +13,7 @@ import { HelmChartListPage } from './pages/helm-chart-list-page'
 import { InitializationPage } from './pages/initialization'
 import { LogCenterPage } from './pages/log-center-page'
 import { LoginPage } from './pages/login'
+import { NamespaceDashboard } from './pages/namespace-dashboard'
 import { Overview } from './pages/overview'
 import { PluginManagementPage } from './pages/plugins'
 import { PrometheusExplorerPage } from './pages/prometheus-explorer-page'
@@ -121,6 +122,10 @@ export const router = createBrowserRouter(
         {
           path: 'crds/:resource/:name',
           element: <ResourceDetail />,
+        },
+        {
+          path: 'namespaces/:name',
+          element: <NamespaceDashboard />,
         },
         {
           path: ':resource/:name',

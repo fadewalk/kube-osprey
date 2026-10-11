@@ -14,6 +14,7 @@ import { IconDownload } from '@tabler/icons-react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Box, Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 
 import { ResourceType } from '@/types/api'
@@ -103,15 +104,20 @@ function ResourceTableContent<T>({
   } = tableState
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [refreshInterval, setRefreshInterval] = useState(5000)
+  const [searchParams] = useSearchParams()
   const [selectedNamespace, setSelectedNamespace] = useState<
     string | undefined
   >(() => {
+    if (clusterScope) return undefined
+    // Deep links (?namespace=) win over the remembered selector.
+    const fromUrl = searchParams.get('namespace')
+    if (fromUrl) return fromUrl
     const storageKey = getClusterScopedStorageKey('selectedNamespace')
-    return clusterScope
-      ? undefined
-      : sessionStorage.getItem(storageKey) ||
-          localStorage.getItem(storageKey) ||
-          'default'
+    return (
+      sessionStorage.getItem(storageKey) ||
+      localStorage.getItem(storageKey) ||
+      'default'
+    )
   })
   const [useSSE, setUseSSE] = useState(false)
   const effectiveNamespace = clusterScope

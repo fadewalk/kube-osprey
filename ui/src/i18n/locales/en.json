@@ -573,6 +573,15 @@
     "openContainerDetails": "Open {{name}}",
     "lastState": "last: {{state}}"
   },
+  "namespaceDashboard": {
+    "workloads": "Workloads",
+    "network": "Network",
+    "config": "Config",
+    "storage": "Storage",
+    "recentEvents": "Recent Events",
+    "noEvents": "No recent events in this namespace.",
+    "viewAllEvents": "View all events"
+  },
   "deployments": {
     "title": "Deployments",
     "exposed": "Service {{service}} created",
