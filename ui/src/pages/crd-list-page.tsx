@@ -120,6 +120,7 @@ export function CRDListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Custom Resource Definitions"
       resourceType="crds"
       columns={columns}

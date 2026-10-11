@@ -43,6 +43,7 @@ export function NamespaceListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Namespaces"
       columns={columns}
       clusterScope={true}

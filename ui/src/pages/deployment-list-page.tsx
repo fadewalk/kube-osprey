@@ -138,6 +138,7 @@ export function DeploymentListPage() {
   return (
     <>
       <ResourceTable
+        enableYamlExport
         resourceName="Deployments"
         columns={columns}
         searchQueryFilter={deploymentSearchFilter}

@@ -176,6 +176,7 @@ export function StorageClassListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="StorageClasses"
       resourceType="storageclasses"
       columns={columns}

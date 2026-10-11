@@ -120,6 +120,7 @@ export function PVCListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName={'PersistentVolumeClaims'}
       columns={columns}
       searchQueryFilter={pvcSearchFilter}

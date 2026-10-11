@@ -135,6 +135,7 @@ export function PVListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName={'PersistentVolumes'}
       columns={columns}
       clusterScope={true}

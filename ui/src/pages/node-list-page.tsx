@@ -339,6 +339,7 @@ export function NodeListPage() {
   return (
     <>
       <ResourceTable
+        enableYamlExport
         resourceName="Nodes"
         resourceType="nodes"
         columns={columns}

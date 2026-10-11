@@ -135,6 +135,26 @@ export function StatefulSetListPage() {
           )
         },
       }),
+      columnHelper.display({
+        id: 'logs',
+        header: t('common.fields.logs'),
+        cell: ({ row }) => {
+          const selector = Object.entries(
+            row.original.spec?.selector?.matchLabels ?? {}
+          )
+            .map(([key, value]) => `${key}=${value}`)
+            .join(',')
+          return (
+            <Link
+              to={`/logs?namespace=${row.original.metadata!.namespace}&selector=${encodeURIComponent(selector)}`}
+              className="text-muted-foreground text-sm hover:text-foreground"
+              title={t('logCenter.linkTitle')}
+            >
+              {t('common.fields.logs')}
+            </Link>
+          )
+        },
+      }),
     ],
     [t]
   )
@@ -142,6 +162,7 @@ export function StatefulSetListPage() {
   return (
     <>
       <ResourceTable
+        enableYamlExport
         resourceName={'StatefulSets'}
         resourceType="statefulsets"
         columns={columns}

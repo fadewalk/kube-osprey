@@ -115,6 +115,7 @@ export function ServiceListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Services"
       columns={columns}
       clusterScope={false} // Services are namespace-scoped

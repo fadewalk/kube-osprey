@@ -17,6 +17,7 @@
       "customizeSidebar": "Customize Sidebar",
       "delete": "Delete",
       "describe": "Describe",
+      "download": "Download",
       "disable": "Disable",
       "done": "Done",
       "drain": "Drain",
@@ -805,7 +806,8 @@
       "drainNodesTitle": "Drain {{count}} selected nodes?",
       "drainNodesDescription": "Selected nodes will be cordoned and drained one at a time. Pod eviction can be disruptive and cannot be automatically rolled back.",
       "restartResourcesTitle": "Restart {{count}} selected {{resource}}?",
-      "restartResourcesDescription": "This updates each {{resource}} Pod template and triggers a rollout. Paused or OnDelete strategies may not restart immediately, and rollout health is not monitored."
+      "restartResourcesDescription": "This updates each {{resource}} Pod template and triggers a rollout. Paused or OnDelete strategies may not restart immediately, and rollout health is not monitored.",
+      "exportYaml": "Export YAML"
     },
     "watch": "Watch",
     "namespace": "Namespace",

@@ -86,6 +86,7 @@ export function SimpleListPage<T extends keyof ResourceTypeMap>({
       columns={columns}
       clusterScope={isClusterScope}
       searchQueryFilter={filter}
+      enableYamlExport
     />
   )
 }

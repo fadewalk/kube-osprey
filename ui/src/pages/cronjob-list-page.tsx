@@ -105,6 +105,7 @@ export function CronJobListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="CronJobs"
       resourceType="cronjobs"
       columns={columns}

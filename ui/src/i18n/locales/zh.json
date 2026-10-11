@@ -17,6 +17,7 @@
       "customizeSidebar": "自定义侧边栏",
       "delete": "删除",
       "describe": "描述",
+      "download": "下载",
       "disable": "禁用",
       "done": "完成",
       "drain": "驱逐",
@@ -805,7 +806,8 @@
       "drainNodesTitle": "驱逐已选择的 {{count}} 个节点？",
       "drainNodesDescription": "所选节点将逐个停止调度并执行驱逐。Pod 驱逐可能影响业务，且无法自动回滚。",
       "restartResourcesTitle": "重启已选择的 {{count}} 个 {{resource}}？",
-      "restartResourcesDescription": "此操作会更新每个 {{resource}} 的 Pod 模板并触发滚动更新。Paused 或 OnDelete 策略可能不会立即重启，且不会等待滚动更新健康完成。"
+      "restartResourcesDescription": "此操作会更新每个 {{resource}} 的 Pod 模板并触发滚动更新。Paused 或 OnDelete 策略可能不会立即重启，且不会等待滚动更新健康完成。",
+      "exportYaml": "导出 YAML"
     },
     "watch": "监听",
     "namespace": "命名空间",

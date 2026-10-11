@@ -80,6 +80,7 @@ export function ConfigMapListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="ConfigMaps"
       columns={columns}
       searchQueryFilter={configMapSearchFilter}

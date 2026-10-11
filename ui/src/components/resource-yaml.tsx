@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { ResourceYamlProps } from '@kite-dev/plugin-sdk/ui'
-import { IconCheck, IconEdit, IconLoader, IconX } from '@tabler/icons-react'
+import {
+  IconCheck,
+  IconDownload,
+  IconEdit,
+  IconLoader,
+  IconX,
+} from '@tabler/icons-react'
 import * as yaml from 'js-yaml'
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useTranslation } from 'react-i18next'
@@ -12,6 +18,7 @@ import {
   useMonacoBackgroundColor,
 } from '@/lib/monaco-theme'
 import { cn, translateError } from '@/lib/utils'
+import { downloadResourceYaml } from '@/lib/yaml-export'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -124,6 +131,17 @@ export function ResourceYaml<T>({
         </div>
         <div className="flex items-center gap-4">
           {actions}
+          {!isEditing && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => downloadResourceYaml(value)}
+              title={t('common.actions.download')}
+            >
+              <IconDownload className="w-4 h-4" />
+              {t('common.actions.download')}
+            </Button>
+          )}
           {onSave && (
             <div className="flex gap-2">
               {isEditing ? (

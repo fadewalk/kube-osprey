@@ -82,6 +82,7 @@ export function IngressListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Ingresses"
       columns={columns}
       searchQueryFilter={filter}

@@ -78,6 +78,7 @@ export function SecretListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Secrets"
       columns={columns}
       clusterScope={false} // Secrets are namespace-scoped

@@ -143,6 +143,7 @@ function CRListPageContent() {
   return (
     <>
       <ResourceTable
+        enableYamlExport
         resourceName={crdData.spec.names.kind || 'Custom Resources'}
         resourceType={crd as ResourceType}
         columns={columns}

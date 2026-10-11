@@ -118,6 +118,7 @@ export function HorizontalPodAutoscalerListPage() {
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName={t('nav.horizontalpodautoscalers', { defaultValue: 'HPA' })}
       resourceType="horizontalpodautoscalers"
       columns={columns}

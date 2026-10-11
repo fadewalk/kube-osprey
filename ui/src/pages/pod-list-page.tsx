@@ -163,6 +163,7 @@ export function PodListPage() {
 
   return (
     <ResourceTable<Pod>
+      enableYamlExport
       resourceName="Pods"
       columns={columns}
       clusterScope={false}

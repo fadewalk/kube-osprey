@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { createColumnHelper } from '@tanstack/react-table'
 import { Job } from 'kubernetes-types/batch/v1'
+import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
 import { createSearchFilter } from '@/lib/k8s'
@@ -16,6 +17,8 @@ const jobSearchFilter = createSearchFilter<Job>(
 const columnHelper = createColumnHelper<Job>()
 
 export function JobListPage() {
+  const { t } = useTranslation()
+
   // Define columns for the job table
   const columns = useMemo(
     () => [
@@ -116,12 +119,33 @@ export function JobListPage() {
           )
         },
       }),
+      columnHelper.display({
+        id: 'logs',
+        header: t('common.fields.logs'),
+        cell: ({ row }) => {
+          const selector = Object.entries(
+            row.original.spec?.selector?.matchLabels ?? {}
+          )
+            .map(([key, value]) => `${key}=${value}`)
+            .join(',')
+          return (
+            <Link
+              to={`/logs?namespace=${row.original.metadata!.namespace}&selector=${encodeURIComponent(selector)}`}
+              className="text-muted-foreground text-sm hover:text-foreground"
+              title={t('logCenter.linkTitle')}
+            >
+              {t('common.fields.logs')}
+            </Link>
+          )
+        },
+      }),
     ],
-    []
+    [t]
   )
 
   return (
     <ResourceTable
+      enableYamlExport
       resourceName="Jobs"
       columns={columns}
       searchQueryFilter={jobSearchFilter}

@@ -10,6 +10,7 @@ import {
   usePluginColumnContributions,
   usePluginResourceColumns,
 } from '@/plugins/resource-extensions'
+import { IconDownload } from '@tabler/icons-react'
 import { ColumnDef } from '@tanstack/react-table'
 import { Box, Database } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +23,7 @@ import {
   getResourceMetadata,
   getResourceSingularLabel,
 } from '@/lib/resource-catalog'
+import { exportResourcesAsYaml } from '@/lib/yaml-export'
 import { useCluster } from '@/hooks/use-cluster'
 import { useResourceTable } from '@/hooks/use-resource-table'
 import { useResourceTableData } from '@/hooks/use-resource-table-data'
@@ -59,6 +61,9 @@ export interface ResourceTableProps<T> {
   clusterScope?: boolean // If true, don't show namespace selector
   showCreateButton?: boolean // If true, show create button
   batchActions?: ResourceTableBatchAction<T>[]
+  // If true, adds a built-in "Export YAML" batch action that downloads the
+  // selected rows as a multi-document YAML file.
+  enableYamlExport?: boolean
 }
 
 export function ResourceTable<T>(props: ResourceTableProps<T>) {
@@ -80,6 +85,7 @@ function ResourceTableContent<T>({
   extraToolbars = [],
   batchActions = [],
   defaultHiddenColumns = [],
+  enableYamlExport = false,
 }: ResourceTableProps<T>) {
   const { t } = useTranslation()
   const tableState = useResourceTableState({
@@ -354,6 +360,19 @@ function ResourceTableContent<T>({
     },
   })
 
+  const effectiveBatchActions = useMemo<ResourceTableBatchAction<T>[]>(() => {
+    if (!enableYamlExport) return batchActions
+    return [
+      {
+        id: 'export-yaml',
+        label: t('resourceTable.batchActions.exportYaml'),
+        icon: <IconDownload className="size-4" />,
+        onSelect: (rows) => exportResourcesAsYaml(rows, resourceName),
+      },
+      ...batchActions,
+    ]
+  }, [batchActions, enableYamlExport, resourceName, t])
+
   // Handle batch delete - must be after table is defined
   const handleBatchDelete = useCallback(async () => {
     setIsDeleting(true)
@@ -534,7 +553,7 @@ function ResourceTableContent<T>({
           refreshInterval={refreshInterval}
           onRefreshIntervalChange={handleRefreshIntervalChange}
           onOpenDeleteDialog={() => setDeleteDialogOpen(true)}
-          batchActions={batchActions}
+          batchActions={effectiveBatchActions}
         />
 
         <ResourceTableView
