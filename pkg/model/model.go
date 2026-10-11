@@ -106,6 +106,8 @@ func InitDB() error {
 		OAuthProvider{},
 		Role{},
 		RoleAssignment{},
+		UserGroup{},
+		UserGroupMember{},
 		ResourceHistory{},
 		ResourceTemplate{},
 		MCPAuditLog{},

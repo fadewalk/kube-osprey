@@ -900,7 +900,8 @@
       "oauth": "认证",
       "rbac": "RBAC",
       "users": "用户",
-      "apikeys": "API 密钥"
+      "apikeys": "API 密钥",
+      "groups": "用户组"
     }
   },
   "generalManagement": {
@@ -1888,5 +1889,39 @@
         "sidebar-preference": "侧边栏偏好"
       }
     }
+  },
+  "userGroups": {
+    "title": "用户组",
+    "description": "将角色绑定到用户组，组成员自动继承权限；成员绑定可设置失效日期。",
+    "searchPlaceholder": "搜索用户组...",
+    "addGroup": "新增用户组",
+    "viewDetail": "查看详情",
+    "members": "成员",
+    "membersTab": "成员",
+    "rolesTab": "角色",
+    "permissionsTab": "权限",
+    "addMembers": "添加成员",
+    "noMembers": "该组还没有成员。",
+    "allUsersAdded": "所有用户都已在组内。",
+    "membersAdded": "已添加 {{count}} 个成员",
+    "memberRemoved": "已移除成员",
+    "expiresAt": "{{date}} 到期",
+    "expired": "已过期",
+    "membershipExpiry": "成员有效期至",
+    "membershipExpiryHint": "可选。过期成员将自动失去组权限。",
+    "bindRole": "绑定角色",
+    "selectRole": "选择角色...",
+    "allRolesBound": "所有角色都已绑定。",
+    "roleBound": "角色已绑定",
+    "roleUnbound": "角色已解绑",
+    "noRoles": "尚未绑定角色。绑定角色后所有成员自动获得对应权限。",
+    "createTitle": "新增用户组",
+    "editTitle": "编辑用户组",
+    "formDescription": "组名创建后不可修改，角色绑定通过组名关联。",
+    "groupEnabled": "启用",
+    "groupEnabledHint": "停用后该组所有成员的组权限立即失效。",
+    "created": "用户组创建成功",
+    "deleted": "用户组已删除",
+    "deleteDescription": "成员将失去从该组继承的权限，组绑定的角色也会一并删除。此操作不可恢复。"
   }
 }

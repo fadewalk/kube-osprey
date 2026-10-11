@@ -206,6 +206,74 @@ export const unassignRole = async (
   )
 }
 
+// User group API
+export interface UserGroupMemberItem {
+  id: number
+  groupId: number
+  userId: number
+  expiresAt?: string | null
+  user: UserItem
+}
+
+export interface UserGroupItem {
+  id: number
+  name: string
+  description?: string
+  enabled: boolean
+  createdAt: string
+  members: UserGroupMemberItem[]
+}
+
+export const fetchUserGroups = async (): Promise<UserGroupItem[]> => {
+  return fetchAPI<{ groups: UserGroupItem[] }>(`/admin/user-groups/`).then(
+    (resp) => resp.groups
+  )
+}
+
+export const useUserGroups = (options?: { staleTime?: number }) => {
+  return useQuery({
+    queryKey: ['user-groups'],
+    queryFn: fetchUserGroups,
+    staleTime: options?.staleTime || 10000,
+  })
+}
+
+export const createUserGroup = async (data: {
+  name: string
+  description?: string
+}) => {
+  return await apiClient.post<UserGroupItem>(`/admin/user-groups/`, data)
+}
+
+export const updateUserGroup = async (
+  id: number,
+  data: { description?: string; enabled?: boolean }
+) => {
+  return await apiClient.put<UserGroupItem>(`/admin/user-groups/${id}`, data)
+}
+
+export const deleteUserGroup = async (id: number) => {
+  return await apiClient.delete<{ success: boolean }>(
+    `/admin/user-groups/${id}`
+  )
+}
+
+export const addGroupMembers = async (
+  id: number,
+  data: { userIds: number[]; expiresAt?: string | null }
+) => {
+  return await apiClient.post<{ added: number }>(
+    `/admin/user-groups/${id}/members`,
+    data
+  )
+}
+
+export const removeGroupMember = async (id: number, memberId: number) => {
+  return await apiClient.delete<{ success: boolean }>(
+    `/admin/user-groups/${id}/members/${memberId}`
+  )
+}
+
 export const fetchUserList = async (
   page = 1,
   size = 20,

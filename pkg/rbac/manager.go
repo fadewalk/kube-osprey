@@ -60,8 +60,26 @@ func loadRolesFromDB() error {
 			cfg.RoleMapping = append(cfg.RoleMapping, rm)
 		}
 	}
+	groups := make(map[string]*groupInfo)
+	var userGroups []model.UserGroup
+	if err := model.DB.Preload("Members.User").Find(&userGroups).Error; err != nil {
+		return err
+	}
+	for _, g := range userGroups {
+		info := &groupInfo{enabled: g.Enabled, members: make(map[string]*time.Time)}
+		for _, m := range g.Members {
+			key := m.User.Key()
+			if key == "" {
+				continue
+			}
+			info.members[key] = m.ExpiresAt
+		}
+		groups[g.Name] = info
+	}
+
 	rwlock.Lock()
 	RBACConfig = cfg
+	localGroups = groups
 	rwlock.Unlock()
 	return nil
 }

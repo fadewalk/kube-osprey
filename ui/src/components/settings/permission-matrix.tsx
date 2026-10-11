@@ -282,3 +282,124 @@ export function ResourceVerbPicker({
     </div>
   )
 }
+
+interface MergedRoleSource {
+  id: number | string
+  name: string
+  clusters: string[]
+  namespaces: string[]
+  resources: string[]
+  verbs: string[]
+}
+
+// Union of every (resource, verb) cell granted by any of the given roles;
+// each cell records which roles granted it for troubleshooting.
+export function MergedPermissionsTable({
+  roles,
+}: {
+  roles: MergedRoleSource[]
+}) {
+  const { t } = useTranslation()
+
+  const merged = useMemo(() => {
+    const map = new Map<
+      string,
+      { label: string; verbs: Map<string, Set<string>> }
+    >()
+    const ensure = (type: string) => {
+      const entry = resourceCatalog.find((r) => r.type === type)
+      if (!map.has(type)) {
+        map.set(type, {
+          label:
+            entry && 'titleKey' in entry
+              ? t(entry.titleKey, { defaultValue: entry.pluralLabel })
+              : (entry?.pluralLabel ?? type),
+          verbs: new Map(),
+        })
+      }
+      return map.get(type)!
+    }
+    for (const role of roles) {
+      const scope: PermissionScope = {
+        clusters: role.clusters || [],
+        namespaces: role.namespaces || [],
+        resources: role.resources || [],
+        verbs: role.verbs || [],
+      }
+      const resourceTypes = new Set(
+        scope.resources.filter((r) => r !== '*' && !r.startsWith('!'))
+      )
+      if (scope.resources.includes('*')) {
+        for (const r of resourceCatalog) {
+          if (r.type !== 'crs') resourceTypes.add(r.type)
+        }
+      }
+      const verbSet = new Set(
+        scope.verbs.includes('*')
+          ? RBAC_VERBS
+          : scope.verbs.filter((v) => !v.startsWith('!'))
+      )
+      for (const r of resourceTypes) {
+        const row = ensure(r)
+        for (const v of verbSet) {
+          if (cellGranted(scope, r, v)) {
+            if (!row.verbs.has(v)) row.verbs.set(v, new Set())
+            row.verbs.get(v)!.add(role.name)
+          }
+        }
+      }
+    }
+    return Array.from(map.entries())
+  }, [roles, t])
+
+  if (roles.length === 0) {
+    return (
+      <p className="text-muted-foreground py-4 text-center text-sm">
+        {t('rbac.userPermissions.noRoles', 'No roles assigned.')}
+      </p>
+    )
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-md border">
+      <table className="w-full min-w-max text-sm">
+        <thead>
+          <tr className="bg-muted/40 border-b">
+            <th className="px-3 py-2 text-left font-medium">
+              {t('common.fields.resources', 'Resources')}
+            </th>
+            <th className="px-3 py-2 text-left font-medium">
+              {t('common.fields.verbs', 'Verbs')}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {merged.map(([type, row]) => (
+            <tr key={type} className="border-b last:border-b-0">
+              <td className="px-3 py-1.5">{row.label}</td>
+              <td className="px-3 py-1.5">
+                <div className="flex flex-wrap gap-1">
+                  {Array.from(row.verbs.entries()).map(([verb, sources]) => (
+                    <span
+                      key={verb}
+                      title={t('rbac.userPermissions.fromRoles', {
+                        defaultValue: 'Granted by: {{roles}}',
+                        roles: Array.from(sources).join(', '),
+                      })}
+                      className="bg-secondary inline-flex items-center rounded-full px-2 py-0.5 font-mono text-xs"
+                    >
+                      {verb}
+                    </span>
+                  ))}
+                  {row.verbs.size === 0 && (
+                    <span className="text-muted-foreground text-xs">-</span>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}

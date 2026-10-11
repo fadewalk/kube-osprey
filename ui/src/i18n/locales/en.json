@@ -894,7 +894,8 @@
       "general": "General",
       "oauth": "Authentication",
       "rbac": "RBAC",
-      "users": "User"
+      "users": "User",
+      "groups": "Groups"
     }
   },
   "generalManagement": {
@@ -1806,5 +1807,39 @@
         "sidebar-preference": "Sidebar Preference"
       }
     }
+  },
+  "userGroups": {
+    "title": "User Groups",
+    "description": "Grant roles to groups so members inherit permissions; memberships can carry an expiry date.",
+    "searchPlaceholder": "Search groups...",
+    "addGroup": "Add User Group",
+    "viewDetail": "View Detail",
+    "members": "Members",
+    "membersTab": "Members",
+    "rolesTab": "Roles",
+    "permissionsTab": "Permissions",
+    "addMembers": "Add Members",
+    "noMembers": "No members in this group yet.",
+    "allUsersAdded": "All users are already members.",
+    "membersAdded": "{{count}} member(s) added",
+    "memberRemoved": "Member removed",
+    "expiresAt": "expires {{date}}",
+    "expired": "Expired",
+    "membershipExpiry": "Membership expires at",
+    "membershipExpiryHint": "Optional. Expired members automatically lose group permissions.",
+    "bindRole": "Bind Role",
+    "selectRole": "Select a role...",
+    "allRolesBound": "Every role is already bound.",
+    "roleBound": "Role bound",
+    "roleUnbound": "Role unbound",
+    "noRoles": "No roles bound. Bind a role to grant permissions to every member.",
+    "createTitle": "Add User Group",
+    "editTitle": "Edit User Group",
+    "formDescription": "The group name cannot be changed after creation; role assignments reference it.",
+    "groupEnabled": "Enabled",
+    "groupEnabledHint": "Disabled groups suspend permissions for all members.",
+    "created": "User group created",
+    "deleted": "User group deleted",
+    "deleteDescription": "Members lose permissions inherited from this group, and its role bindings are removed. This cannot be undone."
   }
 }

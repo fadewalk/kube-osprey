@@ -5,6 +5,7 @@ import (
 	"regexp"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/model"
@@ -103,6 +104,7 @@ func GetUserRoles(user model.User) []common.Role {
 	if RBACConfig == nil {
 		return nil
 	}
+	userGroups := localGroupNamesForLocked(user)
 	for _, mapping := range RBACConfig.RoleMapping {
 		if contains(mapping.Users, "*") || contains(mapping.Users, user.Key()) {
 			if r := findRoleLocked(mapping.Name); r != nil {
@@ -116,12 +118,53 @@ func GetUserRoles(user model.User) []common.Role {
 				}
 			}
 		}
+		for _, group := range userGroups {
+			if contains(mapping.OIDCGroups, group) {
+				if r := findRoleLocked(mapping.Name); r != nil {
+					rolesMap[r.Name] = *r
+				}
+			}
+		}
 	}
 	roles := make([]common.Role, 0, len(rolesMap))
 	for _, role := range rolesMap {
 		roles = append(roles, role)
 	}
 	return roles
+}
+
+// groupInfo caches local user-group membership so permission checks never
+// hit the database; it is rebuilt together with RBACConfig.
+type groupInfo struct {
+	enabled bool
+	// member user key -> expiry (nil = never expires)
+	members map[string]*time.Time
+}
+
+var localGroups map[string]*groupInfo
+
+// localGroupNamesForLocked returns the names of enabled local groups the
+// user actively belongs to (membership not expired). Caller holds rwlock.
+func localGroupNamesForLocked(user model.User) []string {
+	if len(localGroups) == 0 {
+		return nil
+	}
+	now := time.Now()
+	var names []string
+	for name, info := range localGroups {
+		if !info.enabled {
+			continue
+		}
+		expiry, ok := info.members[user.Key()]
+		if !ok {
+			continue
+		}
+		if expiry != nil && !expiry.After(now) {
+			continue
+		}
+		names = append(names, name)
+	}
+	return names
 }
 
 func findRoleLocked(name string) *common.Role {

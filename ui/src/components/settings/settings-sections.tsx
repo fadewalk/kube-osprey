@@ -8,6 +8,7 @@ import { ClusterManagement } from './cluster-management'
 import { GeneralManagement } from './general-management'
 import { RBACManagement } from './rbac-management'
 import { TemplateManagement } from './template-management'
+import { UserGroupManagement } from './user-group-management'
 import { UserManagement } from './user-management'
 
 export interface SettingsSectionDefinition {
@@ -61,6 +62,12 @@ export const settingsSectionRegistry: SettingsSectionDefinition[] = [
     'settings.tabs.users',
     'User',
     UserManagement
+  ),
+  createSettingsSectionDefinition(
+    'groups',
+    'settings.tabs.groups',
+    'Groups',
+    UserGroupManagement
   ),
   createSettingsSectionDefinition(
     'apikeys',

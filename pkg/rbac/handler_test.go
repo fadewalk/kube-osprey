@@ -46,7 +46,7 @@ func TestRoleHandlers(t *testing.T) { //nolint:gocyclo // handler lifecycle test
 	if err := db.Exec("PRAGMA foreign_keys = ON").Error; err != nil {
 		t.Fatalf("enable foreign keys: %v", err)
 	}
-	if err := db.AutoMigrate(&model.Role{}, &model.RoleAssignment{}); err != nil {
+	if err := db.AutoMigrate(&model.Role{}, &model.RoleAssignment{}, &model.UserGroup{}, &model.UserGroupMember{}); err != nil {
 		t.Fatalf("migrate database: %v", err)
 	}
 
