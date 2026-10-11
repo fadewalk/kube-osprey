@@ -14,12 +14,7 @@ import { ResourceType } from '@/types/api'
 import { useResources } from '@/lib/api'
 import { getAge } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 type NamespaceResource =
   | 'deployments'
@@ -105,7 +100,9 @@ function ResourceCountRow({
       to={`/${resource}?namespace=${encodeURIComponent(namespace)}`}
       className="hover:bg-accent/50 -mx-2 flex items-center justify-between rounded-md px-2 py-1.5 text-sm"
     >
-      <span className="truncate">{t(titleKey, { defaultValue: titleKey })}</span>
+      <span className="truncate">
+        {t(titleKey, { defaultValue: titleKey })}
+      </span>
       <span className="flex items-center gap-1">
         <span className="text-muted-foreground tabular-nums">
           {count ?? '-'}
@@ -190,7 +187,10 @@ function RecentEventsCard({ namespace }: { namespace: string }) {
       <CardContent className="space-y-2">
         {(recent || []).length === 0 ? (
           <p className="text-muted-foreground py-4 text-center text-sm">
-            {t('namespaceDashboard.noEvents', 'No recent events in this namespace.')}
+            {t(
+              'namespaceDashboard.noEvents',
+              'No recent events in this namespace.'
+            )}
           </p>
         ) : (
           recent.map((event) => (
@@ -203,7 +203,9 @@ function RecentEventsCard({ namespace }: { namespace: string }) {
                   {event.type === 'Warning' && (
                     <IconAlertTriangle className="h-3.5 w-3.5 shrink-0 text-amber-500" />
                   )}
-                  <span className="font-medium">{event.involvedObject?.name}</span>
+                  <span className="font-medium">
+                    {event.involvedObject?.name}
+                  </span>
                   <span className="text-muted-foreground truncate text-xs">
                     {event.reason}
                   </span>
@@ -234,9 +236,7 @@ export function NamespaceDashboard() {
   const { name = '' } = useParams()
   const { t } = useTranslation()
   const { data: namespaces } = useResources('namespaces')
-  const namespace = (namespaces || []).find(
-    (ns) => ns.metadata?.name === name
-  )
+  const namespace = (namespaces || []).find((ns) => ns.metadata?.name === name)
 
   return (
     <div className="space-y-4">
