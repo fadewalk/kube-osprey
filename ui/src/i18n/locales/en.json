@@ -1582,7 +1582,14 @@
     "title": "Topology",
     "empty": "No objects to display in this namespace.",
     "syncUnavailable": "Sync engine data unavailable - enable it in Settings, General",
-    "hint": "Ownership graph from the sync engine: workloads point to their ReplicaSets and pods. Click a node to open the resource."
+    "hint": "Ownership graph from the sync engine: workloads point to their ReplicaSets and pods. Click a node to open the resource.",
+    "relations": {
+      "owner": "Ownership",
+      "selector": "Service selector",
+      "config": "Config / env reference",
+      "storage": "Volume claim",
+      "all": "All relations"
+    }
   },
   "imageTitle": "Update images — {{name}}",
   "imageUpdated": "{{count}} container image(s) updated, rollout started",

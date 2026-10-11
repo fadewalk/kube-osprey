@@ -34,6 +34,7 @@ var DefaultWhitelist = []string{
 	"services",
 	"ingresses",
 	"configmaps",
+	"persistentvolumeclaims",
 	"nodes",
 	"namespaces",
 	"events",

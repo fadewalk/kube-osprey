@@ -238,12 +238,15 @@ func SearchObjectRows(clusterName, resource, q string, limit int64) ([]model.Syn
 	return rows, nil
 }
 
-// TopologyObjects returns uid/kind/name/owner chains for drawing dependency
-// graphs, scoped to a namespace (or all).
-func TopologyObjects(clusterName, namespace string) ([]map[string]any, error) {
+// TopologyObjects returns the mirrored rows feeding the dependency graph,
+// scoped to a namespace (or all).
+func TopologyObjects(clusterName, namespace string) ([]model.SyncObject, error) {
 	query := model.DB.Model(&model.SyncObject{}).
 		Where("cluster_name = ? AND deleted_at IS NULL", clusterName).
-		Where("resource IN ?", []string{"pods", "deployments", "statefulsets", "daemonsets", "services", "replicasets", "jobs"})
+		Where("resource IN ?", []string{
+			"pods", "deployments", "statefulsets", "daemonsets", "services",
+			"replicasets", "jobs", "configmaps", "persistentvolumeclaims",
+		})
 	if namespace != "" && namespace != "_all" {
 		query = query.Where("namespace = ?", namespace)
 	}
@@ -251,21 +254,266 @@ func TopologyObjects(clusterName, namespace string) ([]map[string]any, error) {
 	if err := query.Order("creation_timestamp DESC").Limit(5000).Find(&rows).Error; err != nil {
 		return nil, err
 	}
-	out := make([]map[string]any, 0, len(rows))
-	for _, row := range rows {
-		var owners []string
-		_ = json.Unmarshal([]byte(row.OwnerUIDs), &owners)
-		out = append(out, map[string]any{
-			"uid":       row.UID,
-			"kind":      row.Kind,
-			"name":      row.Name,
-			"namespace": row.Namespace,
-			"resource":  row.Resource,
-			"ownerUids": owners,
-			"createdAt": row.CreationTimestamp,
-		})
+	return rows, nil
+}
+
+func topologyNode(row model.SyncObject) map[string]any {
+	var owners []string
+	_ = json.Unmarshal([]byte(row.OwnerUIDs), &owners)
+	return map[string]any{
+		"uid":       row.UID,
+		"kind":      row.Kind,
+		"name":      row.Name,
+		"namespace": row.Namespace,
+		"resource":  row.Resource,
+		"ownerUids": owners,
+		"createdAt": row.CreationTimestamp,
 	}
-	return out, nil
+}
+
+// topologyRef identifies an edge target that may not exist as a synced node
+// (e.g. a Secret reference, whose contents the engine deliberately mirrors).
+type topologyRef struct {
+	kind      string
+	namespace string
+	name      string
+}
+
+func (r topologyRef) placeholderUID() string {
+	return "placeholder/" + r.kind + "/" + r.namespace + "/" + r.name
+}
+
+// topologyEdge is a non-ownership relation between two graph nodes.
+type topologyEdge struct {
+	From string `json:"from"`
+	To   string `json:"to"`
+	Type string `json:"type"` // selector | config | storage
+}
+
+type topologyPodVolume struct {
+	name      string
+	configMap string
+	secret    string
+	pvc       string
+}
+
+type topologyPod struct {
+	uid       string
+	namespace string
+	volumes   []topologyPodVolume
+	envRefs   []topologyRef
+}
+
+type topologyService struct {
+	uid       string
+	namespace string
+	selector  map[string]string
+}
+
+// parseTopologyPod extracts the relation-relevant parts of a pod (labels,
+// volume sources, env references) from its mirrored JSON.
+func parseTopologyPod(row model.SyncObject) (topologyPod, map[string]string) {
+	info := topologyPod{uid: row.UID, namespace: row.Namespace}
+	var labels map[string]string
+	_ = json.Unmarshal([]byte(row.LabelsJSON), &labels)
+	var spec struct {
+		Spec struct {
+			Volumes []struct {
+				Name      string `json:"name"`
+				ConfigMap *struct {
+					Name string `json:"name"`
+				} `json:"configMap"`
+				Secret *struct {
+					SecretName string `json:"secretName"`
+				} `json:"secret"`
+				PersistentVolumeClaim *struct {
+					ClaimName string `json:"claimName"`
+				} `json:"persistentVolumeClaim"`
+			} `json:"volumes"`
+			Containers []struct {
+				EnvFrom []struct {
+					ConfigMapRef *struct {
+						Name string `json:"name"`
+					} `json:"configMapRef"`
+					SecretRef *struct {
+						Name string `json:"name"`
+					} `json:"secretRef"`
+				} `json:"envFrom"`
+				Env []struct {
+					ValueFrom *struct {
+						ConfigMapKeyRef *struct {
+							Name string `json:"name"`
+						} `json:"configMapKeyRef"`
+						SecretKeyRef *struct {
+							Name string `json:"name"`
+						} `json:"secretKeyRef"`
+					} `json:"valueFrom"`
+				} `json:"env"`
+			} `json:"containers"`
+		} `json:"spec"`
+	}
+	if row.ObjectJSON == "" || json.Unmarshal([]byte(row.ObjectJSON), &spec) != nil {
+		return info, labels
+	}
+	for _, v := range spec.Spec.Volumes {
+		vol := topologyPodVolume{name: v.Name}
+		if v.ConfigMap != nil {
+			vol.configMap = v.ConfigMap.Name
+		}
+		if v.Secret != nil {
+			vol.secret = v.Secret.SecretName
+		}
+		if v.PersistentVolumeClaim != nil {
+			vol.pvc = v.PersistentVolumeClaim.ClaimName
+		}
+		info.volumes = append(info.volumes, vol)
+	}
+	for _, c := range spec.Spec.Containers {
+		for _, ef := range c.EnvFrom {
+			if ef.ConfigMapRef.Name != "" {
+				info.envRefs = append(info.envRefs, topologyRef{kind: "ConfigMap", namespace: row.Namespace, name: ef.ConfigMapRef.Name})
+			}
+			if ef.SecretRef.Name != "" {
+				info.envRefs = append(info.envRefs, topologyRef{kind: "Secret", namespace: row.Namespace, name: ef.SecretRef.Name})
+			}
+		}
+		for _, e := range c.Env {
+			if e.ValueFrom == nil {
+				continue
+			}
+			if e.ValueFrom.ConfigMapKeyRef != nil && e.ValueFrom.ConfigMapKeyRef.Name != "" {
+				info.envRefs = append(info.envRefs, topologyRef{kind: "ConfigMap", namespace: row.Namespace, name: e.ValueFrom.ConfigMapKeyRef.Name})
+			}
+			if e.ValueFrom.SecretKeyRef != nil && e.ValueFrom.SecretKeyRef.Name != "" {
+				info.envRefs = append(info.envRefs, topologyRef{kind: "Secret", namespace: row.Namespace, name: e.ValueFrom.SecretKeyRef.Name})
+			}
+		}
+	}
+	return info, labels
+}
+
+// deriveTopologyRelations computes selector (Service→Pod label match),
+// config (Pod→ConfigMap/Secret via volumes and env), and storage
+// (Pod→PVC via volumes) edges from the mirrored object JSON. Targets that
+// are not synced themselves (Secrets) become placeholder nodes carrying no
+// data, so the graph stays complete without storing secret contents.
+func deriveTopologyRelations(rows []model.SyncObject) (edges []topologyEdge, extraNodes []map[string]any) {
+	edges = []topologyEdge{}
+	extraNodes = []map[string]any{}
+
+	byRef := map[topologyRef]string{} // existing node lookup: kind+ns+name -> uid
+	podLabels := map[string]map[string]string{}
+	pods := []topologyPod{}
+	services := []topologyService{}
+	seenPlaceholder := map[string]bool{}
+
+	addPlaceholder := func(ref topologyRef) string {
+		id := ref.placeholderUID()
+		if !seenPlaceholder[id] {
+			seenPlaceholder[id] = true
+			extraNodes = append(extraNodes, map[string]any{
+				"uid":         id,
+				"kind":        ref.kind,
+				"name":        ref.name,
+				"namespace":   ref.namespace,
+				"resource":    "",
+				"ownerUids":   []string{},
+				"createdAt":   time.Time{},
+				"placeholder": true,
+			})
+		}
+		return id
+	}
+
+	for _, row := range rows {
+		ref := topologyRef{kind: row.Kind, namespace: row.Namespace, name: row.Name}
+		byRef[ref] = row.UID
+		switch row.Resource {
+		case "pods":
+			info, labels := parseTopologyPod(row)
+			podLabels[row.UID] = labels
+			pods = append(pods, info)
+		case "services":
+			var spec struct {
+				Spec struct {
+					Selector map[string]string `json:"selector"`
+				} `json:"spec"`
+			}
+			if row.ObjectJSON != "" && json.Unmarshal([]byte(row.ObjectJSON), &spec) == nil && len(spec.Spec.Selector) > 0 {
+				services = append(services, topologyService{
+					uid:       row.UID,
+					namespace: row.Namespace,
+					selector:  spec.Spec.Selector,
+				})
+			}
+		}
+	}
+
+	// selector: Service -> Pods whose labels satisfy the selector.
+	for _, svc := range services {
+		for uid, labels := range podLabels {
+			if labels == nil {
+				continue
+			}
+			matched := true
+			for k, v := range svc.selector {
+				if labels[k] != v {
+					matched = false
+					break
+				}
+			}
+			if matched {
+				edges = append(edges, topologyEdge{From: svc.uid, To: uid, Type: "selector"})
+			}
+		}
+	}
+
+	// config + storage: Pod -> ConfigMap/Secret/PVC.
+	seenEdge := map[string]bool{}
+	addEdge := func(from, to, typ string) {
+		key := from + "|" + to + "|" + typ
+		if seenEdge[key] {
+			return
+		}
+		seenEdge[key] = true
+		edges = append(edges, topologyEdge{From: from, To: to, Type: typ})
+	}
+	for _, pod := range pods {
+		for _, vol := range pod.volumes {
+			if vol.configMap != "" {
+				ref := topologyRef{kind: "ConfigMap", namespace: pod.namespace, name: vol.configMap}
+				if uid, ok := byRef[ref]; ok {
+					addEdge(pod.uid, uid, "config")
+				} else {
+					addEdge(pod.uid, addPlaceholder(ref), "config")
+				}
+			}
+			if vol.secret != "" {
+				ref := topologyRef{kind: "Secret", namespace: pod.namespace, name: vol.secret}
+				if uid, ok := byRef[ref]; ok {
+					addEdge(pod.uid, uid, "config")
+				} else {
+					addEdge(pod.uid, addPlaceholder(ref), "config")
+				}
+			}
+			if vol.pvc != "" {
+				ref := topologyRef{kind: "PersistentVolumeClaim", namespace: pod.namespace, name: vol.pvc}
+				if uid, ok := byRef[ref]; ok {
+					addEdge(pod.uid, uid, "storage")
+				} else {
+					addEdge(pod.uid, addPlaceholder(ref), "storage")
+				}
+			}
+		}
+		for _, ref := range pod.envRefs {
+			if uid, ok := byRef[ref]; ok {
+				addEdge(pod.uid, uid, "config")
+			} else {
+				addEdge(pod.uid, addPlaceholder(ref), "config")
+			}
+		}
+	}
+	return edges, extraNodes
 }
 
 // HandleTopology serves the dependency graph (uid + owner chains) for a
@@ -283,10 +531,20 @@ func HandleTopology(c *gin.Context) {
 		c.JSON(http.StatusForbidden, gin.H{"error": "cluster-wide pod read access required"})
 		return
 	}
-	nodes, err := TopologyObjects(cs.Name, c.Query("namespace"))
+	rows, err := TopologyObjects(cs.Name, c.Query("namespace"))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"objects": nodes, "available": Active(cs.Name, "pods")})
+	nodes := make([]map[string]any, 0, len(rows))
+	for _, row := range rows {
+		nodes = append(nodes, topologyNode(row))
+	}
+	edges, extraNodes := deriveTopologyRelations(rows)
+	nodes = append(nodes, extraNodes...)
+	c.JSON(http.StatusOK, gin.H{
+		"objects":   nodes,
+		"edges":     edges,
+		"available": Active(cs.Name, "pods"),
+	})
 }
