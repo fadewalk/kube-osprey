@@ -2,6 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react'
 import {
   IconCircleCheckFilled,
   IconExclamationCircle,
+  IconGitCompare,
 } from '@tabler/icons-react'
 import * as yaml from 'js-yaml'
 import type { Container, Pod } from 'kubernetes-types/core/v1'
@@ -66,6 +67,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { HelmChartIcon } from '@/components/helm-chart-icon'
+import { HelmRevisionDiffDialog } from '@/components/helm-revision-diff-dialog'
 import { LogViewer } from '@/components/log-viewer'
 import {
   CompactRelatedResourcesCard,
@@ -551,6 +553,10 @@ function HelmReleaseHistoryTable({
   const [rollingBackRevision, setRollingBackRevision] = useState<number | null>(
     null
   )
+  const [diffPair, setDiffPair] = useState<{
+    from: HelmReleaseHistoryItem
+    to: HelmReleaseHistoryItem
+  } | null>(null)
   const {
     data,
     isLoading,
@@ -571,6 +577,11 @@ function HelmReleaseHistoryTable({
       setRollingBackRevision(null)
     }
   }
+
+  const historyItems = data?.items || []
+  const revisionLookup = new Map(
+    historyItems.map((item) => [item.revision, item])
+  )
 
   if (isLoading) {
     return (
@@ -672,8 +683,26 @@ function HelmReleaseHistoryTable({
               cell: (value) => {
                 const item = value as HelmReleaseHistoryItem
                 const isCurrent = item.revision === currentRevision
+                const previous = revisionLookup.get(item.revision - 1)
                 return (
-                  <div className="ml-auto grid w-max grid-cols-[6rem_6rem] gap-2">
+                  <div className="ml-auto grid w-max grid-cols-[2.5rem_6rem_6rem] items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-foreground"
+                      disabled={!previous}
+                      title={t('helm.messages.diffWithPrevious', {
+                        defaultValue: 'Diff values with previous revision',
+                      })}
+                      aria-label={t('helm.messages.diffWithPrevious', {
+                        defaultValue: 'Diff values with previous revision',
+                      })}
+                      onClick={() =>
+                        previous && setDiffPair({ from: previous, to: item })
+                      }
+                    >
+                      <IconGitCompare className="h-4 w-4" />
+                    </Button>
                     <HelmReleaseHistoryValuesDialog item={item} />
                     {isCurrent ? (
                       <Button
@@ -700,6 +729,15 @@ function HelmReleaseHistoryTable({
             },
           ]}
           pagination={{ enabled: true, pageSize: 10 }}
+        />
+
+        <HelmRevisionDiffDialog
+          open={!!diffPair}
+          onOpenChange={(open) => {
+            if (!open) setDiffPair(null)
+          }}
+          from={diffPair?.from ?? null}
+          to={diffPair?.to ?? null}
         />
       </CardContent>
     </Card>
