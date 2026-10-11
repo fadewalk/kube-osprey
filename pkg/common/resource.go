@@ -42,6 +42,9 @@ const (
 	IngressClasses                    ResourceType = "ingressclasses"
 	Gateways                          ResourceType = "gateways"
 	HTTPRoutes                        ResourceType = "httproutes"
+	TLSRoutes                         ResourceType = "tlsroutes"
+	TCPRoutes                         ResourceType = "tcproutes"
+	UDPRoutes                         ResourceType = "udproutes"
 	GRPCRoutes                        ResourceType = "grpcroutes"
 	ReferenceGrants                   ResourceType = "referencegrants"
 	IPAddresses                       ResourceType = "ipaddresses"
@@ -142,6 +145,9 @@ var Registry = []ResourceMeta{
 	{Kind: "IngressClass", Singular: "ingressclass", Plural: IngressClasses, Group: "networking.k8s.io", Version: "v1", ClusterScoped: true},
 	{Kind: "Gateway", Singular: "gateway", Plural: Gateways, Group: "gateway.networking.k8s.io", Version: "v1", Searchable: true, Related: true},
 	{Kind: "HTTPRoute", Singular: "httproute", Plural: HTTPRoutes, Group: "gateway.networking.k8s.io", Version: "v1", Searchable: true, Related: true},
+	{Kind: "TLSRoute", Singular: "tlsroute", Plural: TLSRoutes, Group: "gateway.networking.k8s.io", Version: "v1alpha2"},
+	{Kind: "TCPRoute", Singular: "tcproute", Plural: TCPRoutes, Group: "gateway.networking.k8s.io", Version: "v1alpha2"},
+	{Kind: "UDPRoute", Singular: "udproute", Plural: UDPRoutes, Group: "gateway.networking.k8s.io", Version: "v1alpha2"},
 	{Kind: "GRPCRoute", Singular: "grpcroute", Plural: GRPCRoutes, Group: "gateway.networking.k8s.io", Version: "v1"},
 	{Kind: "ReferenceGrant", Singular: "referencegrant", Plural: ReferenceGrants, Group: "gateway.networking.k8s.io", Version: "v1beta1"},
 	{Kind: "IPAddress", Singular: "ipaddress", Plural: IPAddresses, Group: "networking.k8s.io", Version: "v1", ClusterScoped: true},

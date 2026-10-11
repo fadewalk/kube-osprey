@@ -217,7 +217,8 @@
       "volumes": "Volumes",
       "yamlConfiguration": "YAML Configuration",
       "yamlContent": "YAML Content",
-      "yamlDiff": "YAML Diff"
+      "yamlDiff": "YAML Diff",
+      "logs": "Logs"
     },
     "messages": {
       "addNewItem": "Add a new {{resource}}",
@@ -1662,7 +1663,8 @@
     "selectorLabel": "Label selector",
     "selectorHint": "e.g. app=nginx — leave empty to stream every pod",
     "podCount": "{{count}} pods streaming",
-    "selectNamespace": "Select a namespace to start streaming logs"
+    "selectNamespace": "Select a namespace to start streaming logs",
+    "linkTitle": "View aggregate logs for pods matching this workload"
   },
   "health": {
     "description": "Cluster health score, risk items, and resource usage leaders",

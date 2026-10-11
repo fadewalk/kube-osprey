@@ -45,6 +45,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	metricsv1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -132,6 +133,9 @@ func newResourceHandlers() map[string]resourceHandler {
 		string(common.HTTPRoutes):        NewGenericResourceHandler[*gatewayv1.HTTPRoute, *gatewayv1.HTTPRouteList](common.HTTPRoutes),
 		string(common.GRPCRoutes):        NewGenericResourceHandler[*gatewayv1.GRPCRoute, *gatewayv1.GRPCRouteList](common.GRPCRoutes),
 		string(common.ReferenceGrants):   NewGenericResourceHandler[*gatewayv1beta1.ReferenceGrant, *gatewayv1beta1.ReferenceGrantList](common.ReferenceGrants),
+		string(common.TLSRoutes):         NewGenericResourceHandler[*gatewayv1alpha2.TLSRoute, *gatewayv1alpha2.TLSRouteList](common.TLSRoutes),
+		string(common.TCPRoutes):         NewGenericResourceHandler[*gatewayv1alpha2.TCPRoute, *gatewayv1alpha2.TCPRouteList](common.TCPRoutes),
+		string(common.UDPRoutes):         NewGenericResourceHandler[*gatewayv1alpha2.UDPRoute, *gatewayv1alpha2.UDPRouteList](common.UDPRoutes),
 		string(common.IPAddresses):       NewGenericResourceHandler[*networkingv1.IPAddress, *networkingv1.IPAddressList](common.IPAddresses),
 		string(common.ServiceCIDRs):      NewGenericResourceHandler[*networkingv1.ServiceCIDR, *networkingv1.ServiceCIDRList](common.ServiceCIDRs),
 		string(common.StorageClasses):    NewGenericResourceHandler[*storagev1.StorageClass, *storagev1.StorageClassList](common.StorageClasses),

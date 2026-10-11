@@ -22,6 +22,7 @@ import (
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
 	metricsv1 "k8s.io/metrics/pkg/apis/metrics/v1beta1"
@@ -82,6 +83,7 @@ func init() {
 	_ = scheme.AddToScheme(runtimeScheme)
 	_ = apiextensionsv1.AddToScheme(runtimeScheme)
 	_ = gatewayv1.AddToScheme(runtimeScheme)
+	_ = gatewayv1alpha2.AddToScheme(runtimeScheme)
 	_ = gatewayv1beta1.AddToScheme(runtimeScheme)
 	_ = metricsv1.AddToScheme(runtimeScheme)
 }

@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { IconFilter } from '@tabler/icons-react'
 import { useTranslation } from 'react-i18next'
+import { useSearchParams } from 'react-router-dom'
 
 import { useResources, useResourcesWatch } from '@/lib/api'
 import { usePageTitle } from '@/hooks/use-page-title'
@@ -22,9 +23,24 @@ export function LogCenterPage() {
 
   const { data: namespaces } = useResources('namespaces', '_all')
   const namespaceItems = useMemo(() => namespaces ?? [], [namespaces])
-  const [namespace, setNamespace] = useState<string>('')
-  const [selectorInput, setSelectorInput] = useState('')
-  const [labelSelector, setLabelSelector] = useState('')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [namespace, setNamespace] = useState<string>(
+    () => searchParams.get('namespace') ?? ''
+  )
+  const [selectorInput, setSelectorInput] = useState(
+    () => searchParams.get('selector') ?? ''
+  )
+  const [labelSelector, setLabelSelector] = useState(
+    () => searchParams.get('selector') ?? ''
+  )
+
+  // Keep the URL shareable when the user commits a namespace/selector.
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (namespace) params.set('namespace', namespace)
+    if (labelSelector) params.set('selector', labelSelector)
+    setSearchParams(params, { replace: true })
+  }, [namespace, labelSelector, setSearchParams])
 
   const { data: pods } = useResourcesWatch('pods', namespace || undefined, {
     labelSelector: labelSelector || undefined,

@@ -28,6 +28,7 @@ type OperationLog struct {
 	StatusCode int    `json:"statusCode"`
 	DurationMS int64  `json:"durationMs"`
 	IP         string `json:"ip" gorm:"type:varchar(64)"`
+	RequestID  string `json:"requestId" gorm:"type:varchar(64);index"`
 	Body       string `json:"body" gorm:"type:text"`
 }
 

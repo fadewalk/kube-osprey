@@ -212,6 +212,7 @@ func OperationAudit() gin.HandlerFunc {
 			StatusCode:   c.Writer.Status(),
 			DurationMS:   time.Since(start).Milliseconds(),
 			IP:           c.ClientIP(),
+			RequestID:    c.GetString(RequestIDKey),
 			Body:         sanitizeOperationBody(c.GetHeader("Content-Type"), body),
 		}
 		if truncated {

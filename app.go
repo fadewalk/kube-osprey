@@ -80,6 +80,7 @@ func buildEngine(cm *cluster.ClusterManager) *gin.Engine {
 		r.Use(gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedPaths([]string{"/metrics"})))
 	}
 	r.Use(gin.Recovery())
+	r.Use(middleware.RequestID())
 	r.Use(middleware.Logger())
 	r.Use(middleware.DevCORS(common.CORSAllowedOrigins))
 

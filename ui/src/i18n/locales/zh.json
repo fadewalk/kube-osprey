@@ -217,7 +217,8 @@
       "volumes": "卷",
       "yamlConfiguration": "YAML 配置",
       "yamlContent": "YAML 内容",
-      "yamlDiff": "YAML Diff"
+      "yamlDiff": "YAML Diff",
+      "logs": "日志"
     },
     "messages": {
       "addNewItem": "添加新的{{resource}}",
@@ -1744,7 +1745,8 @@
     "selectorLabel": "标签选择器",
     "selectorHint": "例如 app=nginx；留空则聚合命名空间下全部 Pod",
     "podCount": "{{count}} 个 Pod 流式传输中",
-    "selectNamespace": "选择一个命名空间开始查看日志"
+    "selectNamespace": "选择一个命名空间开始查看日志",
+    "linkTitle": "查看该工作负载匹配 Pod 的聚合日志"
   },
   "health": {
     "description": "集群健康评分、风险项与资源用量排行",
