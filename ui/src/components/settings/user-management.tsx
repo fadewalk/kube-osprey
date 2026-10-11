@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as Avatar from '@radix-ui/react-avatar'
 import {
   IconEdit,
+  IconEye,
   IconLock,
   IconLockOpen,
   IconPlus,
@@ -60,6 +61,7 @@ import { ResourceTableView } from '@/components/resource-table-view'
 
 import { Action } from '../action-table'
 import { Badge } from '../ui/badge'
+import { UserPermissionsDialog } from './user-permissions-dialog'
 import UserRoleAssignment from './user-role-assignment'
 
 function userSubjectName(user: UserItem): string {
@@ -173,6 +175,15 @@ export function UserManagement() {
       {
         label: (
           <>
+            <IconEye className="h-4 w-4" />
+            {t('rbac.userPermissions.viewAction', 'View Permissions')}
+          </>
+        ),
+        onClick: (item) => setViewingPermissions(item),
+      },
+      {
+        label: (
+          <>
             <IconShieldCheck className="h-4 w-4" />
             {t('common.actions.assign', 'Assign')}
           </>
@@ -187,6 +198,9 @@ export function UserManagement() {
   const [editingUser, setEditingUser] = useState<UserItem | null>(null)
   const [deletingUser, setDeletingUser] = useState<UserItem | null>(null)
   const [assigning, setAssigning] = useState<UserItem | null>(null)
+  const [viewingPermissions, setViewingPermissions] = useState<UserItem | null>(
+    null
+  )
   const [showAddDialog, setShowAddDialog] = useState(false)
 
   const columns = useMemo<ColumnDef<UserItem>[]>(
@@ -665,6 +679,15 @@ export function UserManagement() {
             ? { type: 'user', name: userSubjectName(assigning) }
             : undefined
         }
+      />
+
+      {/* Effective permissions dialog */}
+      <UserPermissionsDialog
+        open={!!viewingPermissions}
+        onOpenChange={(o) => {
+          if (!o) setViewingPermissions(null)
+        }}
+        user={viewingPermissions}
       />
 
       {/* Add Password User Dialog */}

@@ -864,6 +864,26 @@
       "delete": "Delete",
       "log": "View Logs",
       "exec": "Execute"
+    },
+    "matrix": {
+      "simpleMode": "Simple",
+      "advancedMode": "Advanced",
+      "allResources": "All resources",
+      "allVerbs": "All operations",
+      "customResources": "Custom resources",
+      "previewTitle": "Granted permissions",
+      "noGrant": "No resource permissions granted.",
+      "except": "except {{name}}"
+    },
+    "userPermissions": {
+      "title": "{{name}} 's permissions",
+      "description": "Effective permissions resolved from every role assigned to this user. Hover a cell to see which role granted it.",
+      "noRoles": "No roles assigned to this user.",
+      "viewAction": "View Permissions",
+      "mergedTitle": "Merged permissions",
+      "byRoleTitle": "Per role",
+      "fromRoles": "Granted by: {{roles}}",
+      "scopeIn": "clusters {{clusters}} · namespaces {{namespaces}}"
     }
   },
   "settings": {

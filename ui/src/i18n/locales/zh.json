@@ -869,6 +869,26 @@
       "delete": "删除",
       "log": "查看日志",
       "exec": "执行"
+    },
+    "matrix": {
+      "simpleMode": "简单模式",
+      "advancedMode": "高级模式",
+      "allResources": "全部资源",
+      "allVerbs": "全部操作",
+      "customResources": "自定义资源",
+      "previewTitle": "实际授予的权限",
+      "noGrant": "未授予任何资源权限。",
+      "except": "除 {{name}} 外"
+    },
+    "userPermissions": {
+      "title": "{{name}} 的权限",
+      "description": "汇总该用户所有角色推导出的有效权限，悬停单元格可查看来源角色。",
+      "noRoles": "该用户尚未分配任何角色。",
+      "viewAction": "查看权限",
+      "mergedTitle": "合并后的权限",
+      "byRoleTitle": "按角色明细",
+      "fromRoles": "来源角色：{{roles}}",
+      "scopeIn": "集群 {{clusters}} · 命名空间 {{namespaces}}"
     }
   },
   "settings": {

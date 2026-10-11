@@ -18,6 +18,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 
 import { Separator } from '../ui/separator'
+import { PermissionMatrix, ResourceVerbPicker } from './permission-matrix'
 
 interface RBACDialogProps {
   open: boolean
@@ -186,11 +187,19 @@ export function RBACDialog({
     resources: '',
     verbs: '',
   })
+  // Roles carrying negation ("!") or regex patterns cannot be represented in
+  // the checkbox matrix, so those open straight into the advanced editor.
+  const [simpleMode, setSimpleMode] = useState(true)
 
   useEffect(() => {
     if (!open) return
     setForm(roleToForm(role))
     setDrafts({ clusters: '', namespaces: '', resources: '', verbs: '' })
+    const entries = [...(role?.resources || []), ...(role?.verbs || [])]
+    const needsAdvanced = entries.some(
+      (p) => p.startsWith('!') || (p !== '*' && /[$^+?()[\]{}|\\]/.test(p))
+    )
+    setSimpleMode(!needsAdvanced)
   }, [role, open])
 
   const handleChange = (field: keyof Role, value: string) =>
@@ -279,11 +288,6 @@ export function RBACDialog({
           </div>
           <Separator />
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <h3 className="text-lg font-medium">
-                {t('common.fields.permissions', 'Permissions')}
-              </h3>
-            </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ListEditor
                 label={t('common.fields.clusters', 'Clusters')}
@@ -308,29 +312,81 @@ export function RBACDialog({
                 placeholder="* or namespace"
                 suggestions={['*']}
               />
+            </div>
 
-              <ListEditor
-                label={t('common.fields.resources', 'Resources')}
-                items={form.resources || ['*']}
-                onChange={(items) => setArrayField('resources', items)}
-                input={drafts.resources}
-                onInputChange={(value) => setDraft('resources', value)}
-                placeholder="* or pods,deployments,namespaces"
-                hint={t(
-                  'rbac.resourceHint',
-                  'Use plural resource names. Type to filter suggestions. For CRDs and custom resources, enter the CRD name from the URL, for example widgets.example.com.'
-                )}
-                suggestions={RESOURCE_SUGGESTIONS}
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-medium">
+                {t('common.fields.permissions', 'Permissions')}
+              </h3>
+              <div className="bg-muted inline-flex rounded-md p-0.5 text-xs">
+                {(
+                  [
+                    ['simple', t('rbac.matrix.simpleMode', 'Simple')],
+                    ['advanced', t('rbac.matrix.advancedMode', 'Advanced')],
+                  ] as const
+                ).map(([mode, label]) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setSimpleMode(mode === 'simple')}
+                    className={`rounded-md px-3 py-1 transition-colors ${
+                      (mode === 'simple') === simpleMode
+                        ? 'bg-background shadow-sm'
+                        : 'text-muted-foreground'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {simpleMode ? (
+              <ResourceVerbPicker
+                resources={form.resources || []}
+                verbs={form.verbs || []}
+                onResourcesChange={(items) => setArrayField('resources', items)}
+                onVerbsChange={(items) => setArrayField('verbs', items)}
               />
+            ) : (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <ListEditor
+                  label={t('common.fields.resources', 'Resources')}
+                  items={form.resources || ['*']}
+                  onChange={(items) => setArrayField('resources', items)}
+                  input={drafts.resources}
+                  onInputChange={(value) => setDraft('resources', value)}
+                  placeholder="* or pods,deployments,namespaces"
+                  hint={t(
+                    'rbac.resourceHint',
+                    'Use plural resource names. Type to filter suggestions. For CRDs and custom resources, enter the CRD name from the URL, for example widgets.example.com.'
+                  )}
+                  suggestions={RESOURCE_SUGGESTIONS}
+                />
 
-              <ListEditor
-                label={`${t('common.fields.actions', 'Actions')} / ${t('common.fields.verbs', 'Verbs')}`}
-                items={form.verbs || ['*']}
-                onChange={(items) => setArrayField('verbs', items)}
-                input={drafts.verbs}
-                onInputChange={(value) => setDraft('verbs', value)}
-                placeholder="* or get,create,update,delete,log,exec"
-                suggestions={VERB_SUGGESTIONS}
+                <ListEditor
+                  label={`${t('common.fields.actions', 'Actions')} / ${t('common.fields.verbs', 'Verbs')}`}
+                  items={form.verbs || ['*']}
+                  onChange={(items) => setArrayField('verbs', items)}
+                  input={drafts.verbs}
+                  onInputChange={(value) => setDraft('verbs', value)}
+                  placeholder="* or get,create,update,delete,log,exec"
+                  suggestions={VERB_SUGGESTIONS}
+                />
+              </div>
+            )}
+
+            <div>
+              <div className="mb-1.5 text-sm font-medium">
+                {t('rbac.matrix.previewTitle', 'Granted permissions')}
+              </div>
+              <PermissionMatrix
+                scope={{
+                  clusters: preview.clusters,
+                  namespaces: preview.namespaces,
+                  resources: preview.resources,
+                  verbs: preview.verbs,
+                }}
               />
             </div>
             <div className="rounded-md border bg-muted/40 p-3 text-sm">
