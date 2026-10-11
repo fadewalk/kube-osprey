@@ -1676,5 +1676,58 @@
       "title": "Top pods by usage",
       "memory": "Memory"
     }
+  },
+  "audit": {
+    "operationLogs": {
+      "tab": "Operation Logs",
+      "resourceChangesTab": "Resource Changes",
+      "title": "Operation Logs",
+      "description": "Every state-changing request made through the console, recorded with user, target, and outcome",
+      "empty": "No operation logs found",
+      "operator": "Operator",
+      "module": "Module",
+      "operation": "Operation",
+      "status": "Status",
+      "duration": "Duration",
+      "body": "Body",
+      "bodyTitle": "Request Body",
+      "noBody": "No request body recorded",
+      "usernameFilter": "Filter by user...",
+      "allModules": "All modules",
+      "modules": {
+        "clusters": "Clusters",
+        "roles": "Roles",
+        "users": "Users",
+        "settings": "Settings",
+        "resources": "Resources",
+        "workloads": "Workloads",
+        "changeplans": "Change Plans",
+        "alertmanager": "AlertManager",
+        "plugins": "Plugins",
+        "account": "Account",
+        "templates": "Templates",
+        "oauth": "OAuth",
+        "ldap": "LDAP",
+        "helm": "Helm",
+        "unknown": "Other"
+      },
+      "resources": {
+        "cluster": "Cluster",
+        "role": "Role",
+        "user": "User",
+        "general-setting": "General Setting",
+        "ldap-setting": "LDAP Setting",
+        "oauth-provider": "OAuth Provider",
+        "template": "Template",
+        "plugin": "Plugin",
+        "plugin-setting": "Plugin Setting",
+        "resource": "Resource",
+        "workload": "Workload",
+        "change-plan": "Change Plan",
+        "silence": "Silence",
+        "account": "Account",
+        "sidebar-preference": "Sidebar Preference"
+      }
+    }
   }
 }

@@ -83,6 +83,7 @@ func registerAuthRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler) {
 
 func registerUserRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler) {
 	userGroup := r.Group("/api/users")
+	userGroup.Use(middleware.OperationAudit())
 	userGroup.PUT("/me", authHandler.RequireAuth(), users.UpdateCurrentUser)
 	userGroup.POST("/me/password", authHandler.RequireAuth(), users.ChangeCurrentUserPassword)
 	userGroup.POST("/me/mfa/setup", authHandler.RequireAuth(), users.SetupCurrentUserMFA)
@@ -98,8 +99,10 @@ func registerUserRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler) {
 func registerAdminRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *cluster.ClusterManager, helmChartsHandler *helm.HelmChartHandler) {
 	adminAPI := r.Group("/api/v1/admin")
 	adminAPI.Use(authHandler.RequireAuth(), authHandler.RequireAdmin())
+	adminAPI.Use(middleware.OperationAudit())
 
 	adminAPI.GET("/audit-logs", audit.ListAuditLogs)
+	adminAPI.GET("/operation-logs", audit.ListOperationLogs)
 	adminAPI.GET("/plugins", plugins.ListInstalled)
 	adminAPI.GET("/plugin-catalog", plugins.ListCatalog)
 	adminAPI.GET("/plugin-catalog/readme", plugins.GetCatalogReadme)
@@ -166,6 +169,7 @@ func registerAdminRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *
 
 func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *cluster.ClusterManager, helmChartsHandler *helm.HelmChartHandler) {
 	api := r.Group("/api/v1")
+	api.Use(middleware.OperationAudit())
 	api.GET("/clusters", authHandler.RequireAuth(), cm.GetClusters)
 	api.GET("/plugins", authHandler.RequireAuth(), plugins.ListActive)
 	api.GET("/plugins/:id/settings", authHandler.RequireAuth(), plugins.GetSetting)

@@ -1758,5 +1758,58 @@
       "title": "Pod 用量排行",
       "memory": "内存"
     }
+  },
+  "audit": {
+    "operationLogs": {
+      "tab": "操作日志",
+      "resourceChangesTab": "资源变更",
+      "title": "操作日志",
+      "description": "记录通过控制台发起的所有变更操作：操作人、目标与结果",
+      "empty": "暂无操作日志",
+      "operator": "操作人",
+      "module": "模块",
+      "operation": "操作",
+      "status": "状态",
+      "duration": "耗时",
+      "body": "请求体",
+      "bodyTitle": "请求体内容",
+      "noBody": "未记录请求体",
+      "usernameFilter": "按操作人筛选...",
+      "allModules": "全部模块",
+      "modules": {
+        "clusters": "集群",
+        "roles": "角色",
+        "users": "用户",
+        "settings": "系统设置",
+        "resources": "资源",
+        "workloads": "工作负载",
+        "changeplans": "变更计划",
+        "alertmanager": "AlertManager",
+        "plugins": "插件",
+        "account": "账户",
+        "templates": "模板",
+        "oauth": "OAuth",
+        "ldap": "LDAP",
+        "helm": "Helm",
+        "unknown": "其他"
+      },
+      "resources": {
+        "cluster": "集群",
+        "role": "角色",
+        "user": "用户",
+        "general-setting": "常规设置",
+        "ldap-setting": "LDAP 设置",
+        "oauth-provider": "OAuth 提供商",
+        "template": "模板",
+        "plugin": "插件",
+        "plugin-setting": "插件设置",
+        "resource": "资源",
+        "workload": "工作负载",
+        "change-plan": "变更计划",
+        "silence": "静默规则",
+        "account": "账户",
+        "sidebar-preference": "侧边栏偏好"
+      }
+    }
   }
 }

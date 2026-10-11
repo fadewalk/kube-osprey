@@ -534,3 +534,70 @@ export const deleteAPIKey = async (
 ): Promise<{ message: string }> => {
   return await apiClient.delete<{ message: string }>(`/admin/apikeys/${id}`)
 }
+
+export interface OperationLogEntry {
+  id: number
+  createdAt: string
+  userId: number
+  username: string
+  module: string
+  action: string
+  resource: string
+  resourceName?: string
+  cluster?: string
+  method: string
+  path: string
+  statusCode: number
+  durationMs: number
+  ip?: string
+  body?: string
+}
+
+export interface OperationLogResponse {
+  data: OperationLogEntry[]
+  total: number
+}
+
+const fetchOperationLogs = (
+  page: number,
+  size: number,
+  username?: string,
+  module?: string,
+  cluster?: string,
+  method?: string
+): Promise<OperationLogResponse> => {
+  const params = new URLSearchParams({
+    page: String(page),
+    pageSize: String(size),
+  })
+  if (username) params.set('username', username)
+  if (module) params.set('module', module)
+  if (cluster) params.set('cluster', cluster)
+  if (method) params.set('method', method)
+  return fetchAPI<OperationLogResponse>(
+    `/admin/operation-logs?${params.toString()}`
+  )
+}
+
+export const useOperationLogs = (
+  page = 1,
+  size = 20,
+  username?: string,
+  module?: string,
+  cluster?: string,
+  method?: string
+) => {
+  return useQuery<OperationLogResponse, Error>({
+    queryKey: ['operation-logs', page, size, username, module, cluster, method],
+    queryFn: () =>
+      fetchOperationLogs(
+        page,
+        size,
+        username || undefined,
+        module || undefined,
+        cluster || undefined,
+        method || undefined
+      ),
+    placeholderData: (prev) => prev,
+  })
+}

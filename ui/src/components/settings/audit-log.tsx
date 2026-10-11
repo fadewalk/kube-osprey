@@ -9,7 +9,13 @@ import {
 import { useTranslation } from 'react-i18next'
 
 import { ResourceHistory } from '@/types/api'
-import { useAuditLogs, useClusterList, useUserList } from '@/lib/api'
+import {
+  useAuditLogs,
+  useClusterList,
+  useOperationLogs,
+  useUserList,
+  type OperationLogEntry,
+} from '@/lib/api'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -28,10 +34,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ResourceTableView } from '@/components/resource-table-view'
 import { YamlDiffViewer } from '@/components/yaml-diff-viewer'
 
-export function AuditLog() {
+function ResourceChangesAudit() {
   const { t } = useTranslation()
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -457,5 +464,272 @@ export function AuditLog() {
         </DialogContent>
       </Dialog>
     </Card>
+  )
+}
+
+function OperationLogsAudit() {
+  const { t } = useTranslation()
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 20,
+  })
+  const [usernameFilter, setUsernameFilter] = useState('')
+  const [moduleFilter, setModuleFilter] = useState('')
+  const { data, isLoading, error } = useOperationLogs(
+    pagination.pageIndex + 1,
+    pagination.pageSize,
+    usernameFilter || undefined,
+    moduleFilter || undefined
+  )
+  const [selectedEntry, setSelectedEntry] = useState<OperationLogEntry | null>(
+    null
+  )
+
+  const columns = useMemo<ColumnDef<OperationLogEntry>[]>(
+    () => [
+      {
+        accessorKey: 'createdAt',
+        header: t('common.fields.created'),
+        cell: ({ getValue }) => (
+          <span className="whitespace-nowrap text-xs">
+            {formatDate(String(getValue() || ''))}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'username',
+        header: t('audit.operationLogs.operator'),
+        cell: ({ getValue }) => (
+          <span className="font-medium">{String(getValue() || '-')}</span>
+        ),
+      },
+      {
+        accessorKey: 'module',
+        header: t('audit.operationLogs.module'),
+        cell: ({ row }) => (
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                row.original.statusCode >= 400 ? 'destructive' : 'secondary'
+              }
+            >
+              {row.original.method}
+            </Badge>
+            <span className="text-sm">
+              {t(`audit.operationLogs.modules.${row.original.module}`, {
+                defaultValue: row.original.module,
+              })}
+            </span>
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'action',
+        header: t('audit.operationLogs.operation'),
+        cell: ({ row }) => (
+          <div className="text-sm">
+            <span>{row.original.action}</span>
+            {row.original.resource ? (
+              <span className="ml-1 text-xs text-muted-foreground">
+                {t(`audit.operationLogs.resources.${row.original.resource}`, {
+                  defaultValue: row.original.resource,
+                })}
+                {row.original.resourceName
+                  ? ` / ${row.original.resourceName}`
+                  : ''}
+              </span>
+            ) : null}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'cluster',
+        header: t('common.fields.cluster'),
+        cell: ({ getValue }) => (
+          <span className="font-mono text-xs">{String(getValue() || '-')}</span>
+        ),
+      },
+      {
+        accessorKey: 'statusCode',
+        header: t('audit.operationLogs.status'),
+        cell: ({ getValue }) => (
+          <span
+            className={`font-mono text-xs ${
+              Number(getValue()) >= 400 ? 'text-destructive' : ''
+            }`}
+          >
+            {Number(getValue())}
+          </span>
+        ),
+      },
+      {
+        accessorKey: 'durationMs',
+        header: t('audit.operationLogs.duration'),
+        cell: ({ getValue }) => (
+          <span className="whitespace-nowrap text-xs text-muted-foreground">
+            {Number(getValue())} ms
+          </span>
+        ),
+      },
+      {
+        id: 'body',
+        header: t('audit.operationLogs.body'),
+        cell: ({ row }) =>
+          row.original.body ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedEntry(row.original)}
+            >
+              <IconEye className="h-4 w-4" />
+            </Button>
+          ) : null,
+      },
+    ],
+    [t]
+  )
+
+  const table = useReactTable({
+    data: data?.data ?? [],
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    state: { pagination },
+    onPaginationChange: setPagination,
+    manualPagination: true,
+    pageCount: Math.ceil((data?.total ?? 0) / pagination.pageSize) || 0,
+  })
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <CardTitle>{t('audit.operationLogs.title')}</CardTitle>
+            <p className="text-muted-foreground text-sm">
+              {t('audit.operationLogs.description')}
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              placeholder={t('audit.operationLogs.usernameFilter')}
+              value={usernameFilter}
+              onChange={(event) => {
+                setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+                setUsernameFilter(event.target.value)
+              }}
+              className="w-40"
+            />
+            <Select
+              value={moduleFilter || 'all'}
+              onValueChange={(value) => {
+                setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+                setModuleFilter(value === 'all' ? '' : value)
+              }}
+            >
+              <SelectTrigger className="w-44">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  {t('audit.operationLogs.allModules')}
+                </SelectItem>
+                {[
+                  'clusters',
+                  'roles',
+                  'users',
+                  'settings',
+                  'resources',
+                  'workloads',
+                  'changeplans',
+                  'alertmanager',
+                  'plugins',
+                  'account',
+                ].map((moduleName) => (
+                  <SelectItem key={moduleName} value={moduleName}>
+                    {t(`audit.operationLogs.modules.${moduleName}`, {
+                      defaultValue: moduleName,
+                    })}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ResourceTableView
+          table={table}
+          columnCount={columns.length}
+          isLoading={isLoading}
+          data={data?.data}
+          allPageSize={data?.total ?? 0}
+          emptyState={
+            error ? (
+              <div className="py-10 text-center text-destructive">
+                {error.message}
+              </div>
+            ) : (
+              <div className="py-10 text-center text-muted-foreground">
+                {t('audit.operationLogs.empty')}
+              </div>
+            )
+          }
+          hasActiveFilters={Boolean(usernameFilter) || Boolean(moduleFilter)}
+          filteredRowCount={data?.data.length ?? 0}
+          totalRowCount={data?.total ?? 0}
+          searchQuery={usernameFilter}
+          pagination={pagination}
+          setPagination={setPagination}
+          maxBodyHeightClassName="max-h-[600px]"
+        />
+      </CardContent>
+      <Dialog
+        open={!!selectedEntry}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedEntry(null)
+          }
+        }}
+      >
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>{t('audit.operationLogs.bodyTitle')}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-96 overflow-auto whitespace-pre-wrap break-all rounded-md bg-muted p-3 font-mono text-xs">
+            {selectedEntry?.body || t('audit.operationLogs.noBody')}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  )
+}
+
+export function AuditLog() {
+  const { t } = useTranslation()
+  const [view, setView] = useState<'resource-changes' | 'operation-logs'>(
+    'resource-changes'
+  )
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Tabs
+        value={view}
+        onValueChange={(value) => setView(value as typeof view)}
+      >
+        <TabsList>
+          <TabsTrigger value="resource-changes">
+            {t('audit.operationLogs.resourceChangesTab')}
+          </TabsTrigger>
+          <TabsTrigger value="operation-logs">
+            {t('audit.operationLogs.tab')}
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
+      {view === 'resource-changes' ? (
+        <ResourceChangesAudit />
+      ) : (
+        <OperationLogsAudit />
+      )}
+    </div>
   )
 }

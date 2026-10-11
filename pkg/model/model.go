@@ -109,6 +109,7 @@ func InitDB() error {
 		ResourceHistory{},
 		ResourceTemplate{},
 		MCPAuditLog{},
+		OperationLog{},
 		ChangePlan{},
 		ChangePlanStep{},
 		SyncObject{},
