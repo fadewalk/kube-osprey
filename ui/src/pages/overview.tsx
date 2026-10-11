@@ -6,6 +6,8 @@ import { useOverview, useResourceUsageHistory } from '@/lib/api'
 import NetworkUsageChart from '@/components/chart/network-usage-chart'
 import ResourceUtilizationChart from '@/components/chart/resource-utilization'
 import { ClusterStatsCards } from '@/components/cluster-stats-cards'
+import { OverviewHealthCard } from '@/components/overview-health-card'
+import { OverviewTodos } from '@/components/overview-todos'
 import { RecentEvents } from '@/components/recent-events'
 import { ResourceCharts } from '@/components/resources-charts'
 import { SettingsHint } from '@/components/settings-hint'
@@ -50,6 +52,12 @@ export function Overview() {
       </div>
 
       <ClusterStatsCards stats={overview} isLoading={isLoading} />
+
+      <div className="grid grid-cols-1 gap-4 @5xl/main:grid-cols-2">
+        <OverviewTodos />
+        <OverviewHealthCard />
+      </div>
+
       {!isDismissed &&
         user?.provider !== 'Anonymous' &&
         user?.roles?.some((role) => role.name === 'admin') && <SettingsHint />}

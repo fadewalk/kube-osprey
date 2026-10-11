@@ -495,7 +495,21 @@
     "recentEvents": "最近事件",
     "resourceCharts": "资源图表",
     "failedToLoad": "加载概览数据失败",
-    "unknownError": "未知错误"
+    "unknownError": "未知错误",
+    "todos": {
+      "title": "待办",
+      "empty": "暂无需要关注的事项",
+      "pendingPlans": "待审批的变更计划",
+      "firingAlerts": "触发中的告警"
+    },
+    "health": {
+      "title": "集群健康",
+      "viewDiagnostics": "查看诊断",
+      "score": "健康评分",
+      "allHealthy": "所有检查项均通过",
+      "riskSummary": "{{critical}} 项严重、{{warning}} 项警告",
+      "unavailable": "健康报告暂不可用"
+    }
   },
   "pods": {
     "title": "Pods",

@@ -495,7 +495,21 @@
     "recentEvents": "Recent Events",
     "resourceCharts": "Resource Charts",
     "failedToLoad": "Failed to load overview data",
-    "unknownError": "Unknown error occurred"
+    "unknownError": "Unknown error occurred",
+    "todos": {
+      "title": "Todos",
+      "empty": "Nothing needs your attention",
+      "pendingPlans": "Change plans awaiting approval",
+      "firingAlerts": "Firing alerts"
+    },
+    "health": {
+      "title": "Cluster Health",
+      "viewDiagnostics": "View diagnostics",
+      "score": "Health score",
+      "allHealthy": "All checks passed",
+      "riskSummary": "{{critical}} critical and {{warning}} warning item(s)",
+      "unavailable": "Health report unavailable"
+    }
   },
   "pods": {
     "title": "Pods",
