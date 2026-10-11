@@ -389,6 +389,8 @@ export interface GeneralSetting {
   enableMFA: boolean
   enablePasskeyLogin: boolean
   loginPrompt: string
+  siteTitle: string
+  siteLogo: string
   passwordExpireDays: number
   passwordMinLength: number
   passwordRequireUppercase: boolean
@@ -424,6 +426,8 @@ export interface GeneralSettingUpdateRequest {
   enableMFA?: boolean
   enablePasskeyLogin?: boolean
   loginPrompt?: string
+  siteTitle?: string
+  siteLogo?: string
   passwordExpireDays?: number
   passwordMinLength?: number
   passwordRequireUppercase?: boolean

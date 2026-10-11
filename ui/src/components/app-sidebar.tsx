@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useCallback, useMemo, useState } from 'react'
 import Icon from '@/assets/icon.svg'
+import { useAuth } from '@/contexts/auth-context'
 import { useSidebarConfig } from '@/contexts/sidebar-config-context'
 import { CollapsibleContent } from '@radix-ui/react-collapsible'
 import { IconLayoutDashboard } from '@tabler/icons-react'
@@ -53,6 +54,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isMobile, setOpenMobile } = useSidebar()
   const { config, isLoading } = useSidebarConfig()
   const { data: versionInfo } = useVersionInfo()
+  const { siteTitle, siteLogo } = useAuth()
+  const brandTitle = siteTitle || 'Kite'
+  const brandLogo = siteLogo || Icon
 
   // English term shown under the localized title; omitted in English or when
   // the localized label already carries the English word (e.g. "Pod").
@@ -290,8 +294,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
                 <Link to="/" onClick={handleMenuItemClick}>
-                  <img src={Icon} alt="Kite Logo" className="ml-1 h-8 w-8" />
-                  <span className="text-base font-semibold">Kite</span>
+                  <img
+                    src={brandLogo}
+                    alt={`${brandTitle} Logo`}
+                    className="ml-1 h-8 w-8 object-contain"
+                  />
+                  <span className="text-base font-semibold">{brandTitle}</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
@@ -318,10 +326,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <Link to="/" onClick={handleMenuItemClick}>
                 <div className="relative flex items-center justify-between w-full">
                   <div className="flex items-center gap-2">
-                    <img src={Icon} alt="Kite Logo" className="h-8 w-8" />
+                    <img
+                      src={brandLogo}
+                      alt={`${brandTitle} Logo`}
+                      className="h-8 w-8 object-contain"
+                    />
                     <div className="flex flex-col">
                       <span className="text-base font-semibold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-                        Kite
+                        {brandTitle}
                       </span>
                       <VersionInfo />
                     </div>

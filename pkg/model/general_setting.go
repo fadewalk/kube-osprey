@@ -79,15 +79,18 @@ type GeneralSetting struct {
 	SyncEngineResources string `json:"syncEngineResources" gorm:"column:sync_engine_resources;type:text"`
 	// AIChangePlanMode routes chat-assistant mutations through the change
 	// plan approval flow instead of the in-chat single-step confirmation.
-	AIChangePlanMode        bool         `json:"aiChangePlanMode" gorm:"column:ai_change_plan_mode;type:boolean;not null;default:false"`
-	EnableAnalytics         bool         `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
-	AnalyticsInstallationID string       `json:"-" gorm:"type:varchar(32)"`
-	AnalyticsLastAttemptAt  *time.Time   `json:"-"`
-	EnableVersionCheck      bool         `json:"enableVersionCheck" gorm:"column:enable_version_check;type:boolean;not null;default:true"`
-	PasswordLoginDisabled   bool         `json:"passwordLoginDisabled" gorm:"column:password_login_disabled;type:boolean;not null;default:false"`
-	EnableMFA               bool         `json:"enableMFA" gorm:"column:enable_mfa;type:boolean;not null;default:true"`
-	EnablePasskeyLogin      bool         `json:"enablePasskeyLogin" gorm:"column:enable_passkey_login;type:boolean;not null;default:true"`
-	LoginPrompt             string       `json:"loginPrompt" gorm:"column:login_prompt;type:text"`
+	AIChangePlanMode        bool       `json:"aiChangePlanMode" gorm:"column:ai_change_plan_mode;type:boolean;not null;default:false"`
+	EnableAnalytics         bool       `json:"enableAnalytics" gorm:"column:enable_analytics;type:boolean;not null;default:false"`
+	AnalyticsInstallationID string     `json:"-" gorm:"type:varchar(32)"`
+	AnalyticsLastAttemptAt  *time.Time `json:"-"`
+	EnableVersionCheck      bool       `json:"enableVersionCheck" gorm:"column:enable_version_check;type:boolean;not null;default:true"`
+	PasswordLoginDisabled   bool       `json:"passwordLoginDisabled" gorm:"column:password_login_disabled;type:boolean;not null;default:false"`
+	EnableMFA               bool       `json:"enableMFA" gorm:"column:enable_mfa;type:boolean;not null;default:true"`
+	EnablePasskeyLogin      bool       `json:"enablePasskeyLogin" gorm:"column:enable_passkey_login;type:boolean;not null;default:true"`
+	LoginPrompt             string     `json:"loginPrompt" gorm:"column:login_prompt;type:text"`
+	// Branding overrides: empty values keep the built-in Kite logo and title.
+	SiteTitle               string       `json:"siteTitle" gorm:"column:site_title;type:varchar(100)"`
+	SiteLogo                string       `json:"siteLogo" gorm:"column:site_logo;type:varchar(2048)"`
 	JWTSecret               SecretString `json:"-" gorm:"column:jwt_secret;type:text"`
 	GlobalSidebarPreference string       `json:"-" gorm:"column:global_sidebar_preference;type:text"`
 

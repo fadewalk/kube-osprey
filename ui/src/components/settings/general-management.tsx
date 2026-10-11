@@ -5,6 +5,7 @@ import {
   IconKey,
   IconLink,
   IconMessage,
+  IconPalette,
   IconPuzzle,
   IconRobot,
   IconSettings,
@@ -67,6 +68,8 @@ interface GeneralSettingsFormData {
   enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
+  siteTitle: string
+  siteLogo: string
   passwordExpireDays: number
   passwordMinLength: number
   passwordRequireUppercase: boolean
@@ -104,6 +107,8 @@ export function GeneralManagement() {
     enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
+    siteTitle: '',
+    siteLogo: '',
     passwordExpireDays: 0,
     passwordMinLength: 8,
     passwordRequireUppercase: false,
@@ -139,6 +144,8 @@ export function GeneralManagement() {
       enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
+      siteTitle: data.siteTitle || '',
+      siteLogo: data.siteLogo || '',
       passwordExpireDays: data.passwordExpireDays ?? 0,
       passwordMinLength: data.passwordMinLength ?? 8,
       passwordRequireUppercase: data.passwordRequireUppercase ?? false,
@@ -256,6 +263,8 @@ export function GeneralManagement() {
       enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
+      siteTitle: formData.siteTitle.trim(),
+      siteLogo: formData.siteLogo.trim(),
       passwordExpireDays: Math.max(0, formData.passwordExpireDays || 0),
       passwordMinLength: Math.max(4, formData.passwordMinLength || 8),
       passwordRequireUppercase: formData.passwordRequireUppercase,
@@ -883,6 +892,62 @@ export function GeneralManagement() {
                 }))
               }
             />
+          </div>
+        </div>
+
+        <div className="rounded-lg border p-3">
+          <div className="space-y-1">
+            <Label className="flex items-center gap-2 text-sm font-medium">
+              <IconPalette className="h-4 w-4" />
+              {t('generalManagement.branding.title', 'Branding')}
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              {t(
+                'generalManagement.branding.description',
+                'Override the site name and logo shown on the login page and sidebar. Leave empty to keep the Kite defaults.'
+              )}
+            </p>
+          </div>
+
+          <div className="mt-3 grid gap-3 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="general-site-title">
+                {t('generalManagement.branding.siteTitle', 'Site Title')}
+              </Label>
+              <Input
+                id="general-site-title"
+                value={formData.siteTitle}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    siteTitle: e.target.value,
+                  }))
+                }
+                placeholder={t(
+                  'generalManagement.branding.siteTitlePlaceholder',
+                  'Leave empty to use "Kite"'
+                )}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="general-site-logo">
+                {t('generalManagement.branding.siteLogo', 'Logo URL')}
+              </Label>
+              <Input
+                id="general-site-logo"
+                value={formData.siteLogo}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    siteLogo: e.target.value,
+                  }))
+                }
+                placeholder={t(
+                  'generalManagement.branding.siteLogoPlaceholder',
+                  'Leave empty to use the Kite logo'
+                )}
+              />
+            </div>
           </div>
         </div>
 

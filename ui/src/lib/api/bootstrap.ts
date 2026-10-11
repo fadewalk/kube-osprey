@@ -23,11 +23,17 @@ export interface AuthProviderCatalog {
   passkeyLoginEnabled: boolean
 }
 
+export interface BootstrapBranding {
+  siteTitle: string
+  siteLogo: string
+}
+
 export interface BootstrapResponse {
   kiteVersion: string
   setup: BootstrapSetup
   auth: AuthProviderCatalog
   capabilities: BootstrapCapabilities
+  branding: BootstrapBranding
   user: AuthUser | null
   hasGlobalSidebarPreference: boolean
   globalSidebarPreference: string

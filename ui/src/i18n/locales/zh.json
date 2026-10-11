@@ -959,6 +959,14 @@
         "placeholder": "留空则不展示登录提示"
       }
     },
+    "branding": {
+      "title": "品牌定制",
+      "description": "自定义登录页与侧边栏显示的站点名称和 Logo。留空保持 Kite 默认样式。",
+      "siteTitle": "站点名称",
+      "siteTitlePlaceholder": "留空使用 \"Kite\"",
+      "siteLogo": "Logo 地址",
+      "siteLogoPlaceholder": "留空使用 Kite 默认 Logo"
+    },
     "errors": {
       "modelRequired": "模型不能为空",
       "apiKeyRequired": "启用 AI Agent 时必须配置 API Key",

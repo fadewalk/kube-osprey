@@ -49,6 +49,8 @@ func generalSettingResponse(setting *model.GeneralSetting) gin.H {
 		"enableMFA":                setting.EnableMFA,
 		"enablePasskeyLogin":       setting.EnablePasskeyLogin,
 		"loginPrompt":              setting.LoginPrompt,
+		"siteTitle":                setting.SiteTitle,
+		"siteLogo":                 setting.SiteLogo,
 		"passwordExpireDays":       setting.PasswordExpireDays,
 		"passwordMinLength":        setting.PasswordMinLength,
 		"passwordRequireUppercase": setting.PasswordRequireUppercase,
@@ -85,6 +87,8 @@ type UpdateGeneralSettingRequest struct {
 	EnableMFA             *bool   `json:"enableMFA"`
 	EnablePasskeyLogin    *bool   `json:"enablePasskeyLogin"`
 	LoginPrompt           *string `json:"loginPrompt"`
+	SiteTitle             *string `json:"siteTitle"`
+	SiteLogo              *string `json:"siteLogo"`
 
 	PasswordExpireDays       *int  `json:"passwordExpireDays"`
 	PasswordMinLength        *int  `json:"passwordMinLength"`
@@ -277,6 +281,12 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	}
 	if req.LoginPrompt != nil {
 		updates["login_prompt"] = strings.TrimSpace(*req.LoginPrompt)
+	}
+	if req.SiteTitle != nil {
+		updates["site_title"] = strings.TrimSpace(*req.SiteTitle)
+	}
+	if req.SiteLogo != nil {
+		updates["site_logo"] = strings.TrimSpace(*req.SiteLogo)
 	}
 	if req.PasswordLoginDisabled != nil {
 		updates["password_login_disabled"] = *req.PasswordLoginDisabled

@@ -26,6 +26,11 @@ type bootstrapAuthOptions struct {
 	PasskeyLoginEnabled bool     `json:"passkeyLoginEnabled"`
 }
 
+type bootstrapBranding struct {
+	SiteTitle string `json:"siteTitle"`
+	SiteLogo  string `json:"siteLogo"`
+}
+
 type bootstrapCapabilities struct {
 	AIEnabled           bool `json:"aiEnabled"`
 	KubectlEnabled      bool `json:"kubectlEnabled"`
@@ -37,6 +42,7 @@ type bootstrapResponse struct {
 	Setup                      bootstrapSetupState   `json:"setup"`
 	Auth                       bootstrapAuthOptions  `json:"auth"`
 	Capabilities               bootstrapCapabilities `json:"capabilities"`
+	Branding                   bootstrapBranding     `json:"branding"`
 	User                       *model.User           `json:"user"`
 	HasGlobalSidebarPreference bool                  `json:"hasGlobalSidebarPreference"`
 	GlobalSidebarPreference    string                `json:"globalSidebarPreference"`
@@ -70,6 +76,10 @@ func (h *AuthHandler) Bootstrap(c *gin.Context) {
 			AIEnabled:           setting.AIAgentEnabled && strings.TrimSpace(string(setting.AIAPIKey)) != "",
 			KubectlEnabled:      setting.KubectlEnabled,
 			NodeTerminalEnabled: setting.NodeTerminalEnabled,
+		},
+		Branding: bootstrapBranding{
+			SiteTitle: strings.TrimSpace(setting.SiteTitle),
+			SiteLogo:  strings.TrimSpace(setting.SiteLogo),
 		},
 		User:                       user,
 		HasGlobalSidebarPreference: globalSidebarPreference != "",

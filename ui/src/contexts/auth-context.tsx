@@ -36,6 +36,8 @@ interface AuthContextType {
   loginPrompt: string
   mfaEnabled: boolean
   passkeyLoginEnabled: boolean
+  siteTitle: string
+  siteLogo: string
   capabilities: BootstrapCapabilities
   login: (provider?: string) => Promise<void>
   loginWithCredentials: (
@@ -166,6 +168,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const mfaEnabled = bootstrap?.auth.mfaEnabled ?? true
   const passkeyLoginEnabled = bootstrap?.auth.passkeyLoginEnabled ?? false
   const capabilities = bootstrap?.capabilities ?? defaultCapabilities
+  const siteTitle = bootstrap?.branding.siteTitle || ''
+  const siteLogo = bootstrap?.branding.siteLogo || ''
+
+  useEffect(() => {
+    document.title = siteTitle || 'Kite'
+  }, [siteTitle])
 
   const value = useMemo(() => {
     const credentialProviders = bootstrap?.auth.credentialProviders ?? []
@@ -182,6 +190,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       loginPrompt,
       mfaEnabled,
       passkeyLoginEnabled,
+      siteTitle,
+      siteLogo,
       capabilities,
       login,
       loginWithCredentials,
@@ -200,6 +210,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     loginPrompt,
     mfaEnabled,
     passkeyLoginEnabled,
+    siteTitle,
+    siteLogo,
     capabilities,
     login,
     loginWithCredentials,
