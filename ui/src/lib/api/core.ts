@@ -266,6 +266,21 @@ export interface PromQLResponse {
   warnings?: string[]
 }
 
+// The backend contract takes Unix seconds for all range params, so the page's
+// looser inputs (RFC3339 dates, blank start/end/step) are normalized here.
+const parsePromTimestamp = (value?: string): number | null => {
+  const trimmed = value?.trim()
+  if (!trimmed) return null
+  if (/^\d+(\.\d+)?$/.test(trimmed)) return Math.floor(Number(trimmed))
+  const parsed = Date.parse(trimmed)
+  return Number.isNaN(parsed) ? null : Math.floor(parsed / 1000)
+}
+
+const parsePromSeconds = (value?: string): number | null => {
+  const parsed = Number(value?.trim())
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : null
+}
+
 export const fetchPromQL = (options: {
   query: string
   range?: boolean
@@ -274,9 +289,14 @@ export const fetchPromQL = (options: {
   step?: string
 }): Promise<PromQLResponse> => {
   const params = new URLSearchParams({ query: options.query })
-  if (options.start) params.set('start', options.start)
-  if (options.end) params.set('end', options.end)
-  if (options.step) params.set('step', options.step)
+  if (options.range) {
+    const end = parsePromTimestamp(options.end) ?? Math.floor(Date.now() / 1000)
+    const start = parsePromTimestamp(options.start) ?? end - 3600
+    const step = parsePromSeconds(options.step) ?? 60
+    params.set('start', String(start))
+    params.set('end', String(end))
+    params.set('step', String(step))
+  }
   return fetchAPI<PromQLResponse>(
     `/prometheus/${options.range ? 'query_range' : 'query'}?${params.toString()}`
   )
