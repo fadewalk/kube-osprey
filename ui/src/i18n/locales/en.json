@@ -362,6 +362,10 @@
       "workloads": "Workloads",
       "application": "Applications"
     },
+    "subgroups": {
+      "servicesRouting": "Services & Routing",
+      "gatewayApi": "Gateway API"
+    },
     "short": {
       "pvcs": "PVCs",
       "pvs": "PVs"

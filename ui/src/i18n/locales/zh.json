@@ -362,6 +362,10 @@
       "workloads": "工作负载",
       "application": "应用"
     },
+    "subgroups": {
+      "servicesRouting": "服务与路由",
+      "gatewayApi": "Gateway API"
+    },
     "short": {
       "pvcs": "存储卷声明",
       "pvs": "持久卷"

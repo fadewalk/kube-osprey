@@ -6,6 +6,8 @@ import {
   IconClipboardCheck,
   IconFileText,
   IconGauge,
+  IconLoadBalancer,
+  IconRoute,
   IconTopologyBus,
   type Icon,
   type IconProps,
@@ -13,6 +15,7 @@ import {
 
 import {
   DefaultMenus,
+  MenuItemData,
   SidebarConfig,
   SidebarGroup,
   SidebarItem,
@@ -37,6 +40,7 @@ type StoredSidebarItem = {
   type?: SidebarItem['type']
   apiGroup?: string
   crdGroup?: string
+  children?: StoredSidebarItem[]
 }
 type StoredSidebarConfig = Omit<SidebarConfig, 'groups'> & {
   groups: Array<Omit<SidebarGroup, 'items'> & { items: StoredSidebarItem[] }>
@@ -111,7 +115,49 @@ defaultMenus['sidebar.groups.application'].push({
   icon: getResourceIconComponent('IconPackage'),
 })
 
-export const SIDEBAR_CONFIG_VERSION = 8
+// Kuboard-style nested subgroups: entries listed here are pulled out of
+// their flat group and rendered as collapsible parents with children.
+const nestedSubgroups: Record<string, MenuItemData[]> = {}
+{
+  const traffic = defaultMenus['sidebar.groups.traffic']
+  const take = (url: string): MenuItemData | undefined => {
+    const index = traffic.findIndex((item) => item.url === url)
+    return index >= 0 ? traffic.splice(index, 1)[0] : undefined
+  }
+  const subgroup = (
+    titleKey: string,
+    icon: ComponentType<{ className?: string }>,
+    urls: string[]
+  ): MenuItemData | undefined => {
+    const children = urls
+      .map(take)
+      .filter((item): item is MenuItemData => item !== undefined)
+    if (children.length === 0) return undefined
+    return { titleKey, icon, url: '', children }
+  }
+
+  const subgroups = [
+    subgroup('sidebar.subgroups.servicesRouting', IconRoute, [
+      '/services',
+      '/ingresses',
+      '/networkpolicies',
+    ]),
+    subgroup('sidebar.subgroups.gatewayApi', IconLoadBalancer, [
+      '/gateways',
+      '/httproutes',
+    ]),
+  ].filter((item): item is MenuItemData => item !== undefined)
+
+  if (subgroups.length > 0) {
+    nestedSubgroups['sidebar.groups.traffic'] = subgroups
+  }
+  // Subgroups render after the remaining flat entries of their group.
+  for (const [groupKey, parents] of Object.entries(nestedSubgroups)) {
+    defaultMenus[groupKey].push(...parents)
+  }
+}
+
+export const SIDEBAR_CONFIG_VERSION = 9
 
 function getIconName(iconComponent: ComponentType<{ className?: string }>) {
   const entry = Object.entries(sidebarIconMap).find(
@@ -143,15 +189,35 @@ export function buildDefaultSidebarConfig(): SidebarConfig {
       if (item.defaultHidden) {
         hiddenItems.push(id)
       }
-      return {
+      const base = {
         id,
-        type: 'link',
         titleKey: item.titleKey,
-        url: item.url,
         icon: getIconName(item.icon),
         visible: true,
         pinned: false,
         order: index,
+      }
+      if (item.children && item.children.length > 0) {
+        return {
+          ...base,
+          type: 'link' as const,
+          url: '',
+          children: item.children.map((child, childIndex) => ({
+            id: `${id}-${child.url.replace(/[^a-zA-Z0-9]/g, '-')}`,
+            type: 'link' as const,
+            titleKey: child.titleKey,
+            url: child.url,
+            icon: getIconName(child.icon),
+            visible: true,
+            pinned: false,
+            order: childIndex,
+          })),
+        }
+      }
+      return {
+        ...base,
+        type: 'link' as const,
+        url: item.url,
       }
     })
 
@@ -223,35 +289,50 @@ export function migrateSidebarConfig(
       ...group,
       items: group.items
         .filter((item) => !removedItemIds.has(item.id))
-        .map((item): SidebarItem => {
-          const apiGroup = item.apiGroup || item.crdGroup
-          const baseItem = {
-            id: item.id,
-            titleKey: item.titleKey,
-            icon: item.icon,
-            visible: item.visible,
-            pinned: item.pinned,
-            order: item.order,
-          }
-
-          if (apiGroup) {
-            return {
-              ...baseItem,
-              type: 'apiGroup',
-              apiGroup,
-            }
-          }
-
-          return {
-            ...baseItem,
-            type:
-              item.type === 'customResource' ||
-              (!item.type && item.url?.startsWith('/crds/'))
-                ? 'customResource'
-                : 'link',
-            url: item.url!,
-          }
-        }),
+        .map((item): SidebarItem => migrateSidebarItem(item)),
     })),
+  }
+}
+
+function migrateSidebarItem(item: StoredSidebarItem): SidebarItem {
+  const apiGroup = item.apiGroup || item.crdGroup
+  const baseItem = {
+    id: item.id,
+    titleKey: item.titleKey,
+    icon: item.icon,
+    visible: item.visible,
+    pinned: item.pinned,
+    order: item.order,
+  }
+
+  const children = item.children?.map((child): SidebarItem =>
+    migrateSidebarItem(child)
+  )
+  if (children && children.length > 0) {
+    return {
+      ...baseItem,
+      type: 'link',
+      url: item.url ?? '',
+      // Children of a subgroup are always link items.
+      children: children as Extract<SidebarItem, { type: 'link' }>[],
+    }
+  }
+
+  if (apiGroup) {
+    return {
+      ...baseItem,
+      type: 'apiGroup',
+      apiGroup,
+    }
+  }
+
+  return {
+    ...baseItem,
+    type:
+      item.type === 'customResource' ||
+      (!item.type && item.url?.startsWith('/crds/'))
+        ? 'customResource'
+        : 'link',
+    url: item.url!,
   }
 }

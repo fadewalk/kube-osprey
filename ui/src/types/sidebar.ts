@@ -64,6 +64,9 @@ export interface MenuItemData {
   url: string
   icon: React.ComponentType<{ className?: string }>
   defaultHidden?: boolean
+  // Nested subgroup entries render as collapsible parents (Kuboard-style
+  // three-level menus); children carry their own titles and urls.
+  children?: MenuItemData[]
 }
 
 export interface DefaultMenus {

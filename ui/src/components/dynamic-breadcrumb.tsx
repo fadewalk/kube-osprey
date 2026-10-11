@@ -34,6 +34,15 @@ export function DynamicBreadcrumb() {
   const generateBreadcrumbs = (): BreadcrumbSegment[] => {
     const breadcrumbs: BreadcrumbSegment[] = []
 
+    // zh sidebar keeps single-line localized labels; the English term moves
+    // here in parentheses so resource names stay recognizable both ways.
+    const glossed = (text: string, titleKey?: string): string => {
+      if (!titleKey || !i18n.language.startsWith('zh')) return text
+      const english = i18n.t(titleKey, { lng: 'en', defaultValue: '' })
+      if (!english || english === text) return text
+      return `${text} (${english})`
+    }
+
     if (pathSegments[0] === 'plugins') {
       const plugin = plugins.find(
         (item) => item.manifest.id === pathSegments[1]
@@ -71,7 +80,7 @@ export function DynamicBreadcrumb() {
       href?: string
     ): BreadcrumbSegment => {
       if (label === 'pvcs') {
-        return { label: t('sidebar.short.pvcs'), href }
+        return { label: glossed(t('sidebar.short.pvcs')), href }
       }
 
       const resource = getResourceCatalogEntry(label)
@@ -83,12 +92,14 @@ export function DynamicBreadcrumb() {
       const shortLabel =
         'shortLabel' in resource ? resource.shortLabel : undefined
 
+      const text = titleKey
+        ? t(titleKey, {
+            defaultValue: shortLabel || resource.pluralLabel,
+          })
+        : shortLabel || resource.pluralLabel
+
       return {
-        label: titleKey
-          ? t(titleKey, {
-              defaultValue: shortLabel || resource.pluralLabel,
-            })
-          : shortLabel || resource.pluralLabel,
+        label: glossed(text, titleKey),
         href,
       }
     }
