@@ -168,8 +168,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const mfaEnabled = bootstrap?.auth.mfaEnabled ?? true
   const passkeyLoginEnabled = bootstrap?.auth.passkeyLoginEnabled ?? false
   const capabilities = bootstrap?.capabilities ?? defaultCapabilities
-  const siteTitle = bootstrap?.branding.siteTitle || ''
-  const siteLogo = bootstrap?.branding.siteLogo || ''
+  const siteTitle = bootstrap?.branding?.siteTitle || ''
+  const siteLogo = bootstrap?.branding?.siteLogo || ''
 
   useEffect(() => {
     document.title = siteTitle || 'Kite'
