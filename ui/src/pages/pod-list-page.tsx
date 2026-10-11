@@ -142,6 +142,21 @@ export function PodListPage() {
           )
         },
       }),
+      columnHelper.display({
+        id: 'logs',
+        header: t('common.fields.logs'),
+        cell: ({ row }) => (
+          <Link
+            to={`/pods/${row.original.metadata?.namespace}/${
+              row.original.metadata?.name
+            }?tab=logs`}
+            className="text-muted-foreground text-sm hover:text-foreground"
+            title={t('logCenter.linkTitle')}
+          >
+            {t('common.fields.logs')}
+          </Link>
+        ),
+      }),
     ],
     [t]
   )
