@@ -485,7 +485,8 @@
     "grpcroutes": "GRPCRoutes",
     "referencegrants": "ReferenceGrants",
     "settings": "Settings",
-    "alertCenter": "Alert Center"
+    "alertCenter": "Alert Center",
+    "logCenter": "Log Center"
   },
   "overview": {
     "title": "Overview",
@@ -1623,5 +1624,14 @@
       "deleted": "Silence expired",
       "confirmDelete": "Expire this silence?"
     }
+  },
+  "logCenter": {
+    "description": "Stream logs from every pod in a namespace in one aggregated view",
+    "namespace": "Namespace",
+    "namespacePlaceholder": "Select a namespace",
+    "selectorLabel": "Label selector",
+    "selectorHint": "e.g. app=nginx — leave empty to stream every pod",
+    "podCount": "{{count}} pods streaming",
+    "selectNamespace": "Select a namespace to start streaming logs"
   }
 }

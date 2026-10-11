@@ -83,22 +83,31 @@ func (h *LogsHandler) HandleLogsWebSocket(c *gin.Context) {
 		labelSelector := c.Query("labelSelector")
 		bl := kube.NewBatchLogHandler(ws.Conn, cs.K8sClient, logOptions)
 
-		if podName == common.AllNamespaces && labelSelector != "" {
-			selector, err := metav1.ParseToLabelSelector(labelSelector)
-			if err != nil {
-				ws.SendErrorMessage("invalid labelSelector parameter: " + err.Error())
-				return
-			}
-			labelSelectorOption, err := metav1.LabelSelectorAsSelector(selector)
-			if err != nil {
-				ws.SendErrorMessage("failed to convert labelSelector: " + err.Error())
-				return
+		if podName == common.AllNamespaces {
+			// Aggregate mode: stream every pod in the namespace, optionally
+			// narrowed by a label selector.
+			var selectorOption client.ListOption
+			var watchSelector labels.Selector
+			if labelSelector != "" {
+				selector, err := metav1.ParseToLabelSelector(labelSelector)
+				if err != nil {
+					ws.SendErrorMessage("invalid labelSelector parameter: " + err.Error())
+					return
+				}
+				watchSelector, err = metav1.LabelSelectorAsSelector(selector)
+				if err != nil {
+					ws.SendErrorMessage("failed to convert labelSelector: " + err.Error())
+					return
+				}
+				selectorOption = client.MatchingLabelsSelector{Selector: watchSelector}
 			}
 
 			podList := &corev1.PodList{}
 			var listOpts []client.ListOption
 			listOpts = append(listOpts, client.InNamespace(namespace))
-			listOpts = append(listOpts, client.MatchingLabelsSelector{Selector: labelSelectorOption})
+			if selectorOption != nil {
+				listOpts = append(listOpts, selectorOption)
+			}
 			if err := cs.K8sClient.List(ctx, podList, listOpts...); err != nil {
 				ws.SendErrorMessage("failed to list pods: " + err.Error())
 				return
@@ -109,7 +118,7 @@ func (h *LogsHandler) HandleLogsWebSocket(c *gin.Context) {
 				}
 			}
 
-			go h.watchPods(ctx, cs, namespace, labelSelectorOption, bl)
+			go h.watchPods(ctx, cs, namespace, watchSelector, bl)
 		} else {
 			bl.AddPod(corev1.Pod{
 				ObjectMeta: metav1.ObjectMeta{
@@ -124,8 +133,12 @@ func (h *LogsHandler) HandleLogsWebSocket(c *gin.Context) {
 }
 
 func (h *LogsHandler) watchPods(ctx context.Context, cs *cluster.ClientSet, namespace string, labelSelector labels.Selector, bl *kube.BatchLogHandler) {
+	selectorString := ""
+	if labelSelector != nil {
+		selectorString = labelSelector.String()
+	}
 	listOptions := metav1.ListOptions{
-		LabelSelector: labelSelector.String(),
+		LabelSelector: selectorString,
 	}
 
 	watchInterface, err := cs.K8sClient.ClientSet.CoreV1().Pods(namespace).Watch(ctx, listOptions)

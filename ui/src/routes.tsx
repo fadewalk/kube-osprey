@@ -10,6 +10,7 @@ import { CRListPage } from './pages/cr-list-page'
 import { HelmChartDetailPage } from './pages/helm-chart-detail-page'
 import { HelmChartListPage } from './pages/helm-chart-list-page'
 import { InitializationPage } from './pages/initialization'
+import { LogCenterPage } from './pages/log-center-page'
 import { LoginPage } from './pages/login'
 import { Overview } from './pages/overview'
 import { PluginManagementPage } from './pages/plugins'
@@ -91,6 +92,10 @@ export const router = createBrowserRouter(
         {
           path: 'alerts',
           element: <AlertCenterPage />,
+        },
+        {
+          path: 'logs',
+          element: <LogCenterPage />,
         },
         {
           path: 'crds/:crd',

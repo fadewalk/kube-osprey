@@ -57,6 +57,7 @@ import { PodSelector } from './selector/pod-selector'
 export interface LogViewerProps {
   namespace: string
   podName?: string
+  defaultPodName?: string
   pods?: Pod[]
   labelSelector?: string
   containers?: Container[]
@@ -77,6 +78,7 @@ const TERMINAL_THEME_ENTRIES = Object.entries(TERMINAL_THEMES) as Array<
 export function LogViewer({
   namespace,
   podName,
+  defaultPodName,
   pods,
   containers: _containers,
   initContainers,
@@ -151,7 +153,7 @@ export function LogViewer({
   const currentTheme = TERMINAL_THEMES[logTheme]
 
   const [selectPodName, setSelectPodName] = useState<string | undefined>(
-    podName || pods?.[0]?.metadata?.name || undefined
+    podName || defaultPodName || pods?.[0]?.metadata?.name || undefined
   )
 
   useEffect(() => {
@@ -165,16 +167,28 @@ export function LogViewer({
       }
       return
     }
-    if (pods && pods.length > 0) {
-      if (
-        selectPodName !== '_all' &&
-        (!selectPodName ||
-          !pods.find((p) => p.metadata?.name === selectPodName))
-      ) {
+    // The aggregate "_all" selection stays valid regardless of the pod list.
+    if (selectPodName === '_all') {
+      return
+    }
+    if (!selectPodName) {
+      if (defaultPodName) {
+        setSelectPodName(defaultPodName)
+        return
+      }
+      if (pods && pods.length > 0) {
         setSelectPodName(pods[0].metadata?.name)
       }
+      return
     }
-  }, [podName, pods, selectPodName])
+    if (
+      pods &&
+      pods.length > 0 &&
+      !pods.find((p) => p.metadata?.name === selectPodName)
+    ) {
+      setSelectPodName(pods[0].metadata?.name)
+    }
+  }, [podName, pods, selectPodName, defaultPodName])
 
   useEffect(() => {
     if (containers.length === 0) {

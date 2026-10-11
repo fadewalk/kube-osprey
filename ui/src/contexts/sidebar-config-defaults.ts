@@ -4,6 +4,7 @@ import {
   IconBox,
   IconChartLine,
   IconClipboardCheck,
+  IconFileText,
   IconTopologyBus,
   type Icon,
   type IconProps,
@@ -82,6 +83,11 @@ defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.alertCenter',
   url: '/alerts',
   icon: IconBell,
+})
+defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.logCenter',
+  url: '/logs',
+  icon: IconFileText,
 })
 defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.changePlans',

@@ -485,7 +485,8 @@
     "httproutes": "HTTP 路由",
     "grpcroutes": "gRPC 路由",
     "referencegrants": "引用授权",
-    "alertCenter": "告警中心"
+    "alertCenter": "告警中心",
+    "logCenter": "日志中心"
   },
   "overview": {
     "title": "概览",
@@ -1705,5 +1706,14 @@
       "deleted": "静默已失效",
       "confirmDelete": "确认使该静默规则失效？"
     }
+  },
+  "logCenter": {
+    "description": "在一个聚合视图中查看命名空间下所有 Pod 的实时日志",
+    "namespace": "命名空间",
+    "namespacePlaceholder": "选择命名空间",
+    "selectorLabel": "标签选择器",
+    "selectorHint": "例如 app=nginx；留空则聚合命名空间下全部 Pod",
+    "podCount": "{{count}} 个 Pod 流式传输中",
+    "selectNamespace": "选择一个命名空间开始查看日志"
   }
 }
