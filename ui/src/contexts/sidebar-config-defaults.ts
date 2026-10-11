@@ -185,7 +185,14 @@ export function buildDefaultSidebarConfig(): SidebarConfig {
       .replace(/\./g, '-')
       .replace(/\s+/g, '-')
     const sidebarItems: SidebarItem[] = items.map((item, index) => {
-      const id = `${groupId}-${item.url.replace(/[^a-zA-Z0-9]/g, '-')}`
+      // Subgroup parents have no url of their own; slug the titleKey so two
+      // parents in one group can never collide (shared ids made their
+      // collapse state and React keys clash).
+      const id = `${groupId}-${
+        item.url
+          ? item.url.replace(/[^a-zA-Z0-9]/g, '-')
+          : `${item.titleKey.replace(/[^a-zA-Z0-9]/g, '-')}-sub`
+      }`
       if (item.defaultHidden) {
         hiddenItems.push(id)
       }
@@ -285,12 +292,27 @@ export function migrateSidebarConfig(
           ),
         }
       : undefined,
-    groups: storedConfig.groups.map((group) => ({
-      ...group,
-      items: group.items
-        .filter((item) => !removedItemIds.has(item.id))
-        .map((item): SidebarItem => migrateSidebarItem(item)),
-    })),
+    groups: storedConfig.groups.map((group) => {
+      // Older configs could carry duplicate ids (e.g. two subgroup parents
+      // built from an empty url); suffix duplicates so React keys, collapse
+      // state and the customizer stay per-item.
+      const seen = new Set<string>()
+      return {
+        ...group,
+        items: group.items
+          .filter((item) => !removedItemIds.has(item.id))
+          .map((item): SidebarItem => {
+            let migrated = migrateSidebarItem(item)
+            if (seen.has(migrated.id)) {
+              let suffix = 2
+              while (seen.has(`${migrated.id}-${suffix}`)) suffix++
+              migrated = { ...migrated, id: `${migrated.id}-${suffix}` }
+            }
+            seen.add(migrated.id)
+            return migrated
+          }),
+      }
+    }),
   }
 }
 
