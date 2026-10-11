@@ -486,7 +486,8 @@
     "grpcroutes": "gRPC 路由",
     "referencegrants": "引用授权",
     "alertCenter": "告警中心",
-    "logCenter": "日志中心"
+    "logCenter": "日志中心",
+    "diagnostics": "健康诊断"
   },
   "overview": {
     "title": "概览",
@@ -1715,5 +1716,47 @@
     "selectorHint": "例如 app=nginx；留空则聚合命名空间下全部 Pod",
     "podCount": "{{count}} 个 Pod 流式传输中",
     "selectNamespace": "选择一个命名空间开始查看日志"
+  },
+  "health": {
+    "description": "集群健康评分、风险项与资源用量排行",
+    "score": "健康评分",
+    "allHealthy": "所有检查项均通过",
+    "issuesFound": "发现 {{count}} 项风险",
+    "prometheusRequired": "配置 Prometheus 后可查看资源用量排行",
+    "noData": "暂无用量数据",
+    "controlPlane": "控制平面",
+    "controlPlaneEmpty": "未检测到控制平面静态 Pod",
+    "readyCount": "{{ready}}/{{total}} 就绪",
+    "categories": {
+      "nodes": "节点",
+      "workloads": "工作负载",
+      "storage": "存储",
+      "platform": "平台"
+    },
+    "severities": {
+      "critical": "严重",
+      "warning": "警告",
+      "info": "信息"
+    },
+    "checks": {
+      "node_not_ready": "{{count}} 个节点未就绪",
+      "node_memory_pressure": "{{count}} 个节点存在内存压力",
+      "node_disk_pressure": "{{count}} 个节点存在磁盘压力",
+      "node_pid_pressure": "{{count}} 个节点存在 PID 压力",
+      "pod_crashloop": "{{count}} 个容器处于 CrashLoopBackOff",
+      "pod_image_pull": "{{count}} 个 Pod 拉取镜像失败",
+      "pod_stuck_pending": "{{count}} 个 Pod 已 Pending 超过 10 分钟",
+      "pvc_pending": "{{count}} 个存储卷声明处于 Pending 或 Lost",
+      "prometheus_not_configured": "未配置 Prometheus，无法查看资源用量排行",
+      "prometheus_unavailable": "Prometheus 查询失败，资源用量数据暂不可用"
+    },
+    "topNodes": {
+      "title": "节点用量排行",
+      "memory": "内存"
+    },
+    "topPods": {
+      "title": "Pod 用量排行",
+      "memory": "内存"
+    }
   }
 }

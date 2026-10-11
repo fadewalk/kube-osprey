@@ -197,6 +197,7 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 
 func registerClusterProtectedRoutes(api *gin.RouterGroup, helmChartsHandler *helm.HelmChartHandler) {
 	api.GET("/overview", system.GetOverview)
+	api.GET("/health-report", system.GetHealthReport)
 
 	metricsHandler := metrics.NewHandler()
 	api.GET("/prometheus/query", metricsHandler.QueryPrometheus)

@@ -486,7 +486,8 @@
     "referencegrants": "ReferenceGrants",
     "settings": "Settings",
     "alertCenter": "Alert Center",
-    "logCenter": "Log Center"
+    "logCenter": "Log Center",
+    "diagnostics": "Health Diagnostics"
   },
   "overview": {
     "title": "Overview",
@@ -1633,5 +1634,47 @@
     "selectorHint": "e.g. app=nginx — leave empty to stream every pod",
     "podCount": "{{count}} pods streaming",
     "selectNamespace": "Select a namespace to start streaming logs"
+  },
+  "health": {
+    "description": "Cluster health score, risk items, and resource usage leaders",
+    "score": "Health score",
+    "allHealthy": "All checks passed",
+    "issuesFound": "{{count}} risk item(s) found",
+    "prometheusRequired": "Configure Prometheus to see resource usage leaders",
+    "noData": "No usage data returned",
+    "controlPlane": "Control plane",
+    "controlPlaneEmpty": "No control-plane static pods detected",
+    "readyCount": "{{ready}}/{{total}} ready",
+    "categories": {
+      "nodes": "Nodes",
+      "workloads": "Workloads",
+      "storage": "Storage",
+      "platform": "Platform"
+    },
+    "severities": {
+      "critical": "Critical",
+      "warning": "Warning",
+      "info": "Info"
+    },
+    "checks": {
+      "node_not_ready": "{{count}} node is not Ready | {{count}} nodes are not Ready",
+      "node_memory_pressure": "{{count}} node reports MemoryPressure | {{count}} nodes report MemoryPressure",
+      "node_disk_pressure": "{{count}} node reports DiskPressure | {{count}} nodes report DiskPressure",
+      "node_pid_pressure": "{{count}} node reports PIDPressure | {{count}} nodes report PIDPressure",
+      "pod_crashloop": "{{count}} container is in CrashLoopBackOff | {{count}} containers are in CrashLoopBackOff",
+      "pod_image_pull": "{{count}} pod is failing to pull its image | {{count}} pods are failing to pull their images",
+      "pod_stuck_pending": "{{count}} pod has been Pending for over 10 minutes | {{count}} pods have been Pending for over 10 minutes",
+      "pvc_pending": "{{count}} volume claim is Pending or Lost | {{count}} volume claims are Pending or Lost",
+      "prometheus_not_configured": "Prometheus is not configured — usage leaders are unavailable",
+      "prometheus_unavailable": "Prometheus queries failed — usage data is unavailable"
+    },
+    "topNodes": {
+      "title": "Top nodes by usage",
+      "memory": "Memory"
+    },
+    "topPods": {
+      "title": "Top pods by usage",
+      "memory": "Memory"
+    }
   }
 }

@@ -5,6 +5,7 @@ import {
   IconChartLine,
   IconClipboardCheck,
   IconFileText,
+  IconGauge,
   IconTopologyBus,
   type Icon,
   type IconProps,
@@ -90,6 +91,11 @@ defaultMenus['sidebar.groups.application'].push({
   icon: IconFileText,
 })
 defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.diagnostics',
+  url: '/diagnostics',
+  icon: IconGauge,
+})
+defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.changePlans',
   url: '/change-plans',
   icon: IconClipboardCheck,
@@ -105,7 +111,7 @@ defaultMenus['sidebar.groups.application'].push({
   icon: getResourceIconComponent('IconPackage'),
 })
 
-export const SIDEBAR_CONFIG_VERSION = 7
+export const SIDEBAR_CONFIG_VERSION = 8
 
 function getIconName(iconComponent: ComponentType<{ className?: string }>) {
   const entry = Object.entries(sidebarIconMap).find(

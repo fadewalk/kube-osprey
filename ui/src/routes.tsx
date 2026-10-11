@@ -7,6 +7,7 @@ import { getSubPath } from './lib/subpath'
 import { AlertCenterPage } from './pages/alert-center-page'
 import { ChangePlansPage } from './pages/change-plans'
 import { CRListPage } from './pages/cr-list-page'
+import { HealthDiagnosticsPage } from './pages/health-diagnostics-page'
 import { HelmChartDetailPage } from './pages/helm-chart-detail-page'
 import { HelmChartListPage } from './pages/helm-chart-list-page'
 import { InitializationPage } from './pages/initialization'
@@ -96,6 +97,10 @@ export const router = createBrowserRouter(
         {
           path: 'logs',
           element: <LogCenterPage />,
+        },
+        {
+          path: 'diagnostics',
+          element: <HealthDiagnosticsPage />,
         },
         {
           path: 'crds/:crd',
