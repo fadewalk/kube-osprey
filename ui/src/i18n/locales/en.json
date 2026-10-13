@@ -1854,5 +1854,13 @@
     "created": "User group created",
     "deleted": "User group deleted",
     "deleteDescription": "Members lose permissions inherited from this group, and its role bindings are removed. This cannot be undone."
+  },
+  "terminal": {
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select All",
+    "clearScreen": "Clear Screen",
+    "reconnecting": "Reconnecting (attempt {{attempt}}/3)...",
+    "reconnectGiveUp": "Auto-reconnect gave up. Use the reconnect button."
   }
 }

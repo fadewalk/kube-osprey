@@ -1936,5 +1936,13 @@
     "created": "用户组创建成功",
     "deleted": "用户组已删除",
     "deleteDescription": "成员将失去从该组继承的权限，组绑定的角色也会一并删除。此操作不可恢复。"
+  },
+  "terminal": {
+    "copy": "复制",
+    "paste": "粘贴",
+    "selectAll": "全选",
+    "clearScreen": "清屏",
+    "reconnecting": "正在重连（第 {{attempt}}/3 次）...",
+    "reconnectGiveUp": "自动重连已停止，请使用重连按钮。"
   }
 }

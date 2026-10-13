@@ -85,6 +85,10 @@ export function Terminal({
   const [isConnected, setIsConnected] = useState(false)
   const [reconnectFlag, setReconnectFlag] = useState(false)
   const [networkSpeed, setNetworkSpeed] = useState({ upload: 0, download: 0 })
+  const [contextMenu, setContextMenu] = useState<{
+    x: number
+    y: number
+  } | null>(null)
   const [terminalTheme, setTerminalTheme] = useState<TerminalTheme>(() => {
     const saved = localStorage.getItem('terminal-theme')
     return (saved as TerminalTheme) || 'classic'
@@ -112,6 +116,8 @@ export function Terminal({
     lastUpdate: Date.now(),
   })
   const speedUpdateTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const sendStdinRef = useRef<((data: string) => void) | null>(null)
+  const autoRetryRef = useRef(0)
   const { t } = useTranslation()
   const { currentCluster } = useCluster()
 
@@ -355,6 +361,7 @@ export function Terminal({
 
     websocket.onopen = () => {
       setIsConnected(true)
+      autoRetryRef.current = 0
       networkStatsRef.current = {
         lastReset: Date.now(),
         bytesReceived: 0,
@@ -438,17 +445,60 @@ export function Terminal({
       }
       if (event.code !== 1000) {
         terminal.writeln('\x1b[31mConnection closed unexpectedly\x1b[0m')
+        // Auto-reconnect with a bounded number of attempts, mirroring
+        // Kuboard's terminal behaviour.
+        if (autoRetryRef.current < 3) {
+          autoRetryRef.current += 1
+          const attempt = autoRetryRef.current
+          terminal.writeln(
+            `\x1b[90m${t('terminal.reconnecting', {
+              defaultValue: 'Reconnecting (attempt {{attempt}}/3)...',
+              attempt,
+            })}\x1b[0m`
+          )
+          setTimeout(() => setReconnectFlag((prev) => !prev), 2000)
+        } else {
+          terminal.writeln(
+            `\x1b[90m${t('terminal.reconnectGiveUp', {
+              defaultValue: 'Auto-reconnect gave up. Use the reconnect button.',
+            })}\x1b[0m`
+          )
+        }
       } else {
         terminal.writeln('\x1b[32mConnection closed\x1b[0m')
       }
     }
 
-    terminal.onData((data) => {
+    const send = (data: string) => {
       if (websocket.readyState === WebSocket.OPEN) {
         const message = JSON.stringify({ type: 'stdin', data })
         websocket.send(message)
         updateNetworkStats(new Blob([message]).size, true)
       }
+    }
+    sendStdinRef.current = send
+
+    terminal.onData((data) => send(data))
+
+    // Clipboard parity with Kuboard's terminal: Ctrl/Cmd+V pastes from the
+    // system clipboard, Ctrl/Cmd+C copies when a selection exists.
+    terminal.attachCustomKeyEventHandler((ev) => {
+      if (ev.type !== 'keydown') return true
+      const mod = ev.ctrlKey || ev.metaKey
+      if (mod && ev.key.toLowerCase() === 'v' && !ev.shiftKey) {
+        navigator.clipboard
+          ?.readText()
+          .then((text) => {
+            if (text) send(text)
+          })
+          .catch(() => {})
+        return false
+      }
+      if (mod && ev.key.toLowerCase() === 'c' && terminal.hasSelection()) {
+        navigator.clipboard?.writeText(terminal.getSelection()).catch(() => {})
+        return false
+      }
+      return true
     })
 
     let resizeDebounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -523,6 +573,92 @@ export function Terminal({
   }, [])
 
   // Shared terminal div (the actual xterm canvas)
+  const handleTerminalContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    setContextMenu({ x: e.clientX, y: e.clientY })
+  }
+
+  const copySelection = () => {
+    const selection = xtermRef.current?.getSelection()
+    if (selection) {
+      navigator.clipboard?.writeText(selection).catch(() => {})
+    }
+    setContextMenu(null)
+  }
+
+  const pasteFromClipboard = () => {
+    navigator.clipboard
+      ?.readText()
+      .then((text) => {
+        if (text) sendStdinRef.current?.(text)
+      })
+      .catch(() => {})
+    setContextMenu(null)
+  }
+
+  const selectAll = () => {
+    xtermRef.current?.selectAll()
+    setContextMenu(null)
+  }
+
+  const clearScreen = () => {
+    xtermRef.current?.clear()
+    setContextMenu(null)
+  }
+
+  const contextMenuEl = contextMenu ? (
+    <>
+      <div
+        className="fixed inset-0 z-40"
+        onContextMenu={(e) => {
+          e.preventDefault()
+          setContextMenu(null)
+        }}
+        onMouseDown={() => setContextMenu(null)}
+      />
+      <div
+        className="bg-popover text-popover-foreground fixed z-50 min-w-36 rounded-md border p-1 shadow-md"
+        style={{
+          left: Math.min(contextMenu.x, window.innerWidth - 170),
+          top: Math.min(contextMenu.y, window.innerHeight - 150),
+        }}
+      >
+        {[
+          {
+            label: t('terminal.copy', 'Copy'),
+            action: copySelection,
+            disabled: !xtermRef.current?.hasSelection(),
+          },
+          {
+            label: t('terminal.paste', 'Paste'),
+            action: pasteFromClipboard,
+            disabled: typeof navigator.clipboard?.readText !== 'function',
+          },
+          {
+            label: t('terminal.selectAll', 'Select All'),
+            action: selectAll,
+            disabled: false,
+          },
+          {
+            label: t('terminal.clearScreen', 'Clear Screen'),
+            action: clearScreen,
+            disabled: false,
+          },
+        ].map((entry) => (
+          <button
+            key={entry.label}
+            type="button"
+            disabled={entry.disabled}
+            onClick={entry.action}
+            className="hover:bg-accent w-full rounded-sm px-2 py-1.5 text-left text-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {entry.label}
+          </button>
+        ))}
+      </div>
+    </>
+  ) : null
+
   const terminalDiv = (
     <div
       ref={terminalRef}
@@ -535,13 +671,17 @@ export function Terminal({
         position: 'relative',
         isolation: 'isolate',
       }}
+      onContextMenu={handleTerminalContextMenu}
     />
   )
 
   // Embedded mode: no header, fills parent completely
   if (embedded) {
     return (
-      <div className="flex flex-col h-full w-full min-h-0">{terminalDiv}</div>
+      <div className="flex h-full w-full min-h-0 flex-col">
+        {terminalDiv}
+        {contextMenuEl}
+      </div>
     )
   }
 
@@ -754,6 +894,7 @@ export function Terminal({
 
       <CardContent className="p-0 flex h-full min-h-0">
         {terminalDiv}
+        {contextMenuEl}
       </CardContent>
     </Card>
   )

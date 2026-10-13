@@ -116,6 +116,13 @@ func ValidateWebSocketOrigin(r *http.Request) bool {
 	if parsedOrigin.Scheme != "http" && parsedOrigin.Scheme != "https" {
 		return false
 	}
+	// The Vite dev server proxies API/WebSocket traffic from a loopback port
+	// to the backend, so the browser Origin (localhost:5174) differs from
+	// r.Host (localhost:8080). Loopback origins are always the local
+	// developer's own machine.
+	if hostname := strings.ToLower(parsedOrigin.Hostname()); hostname == "localhost" || hostname == "127.0.0.1" || hostname == "::1" {
+		return true
+	}
 	return strings.EqualFold(parsedOrigin.Host, r.Host)
 }
 
