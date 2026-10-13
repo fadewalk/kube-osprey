@@ -21,12 +21,14 @@ SPEC ?=
 VERSION=$(shell scripts/get-version.sh)
 BUILD_DATE ?= $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 COMMIT_ID ?= $(shell git rev-parse HEAD 2>/dev/null || echo "unknown")
+REPO_URL ?= $(shell scripts/get-repo-url.sh 2>/dev/null)
 
 # Build flags
 LDFLAGS=-ldflags "-s -w \
 	-X 'github.com/zxh326/kite/pkg/version.Version=$(VERSION)' \
 	-X 'github.com/zxh326/kite/pkg/version.BuildDate=$(BUILD_DATE)' \
-	-X 'github.com/zxh326/kite/pkg/version.CommitID=$(COMMIT_ID)'"
+	-X 'github.com/zxh326/kite/pkg/version.CommitID=$(COMMIT_ID)' \
+	-X 'github.com/zxh326/kite/pkg/version.RepoURL=$(REPO_URL)'"
 
 # Default target
 .DEFAULT_GOAL := build

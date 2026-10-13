@@ -11,12 +11,16 @@ var (
 	Version   = "dev"
 	BuildDate = "unknown"
 	CommitID  = "unknown"
+	// RepoURL is the browsable base URL of the repository this binary was
+	// built from (injected at link time); empty disables commit links.
+	RepoURL = ""
 )
 
 type VersionInfo struct {
 	Version   string `json:"version"`
 	BuildDate string `json:"buildDate"`
 	CommitID  string `json:"commitId"`
+	RepoURL   string `json:"repoUrl"`
 	HasNew    bool   `json:"hasNewVersion"`
 	Release   string `json:"releaseUrl"`
 }
@@ -26,6 +30,7 @@ func GetVersion(c *gin.Context) {
 		Version:   Version,
 		BuildDate: BuildDate,
 		CommitID:  CommitID,
+		RepoURL:   RepoURL,
 	}
 
 	if common.EnableVersionCheck {
