@@ -1,10 +1,10 @@
-# Kite 项目交接文档
+# Osprey 项目交接文档
 
-> 更新时间：2026-10-13
+> 更新时间：2026-10-13（2026-10-15 品牌更名：项目品牌由 Kite 更名为 **Osprey**，仓库 `fadewalk/osprey`；品牌层仅覆盖 README/UI 文案/构建产物名，代码层标识（Go module `github.com/zxh326/kite`、`KITE_*` 环境变量、`charts/kite`）保留原名以保证上游合并。文中提到的 "Kite" 多指上游项目或历史语境。）
 > 当前分支：`feat/kubepi-value-mvp`
-> 当前 HEAD：`ae56105 feat: add terminal clipboard menu, shortcuts, and auto-reconnect`（**已推送**至 fadewalk/kite，与远端同步；origin 仍指 kite-org/kite 上游，推送用 `git push fadewalk <branch>`）
+> 当前 HEAD：`ae56105 feat: add terminal clipboard menu, shortcuts, and auto-reconnect`（**已推送**；remote 布局：`origin` = fadewalk/osprey（本仓库），`upstream` = kite-org/kite（上游，仅 fetch），推送用 `git push origin <branch>`，拉上游用 `git fetch upstream`）
 
-本文档用于把当前 Kite / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
+本文档用于把当前 Osprey / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
 
 ## 1. 项目定位和总体决策
 

@@ -1,19 +1,16 @@
 <div align="center">
 
-<img src="./docs/assets/logo.svg" alt="Kite Logo" width="128" height="128">
+<img src="./docs/assets/logo.svg" alt="Osprey Logo" width="128" height="128">
 
-# Kite
+# Osprey
 
-**所有集群，一个工作空间。**
+**所有集群，一个控制台。**
 
-Kite 是一个轻量、开源的 Kubernetes 工作空间，面向多集群运维、可观测性、访问控制与 AI 辅助排障。
+Osprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维、可观测性、访问控制与 AI 辅助排障。
 
-[![Release](https://img.shields.io/github/v/release/kite-org/kite?style=flat-square&logo=github&label=Release)](https://github.com/kite-org/kite/releases)
-[![Stars](https://img.shields.io/github/stars/kite-org/kite?style=flat-square&logo=github&label=Stars)](https://github.com/kite-org/kite/stargazers)
-[![Downloads](https://img.shields.io/github/downloads/kite-org/kite/total?style=flat-square&logo=github&label=Downloads)](https://github.com/kite-org/kite/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square)](LICENSE)
 
-[**文档**](https://kitehq.dev/zh/) · [**版本发布**](https://github.com/kite-org/kite/releases) · [**社区**](https://join.slack.com/t/kite-dashboard/shared_invite/zt-3cl9mccs7-eQZ1_t6IoTPHZkxXED1ceg)
+[![Upstream](https://img.shields.io/badge/fork%20of-Kite-blue?style=flat-square)](https://github.com/kite-org/kite)
 
 [English](./README.md) · **中文**
 
@@ -21,7 +18,10 @@ Kite 是一个轻量、开源的 Kubernetes 工作空间，面向多集群运维
 
 <img width="1586" height="1167" alt="image" src="https://github.com/user-attachments/assets/a88a63b7-5b71-444d-8d98-66f147a68ef7" />
 
-## 为什么选择 Kite
+> [!NOTE]
+> Osprey 是 [Kite](https://github.com/kite-org/kite)（Apache-2.0）的独立维护 fork：持续吸收上游有价值的更新，但独立发展、不向上游回传改动。代码层标识（Go module 路径、`KITE_*` 环境变量、`charts/kite`）刻意保留原名，以保证上游变更可以持续干净地合并。
+
+## 为什么选择 Osprey
 
 ### 可观测
 
@@ -46,30 +46,27 @@ Kite 是一个轻量、开源的 Kubernetes 工作空间，面向多集群运维
 
 ## 快速开始
 
-### Helm
+### 从源码构建
 
-如需快速体验，可通过 OCI Registry 将 Kite 安装到独立的命名空间：
+构建 Osprey 需要 Go 1.26、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
+
+```bash
+git clone https://github.com/fadewalk/osprey.git
+cd osprey
+make deps
+make build
+./osprey
+```
+
+### 上游发行版（Kite）
+
+上游项目以 Kite 名称发布现成的 Helm Chart、Docker 镜像和 Manifest：
 
 ```bash
 helm install kite oci://ghcr.io/kite-org/charts/kite \
   --namespace kite-system \
   --create-namespace
 ```
-
-将服务转发到本地：
-
-```bash
-kubectl port-forward --namespace kite-system svc/kite 8080:8080
-```
-
-打开 [http://localhost:8080](http://localhost:8080)，创建首个管理员账户，并按照初始化流程连接集群。如果 Kite 运行在需要管理的集群中，选择 `in-cluster` 连接类型即可完成最简单的配置。
-
-> [!IMPORTANT]
-> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、替换默认加密密钥，并检查 Chart 创建的集群级 RBAC 权限。详见[安装指南](https://kitehq.dev/zh/guide/installation)和 [Chart Values](https://kitehq.dev/zh/config/chart-values)。
-
-## 其他安装方式
-
-### Docker
 
 ```bash
 mkdir -p data
@@ -80,32 +77,12 @@ docker run -d --name kite \
   ghcr.io/kite-org/kite:latest
 ```
 
-### Kubernetes Manifest
-
-独立 Manifest 适合快速体验。除非额外挂载持久化存储，否则应用数据会保存在容器内。
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kite-org/kite/main/deploy/install.yaml
-kubectl port-forward --namespace kube-system svc/kite 8080:8080
-```
-
-该 Manifest 会为 ServiceAccount 授予 `cluster-admin` 权限。在测试环境之外使用前，请检查并收紧这些权限。
-
-### 从源码构建
-
-构建 Kite 需要 Go 1.26、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
-
-```bash
-git clone https://github.com/kite-org/kite.git
-cd kite
-make deps
-make build
-./kite
-```
+> [!IMPORTANT]
+> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、替换默认加密密钥，并检查 Chart 创建的集群级 RBAC 权限。详见上游[安装指南](https://kitehq.dev/zh/guide/installation)和 [Chart Values](https://kitehq.dev/zh/config/chart-values)。
 
 ## 文档
 
-| 主题             | 指南                                                                                                                            |
+| 主题             | 上游指南                                                                                                                        |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | 安装与访问       | [安装指南](https://kitehq.dev/zh/guide/installation)                                                                            |
 | 用户、认证和权限 | [用户管理](https://kitehq.dev/zh/config/user-management) · [RBAC](https://kitehq.dev/zh/config/rbac-config)                     |
@@ -114,37 +91,6 @@ make build
 | AI               | [AI 助手](https://kitehq.dev/zh/guide/ai-assistant)                                                                             |
 | API              | [API 文档](https://kitehq.dev/zh/api/authentication)                                                                            |
 
-## 社区
-
-- 提交 Pull Request 前请先阅读[贡献指南](./CONTRIBUTING.md)。
-- 请按照[安全策略](./SECURITY.md)报告安全漏洞。
-- 加入 [Kite Slack 社区](https://join.slack.com/t/kite-dashboard/shared_invite/zt-3cl9mccs7-eQZ1_t6IoTPHZkxXED1ceg)，与其他用户交流。
-
-## 支持本项目
-
-如果你觉得 Kite 对你有帮助，请考虑支持本项目的开发。你的捐赠将帮助我们维护和改进项目。
-
-<table>
-  <tr>
-    <td align="center">
-      <b>支付宝</b><br>
-      <img src="./docs/donate/alipay.jpeg" alt="支付宝二维码" width="200">
-    </td>
-    <td align="center">
-      <b>微信支付</b><br>
-      <img src="./docs/donate/wechat.jpeg" alt="微信支付二维码" width="200">
-    </td>
-    <td align="center">
-      <b>PayPal</b><br>
-      <a href="https://www.paypal.me/zxh326">
-        <img src="https://www.paypalobjects.com/webstatic/mktg/logo/pp_cc_mark_111x69.jpg" alt="PayPal" width="150">
-      </a>
-    </td>
-  </tr>
-</table>
-
-感谢你的支持！❤️
-
 ## 许可证
 
-Kite 基于 [Apache License 2.0](LICENSE) 发布。
+Osprey 基于 [Apache License 2.0](LICENSE) 发布，许可继承自 Kite。

@@ -394,7 +394,7 @@
     "unsetGlobalError": "取消全局侧边栏失败",
     "expand": "展开",
     "collapse": "收起",
-    "updateAvailable": "有新的 Kite 版本可用"
+    "updateAvailable": "有新的 Osprey 版本可用"
   },
   "prometheusExplorer": {
     "description": "针对当前集群执行即时或区间 PromQL 查询。",
@@ -610,7 +610,7 @@
     },
     "tabs": {
       "rolloutRevisions": "发布版本历史",
-      "kiteAudit": "Kite 审计记录"
+      "kiteAudit": "Osprey 审计记录"
     }
   },
   "daemonsets": {
@@ -758,7 +758,7 @@
     "tryAgainHint": "请尝试使用有权限的其他账号登录。",
     "noLoginMethods": "未配置登录方式",
     "configureAuth": "请先配置认证方式",
-    "footer": "© {{year}} Kite. All rights reserved.",
+    "footer": "© {{year}} Osprey. All rights reserved.",
     "documentation": "文档",
     "errors": {
       "accessDenied": "访问被拒绝",
@@ -963,7 +963,7 @@
     },
     "pluginCatalog": {
       "title": "Plugin catalog",
-      "description": "用于浏览和安装插件的 Catalog 地址。留空时使用 Kite 官方 Catalog。",
+      "description": "用于浏览和安装插件的 Catalog 地址。留空时使用 Osprey 官方 Catalog。",
       "url": "Catalog URL"
     },
     "mcp": {
@@ -995,11 +995,11 @@
     },
     "branding": {
       "title": "品牌定制",
-      "description": "自定义登录页与侧边栏显示的站点名称和 Logo。留空保持 Kite 默认样式。",
+      "description": "自定义登录页与侧边栏显示的站点名称和 Logo。留空保持 Osprey 默认样式。",
       "siteTitle": "站点名称",
-      "siteTitlePlaceholder": "留空使用 \"Kite\"",
+      "siteTitlePlaceholder": "留空使用 \"Osprey\"",
       "siteLogo": "Logo 地址",
-      "siteLogoPlaceholder": "留空使用 Kite 默认 Logo"
+      "siteLogoPlaceholder": "留空使用 Osprey 默认 Logo"
     },
     "errors": {
       "modelRequired": "模型不能为空",
@@ -1145,7 +1145,7 @@
     "errors": {
       "loadFailed": "加载集群失败"
     },
-    "deleteConfirmation": "此操作仅移除 Kite 中的集群配置，不会删除集群内的任何资源。",
+    "deleteConfirmation": "此操作仅移除 Osprey 中的集群配置，不会删除集群内的任何资源。",
     "dialog": {
       "createTitle": "添加集群",
       "editTitle": "编辑集群",
@@ -1227,7 +1227,7 @@
   },
   "initialization": {
     "title": "初始化设置",
-    "welcome": "欢迎使用 Kite",
+    "welcome": "欢迎使用 Osprey",
     "subtitle": "创建你的账号。\n连接第一个集群。",
     "description": "创建管理员账号并连接集群",
     "stepCounter": "第 {{current}} 步，共 {{total}} 步",
@@ -1238,7 +1238,7 @@
       "title": "创建管理员账号",
       "description": "设置管理员信息",
       "heading": "创建你的管理员账号",
-      "headingDescription": "此账号将拥有 Kite 控制台的全部访问权限。",
+      "headingDescription": "此账号将拥有 Osprey 控制台的全部访问权限。",
       "username": "用户名",
       "usernameRequired": "用户名 *",
       "usernamePlaceholder": "输入管理员用户名",
@@ -1264,7 +1264,7 @@
       "title": "连接集群",
       "description": "导入 Kubernetes 集群",
       "heading": "连接第一个集群",
-      "headingDescription": "导入 kubeconfig，或使用 Kite 所在的集群。",
+      "headingDescription": "导入 kubeconfig，或使用 Osprey 所在的集群。",
       "kubeconfig": "Kubeconfig",
       "kubeconfigRequired": "Kubeconfig *",
       "kubeconfigPlaceholder": "粘贴 kubeconfig 内容...",
@@ -1516,7 +1516,7 @@
       "plainHTTPHint": "此 OCI Registry 将使用 HTTP 而非 HTTPS，凭据和 Chart 数据将以明文传输。",
       "repositoryAdded": "Repository 已添加",
       "repositoryDeleted": "Repository 已删除",
-      "deleteRepositoryDescription": "这里只会从 Kite 移除这个受管理的 Chart 来源，不会删除远端 Chart，也不会卸载已安装的 Helm Release。",
+      "deleteRepositoryDescription": "这里只会从 Osprey 移除这个受管理的 Chart 来源，不会删除远端 Chart，也不会卸载已安装的 Helm Release。",
       "noCharts": "未找到 Chart",
       "noReadme": "未找到 README",
       "noValues": "未找到 Values",
@@ -1524,7 +1524,7 @@
       "noVersions": "未找到版本",
       "noChartUrl": "缺少 Chart 包 URL。",
       "invalidValues": "Values 必须是 YAML 对象。",
-      "artifactHubTrafficNotice": "从该来源搜索或查看 Chart 信息时，Kite 会访问 <artifactHub>Artifact Hub</artifactHub>。Kite 仅展示第三方数据，不对其中内容负责。",
+      "artifactHubTrafficNotice": "从该来源搜索或查看 Chart 信息时，Osprey 会访问 <artifactHub>Artifact Hub</artifactHub>。Osprey 仅展示第三方数据，不对其中内容负责。",
       "installed": "Helm Release 已安装"
     },
     "placeholders": {
@@ -1650,7 +1650,7 @@
     "uninstall": "卸载",
     "saved": "插件配置已更新",
     "adminOnly": "只有管理员可以管理插件。",
-    "trust": "插件在浏览器中使用你的 Kite 访问权限运行，请仅安装来自可信作者的插件。",
+    "trust": "插件在浏览器中使用你的 Osprey 访问权限运行，请仅安装来自可信作者的插件。",
     "unavailable": "此插件尚未安装或已停用。",
     "notFound": "此插件页面不存在。",
     "loadFailed": "插件加载失败",
@@ -1741,7 +1741,7 @@
   "alertCenter": {
     "description": "查看当前集群的 AlertManager 告警并进行静默管理",
     "notConfigured": "当前集群未配置 AlertManager",
-    "configureHint": "可在集群设置中填写 AlertManager URL；未填写时 Kite 会自动发现集群内的 AlertManager 服务。",
+    "configureHint": "可在集群设置中填写 AlertManager URL；未填写时 Osprey 会自动发现集群内的 AlertManager 服务。",
     "goToSettings": "前往集群设置",
     "title": "告警列表",
     "noAlerts": "没有符合筛选条件的告警",

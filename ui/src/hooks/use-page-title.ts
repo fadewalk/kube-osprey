@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/auth-context'
 
 export function usePageTitle(title: string) {
   const { siteTitle } = useAuth()
-  const brand = siteTitle || 'Kite'
+  const brand = siteTitle || 'Osprey'
 
   useEffect(() => {
     const previousTitle = document.title

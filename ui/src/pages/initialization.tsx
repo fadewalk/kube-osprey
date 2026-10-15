@@ -163,7 +163,7 @@ export function InitializationPage() {
         <div className="flex items-center gap-3">
           <img src={Logo} alt="" className="size-9" />
           <span className="font-mono text-2xl font-semibold tracking-tight">
-            Kite
+            Osprey
           </span>
         </div>
 
@@ -226,7 +226,7 @@ export function InitializationPage() {
             <IconArrowUpRight className="size-4" aria-hidden="true" />
           </a>
           <a
-            href="https://github.com/zxh326/kite"
+            href="https://github.com/fadewalk/osprey"
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-1.5 hover:text-foreground"

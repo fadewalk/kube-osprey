@@ -2,7 +2,7 @@
 .PHONY: help dev build clean test docker-build docker-run frontend backend install deps e2e-install e2e-install-browser e2e-kind-up e2e-kind-down e2e-stop-app e2e-setup-ldap e2e-setup-dex e2e-run e2e-run-headed e2e-test e2e-test-headed
 
 # Variables
-BINARY_NAME=kite
+BINARY_NAME=osprey
 UI_DIR=ui
 E2E_DIR=e2e
 DOCKER_IMAGE=kite
@@ -83,16 +83,16 @@ package-release:
 	tar -czvf bin/$(BINARY_NAME)-$(shell git describe --tags --match 'v*' | grep -oE 'v[0-9]+\.[0-9][0-9]*(\.[0-9]+)?').tar.gz bin/*
 
 package-binaries: ## Package each kite binary file separately
-	@echo "🔄 Packaging kite binaries separately..."
+	@echo "🔄 Packaging osprey binaries separately..."
 	@VERSION=$$(git describe --tags --match 'v*' | grep -oE 'v[0-9]+\.[0-9][0-9]*(\.[0-9]+)?'); \
-	for file in bin/kite-*; do \
+	for file in bin/osprey-*; do \
 		if [ -f "$$file" ]; then \
 			filename=$$(basename "$$file"); \
 			echo "📦 Packaging $$filename with version $$VERSION..."; \
 			tar -czvf "bin/$$filename-$$VERSION.tar.gz" "$$file"; \
 		fi; \
 	done
-	@echo "✅ All kite binaries packaged successfully!"
+	@echo "✅ All osprey binaries packaged successfully!"
 
 frontend: static ## Build frontend only
 

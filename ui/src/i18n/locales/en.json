@@ -390,7 +390,7 @@
     "unsetGlobal": "Unset global sidebar",
     "unsetGlobalSuccess": "Global sidebar disabled successfully",
     "unsetGlobalError": "Failed to disable global sidebar",
-    "updateAvailable": "A newer Kite version is available",
+    "updateAvailable": "A newer Osprey version is available",
     "collapse": "Collapse",
     "expand": "Expand",
     "customize": "Customize Sidebar",
@@ -610,7 +610,7 @@
     },
     "tabs": {
       "rolloutRevisions": "Rollout Revisions",
-      "kiteAudit": "Kite Audit"
+      "kiteAudit": "Osprey Audit"
     }
   },
   "daemonsets": {
@@ -758,7 +758,7 @@
     "tryAgainHint": "You can try logging in with a different account that has the required permissions.",
     "noLoginMethods": "No login methods configured",
     "configureAuth": "Please configure authentication providers in your environment",
-    "footer": "© {{year}} Kite. All rights reserved.",
+    "footer": "© {{year}} Osprey. All rights reserved.",
     "documentation": "Documentation",
     "errors": {
       "accessDenied": "Access Denied",
@@ -957,7 +957,7 @@
     },
     "pluginCatalog": {
       "title": "Plugin catalog",
-      "description": "Catalog URL for browsing and installing plugins. Leave empty to use the official Kite catalog.",
+      "description": "Catalog URL for browsing and installing plugins. Leave empty to use the official Osprey catalog.",
       "url": "Catalog URL"
     },
     "mcp": {
@@ -989,11 +989,11 @@
     },
     "branding": {
       "title": "Branding",
-      "description": "Override the site name and logo shown on the login page and sidebar. Leave empty to keep the Kite defaults.",
+      "description": "Override the site name and logo shown on the login page and sidebar. Leave empty to keep the Osprey defaults.",
       "siteTitle": "Site Title",
-      "siteTitlePlaceholder": "Leave empty to use \"Kite\"",
+      "siteTitlePlaceholder": "Leave empty to use \"Osprey\"",
       "siteLogo": "Logo URL",
-      "siteLogoPlaceholder": "Leave empty to use the Kite logo"
+      "siteLogoPlaceholder": "Leave empty to use the Osprey logo"
     },
     "errors": {
       "modelRequired": "Model is required",
@@ -1071,7 +1071,7 @@
   },
   "settingsHint": {
     "title": "Complete Your Setup",
-    "description": "Configure essential settings to get the most out of Kite",
+    "description": "Configure essential settings to get the most out of Osprey",
     "p8s": {
       "description": "Configure Prometheus"
     },
@@ -1202,7 +1202,7 @@
   },
   "initialization": {
     "title": "Initial Setup",
-    "welcome": "Welcome to Kite",
+    "welcome": "Welcome to Osprey",
     "subtitle": "Set up your account.\nConnect your first cluster.",
     "description": "Configure your admin user and connect cluster",
     "stepCounter": "Step {{current}} of {{total}}",
@@ -1213,7 +1213,7 @@
       "title": "Create admin account",
       "description": "Set up your administrator",
       "heading": "Create your admin account",
-      "headingDescription": "This account will have full access to your Kite console.",
+      "headingDescription": "This account will have full access to your Osprey console.",
       "username": "Username",
       "usernameRequired": "Username *",
       "usernamePlaceholder": "Enter admin username",
@@ -1239,7 +1239,7 @@
       "title": "Connect cluster",
       "description": "Import your Kubernetes cluster",
       "heading": "Connect your first cluster",
-      "headingDescription": "Import a kubeconfig or use the cluster where Kite is running.",
+      "headingDescription": "Import a kubeconfig or use the cluster where Osprey is running.",
       "kubeconfig": "Kubeconfig File",
       "kubeconfigRequired": "Kubeconfig File *",
       "kubeconfigPlaceholder": "Paste your kubeconfig file content here...",
@@ -1434,7 +1434,7 @@
       "plainHTTPHint": "Use HTTP instead of HTTPS for this OCI registry. Credentials and chart data are sent without encryption.",
       "repositoryAdded": "Repository added",
       "repositoryDeleted": "Repository deleted",
-      "deleteRepositoryDescription": "This only removes the managed chart source from Kite. It does not delete remote charts or installed Helm releases.",
+      "deleteRepositoryDescription": "This only removes the managed chart source from Osprey. It does not delete remote charts or installed Helm releases.",
       "noCharts": "No charts found",
       "noReadme": "No README found",
       "noValues": "No values found",
@@ -1442,7 +1442,7 @@
       "noVersions": "No versions found",
       "noChartUrl": "Chart package URL is missing.",
       "invalidValues": "Values must be a YAML object.",
-      "artifactHubTrafficNotice": "Security notice: Kite contacts <artifactHub>Artifact Hub</artifactHub> when searching or viewing chart information from this source. Kite only displays third-party data and is not responsible for its content.",
+      "artifactHubTrafficNotice": "Security notice: Osprey contacts <artifactHub>Artifact Hub</artifactHub> when searching or viewing chart information from this source. Osprey only displays third-party data and is not responsible for its content.",
       "installed": "Helm release installed"
     },
     "placeholders": {
@@ -1568,7 +1568,7 @@
     "uninstall": "Uninstall",
     "saved": "Plugin configuration updated",
     "adminOnly": "Only administrators can manage plugins.",
-    "trust": "Plugins run in your browser with your Kite access. Only install packages from authors you trust.",
+    "trust": "Plugins run in your browser with your Osprey access. Only install packages from authors you trust.",
     "unavailable": "This plugin is not installed or is disabled.",
     "notFound": "This plugin page does not exist.",
     "loadFailed": "Plugin failed to load",
@@ -1659,7 +1659,7 @@
   "alertCenter": {
     "description": "View and silence AlertManager alerts for the current cluster",
     "notConfigured": "AlertManager is not configured for this cluster",
-    "configureHint": "Fill in the AlertManager URL in cluster settings. When left empty, Kite auto-discovers an AlertManager service inside the cluster.",
+    "configureHint": "Fill in the AlertManager URL in cluster settings. When left empty, Osprey auto-discovers an AlertManager service inside the cluster.",
     "goToSettings": "Go to cluster settings",
     "title": "Alerts",
     "noAlerts": "No alerts match the current filters",

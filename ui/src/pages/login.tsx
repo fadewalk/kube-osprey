@@ -261,13 +261,13 @@ export function LoginPage() {
               {siteLogo ? (
                 <img
                   src={siteLogo}
-                  alt={siteTitle || 'Kite'}
+                  alt={siteTitle || 'Osprey'}
                   className="h-10 w-10 object-contain"
                 />
               ) : (
                 <img src={Logo} className="h-10 w-10 dark:invert" />
               )}{' '}
-              <h1 className="text-2xl font-bold">{siteTitle || 'Kite'}</h1>
+              <h1 className="text-2xl font-bold">{siteTitle || 'Osprey'}</h1>
             </div>
             <p className="text-gray-600">{t('login.kubernetesDashboard')}</p>
           </div>

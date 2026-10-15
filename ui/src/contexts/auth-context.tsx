@@ -172,7 +172,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const siteLogo = bootstrap?.branding?.siteLogo || ''
 
   useEffect(() => {
-    document.title = siteTitle || 'Kite'
+    document.title = siteTitle || 'Osprey'
   }, [siteTitle])
 
   const value = useMemo(() => {
