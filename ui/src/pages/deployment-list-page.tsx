@@ -1,15 +1,18 @@
 import { useMemo, useState } from 'react'
-import { IconReload } from '@tabler/icons-react'
+import { IconArrowsVertical, IconBox, IconReload } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import { Deployment } from 'kubernetes-types/apps/v1'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { restartWorkload } from '@/lib/api'
+import { patchResource, restartWorkload } from '@/lib/api'
+import { updateWorkloadImage } from '@/lib/api/workload-ops'
 import { createSearchFilter, getDeploymentStatus } from '@/lib/k8s'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { DeploymentStatusIcon } from '@/components/deployment-status-icon'
 import { DeploymentCreateDialog } from '@/components/editors/deployment-create-dialog'
 import { ResourceBatchActionDialog } from '@/components/resource-batch-action-dialog'
@@ -31,7 +34,15 @@ export function DeploymentListPage() {
   const queryClient = useQueryClient()
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
+  const [isScaleDialogOpen, setIsScaleDialogOpen] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
   const [batchDeployments, setBatchDeployments] = useState<Deployment[]>([])
+  const [scaleReplicas, setScaleReplicas] = useState('1')
+  const [batchImage, setBatchImage] = useState('')
+  const [batchImageContainer, setBatchImageContainer] = useState('')
+
+  const replicas = Number(scaleReplicas)
+  const scaleValid = Number.isInteger(replicas) && replicas >= 0
 
   const batchActions = useMemo<ResourceTableBatchAction<Deployment>[]>(
     () => [
@@ -42,6 +53,27 @@ export function DeploymentListPage() {
         onSelect: (deployments) => {
           setBatchDeployments(deployments)
           setIsRestartDialogOpen(true)
+        },
+      },
+      {
+        id: 'scale',
+        label: t('common.actions.scale'),
+        icon: <IconArrowsVertical className="size-4" />,
+        onSelect: (deployments) => {
+          setBatchDeployments(deployments)
+          setScaleReplicas('1')
+          setIsScaleDialogOpen(true)
+        },
+      },
+      {
+        id: 'image',
+        label: t('resourceTable.batchActions.updateImage'),
+        icon: <IconBox className="size-4" />,
+        onSelect: (deployments) => {
+          setBatchDeployments(deployments)
+          setBatchImage('')
+          setBatchImageContainer('')
+          setIsImageDialogOpen(true)
         },
       },
     ],
@@ -177,6 +209,108 @@ export function DeploymentListPage() {
           queryClient.invalidateQueries({ queryKey: ['deployments'] })
         }
         destructive={true}
+      />
+
+      <ResourceBatchActionDialog
+        open={isScaleDialogOpen}
+        onOpenChange={setIsScaleDialogOpen}
+        resources={batchDeployments}
+        title={t('resourceTable.batchActions.scaleResourcesTitle', {
+          count: batchDeployments.length,
+          resource: t('nav.deployments'),
+        })}
+        description={t('resourceTable.batchActions.scaleResourcesDescription', {
+          resource: t('nav.deployments'),
+        })}
+        actionLabel={t('common.actions.scale')}
+        executeDisabled={!scaleValid}
+        options={(disabled) => (
+          <div className="space-y-1">
+            <Label htmlFor="batch-scale-replicas">
+              {t('resourceTable.batchActions.scaleReplicasLabel')}
+            </Label>
+            <Input
+              id="batch-scale-replicas"
+              type="number"
+              min={0}
+              value={scaleReplicas}
+              disabled={disabled}
+              onChange={(e) => setScaleReplicas(e.target.value)}
+            />
+          </div>
+        )}
+        onExecute={(deployment) =>
+          patchResource(
+            'deployments',
+            deployment.metadata!.name!,
+            deployment.metadata!.namespace!,
+            {
+              spec: { replicas },
+            }
+          )
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['deployments'] })
+        }
+      />
+
+      <ResourceBatchActionDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        resources={batchDeployments}
+        title={t('resourceTable.batchActions.imageResourcesTitle', {
+          count: batchDeployments.length,
+          resource: t('nav.deployments'),
+        })}
+        description={t('resourceTable.batchActions.imageResourcesDescription', {
+          resource: t('nav.deployments'),
+        })}
+        actionLabel={t('resourceTable.batchActions.updateImage')}
+        executeDisabled={!batchImage.trim()}
+        options={(disabled) => (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="batch-image">
+                {t('resourceTable.batchActions.imageLabel')}
+              </Label>
+              <Input
+                id="batch-image"
+                value={batchImage}
+                disabled={disabled}
+                onChange={(e) => setBatchImage(e.target.value)}
+                className="font-mono text-xs"
+                placeholder="nginx:1.27"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="batch-image-container">
+                {t('resourceTable.batchActions.imageContainerLabel')}
+              </Label>
+              <Input
+                id="batch-image-container"
+                value={batchImageContainer}
+                disabled={disabled}
+                onChange={(e) => setBatchImageContainer(e.target.value)}
+                className="font-mono text-xs"
+                placeholder={t(
+                  'resourceTable.batchActions.imageContainerPlaceholder'
+                )}
+              />
+            </div>
+          </div>
+        )}
+        onExecute={(deployment) =>
+          updateWorkloadImage({
+            kind: 'deployments',
+            namespace: deployment.metadata!.namespace!,
+            name: deployment.metadata!.name!,
+            container: batchImageContainer.trim() || undefined,
+            image: batchImage.trim(),
+          })
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['deployments'] })
+        }
       />
     </>
   )

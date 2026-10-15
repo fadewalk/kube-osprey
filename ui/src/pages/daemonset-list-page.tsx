@@ -1,14 +1,28 @@
-import { useMemo } from 'react'
-import { IconCircleCheckFilled, IconLoader } from '@tabler/icons-react'
+import { useMemo, useState } from 'react'
+import {
+  IconBox,
+  IconCircleCheckFilled,
+  IconLoader,
+  IconReload,
+} from '@tabler/icons-react'
+import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import { DaemonSet } from 'kubernetes-types/apps/v1'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
+import { restartWorkload } from '@/lib/api'
+import { updateWorkloadImage } from '@/lib/api/workload-ops'
 import { createSearchFilter } from '@/lib/k8s'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
-import { ResourceTable } from '@/components/resource-table'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { ResourceBatchActionDialog } from '@/components/resource-batch-action-dialog'
+import {
+  ResourceTable,
+  type ResourceTableBatchAction,
+} from '@/components/resource-table'
 
 const daemonSetSearchFilter = createSearchFilter<DaemonSet>(
   (d) => d.metadata?.name,
@@ -19,6 +33,38 @@ const columnHelper = createColumnHelper<DaemonSet>()
 
 export function DaemonSetListPage() {
   const { t } = useTranslation()
+  const queryClient = useQueryClient()
+  const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
+  const [batchDaemonSets, setBatchDaemonSets] = useState<DaemonSet[]>([])
+  const [batchImage, setBatchImage] = useState('')
+  const [batchImageContainer, setBatchImageContainer] = useState('')
+
+  const batchActions = useMemo<ResourceTableBatchAction<DaemonSet>[]>(
+    () => [
+      {
+        id: 'restart',
+        label: t('common.actions.restart'),
+        icon: <IconReload className="size-4" />,
+        onSelect: (daemonSets) => {
+          setBatchDaemonSets(daemonSets)
+          setIsRestartDialogOpen(true)
+        },
+      },
+      {
+        id: 'image',
+        label: t('resourceTable.batchActions.updateImage'),
+        icon: <IconBox className="size-4" />,
+        onSelect: (daemonSets) => {
+          setBatchDaemonSets(daemonSets)
+          setBatchImage('')
+          setBatchImageContainer('')
+          setIsImageDialogOpen(true)
+        },
+      },
+    ],
+    [t]
+  )
 
   // Define columns for the daemonset table
   const columns = useMemo(
@@ -130,11 +176,99 @@ export function DaemonSetListPage() {
   )
 
   return (
-    <ResourceTable
-      enableYamlExport
-      resourceName={'DaemonSets'}
-      columns={columns}
-      searchQueryFilter={daemonSetSearchFilter}
-    />
+    <>
+      <ResourceTable
+        enableYamlExport
+        resourceName={'DaemonSets'}
+        columns={columns}
+        searchQueryFilter={daemonSetSearchFilter}
+        batchActions={batchActions}
+      />
+
+      <ResourceBatchActionDialog
+        open={isRestartDialogOpen}
+        onOpenChange={setIsRestartDialogOpen}
+        resources={batchDaemonSets}
+        title={t('resourceTable.batchActions.restartResourcesTitle', {
+          count: batchDaemonSets.length,
+          resource: t('nav.daemonsets'),
+        })}
+        description={t(
+          'resourceTable.batchActions.restartResourcesDescription',
+          { resource: t('nav.daemonsets') }
+        )}
+        actionLabel={t('common.actions.restart')}
+        onExecute={(daemonSet) =>
+          restartWorkload(
+            'daemonsets',
+            daemonSet.metadata!.name!,
+            daemonSet.metadata!.namespace!
+          )
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['daemonsets'] })
+        }
+        destructive={true}
+      />
+
+      <ResourceBatchActionDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        resources={batchDaemonSets}
+        title={t('resourceTable.batchActions.imageResourcesTitle', {
+          count: batchDaemonSets.length,
+          resource: t('nav.daemonsets'),
+        })}
+        description={t('resourceTable.batchActions.imageResourcesDescription', {
+          resource: t('nav.daemonsets'),
+        })}
+        actionLabel={t('resourceTable.batchActions.updateImage')}
+        executeDisabled={!batchImage.trim()}
+        options={(disabled) => (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="batch-image">
+                {t('resourceTable.batchActions.imageLabel')}
+              </Label>
+              <Input
+                id="batch-image"
+                value={batchImage}
+                disabled={disabled}
+                onChange={(e) => setBatchImage(e.target.value)}
+                className="font-mono text-xs"
+                placeholder="nginx:1.27"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="batch-image-container">
+                {t('resourceTable.batchActions.imageContainerLabel')}
+              </Label>
+              <Input
+                id="batch-image-container"
+                value={batchImageContainer}
+                disabled={disabled}
+                onChange={(e) => setBatchImageContainer(e.target.value)}
+                className="font-mono text-xs"
+                placeholder={t(
+                  'resourceTable.batchActions.imageContainerPlaceholder'
+                )}
+              />
+            </div>
+          </div>
+        )}
+        onExecute={(daemonSet) =>
+          updateWorkloadImage({
+            kind: 'daemonsets',
+            namespace: daemonSet.metadata!.namespace!,
+            name: daemonSet.metadata!.name!,
+            container: batchImageContainer.trim() || undefined,
+            image: batchImage.trim(),
+          })
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['daemonsets'] })
+        }
+      />
+    </>
   )
 }

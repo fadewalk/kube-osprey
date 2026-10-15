@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react'
 import {
+  IconArrowsVertical,
+  IconBox,
   IconCircleCheckFilled,
   IconLoader,
   IconReload,
@@ -10,10 +12,13 @@ import { StatefulSet } from 'kubernetes-types/apps/v1'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 
-import { restartWorkload } from '@/lib/api'
+import { patchResource, restartWorkload } from '@/lib/api'
+import { updateWorkloadImage } from '@/lib/api/workload-ops'
 import { createSearchFilter } from '@/lib/k8s'
 import { formatDate } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { ResourceBatchActionDialog } from '@/components/resource-batch-action-dialog'
 import {
   ResourceTable,
@@ -32,7 +37,15 @@ export function StatefulSetListPage() {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [isRestartDialogOpen, setIsRestartDialogOpen] = useState(false)
+  const [isScaleDialogOpen, setIsScaleDialogOpen] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
   const [batchStatefulSets, setBatchStatefulSets] = useState<StatefulSet[]>([])
+  const [scaleReplicas, setScaleReplicas] = useState('1')
+  const [batchImage, setBatchImage] = useState('')
+  const [batchImageContainer, setBatchImageContainer] = useState('')
+
+  const replicas = Number(scaleReplicas)
+  const scaleValid = Number.isInteger(replicas) && replicas >= 0
 
   const batchActions = useMemo<ResourceTableBatchAction<StatefulSet>[]>(
     () => [
@@ -43,6 +56,27 @@ export function StatefulSetListPage() {
         onSelect: (statefulSets) => {
           setBatchStatefulSets(statefulSets)
           setIsRestartDialogOpen(true)
+        },
+      },
+      {
+        id: 'scale',
+        label: t('common.actions.scale'),
+        icon: <IconArrowsVertical className="size-4" />,
+        onSelect: (statefulSets) => {
+          setBatchStatefulSets(statefulSets)
+          setScaleReplicas('1')
+          setIsScaleDialogOpen(true)
+        },
+      },
+      {
+        id: 'image',
+        label: t('resourceTable.batchActions.updateImage'),
+        icon: <IconBox className="size-4" />,
+        onSelect: (statefulSets) => {
+          setBatchStatefulSets(statefulSets)
+          setBatchImage('')
+          setBatchImageContainer('')
+          setIsImageDialogOpen(true)
         },
       },
     ],
@@ -194,6 +228,108 @@ export function StatefulSetListPage() {
           queryClient.invalidateQueries({ queryKey: ['statefulsets'] })
         }
         destructive={true}
+      />
+
+      <ResourceBatchActionDialog
+        open={isScaleDialogOpen}
+        onOpenChange={setIsScaleDialogOpen}
+        resources={batchStatefulSets}
+        title={t('resourceTable.batchActions.scaleResourcesTitle', {
+          count: batchStatefulSets.length,
+          resource: t('nav.statefulsets'),
+        })}
+        description={t('resourceTable.batchActions.scaleResourcesDescription', {
+          resource: t('nav.statefulsets'),
+        })}
+        actionLabel={t('common.actions.scale')}
+        executeDisabled={!scaleValid}
+        options={(disabled) => (
+          <div className="space-y-1">
+            <Label htmlFor="batch-scale-replicas">
+              {t('resourceTable.batchActions.scaleReplicasLabel')}
+            </Label>
+            <Input
+              id="batch-scale-replicas"
+              type="number"
+              min={0}
+              value={scaleReplicas}
+              disabled={disabled}
+              onChange={(e) => setScaleReplicas(e.target.value)}
+            />
+          </div>
+        )}
+        onExecute={(statefulSet) =>
+          patchResource(
+            'statefulsets',
+            statefulSet.metadata!.name!,
+            statefulSet.metadata!.namespace!,
+            {
+              spec: { replicas },
+            }
+          )
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['statefulsets'] })
+        }
+      />
+
+      <ResourceBatchActionDialog
+        open={isImageDialogOpen}
+        onOpenChange={setIsImageDialogOpen}
+        resources={batchStatefulSets}
+        title={t('resourceTable.batchActions.imageResourcesTitle', {
+          count: batchStatefulSets.length,
+          resource: t('nav.statefulsets'),
+        })}
+        description={t('resourceTable.batchActions.imageResourcesDescription', {
+          resource: t('nav.statefulsets'),
+        })}
+        actionLabel={t('resourceTable.batchActions.updateImage')}
+        executeDisabled={!batchImage.trim()}
+        options={(disabled) => (
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="batch-image">
+                {t('resourceTable.batchActions.imageLabel')}
+              </Label>
+              <Input
+                id="batch-image"
+                value={batchImage}
+                disabled={disabled}
+                onChange={(e) => setBatchImage(e.target.value)}
+                className="font-mono text-xs"
+                placeholder="nginx:1.27"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="batch-image-container">
+                {t('resourceTable.batchActions.imageContainerLabel')}
+              </Label>
+              <Input
+                id="batch-image-container"
+                value={batchImageContainer}
+                disabled={disabled}
+                onChange={(e) => setBatchImageContainer(e.target.value)}
+                className="font-mono text-xs"
+                placeholder={t(
+                  'resourceTable.batchActions.imageContainerPlaceholder'
+                )}
+              />
+            </div>
+          </div>
+        )}
+        onExecute={(statefulSet) =>
+          updateWorkloadImage({
+            kind: 'statefulsets',
+            namespace: statefulSet.metadata!.namespace!,
+            name: statefulSet.metadata!.name!,
+            container: batchImageContainer.trim() || undefined,
+            image: batchImage.trim(),
+          })
+        }
+        onComplete={() =>
+          queryClient.invalidateQueries({ queryKey: ['statefulsets'] })
+        }
       />
     </>
   )

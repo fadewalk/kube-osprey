@@ -618,7 +618,7 @@ export const patchResource = async <T extends ResourceType>(
 }
 
 export const restartWorkload = async (
-  resource: 'deployments' | 'statefulsets',
+  resource: 'deployments' | 'statefulsets' | 'daemonsets',
   name: string,
   namespace: string
 ): Promise<void> => {
