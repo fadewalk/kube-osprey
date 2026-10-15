@@ -1,8 +1,8 @@
 # Kite 项目交接文档
 
-> 更新时间：2026-10-10
+> 更新时间：2026-10-13
 > 当前分支：`feat/kubepi-value-mvp`
-> 当前 HEAD：`dfd2905 feat: add workload quick operations`（**未推送**，领先 origin/main 12 个提交，fadewalk/kite 上游无此分支更新）
+> 当前 HEAD：`ae56105 feat: add terminal clipboard menu, shortcuts, and auto-reconnect`（**已推送**至 fadewalk/kite，与远端同步；origin 仍指 kite-org/kite 上游，推送用 `git push fadewalk <branch>`）
 
 本文档用于把当前 Kite / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
 
@@ -450,3 +450,95 @@ Kuboard 三阶段全部交付并真实集群（colima-xwssd k3s v1.35）验收�
 `make dev` 起后端(8080)+vite(5173，若被占用顺延 5174)；登录 `admin` / `KiteDev#2026`
 （dev.db 密码已重置）。真实集群 colima-xwssd 已导入；同步引擎/MCP 均可在
 Settings → General 打开后按各卡片说明验证。
+
+---
+
+## 11. Kuboard 收尾与产品化补齐（2026-10-11 → 2026-10-13 本轮）
+
+第 10 节之后的三轮工作：KubePolaris Tier1、Kuboard 走查加固、以及对标收官
+（用户/授权/终端/导航全面补齐）。**本节取代第 10 节末尾的"遗留"清单**——
+其中 G5（用户组）、G7（拓扑关系）、G10（调试容器，`pod_debug_handler.go`
+早已实现）均已交付或确认存在；真正剩余的队列见本节末尾。
+
+### 提交清单（按主题，旧 → 新）
+
+KubePolaris Tier1 吸收：
+
+| Commit | 内容 |
+| --- | --- |
+| `f7a825c` | AlertManager 告警中心（`/alerts`，静默管理，`pkg/alertmanager`） |
+| `293741e` | 多 Pod 聚合日志中心（`/logs`，支持 `?namespace=&selector=` 深链） |
+| `8f5d48c` | 集群健康诊断页（`/diagnostics`，健康评分） |
+
+Kuboard v4.3 走查加固：
+
+| Commit | 内容 |
+| --- | --- |
+| `5210221` | HTTP 操作审计日志（`operation_logs` + RequestID 中间件） |
+| `692e2cc` | 概览页待办卡（审批/告警/密码过期）+ 集群健康卡 |
+| `92c0e06` | 密码策略：长度/复杂度/有效期/历史密码，全入口校验，过期 403 |
+| `23f9e7b` | Gateway API 补齐 TLS/TCP/UDPRoute（**新泛型资源须同时注册 registry + scheme**）+ 审计请求编号 + 日志中心深链 |
+| `1acd57b` | Pod 列表行内日志直达（`?tab=logs`） |
+| `446b230` | **G7** 拓扑 selector/config/storage 三类关系边（PVC 入白名单；Secret 引用生成占位节点，**不镜像内容**） |
+
+对标收官（用户/授权/展示层）：
+
+| Commit | 内容 |
+| --- | --- |
+| `20f3d16` | YAML 导出（详情下载 + 18 列表批量多文档导出）+ StatefulSet/DaemonSet/Job 行内日志入口 |
+| `6b9cebf` | Pod 状态条件时间线卡（Scheduled/Initialized/ContainersReady/Ready + 通用回退） |
+| `cc26521` | 事件存活/消亡过滤（30 分钟窗口，默认存活） |
+| `d1db055` | 白标设置：站点标题 + Logo（bootstrap `branding` 块，登录页/侧边栏/页面标题消费） |
+| `4dacdf9` | 修复：`bootstrap?.branding?.siteTitle` 必须可选链（旧后端无该块时白屏） |
+| `02200fd` | 角色权限矩阵编辑器（简单/高级双模式）+ 用户「查看权限」合并视图 |
+| `24cc6f5` | **本地用户组**：用户→用户组→角色链路，成员绑定可带失效日期 |
+| `05d1228` | 侧边栏三级嵌套（网络→服务与路由/Gateway API）+ 中文侧边栏单行化（英文移到面包屑括号） |
+| `e8653d4` | 修复子组重复 id（联动折叠 + 渲染错乱根因，见下） |
+| `4016bd9`/`61fb950` | 命名空间分类仪表盘（`/namespaces/:name`）+ `?namespace=` 深链 |
+| `6d2baf6` | Helm Release 历史逐版本 Values diff（与上一版对比，Monaco 左右分栏） |
+| `256db1c` | 修复侧边栏版本号与 commit 链接（见下） |
+| `ae56105` | 终端右键菜单/剪贴板快捷键/断线自动重连 + WS 回环来源豁免 |
+
+### 关键实现位置
+
+- 用户/授权：`pkg/model/user_group.go`、`pkg/users/group_handler.go`（路由 `/api/v1/admin/user-groups`）、`pkg/rbac/rbac.go`（`localGroupNamesForLocked` 并入角色解析）、前端 `ui/src/components/settings/user-group-management.tsx`、`permission-matrix.tsx`（共享矩阵/合并视图，`cellGranted` 镜像后端 `match()` 语义）、`user-permissions-dialog.tsx`
+- 仪表盘/导出：`ui/src/pages/namespace-dashboard.tsx`、`ui/src/lib/yaml-export.ts`（ResourceTable `enableYamlExport` prop）
+- 终端：`ui/src/components/terminal-content.tsx`（`attachCustomKeyEventHandler`、`sendStdinRef`、右键菜单、`autoRetryRef` 自动重连）
+- 嵌套侧边栏：`ui/src/contexts/sidebar-config-defaults.ts`（`SIDEBAR_CONFIG_VERSION = 9`，`migrateSidebarItem` 递归保留 children）
+- 白标：`pkg/model/general_setting.go`（siteTitle/siteLogo）、`pkg/auth/bootstrap_handler.go`（branding 块）
+
+### 设计要点与坑（不要回退/不要再踩）
+
+- **生成 item id 必须唯一**：子组父项无 url，曾从空串推导出相同 id → React key 冲突（行重叠错乱）+ 折叠状态共用（点一个另一个跟着动）；已改为 titleKey slug，迁移时对重复 id 加后缀
+- **本地组权限继承不走 JWT**：组成员表进内存缓存（`loadRolesFromDB` 一并加载），`GetUserRoles` 把本地组名并入匹配集；成员/启停变更后调 `rbac.TriggerSync()`。实测：零直接角色的用户入组（绑 admin 角色）登录后可访问 admin API
+- **cronjob 列表没有日志深链**：其 jobTemplate selector 在 Job 创建前为 nil，推不出来
+- **角色模型是四元组笛卡尔积**（clusters×namespaces×resources×verbs，支持 `*`/`!`/正则）：一个角色表达不了"Pods 只读 + Deployments 读写"的逐格配对，矩阵编辑器只是真实可视化；含 `!` 或正则的角色打开时自动切高级模式
+- **事件 TTL**：安静集群 Alive/Dead 两个过滤都是空属正常（事件早已过期），不是 bug
+- **新泛型资源注册**：registry + `pkg/kube/client.go` scheme 两处都要（见 `23f9e7b`）；rbac 单测的 AutoMigrate 清单也要同步加新表
+- **重建后端必须带 LDFLAGS**：裸 `go build -o kite .` 会把版本信息剥成 `vdev • unknown`。用 `make kite`；新 `scripts/get-repo-url.sh` 从当前分支跟踪的远程推导 commit 链接仓库（fork 克隆指向 fork）
+- **WS 回环豁免**：`ValidateWebSocketOrigin` 放行 localhost/127.0.0.1/::1（任意端口）——Vite 代理 5174→8080 必需，生产同源不受影响
+- **make 管道坑**：`make pre-commit 2>&1 | tail && git …` 会在 make 失败时继续执行 git（管道掩盖退出码）；且 cd 过 ui/ 后 make 找不到 target。pre-commit 单独在仓库根跑
+- **语言存储键是 `i18nextLng`**（不是 `language`）；中文侧边栏已单行化，英文术语放面包屑括号（`glossed()` in dynamic-breadcrumb.tsx）——勿恢复两行样式
+- **本地集群状态**：kubectl context `colima-xwssd` 是活集群（k3s v1.35）；默认 `colima` profile 曾死过，`colima start` 起的是另一个。UI 新会话默认选中死集群会报 "cluster not found"，切到 colima-xwssd 即可
+- **dev 进程跨会话会丢**：vite 用 `cd ui && nohup pnpm exec vite --port 5174 --strictPort > /tmp/kite-vite.log 2>&1 &` 重启（5173 被旧进程 91147 占用）；后端 `make kite` 后 `pkill -f '^\./kite -v=5'` 再 `KITE_ALLOW_INSECURE_DEFAULTS=true nohup ./kite -v=5 &`
+- **IAB/无头沙箱剪贴板**：`navigator.clipboard` 读写会被权限拒绝（代码路径相同，真实浏览器正常）；终端导出的 blob 下载在沙箱里看不到文件
+
+### 剩余队列（均按需求触发，无阻塞）
+
+| 项 | 说明 |
+| --- | --- |
+| 组绑角色级失效日期 | 需扩 RoleAssignment 模型（当前只有成员级有 ExpiresAt）；补完授权链路 |
+| 解锁提示 / 首登强制改密 | 登录流 UX 收尾（密码策略已就绪，差引导层） |
+| CI/CD webhook | 已有 API Key + Helm 升级 + 变更计划积木，差触发端点与 payload 设计；等真实 GitOps 需求 |
+| 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠 |
+| G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
+| G8 多集群聚合首页 | overview 已有单集群健康卡，多集群聚合等真实多集群需求 |
+| 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
+| 上游同步 | 分支领先上游较多，择机 rebase/PR 回 kite-org（注意本节所有设计要点不回退） |
+
+### 本地验证环境（2026-10-13 实测）
+
+- 后端：仓库根 `make kite` → `KITE_ALLOW_INSECURE_DEFAULTS=true ./kite -v=5`（:8080，version 端点返回真实 v0.16.1-p58）
+- 前端：`cd ui && pnpm exec vite --port 5174 --strictPort`（5173 被旧进程占用）；登录 `admin` / `KiteDev#2026`
+- 集群：kubectl context `colima-xwssd`（k3s v1.35，kite 注册的是该集群，非默认 colima）
+- 本轮全量实测通过项：用户组创建/成员/绑角色/权限继承（API 级证明）、权限矩阵、YAML 导出按钮、事件过滤（删 metrics-server pod 造新事件）、白标三处生效、Pod 条件时间线、嵌套侧边栏独立折叠、面包屑双语、Helm 三版本 diff（本地 helm CLI 造 diffdemo）、终端右键菜单/清屏/自动重连/输入（后端重启模拟断线）
