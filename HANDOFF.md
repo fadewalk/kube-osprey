@@ -525,8 +525,11 @@ Kuboard v4.3 走查加固：
 
 ### 剩余队列（均按需求触发，无阻塞）
 
+> 2026-10-15 更新：上一会话遗留的「批量操作增强」已交付（`eb61ed7`：批量缩容 + 批量改镜像覆盖 Deployment/StatefulSet/DaemonSet，DaemonSet 补齐批量重启）；「MFA/TOTP」按其建议入队为下一个高价值项。
+
 | 项 | 说明 |
 | --- | --- |
+| MFA/TOTP 两步验证 | 密码策略已就绪；Kuboard v4 的 TOTP 语义可参照 `kite/kuboard-reference/`，差模型字段、绑定/校验流程与登录页 UX |
 | 组绑角色级失效日期 | 需扩 RoleAssignment 模型（当前只有成员级有 ExpiresAt）；补完授权链路 |
 | 解锁提示 / 首登强制改密 | 登录流 UX 收尾（密码策略已就绪，差引导层） |
 | CI/CD webhook | 已有 API Key + Helm 升级 + 变更计划积木，差触发端点与 payload 设计；等真实 GitOps 需求 |
@@ -534,7 +537,7 @@ Kuboard v4.3 走查加固：
 | G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
 | G8 多集群聚合首页 | overview 已有单集群健康卡，多集群聚合等真实多集群需求 |
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
-| 上游同步 | 分支领先上游较多，择机 rebase/PR 回 kite-org（注意本节所有设计要点不回退） |
+| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 Osprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并 |
 
 ### 本地验证环境（2026-10-13 实测）
 
