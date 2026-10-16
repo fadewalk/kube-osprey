@@ -198,6 +198,11 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 	changePlanAPI.POST("/:id/reject", changePlanService.RejectChangePlan)
 	changePlanAPI.POST("/:id/rollback", changePlanService.RollbackChangePlan)
 
+	helmReleaseHandler := resources.NewHelmReleaseHandler()
+	webhookAPI := api.Group("/webhooks")
+	webhookAPI.Use(authHandler.RequireAuth(), authHandler.RequireAdmin())
+	webhookAPI.POST("/helm-upgrade", helmReleaseHandler.HelmUpgradeWebhook(cm))
+
 	defaultAPI := api.Group("")
 	defaultAPI.Use(authHandler.RequireAuth(), middleware.ClusterMiddleware(cm))
 	registerClusterProtectedRoutes(defaultAPI, helmChartsHandler)

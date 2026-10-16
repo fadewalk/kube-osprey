@@ -63,6 +63,7 @@ var operationRouteMap = map[string]operationInfo{
 	"POST /api/v1/change-plans/:id/approve":                              {Module: "changeplans", Action: "approve", Resource: "change-plan"},
 	"POST /api/v1/change-plans/:id/reject":                               {Module: "changeplans", Action: "reject", Resource: "change-plan"},
 	"POST /api/v1/change-plans/:id/rollback":                             {Module: "changeplans", Action: "rollback", Resource: "change-plan"},
+	"POST /api/v1/webhooks/helm-upgrade":                                 {Module: "webhook", Action: "upgrade", Resource: "helm-release"},
 	"POST /api/v1/resources/apply":                                       {Module: "resources", Action: "apply", Resource: "resource"},
 	"POST /api/v1/workload-ops/update-image":                             {Module: "workloads", Action: "update-image", Resource: "workload"},
 	"POST /api/v1/workload-ops/restart":                                  {Module: "workloads", Action: "restart", Resource: "workload"},

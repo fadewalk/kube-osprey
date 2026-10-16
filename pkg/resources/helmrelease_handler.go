@@ -1,6 +1,7 @@
 package resources
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -300,14 +301,17 @@ func (h *HelmReleaseHandler) DryRunUpgrade(c *gin.Context) {
 }
 
 func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result helmReleaseRunResult, status int, err error) {
-	ctx := c.Request.Context()
-	namespace, name := c.Param("namespace"), c.Param("name")
+	cs := c.MustGet("cluster").(*cluster.ClientSet)
+	user := c.MustGet("user").(model.User)
 	var req helmReleaseActionRequest
 	if err := c.ShouldBindJSON(&req); err != nil && !errors.Is(err, io.EOF) {
 		return helmReleaseRunResult{}, http.StatusBadRequest, err
 	}
+	return h.executeUpgrade(c.Request.Context(), cs, user, c.Param("namespace"), c.Param("name"), req, dryRun)
+}
 
-	cfg, err := h.actionConfig(c, namespace)
+func (h *HelmReleaseHandler) executeUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, namespace, name string, req helmReleaseActionRequest, dryRun bool) (result helmReleaseRunResult, status int, err error) {
+	cfg, err := h.actionConfigForClientSet(cs, helmutil.StorageNamespace(namespace))
 	if err != nil {
 		return helmReleaseRunResult{}, http.StatusInternalServerError, err
 	}
@@ -321,7 +325,7 @@ func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result hel
 	result.current = current
 	if !dryRun {
 		defer func() {
-			h.recordHistory(c, "upgrade", name, namespace, current, result.release, err == nil, err)
+			helmutil.RecordReleaseHistory(cs.Name, user.ID, "manual", "upgrade", name, namespace, current, result.release, err == nil, err)
 		}()
 	}
 
@@ -347,9 +351,9 @@ func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result hel
 	}
 	description := req.Description
 	if description == "" {
-		description = "Dry run upgrade requested from Kite"
+		description = "Dry run upgrade requested from Osprey"
 		if !dryRun {
-			description = "Upgrade requested from Kite"
+			description = "Upgrade requested from Osprey"
 		}
 	}
 
