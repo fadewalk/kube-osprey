@@ -117,6 +117,14 @@ export function LoginPage() {
       )
     } catch (err) {
       if (err instanceof Error) {
+        const retryAfter = (err as Error & { retryAfterSeconds?: number })
+          .retryAfterSeconds
+        if (typeof retryAfter === 'number' && retryAfter > 0) {
+          setCredentialError(
+            t('login.errors.tooManyAttempts', { seconds: retryAfter })
+          )
+          return
+        }
         if (err.message === 'mfa_required') {
           setMfaRequired(true)
           setCredentialError(null)

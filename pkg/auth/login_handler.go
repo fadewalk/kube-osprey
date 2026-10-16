@@ -152,7 +152,8 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 	}
 	clientIP := c.ClientIP()
 	if credentialLoginAttempts.isBlocked(clientIP) {
-		c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError})
+		retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 		return
 	}
 
@@ -166,7 +167,8 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 		errMsg := fmt.Sprintf("%s login failed for %s: %v", strings.ToUpper(provider), username, err)
 		if isCredentialFailure(err) {
 			if shouldRecordCredentialLoginFailure(provider, err) && credentialLoginAttempts.recordFailure(clientIP) {
-				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError})
+				retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 				return
 			}
 			c.JSON(http.StatusUnauthorized, gin.H{"error": errMsg})
@@ -183,7 +185,8 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 		}
 		if !mfa.Verify(string(user.MFASecret), req.MFACode) {
 			if credentialLoginAttempts.recordFailure(clientIP) {
-				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError})
+				retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 				return
 			}
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "invalid_mfa_code"})
@@ -229,6 +232,11 @@ func (h *AuthHandler) completePasswordLikeLogin(c *gin.Context, user *model.User
 	}
 
 	setCookieSecure(c, "auth_token", jwtToken, common.CookieExpirationSeconds)
+
+	if user.MustChangePassword {
+		c.JSON(http.StatusOK, gin.H{"mustChangePassword": true})
+		return
+	}
 
 	c.Status(http.StatusNoContent)
 }

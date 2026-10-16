@@ -91,9 +91,20 @@ class ApiClient {
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}))
-      throw new Error(
+      if (
+        response.status === 403 &&
+        errorData.error === 'password_change_required'
+      ) {
+        // Reload so bootstrap flips the UI into the forced password-change
+        // view instead of leaking 403s from every in-flight request.
+        window.location.reload()
+        return await new Promise<never>(() => {})
+      }
+      const error = new Error(
         errorData.error || `HTTP error! status: ${response.status}`
-      )
+      ) as Error & { retryAfterSeconds?: number }
+      error.retryAfterSeconds = errorData.retryAfterSeconds
+      throw error
     }
 
     const contentType = response.headers.get('content-type')

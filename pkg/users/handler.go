@@ -27,10 +27,11 @@ func CreatePasswordUser(c *gin.Context) {
 	}
 	// check only admin or users count is zero
 	user := &model.User{
-		Username: userreq.Username,
-		Password: userreq.Password,
-		Name:     userreq.Name,
-		Provider: "password",
+		Username:           userreq.Username,
+		Password:           userreq.Password,
+		Name:               userreq.Name,
+		Provider:           "password",
+		MustChangePassword: true,
 	}
 
 	_, err := model.GetUserByUsername(user.Username)
@@ -178,6 +179,14 @@ func ChangeCurrentUserPassword(c *gin.Context) {
 	if err := model.ResetPasswordByID(user.ID, req.NewPassword); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to change password"})
 		return
+	}
+	if user.MustChangePassword {
+		// ResetPasswordByID saves the whole loaded row, so the flag has to be
+		// cleared explicitly after a successful self-service change.
+		if err := model.SetMustChangePassword(user.ID, false); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to clear password change flag"})
+			return
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
@@ -452,6 +461,10 @@ func ResetPassword(c *gin.Context) {
 	}
 	if err := model.ResetPasswordByID(id, req.Password); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to reset password"})
+		return
+	}
+	if err := model.SetMustChangePassword(id, true); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to flag password reset"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"success": true})

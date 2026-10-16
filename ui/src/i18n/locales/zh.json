@@ -787,7 +787,18 @@
       "userDisabled": "账号已禁用",
       "userDisabledMessage": "你的账号已被禁用，请联系管理员。",
       "notInAllowedGroups": "认证成功，但账号不属于 {{provider}} 的允许群组。",
-      "notInAllowedGroupsDetails": "请联系管理员将你加入允许的群组。"
+      "notInAllowedGroupsDetails": "请联系管理员将你加入允许的群组。",
+      "tooManyAttempts": "登录尝试过多，已锁定 {{seconds}} 秒，请稍后重试或联系管理员解锁。"
+    },
+    "forceChangePassword": {
+      "title": "设置新密码",
+      "description": "出于安全考虑，首次登录或密码被重置后，需要先设置新密码才能继续使用。",
+      "currentPassword": "当前密码",
+      "newPassword": "新密码",
+      "confirmPassword": "确认新密码",
+      "submit": "保存并继续",
+      "mismatch": "两次输入的密码不一致",
+      "success": "密码已更新"
     }
   },
   "cluster": {

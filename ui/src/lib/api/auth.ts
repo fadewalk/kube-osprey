@@ -15,6 +15,7 @@ export interface AuthUser {
   avatar_url: string
   provider: string
   mfa_enabled?: boolean
+  mustChangePassword?: boolean
   roles?: { name: string }[]
   sidebar_preference?: string
   passwordExpiresAt?: string

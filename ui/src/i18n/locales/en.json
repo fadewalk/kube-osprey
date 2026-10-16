@@ -787,7 +787,18 @@
       "userDisabled": "User Disabled",
       "userDisabledMessage": "Your user account has been disabled. Please contact your administrator for more information.",
       "notInAllowedGroups": "Authentication succeeded, but your account is not a member of the allowed groups in {{provider}}.",
-      "notInAllowedGroupsDetails": "Please contact your administrator to be added to an allowed group."
+      "notInAllowedGroupsDetails": "Please contact your administrator to be added to an allowed group.",
+      "tooManyAttempts": "Too many login attempts. Locked for {{seconds}}s — try again later or ask an administrator to unlock."
+    },
+    "forceChangePassword": {
+      "title": "Set a new password",
+      "description": "For security, you must replace the initial or reset password before continuing.",
+      "currentPassword": "Current password",
+      "newPassword": "New password",
+      "confirmPassword": "Confirm new password",
+      "submit": "Save and continue",
+      "mismatch": "Passwords do not match",
+      "success": "Password updated"
     }
   },
   "cluster": {

@@ -32,6 +32,11 @@ type User struct {
 	// serialization; it is never persisted.
 	PasswordExpiresAt *time.Time `json:"passwordExpiresAt,omitempty" gorm:"-"`
 
+	// MustChangePassword is set when an administrator creates the account or
+	// resets its password; logins are restricted to the password-change
+	// endpoint until the user picks a new password.
+	MustChangePassword bool `json:"mustChangePassword" gorm:"column:must_change_password;not null;default:false"`
+
 	APIKey SecretString  `json:"apiKey,omitempty" gorm:"type:text"`
 	Roles  []common.Role `json:"roles,omitempty" gorm:"-"`
 
@@ -240,6 +245,16 @@ func DeleteUserByID(id uint) error {
 func UpdateUser(user *User) error {
 	err := DB.Save(user).Error
 	InvalidateUserCache(uint64(user.ID))
+	return err
+}
+
+// SetMustChangePassword toggles the forced password-change flag.
+func SetMustChangePassword(id uint, mustChange bool) error {
+	err := DB.Model(&User{}).Where("id = ?", id).
+		Update("must_change_password", mustChange).Error
+	if err == nil {
+		InvalidateUserCache(uint64(id))
+	}
 	return err
 }
 

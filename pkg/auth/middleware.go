@@ -112,6 +112,18 @@ func (h *AuthHandler) RequireAuth() gin.HandlerFunc {
 		}
 		user.Roles = rbac.GetUserRoles(*user)
 		c.Set("user", *user)
+		if user.MustChangePassword {
+			// Until the password is changed, only the password-change flow
+			// (plus whoami/logout/refresh) may be used.
+			switch c.FullPath() {
+			case "/api/users/me/password", "/api/auth/user", "/api/auth/logout", "/api/auth/refresh":
+				c.Next()
+			default:
+				c.JSON(http.StatusForbidden, gin.H{"error": "password_change_required"})
+				c.Abort()
+			}
+			return
+		}
 		c.Next()
 	}
 }

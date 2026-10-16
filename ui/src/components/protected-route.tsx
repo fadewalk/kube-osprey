@@ -1,5 +1,6 @@
 import { ReactNode } from 'react'
 import { useAuth } from '@/contexts/auth-context'
+import { ForceChangePasswordPage } from '@/pages/force-change-password'
 import { Navigate, useLocation } from 'react-router-dom'
 
 interface ProtectedRouteProps {
@@ -21,6 +22,10 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!user) {
     const href = location.pathname + location.search + location.hash
     return <Navigate to={`/login?href=${encodeURIComponent(href)}`} replace />
+  }
+
+  if (user.mustChangePassword) {
+    return <ForceChangePasswordPage />
   }
 
   const pendingRedirect = sessionStorage.getItem('loginRedirectHref')
