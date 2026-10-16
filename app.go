@@ -18,7 +18,6 @@ import (
 	"github.com/zxh326/kite/pkg/rbac"
 	"github.com/zxh326/kite/pkg/scheduler"
 	"github.com/zxh326/kite/pkg/syncengine"
-	"github.com/zxh326/kite/pkg/telemetry"
 	"github.com/zxh326/kite/pkg/templates"
 	"k8s.io/klog/v2"
 )
@@ -60,7 +59,6 @@ func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
 	}
 	scheduler.Start(ctx, cm)
 	plugins.Start(ctx)
-	telemetry.Start(ctx, cm)
 	syncengine.Init(cm)
 	ai.SetChangePlanRouter(changeplan.NewService(cm).ChatRouter())
 	appReady.Store(true)

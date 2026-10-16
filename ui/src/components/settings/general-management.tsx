@@ -65,7 +65,6 @@ interface GeneralSettingsFormData {
   mcpRateLimitPerMinute: number
   syncEngineEnabled: boolean
   syncEngineResources: string
-  enableAnalytics: boolean
   enableVersionCheck: boolean
   loginPrompt: string
   siteTitle: string
@@ -104,7 +103,6 @@ export function GeneralManagement() {
     mcpRateLimitPerMinute: 60,
     syncEngineEnabled: false,
     syncEngineResources: '',
-    enableAnalytics: true,
     enableVersionCheck: true,
     loginPrompt: '',
     siteTitle: '',
@@ -141,7 +139,6 @@ export function GeneralManagement() {
       mcpRateLimitPerMinute: data.mcpRateLimitPerMinute || 60,
       syncEngineEnabled: data.syncEngineEnabled ?? false,
       syncEngineResources: data.syncEngineResources || '',
-      enableAnalytics: data.enableAnalytics ?? false,
       enableVersionCheck: data.enableVersionCheck ?? true,
       loginPrompt: data.loginPrompt || '',
       siteTitle: data.siteTitle || '',
@@ -260,7 +257,6 @@ export function GeneralManagement() {
           : 60,
       syncEngineEnabled: formData.syncEngineEnabled,
       syncEngineResources: formData.syncEngineResources.trim(),
-      enableAnalytics: formData.enableAnalytics,
       enableVersionCheck: formData.enableVersionCheck,
       loginPrompt: formData.loginPrompt.trim(),
       siteTitle: formData.siteTitle.trim(),
@@ -854,25 +850,9 @@ export function GeneralManagement() {
             <p className="mt-1 text-xs text-muted-foreground">
               {t(
                 'generalManagement.runtime.description',
-                'Configure analytics and version checking behavior.'
+                'Configure version checking behavior.'
               )}
             </p>
-          </div>
-
-          <div className="flex items-center justify-between border-t p-3">
-            <Label htmlFor="general-enable-analytics" className="text-sm">
-              {t(
-                'generalManagement.runtime.form.enableAnalytics',
-                'Enable analytics'
-              )}
-            </Label>
-            <Switch
-              id="general-enable-analytics"
-              checked={formData.enableAnalytics}
-              onCheckedChange={(checked) =>
-                setFormData((prev) => ({ ...prev, enableAnalytics: checked }))
-              }
-            />
           </div>
 
           <div className="flex items-center justify-between border-t p-3">

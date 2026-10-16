@@ -43,7 +43,6 @@ func generalSettingResponse(setting *model.GeneralSetting) gin.H {
 		"mcpRateLimitPerMinute":    setting.MCPRateLimitPerMinute,
 		"syncEngineEnabled":        setting.SyncEngineEnabled,
 		"syncEngineResources":      setting.SyncEngineResources,
-		"enableAnalytics":          setting.EnableAnalytics,
 		"enableVersionCheck":       setting.EnableVersionCheck,
 		"passwordLoginDisabled":    setting.PasswordLoginDisabled,
 		"enableMFA":                setting.EnableMFA,
@@ -81,7 +80,6 @@ type UpdateGeneralSettingRequest struct {
 	AIChangePlanMode      *bool   `json:"aiChangePlanMode"`
 	SyncEngineEnabled     *bool   `json:"syncEngineEnabled"`
 	SyncEngineResources   *string `json:"syncEngineResources"`
-	EnableAnalytics       *bool   `json:"enableAnalytics"`
 	EnableVersionCheck    *bool   `json:"enableVersionCheck"`
 	PasswordLoginDisabled *bool   `json:"passwordLoginDisabled"`
 	EnableMFA             *bool   `json:"enableMFA"`
@@ -272,9 +270,6 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 			return
 		}
 		updates["mcp_rate_limit_per_minute"] = limit
-	}
-	if req.EnableAnalytics != nil {
-		updates["enable_analytics"] = *req.EnableAnalytics
 	}
 	if req.EnableVersionCheck != nil {
 		updates["enable_version_check"] = *req.EnableVersionCheck

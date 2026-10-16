@@ -451,7 +451,6 @@ export interface GeneralSetting {
   mcpRateLimitPerMinute: number
   syncEngineEnabled: boolean
   syncEngineResources: string
-  enableAnalytics: boolean
   enableVersionCheck: boolean
   passwordLoginDisabled: boolean
   enableMFA: boolean
@@ -488,7 +487,6 @@ export interface GeneralSettingUpdateRequest {
   mcpRateLimitPerMinute?: number
   syncEngineEnabled?: boolean
   syncEngineResources?: string
-  enableAnalytics?: boolean
   enableVersionCheck?: boolean
   passwordLoginDisabled?: boolean
   enableMFA?: boolean

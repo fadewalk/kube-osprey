@@ -27,7 +27,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 
@@ -44,7 +43,6 @@ export function InitializationPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [name, setName] = useState('')
-  const [enableAnalytics, setEnableAnalytics] = useState(true)
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
@@ -109,7 +107,6 @@ export function InitializationPage() {
         username,
         password,
         name: name || undefined,
-        enableAnalytics,
       })
       toast.success(t('initialization.step1.createSuccess'))
       try {
@@ -400,17 +397,6 @@ export function InitializationPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between gap-4 border-t pt-4">
-                  <Label htmlFor="setup-enable-analytics" className="text-sm">
-                    {t('generalManagement.runtime.form.enableAnalytics')}
-                  </Label>
-                  <Switch
-                    id="setup-enable-analytics"
-                    checked={enableAnalytics}
-                    onCheckedChange={setEnableAnalytics}
-                    disabled={isSubmitting}
-                  />
-                </div>
                 <Button
                   type="submit"
                   disabled={isSubmitting}

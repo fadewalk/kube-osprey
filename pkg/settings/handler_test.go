@@ -100,12 +100,10 @@ func setupGeneralSettingTestDB(t *testing.T, apiKey string) {
 	originalDB := model.DB
 	originalEncryptKey := common.KiteEncryptKey
 	originalJWTSecret := common.JwtSecret
-	originalAnalytics := common.EnableAnalytics
 	originalVersionCheck := common.EnableVersionCheck
 
 	common.KiteEncryptKey = "settings-handler-test-key"
 	common.JwtSecret = "settings-handler-test-jwt-secret"
-	common.EnableAnalytics = false
 	common.EnableVersionCheck = true
 
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
@@ -142,7 +140,6 @@ func setupGeneralSettingTestDB(t *testing.T, apiKey string) {
 		model.DB = originalDB
 		common.KiteEncryptKey = originalEncryptKey
 		common.JwtSecret = originalJWTSecret
-		common.EnableAnalytics = originalAnalytics
 		common.EnableVersionCheck = originalVersionCheck
 	})
 }

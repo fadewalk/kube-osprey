@@ -117,14 +117,12 @@ func setupAuthIntegrationDB(t *testing.T) *model.User {
 	originalDB := model.DB
 	originalEncryptKey := common.KiteEncryptKey
 	originalJWTSecret := common.JwtSecret
-	originalAnalytics := common.EnableAnalytics
 	originalVersionCheck := common.EnableVersionCheck
 	originalRBACConfig := rbac.RBACConfig
 	originalLimiter := credentialLoginAttempts
 
 	common.KiteEncryptKey = "auth-integration-test-key"
 	common.JwtSecret = "auth-integration-test-jwt-secret"
-	common.EnableAnalytics = false
 	common.EnableVersionCheck = true
 	credentialLoginAttempts = &credentialLoginAttemptLimiter{attempts: map[string]credentialLoginAttemptState{}}
 	rbac.RBACConfig = &common.RolesConfig{
@@ -175,7 +173,6 @@ func setupAuthIntegrationDB(t *testing.T) *model.User {
 		model.DB = originalDB
 		common.KiteEncryptKey = originalEncryptKey
 		common.JwtSecret = originalJWTSecret
-		common.EnableAnalytics = originalAnalytics
 		common.EnableVersionCheck = originalVersionCheck
 		rbac.RBACConfig = originalRBACConfig
 		credentialLoginAttempts = originalLimiter

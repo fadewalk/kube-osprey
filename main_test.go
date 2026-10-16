@@ -141,14 +141,11 @@ func TestSetupStatic(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	oldBase := common.Base
-	oldEnableAnalytics := common.EnableAnalytics
 	defer func() {
 		common.Base = oldBase
-		common.EnableAnalytics = oldEnableAnalytics
 	}()
 
 	common.Base = "/kite"
-	common.EnableAnalytics = true
 
 	r := gin.New()
 	setupStatic(r)
