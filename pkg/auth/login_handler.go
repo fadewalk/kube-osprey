@@ -152,7 +152,7 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 	}
 	clientIP := c.ClientIP()
 	if credentialLoginAttempts.isBlocked(clientIP) {
-		retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+		retryAfter := credentialLoginAttempts.blockRemainingSeconds(clientIP)
 		c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 		return
 	}
@@ -167,7 +167,7 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 		errMsg := fmt.Sprintf("%s login failed for %s: %v", strings.ToUpper(provider), username, err)
 		if isCredentialFailure(err) {
 			if shouldRecordCredentialLoginFailure(provider, err) && credentialLoginAttempts.recordFailure(clientIP) {
-				retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+				retryAfter := credentialLoginAttempts.blockRemainingSeconds(clientIP)
 				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 				return
 			}
@@ -185,7 +185,7 @@ func (h *AuthHandler) handleCredentialLogin(c *gin.Context, provider string, aut
 		}
 		if !mfa.Verify(string(user.MFASecret), req.MFACode) {
 			if credentialLoginAttempts.recordFailure(clientIP) {
-				retryAfter, _ := credentialLoginAttempts.blockRemainingSeconds(clientIP)
+				retryAfter := credentialLoginAttempts.blockRemainingSeconds(clientIP)
 				c.JSON(http.StatusTooManyRequests, gin.H{"error": tooManyCredentialLoginAttemptsError, "retryAfterSeconds": retryAfter})
 				return
 			}

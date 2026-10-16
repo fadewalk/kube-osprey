@@ -56,7 +56,7 @@ func (l *credentialLoginAttemptLimiter) isBlocked(ip string) bool {
 }
 
 // blockRemainingSeconds reports how many seconds the IP stays blocked.
-func (l *credentialLoginAttemptLimiter) blockRemainingSeconds(ip string) (int, bool) {
+func (l *credentialLoginAttemptLimiter) blockRemainingSeconds(ip string) int {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
@@ -65,12 +65,12 @@ func (l *credentialLoginAttemptLimiter) blockRemainingSeconds(ip string) (int, b
 
 	state, ok := l.attempts[ip]
 	if !ok || state.blockedUntil.IsZero() {
-		return 0, false
+		return 0
 	}
 	if remaining := time.Until(state.blockedUntil); remaining > 0 {
-		return int(remaining.Seconds()) + 1, true
+		return int(remaining.Seconds()) + 1
 	}
-	return 0, false
+	return 0
 }
 
 func (l *credentialLoginAttemptLimiter) recordFailure(ip string) bool {
