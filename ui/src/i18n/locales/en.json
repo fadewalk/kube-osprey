@@ -411,6 +411,7 @@
   },
   "nav": {
     "overview": "Overview",
+    "multiCluster": "Multi-Cluster",
     "prometheusExplorer": "PromQL Explorer",
     "changePlans": "Change Plans",
     "pods": "Pods",
@@ -805,6 +806,10 @@
     "loading": "Loading clusters...",
     "error": "Error loading clusters: {{error}}",
     "error403": "You do not have permission to access this cluster. Please contact your administrator for more information."
+  },
+  "multiCluster": {
+    "unreachable": "Unreachable",
+    "openCluster": "Open cluster"
   },
   "resourceTable": {
     "searchResources": "Search {{resource}}...",

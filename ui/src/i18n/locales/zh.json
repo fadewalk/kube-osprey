@@ -411,6 +411,7 @@
   },
   "nav": {
     "overview": "概览",
+    "multiCluster": "多集群总览",
     "prometheusExplorer": "PromQL 查询",
     "workloads": "工作负载",
     "pods": "Pod",
@@ -805,6 +806,10 @@
     "loading": "加载集群中...",
     "error": "加载集群失败：{{error}}",
     "error403": "你没有权限访问此集群，请联系管理员。"
+  },
+  "multiCluster": {
+    "unreachable": "无法连接",
+    "openCluster": "进入集群"
   },
   "resourceTable": {
     "searchResources": "搜索{{resource}}…",

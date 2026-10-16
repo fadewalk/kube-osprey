@@ -13,6 +13,7 @@ import { HelmChartListPage } from './pages/helm-chart-list-page'
 import { InitializationPage } from './pages/initialization'
 import { LogCenterPage } from './pages/log-center-page'
 import { LoginPage } from './pages/login'
+import { MultiClusterOverviewPage } from './pages/multi-cluster-overview'
 import { NamespaceDashboard } from './pages/namespace-dashboard'
 import { Overview } from './pages/overview'
 import { PluginManagementPage } from './pages/plugins'
@@ -74,6 +75,10 @@ export const router = createBrowserRouter(
         {
           path: 'topology',
           element: <TopologyPage />,
+        },
+        {
+          path: 'multi-cluster',
+          element: <MultiClusterOverviewPage />,
         },
         {
           path: 'plugins',

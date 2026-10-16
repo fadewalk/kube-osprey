@@ -6,6 +6,7 @@ import {
   IconClipboardCheck,
   IconFileText,
   IconGauge,
+  IconLayoutGrid,
   IconLoadBalancer,
   IconRoute,
   IconTopologyBus,
@@ -110,6 +111,11 @@ defaultMenus['sidebar.groups.application'].push({
   icon: IconTopologyBus,
 })
 defaultMenus['sidebar.groups.application'].push({
+  titleKey: 'nav.multiCluster',
+  url: '/multi-cluster',
+  icon: IconLayoutGrid,
+})
+defaultMenus['sidebar.groups.application'].push({
   titleKey: 'nav.helmCharts',
   url: '/charts',
   icon: getResourceIconComponent('IconPackage'),
@@ -157,7 +163,7 @@ const nestedSubgroups: Record<string, MenuItemData[]> = {}
   }
 }
 
-export const SIDEBAR_CONFIG_VERSION = 9
+export const SIDEBAR_CONFIG_VERSION = 10
 
 function getIconName(iconComponent: ComponentType<{ className?: string }>) {
   const entry = Object.entries(sidebarIconMap).find(

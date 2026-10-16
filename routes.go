@@ -179,6 +179,8 @@ func registerProtectedRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, 
 	api := r.Group("/api/v1")
 	api.Use(middleware.OperationAudit())
 	api.GET("/clusters", authHandler.RequireAuth(), cm.GetClusters)
+	multiClusterOverviewHandler := system.NewMultiClusterOverviewHandler(cm)
+	api.GET("/clusters/overview", authHandler.RequireAuth(), multiClusterOverviewHandler.GetMultiClusterOverview)
 	api.GET("/plugins", authHandler.RequireAuth(), plugins.ListActive)
 	api.GET("/plugins/:id/settings", authHandler.RequireAuth(), plugins.GetSetting)
 	api.PUT("/plugins/:id/settings", authHandler.RequireAuth(), authHandler.RequireAdmin(), plugins.UpdateSetting)
