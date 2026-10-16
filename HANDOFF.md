@@ -526,10 +526,10 @@ Kuboard v4.3 走查加固：
 ### 剩余队列（均按需求触发，无阻塞）
 
 > 2026-10-15 更新：上一会话遗留的「批量操作增强」已交付（`eb61ed7`：批量缩容 + 批量改镜像覆盖 Deployment/StatefulSet/DaemonSet，DaemonSet 补齐批量重启）；「MFA/TOTP」按其建议入队为下一个高价值项。
+> 2026-10-16 更新：① 批量操作已运行时实测通过（colima-xwssd 真实集群：批量缩容/改镜像/重启 + 容器名错误失败分支，UI 与集群状态双重复核）。② **MFA/TOTP 上游早已完整实现**（`pkg/mfa` TOTP、登录 `mfa_code` 挑战、账号设置与登录页 UI、全局 `enableMFA` 默认开启），此前"完全没有"的判断有误；已用一次性测试用户 API 级端到端验证全流程通过（setup 需重输密码 → enable → 无码登录 401 mfa_required → 正确码 204 → 错误码 401 → disable 恢复），otpauth issuer 已改为 Osprey。**无需再开发 MFA**。③ 该会话同类过时情报已有两例（批量重启、MFA），吸收其结论前先 grep 代码库确认。
 
 | 项 | 说明 |
 | --- | --- |
-| MFA/TOTP 两步验证 | 密码策略已就绪；Kuboard v4 的 TOTP 语义可参照 `kite/kuboard-reference/`，差模型字段、绑定/校验流程与登录页 UX |
 | 组绑角色级失效日期 | 需扩 RoleAssignment 模型（当前只有成员级有 ExpiresAt）；补完授权链路 |
 | 解锁提示 / 首登强制改密 | 登录流 UX 收尾（密码策略已就绪，差引导层） |
 | CI/CD webhook | 已有 API Key + Helm 升级 + 变更计划积木，差触发端点与 payload 设计；等真实 GitOps 需求 |
@@ -537,7 +537,7 @@ Kuboard v4.3 走查加固：
 | G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
 | G8 多集群聚合首页 | overview 已有单集群健康卡，多集群聚合等真实多集群需求 |
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
-| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 Osprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并 |
+| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 Osprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并） |
 
 ### 本地验证环境（2026-10-13 实测）
 
