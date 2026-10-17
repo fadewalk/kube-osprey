@@ -26,4 +26,4 @@ unset KITE_USERNAME
 unset KITE_PASSWORD
 unset KUBECONFIG
 
-exec ./osprey -v 3
+exec ./kube-osprey -v 3

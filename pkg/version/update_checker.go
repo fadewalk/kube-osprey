@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	githubLatestReleaseAPI = "https://api.github.com/repos/fadewalk/osprey/releases/latest"
+	githubLatestReleaseAPI = "https://api.github.com/repos/fadewalk/kube-osprey/releases/latest"
 	versionCheckTimeout    = 3 * time.Second
 	versionCacheTTL        = time.Hour
 )

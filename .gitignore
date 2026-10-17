@@ -45,7 +45,7 @@ docs/node_modules
 docs/.vitepress/cache
 
 kite
-osprey
+kube-osprey
 !charts/kite
 
 

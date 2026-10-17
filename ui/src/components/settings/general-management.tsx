@@ -884,7 +884,7 @@ export function GeneralManagement() {
             <p className="text-xs text-muted-foreground">
               {t(
                 'generalManagement.branding.description',
-                'Override the site name and logo shown on the login page and sidebar. Leave empty to keep the Osprey defaults.'
+                'Override the site name and logo shown on the login page and sidebar. Leave empty to keep the KubeOsprey defaults.'
               )}
             </p>
           </div>
@@ -905,7 +905,7 @@ export function GeneralManagement() {
                 }
                 placeholder={t(
                   'generalManagement.branding.siteTitlePlaceholder',
-                  'Leave empty to use "Osprey"'
+                  'Leave empty to use "KubeOsprey"'
                 )}
               />
             </div>
@@ -924,7 +924,7 @@ export function GeneralManagement() {
                 }
                 placeholder={t(
                   'generalManagement.branding.siteLogoPlaceholder',
-                  'Leave empty to use the Osprey logo'
+                  'Leave empty to use the KubeOsprey logo'
                 )}
               />
             </div>

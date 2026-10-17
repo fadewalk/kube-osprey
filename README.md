@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="./docs/assets/logo.svg" alt="Osprey logo" width="128" height="128">
+<img src="./docs/assets/logo.svg" alt="KubeOsprey logo" width="128" height="128">
 
-# Osprey
+# KubeOsprey
 
 **One console for all your clusters.**
 
-Osprey is a single-binary Kubernetes workspace for multi-cluster operations, observability, access control, and AI-assisted troubleshooting.
+KubeOsprey is a single-binary Kubernetes workspace for multi-cluster operations, observability, access control, and AI-assisted troubleshooting.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square)](LICENSE)
 
@@ -19,9 +19,9 @@ Osprey is a single-binary Kubernetes workspace for multi-cluster operations, obs
 <img width="1586" height="1167" alt="image" src="https://github.com/user-attachments/assets/5710204d-5d34-44af-85dc-3b436e205c12" />
 
 > [!NOTE]
-> Osprey is an independently maintained fork of [Kite](https://github.com/kite-org/kite) (Apache-2.0). It pulls useful upstream improvements but is developed separately and does not contribute changes back. Code-level identifiers (the Go module path and `KITE_*` environment variables) intentionally keep their original names so upstream changes keep merging cleanly.
+> KubeOsprey is an independently maintained fork of [Kite](https://github.com/kite-org/kite) (Apache-2.0). It pulls useful upstream improvements but is developed separately and does not contribute changes back. Code-level identifiers (the Go module path and `KITE_*` environment variables) intentionally keep their original names so upstream changes keep merging cleanly. KubeOsprey is an independent community project and is not affiliated with or endorsed by the Kubernetes project or the CNCF.
 
-## Why Osprey
+## Why KubeOsprey
 
 ### Observe
 
@@ -48,14 +48,14 @@ Osprey is a single-binary Kubernetes workspace for multi-cluster operations, obs
 
 ### Build from Source
 
-Building Osprey requires Go 1.26, Node.js `^20.19.0` or `>=22.12.0`, pnpm, and Make.
+Building KubeOsprey requires Go 1.26, Node.js `^20.19.0` or `>=22.12.0`, pnpm, and Make.
 
 ```bash
-git clone https://github.com/fadewalk/osprey.git
-cd osprey
+git clone https://github.com/fadewalk/kube-osprey.git
+cd kube-osprey
 make deps
 make build
-./osprey
+./kube-osprey
 ```
 
 ### Upstream Releases (Kite)
@@ -93,4 +93,4 @@ docker run -d --name kite \
 
 ## License
 
-Osprey is licensed under the [Apache License 2.0](LICENSE), inherited from Kite.
+KubeOsprey is licensed under the [Apache License 2.0](LICENSE), inherited from Kite.

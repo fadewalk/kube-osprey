@@ -14,7 +14,7 @@ export function Footer() {
               {t('login.documentation')}
             </a>
             <a
-              href="https://github.com/fadewalk/osprey"
+              href="https://github.com/fadewalk/kube-osprey"
               target="_blank"
               className="app-link"
             >

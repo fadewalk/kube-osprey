@@ -3,7 +3,7 @@ ARG TARGETARCH
 
 WORKDIR /app
 
-COPY bin/osprey-$TARGETARCH ./kite
+COPY bin/kube-osprey-$TARGETARCH ./kite
 
 EXPOSE 8080
 

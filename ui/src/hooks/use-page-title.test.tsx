@@ -3,6 +3,10 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import { usePageTitle } from './use-page-title'
 
+vi.mock('@/contexts/auth-context', () => ({
+  useAuth: () => ({ siteTitle: '' }),
+}))
+
 const createStorage = () => {
   const store = new Map<string, string>()
 
@@ -34,7 +38,7 @@ describe('usePageTitle', () => {
 
     const { unmount } = renderHook(() => usePageTitle('Dashboard'))
 
-    expect(document.title).toBe('Dashboard - Osprey')
+    expect(document.title).toBe('Dashboard - KubeOsprey')
 
     unmount()
 

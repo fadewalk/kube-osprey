@@ -351,9 +351,9 @@ func (h *HelmReleaseHandler) executeUpgrade(ctx context.Context, cs *cluster.Cli
 	}
 	description := req.Description
 	if description == "" {
-		description = "Dry run upgrade requested from Osprey"
+		description = "Dry run upgrade requested from KubeOsprey"
 		if !dryRun {
-			description = "Upgrade requested from Osprey"
+			description = "Upgrade requested from KubeOsprey"
 		}
 	}
 

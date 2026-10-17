@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Osprey is a single-binary Kubernetes console: Go backend, React/Vite frontend in
+KubeOsprey is a single-binary Kubernetes console: Go backend, React/Vite frontend in
 `ui/`, and built frontend assets embedded from `static/`.
 
 It is a brand-level fork of `kite-org/kite`: the Go module path
@@ -55,7 +55,7 @@ diff and referenced paths or commands; skip application tests and builds.
 
 ## Generated files
 
-- Do not hand-edit `static/`, `osprey`, `bin/`, or dependency/cache directories.
+- Do not hand-edit `static/`, `kube-osprey`, `bin/`, or dependency/cache directories.
   Regenerate frontend assets with `make frontend`.
 - Change `go.sum`, `ui/pnpm-lock.yaml`, or `e2e/pnpm-lock.yaml` only when
   dependency changes require it.

@@ -41,7 +41,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { config, isLoading } = useSidebarConfig()
   const { data: versionInfo } = useVersionInfo()
   const { siteTitle, siteLogo } = useAuth()
-  const brandTitle = siteTitle || 'Osprey'
+  const brandTitle = siteTitle || 'KubeOsprey'
   const brandLogo = siteLogo || Icon
 
   const [openAPIGroupItems, setOpenAPIGroupItems] = useState<

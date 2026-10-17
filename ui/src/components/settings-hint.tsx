@@ -114,7 +114,7 @@ export function SettingsHint({ onDismiss }: SettingsHintProps) {
         <CardDescription className="text-muted-foreground">
           {t(
             'settingsHint.description',
-            'Configure essential settings to get the most out of Osprey'
+            'Configure essential settings to get the most out of KubeOsprey'
           )}
         </CardDescription>
       </CardHeader>

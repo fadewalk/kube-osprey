@@ -34,8 +34,8 @@ func TestURL(t *testing.T) {
 	if parsed.Scheme != "otpauth" || parsed.Host != "totp" {
 		t.Fatalf("URL() = %q, want otpauth TOTP URL", value)
 	}
-	if parsed.Path != "/Kite:alice@example.com" {
-		t.Fatalf("URL path = %q, want %q", parsed.Path, "/Kite:alice@example.com")
+	if want := "/" + issuer + ":alice@example.com"; parsed.Path != want {
+		t.Fatalf("URL path = %q, want %q", parsed.Path, want)
 	}
 	if got := parsed.Query().Get("secret"); got != "SECRET" {
 		t.Fatalf("secret query = %q, want %q", got, "SECRET")

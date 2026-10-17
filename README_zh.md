@@ -1,12 +1,12 @@
 <div align="center">
 
-<img src="./docs/assets/logo.svg" alt="Osprey Logo" width="128" height="128">
+<img src="./docs/assets/logo.svg" alt="KubeOsprey Logo" width="128" height="128">
 
-# Osprey
+# KubeOsprey
 
 **所有集群，一个控制台。**
 
-Osprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维、可观测性、访问控制与 AI 辅助排障。
+KubeOsprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维、可观测性、访问控制与 AI 辅助排障。
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square)](LICENSE)
 
@@ -19,9 +19,9 @@ Osprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维、�
 <img width="1586" height="1167" alt="image" src="https://github.com/user-attachments/assets/a88a63b7-5b71-444d-8d98-66f147a68ef7" />
 
 > [!NOTE]
-> Osprey 是 [Kite](https://github.com/kite-org/kite)（Apache-2.0）的独立维护 fork：持续吸收上游有价值的更新，但独立发展、不向上游回传改动。代码层标识（Go module 路径、`KITE_*` 环境变量、`charts/kite`）刻意保留原名，以保证上游变更可以持续干净地合并。
+> KubeOsprey 是 [Kite](https://github.com/kite-org/kite)（Apache-2.0）的独立维护 fork：持续吸收上游有价值的更新，但独立发展、不向上游回传改动。代码层标识（Go module 路径、`KITE_*` 环境变量、`charts/kite`）刻意保留原名，以保证上游变更可以持续干净地合并。KubeOsprey 是独立的社区项目，与 Kubernetes 项目及 CNCF 无隶属或背书关系。
 
-## 为什么选择 Osprey
+## 为什么选择 KubeOsprey
 
 ### 可观测
 
@@ -48,14 +48,14 @@ Osprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维、�
 
 ### 从源码构建
 
-构建 Osprey 需要 Go 1.26、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
+构建 KubeOsprey 需要 Go 1.26、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
 
 ```bash
-git clone https://github.com/fadewalk/osprey.git
-cd osprey
+git clone https://github.com/fadewalk/kube-osprey.git
+cd kube-osprey
 make deps
 make build
-./osprey
+./kube-osprey
 ```
 
 ### 上游发行版（Kite）
@@ -93,4 +93,4 @@ docker run -d --name kite \
 
 ## 许可证
 
-Osprey 基于 [Apache License 2.0](LICENSE) 发布，许可继承自 Kite。
+KubeOsprey 基于 [Apache License 2.0](LICENSE) 发布，许可继承自 Kite。

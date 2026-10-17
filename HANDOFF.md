@@ -1,10 +1,10 @@
-# Osprey 项目交接文档
+# KubeOsprey 项目交接文档
 
-> 更新时间：2026-10-13（2026-10-15 品牌更名：项目品牌由 Kite 更名为 **Osprey**，仓库 `fadewalk/osprey`；品牌层仅覆盖 README/UI 文案/构建产物名，代码层标识（Go module `github.com/zxh326/kite`、`KITE_*` 环境变量、`charts/kite`）保留原名以保证上游合并。文中提到的 "Kite" 多指上游项目或历史语境。）
+> 更新时间：2026-10-13（2026-10-15 品牌更名：项目品牌由 Kite 更名为 **Osprey**；2026-10-17 加 `kube-` 前缀统一为 **KubeOsprey**——展示名 `KubeOsprey`（UI/i18n/README/MFA issuer/Helm 描述），slug `kube-osprey`（仓库 `fadewalk/kube-osprey`、二进制名、`ui/package.json`）。品牌层仅覆盖 README/UI 文案/构建产物名，代码层标识（Go module `github.com/zxh326/kite`、`KITE_*` 环境变量、`charts/kite`、Docker 镜像名 `kite`）保留原名以保证上游合并。文中提到的 "Kite" 多指上游项目或历史语境。）
 > 当前分支：`dev`（2026-10-17 由 `feat/kubepi-value-mvp` 改名——该分支已从一次性特性分支转为常驻开发线：上游更新先合入 dev，验证后快进 main）
-> 当前 HEAD：`ae56105 feat: add terminal clipboard menu, shortcuts, and auto-reconnect`（**已推送**；remote 布局：`origin` = fadewalk/osprey（本仓库），`upstream` = kite-org/kite（上游，仅 fetch），推送用 `git push origin <branch>`，拉上游用 `git fetch upstream`）
+> 当前 HEAD：`ae56105 feat: add terminal clipboard menu, shortcuts, and auto-reconnect`（**已推送**；remote 布局：`origin` = fadewalk/kube-osprey（本仓库，2026-10-17 由 fadewalk/osprey 改名，旧地址自动重定向），`upstream` = kite-org/kite（上游，仅 fetch），推送用 `git push origin <branch>`，拉上游用 `git fetch upstream`）
 
-本文档用于把当前 Osprey / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
+本文档用于把当前 KubeOsprey / KubePi 能力吸收工作交接给下一位开发者或 AI Agent。除非用户明确要求，不要重做已经完成的工作，也不要把本地工具目录加入提交。
 
 ## 1. 项目定位和总体决策
 
@@ -526,7 +526,7 @@ Kuboard v4.3 走查加固：
 ### 剩余队列（均按需求触发，无阻塞）
 
 > 2026-10-15 更新：上一会话遗留的「批量操作增强」已交付（`eb61ed7`：批量缩容 + 批量改镜像覆盖 Deployment/StatefulSet/DaemonSet，DaemonSet 补齐批量重启）；「MFA/TOTP」按其建议入队为下一个高价值项。
-> 2026-10-16 更新：① 批量操作已运行时实测通过（colima-xwssd 真实集群：批量缩容/改镜像/重启 + 容器名错误失败分支，UI 与集群状态双重复核）。② **MFA/TOTP 上游早已完整实现**（`pkg/mfa` TOTP、登录 `mfa_code` 挑战、账号设置与登录页 UI、全局 `enableMFA` 默认开启），此前"完全没有"的判断有误；已用一次性测试用户 API 级端到端验证全流程通过（setup 需重输密码 → enable → 无码登录 401 mfa_required → 正确码 204 → 错误码 401 → disable 恢复），otpauth issuer 已改为 Osprey。**无需再开发 MFA**。③ 该会话同类过时情报已有两例（批量重启、MFA），吸收其结论前先 grep 代码库确认。
+> 2026-10-16 更新：① 批量操作已运行时实测通过（colima-xwssd 真实集群：批量缩容/改镜像/重启 + 容器名错误失败分支，UI 与集群状态双重复核）。② **MFA/TOTP 上游早已完整实现**（`pkg/mfa` TOTP、登录 `mfa_code` 挑战、账号设置与登录页 UI、全局 `enableMFA` 默认开启），此前"完全没有"的判断有误；已用一次性测试用户 API 级端到端验证全流程通过（setup 需重输密码 → enable → 无码登录 401 mfa_required → 正确码 204 → 错误码 401 → disable 恢复），otpauth issuer 已改为品牌名（现为 KubeOsprey）。**无需再开发 MFA**。③ 该会话同类过时情报已有两例（批量重启、MFA），吸收其结论前先 grep 代码库确认。
 > 2026-10-16 第二轮（三个功能交付并运行时实测，`3dc6142`/`40ed26c`/`07b9791`，main 已同步快进）：**CI/CD webhook** `POST /api/v1/webhooks/helm-upgrade`（API Key + admin 角色；payload cluster/namespace/release + 可选 chartUrl/values/dryRun；复用控制台升级执行路径 `executeUpgrade`，审计走操作日志；CI 用法 = 建 API Key 用户并绑 admin 角色，dryRun 返回渲染 diff）；**首登/重置强制改密**（User.mustChangePassword：建用户与 admin 重置时置位，登录 200 响应带标记，RequireAuth 除改密/whoami/logout/refresh 外全拦截 403 password_change_required，前端 ProtectedRoute 渲染强制改密页、api-client 对该错误自动 reload；坑：ResetPasswordByID 整行 Save 会把标记写回 true——自助改密后必须显式清除，SetMustChangePassword 必须 InvalidateUserCache）；**锁定解锁提示**（429 响应带 retryAfterSeconds，登录页本地化倒计时提示）；**G8 多集群总览** `GET /api/v1/clusters/overview` + `/multi-cluster` 页面（并行聚合各集群 nodes/pods/ns/services 计数与版本，不可达集群降级为 error 条目；卡片点击切换集群；sidebar 应用组新增入口，config version 9→10）。
 > 2026-10-16 第三轮（`c160259`）：**角色绑定失效日期已交付**——RoleAssignment 增 `expiresAt`（建/重绑时可传，重复分配视为更新到期时间）；过期判定在 GetUserRoles 匹配时进行（rm.Expiry，无需重新同步即生效），过期绑定不删除、可改期恢复；API Key 用户无角色时登录仍被既有 403 拦截——**先绑角色再做 MFA/expiry 类测试**。
 
@@ -536,7 +536,7 @@ Kuboard v4.3 走查加固：
 | 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠 |
 | G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
-| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 Osprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并） |
+| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 KubeOsprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并） |
 
 ### 本地验证环境（2026-10-13 实测）
 

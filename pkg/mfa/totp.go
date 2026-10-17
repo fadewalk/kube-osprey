@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	issuer     = "Osprey"
+	issuer     = "KubeOsprey"
 	secretSize = 20
 	step       = 30
 	digits     = 6
