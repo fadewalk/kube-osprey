@@ -180,10 +180,9 @@ func OperationAudit() gin.HandlerFunc {
 		truncated := false
 		if c.Request.Body != nil {
 			body, _ = io.ReadAll(io.LimitReader(c.Request.Body, operationAuditMaxBody+1))
-			if len(body) > operationAuditMaxBody {
-				body = body[:operationAuditMaxBody]
-				truncated = true
-			}
+			truncated = len(body) > operationAuditMaxBody
+			// Replay everything read (probe byte included) so downstream
+			// handlers still see the complete request body.
 			c.Request.Body = io.NopCloser(io.MultiReader(bytes.NewReader(body), c.Request.Body))
 		}
 
@@ -200,6 +199,10 @@ func OperationAudit() gin.HandlerFunc {
 		}
 
 		info := classifyOperation(method, c.FullPath(), c)
+		requestBody := body
+		if truncated {
+			requestBody = body[:operationAuditMaxBody]
+		}
 		entry := model.OperationLog{
 			UserID:       user.ID,
 			Username:     user.Key(),
@@ -214,7 +217,7 @@ func OperationAudit() gin.HandlerFunc {
 			DurationMS:   time.Since(start).Milliseconds(),
 			IP:           c.ClientIP(),
 			RequestID:    c.GetString(RequestIDKey),
-			Body:         sanitizeOperationBody(c.GetHeader("Content-Type"), body),
+			Body:         sanitizeOperationBody(c.GetHeader("Content-Type"), requestBody),
 		}
 		if truncated {
 			entry.Body += " ...(truncated)"
