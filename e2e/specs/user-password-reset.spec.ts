@@ -1,4 +1,10 @@
-import { type Browser, type Page, expect, test } from '@playwright/test'
+import {
+  type Browser,
+  type BrowserContext,
+  type Page,
+  expect,
+  test,
+} from '@playwright/test'
 
 async function openUsersPage(page: Page) {
   await page.goto('/settings?tab=users')
@@ -97,6 +103,23 @@ async function loginWithPasswordUi(
   await page.getByRole('button', { name: 'Sign In with Password' }).click()
 }
 
+// Admin-created and admin-reset users must replace their password before
+// the app unlocks. Completing it over the API with the same credential
+// keeps the password the rest of the test expects; context.request shares
+// the session cookie and is immune to the SPA's in-flight redirects.
+async function completeForcedPasswordChangeIfPresent(
+  context: BrowserContext,
+  page: Page,
+  password: string
+) {
+  const response = await context.request.post('/api/users/me/password', {
+    data: { current_password: password, new_password: password },
+  })
+  if (response.status() === 200) {
+    await page.reload()
+  }
+}
+
 async function loginFreshContext(
   browser: Browser,
   origin: string,
@@ -111,6 +134,7 @@ async function loginFreshContext(
   await page.goto(`${origin}/login`)
   await loginWithPasswordUi(page, username, password)
   await page.waitForURL((url) => url.pathname === '/')
+  await completeForcedPasswordChangeIfPresent(context, page, password)
   await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible()
 
   return { context, page }

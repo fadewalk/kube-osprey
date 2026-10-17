@@ -1003,12 +1003,27 @@ test('backend APIs work end to end against the real test environment', async ({
       401
     )
 
+    // Admin reset sets the must-change flag; clear it with the same
+    // credential so the login settles to 204.
     await expect
       .poll(async () => {
         const response = await readerRequest!.post('/api/auth/login/password', {
           data: { username, password: resetPassword },
         })
-        return response.status()
+        if (response.status() !== 200) {
+          return response.status()
+        }
+        await readerRequest!.post('/api/users/me/password', {
+          data: {
+            current_password: resetPassword,
+            new_password: resetPassword,
+          },
+        })
+        return (
+          await readerRequest!.post('/api/auth/login/password', {
+            data: { username, password: resetPassword },
+          })
+        ).status()
       })
       .toBe(204)
     const readerUser = await expectJSON<{

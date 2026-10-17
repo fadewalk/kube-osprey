@@ -40,6 +40,10 @@ test('custom role grants namespaces and denies nodes', async ({
   await roleDialog.getByLabel(/^Role \*$/).fill(roleName)
   await roleDialog.getByLabel('Description').fill('Namespaces read only')
 
+  // The dialog opens in Simple mode with resource checkboxes; the explicit
+  // resources/verbs lists this test drives live under Advanced.
+  await roleDialog.getByRole('button', { name: 'Advanced' }).click()
+
   await roleDialog
     .getByPlaceholder('* or cluster-name')
     .fill('*')
@@ -92,6 +96,15 @@ test('custom role grants namespaces and denies nodes', async ({
   await userPage.getByLabel('Password', { exact: true }).fill(password)
   await userPage.getByRole('button', { name: 'Sign In with Password' }).click()
   await userPage.waitForURL((url) => url.pathname === '/')
+
+  // Admin-created users must replace their password before the app unlocks;
+  // completing it over the API with the same credential keeps the login
+  // usable below. context.request shares the session cookie and is immune
+  // to the SPA's in-flight redirects.
+  await userContext.request.post('/api/users/me/password', {
+    data: { current_password: password, new_password: password },
+  })
+  await userPage.reload()
 
   await userPage.goto('/namespaces')
   await expect(

@@ -187,12 +187,27 @@ test('proxy path escape via encoded .. cannot bypass RBAC to read secrets', asyn
       baseURL,
       storageState: { cookies: [], origins: [] },
     })
-    await expectStatus(
-      await readerRequest.post('/api/auth/login/password', {
-        data: { username, password },
-      }),
-      204
-    )
+    // Admin-created readers must replace their password; clear the flag with
+    // the same credential so the login settles to 204.
+    const readerLogin = await readerRequest.post('/api/auth/login/password', {
+      data: { username, password },
+    })
+    if (readerLogin.status() === 200) {
+      await expectStatus(
+        await readerRequest.post('/api/users/me/password', {
+          data: { current_password: password, new_password: password },
+        }),
+        200
+      )
+      await expectStatus(
+        await readerRequest.post('/api/auth/login/password', {
+          data: { username, password },
+        }),
+        204
+      )
+    } else {
+      await expectStatus(readerLogin, 204)
+    }
 
     // --- Baseline: reader CAN get the pod in default --------------------------
     await expectStatus(await readerRequest.get(podPath), 200)
