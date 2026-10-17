@@ -2,6 +2,7 @@
 import { createColumnHelper } from '@tanstack/react-table'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ResourceTable } from './resource-table'
@@ -42,6 +43,7 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('@/lib/resource-catalog', () => ({
   getResourceMetadata: () => null,
+  getResourceSingularLabel: () => '',
   getResourceCatalogEntry: () => undefined,
 }))
 
@@ -92,11 +94,13 @@ const columns = [columnHelper.accessor('metadata.name', { header: 'Name' })]
 
 function renderTable() {
   return render(
-    <ResourceTable<Row>
-      resourceName="services"
-      columns={columns}
-      clusterScope={true}
-    />
+    <MemoryRouter>
+      <ResourceTable<Row>
+        resourceName="services"
+        columns={columns}
+        clusterScope={true}
+      />
+    </MemoryRouter>
   )
 }
 
