@@ -19,7 +19,7 @@ export DB_TYPE=sqlite
 export DB_DSN="${DB_PATH}"
 export DISABLE_VERSION_CHECK=true
 export JWT_SECRET="${JWT_SECRET:-kite-e2e-jwt-secret}"
-export KITE_ENCRYPT_KEY="${KITE_ENCRYPT_KEY:-kite-e2e-encryption-key}"
+export KITE_ENCRYPT_KEY="${KITE_ENCRYPT_KEY:-kite-e2e-encryption-key-must-be-32-chars}"
 export PORT
 export HOME="${KITE_E2E_HOME:-$(mktemp -d "${TMPDIR:-/tmp}/kite-e2e-home.XXXXXX")}"
 unset KITE_USERNAME

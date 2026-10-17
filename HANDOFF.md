@@ -538,6 +538,19 @@ Kuboard v4.3 走查加固：
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
 | 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 KubeOsprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并） |
 
+### 发布链路（2026-10-17 建立）
+
+此前 release/demo 工作流都有 `repository_owner == 'kite-org'` 门禁，fork 打 tag 不会发布任何产物，README 快速开始装的是上游 Kite 镜像。现已建立 fork 自己的链路：
+
+- **触发**：在 `main` 上推送 `vX.Y.Z` tag（`release.yaml` 门禁改为 `fadewalk`）。版本号延续上游编号，首个 KubeOsprey 版本为 `v0.17.0`。
+- **产物**：镜像 `ghcr.io/fadewalk/kube-osprey:{vX.Y.Z,latest}`（linux/amd64+arm64，用 `Dockerfile.binary` 打包 `make cross-compile` 的产物）；Chart `oci://ghcr.io/fadewalk/charts/kite`（名称仍为 `kite`，**版本在 `helm package` 时用 `--version/--app-version` 从 tag 盖戳，`charts/kite/Chart.yaml` 保持上游原样、不要手动 bump**）；二进制 `kube-osprey-{amd64,arm64,darwin-arm64,windows-amd64.exe}-vX.Y.Z.tar.gz` 挂在 GitHub Release（自动生成 release notes）。
+- `charts/kite/values.yaml` 的 `image.repository` 已改为 `ghcr.io/fadewalk/kube-osprey`（镜像 tag 默认取 appVersion = 发布 tag；不改的话会去拉上游不存在的 `kite-org/kite:vX.Y.Z`）。这是 chart 目录里唯一的品牌层改动。
+- main 每次推送且 CI 通过后，preview 工作流推 `ghcr.io/fadewalk/kube-osprey:main`。
+- 已移除推上游维护者 Docker Hub（`zzde/`）的步骤；`update-helm-index` job 仍门禁 kite-org（fork 不维护 gh-pages helm index，只用 OCI）。
+- `pkg/version/update_checker.go` 指向 `fadewalk/kube-osprey/releases/latest`，有 release 后更新提示才生效。
+- 本地 `upstream` remote 已设 `tagOpt --no-tags`：fork 自有 tag 与上游将来同号 tag 不会在 fetch 时互相覆盖；`scripts/get-version.sh` 据本仓库 tag 算版本。
+- 同日修复的两处 CI 常红：`pkg/mfa` TestURL 硬编码 `Kite:`（10-15 改名后一直失败，改用 `issuer` 常量）；E2E 起不来是 `scripts/e2e-start-app.sh` 默认 `KITE_ENCRYPT_KEY` 只有 23 字符，不满足 fork 自己加的 32 字符下限（`a8f8a73`），已改为 40 字符默认值。
+
 ### 本地验证环境（2026-10-13 实测）
 
 - 后端：仓库根 `make kite` → `KITE_ALLOW_INSECURE_DEFAULTS=true ./kite -v=5`（:8080，version 端点返回真实 v0.16.1-p58）

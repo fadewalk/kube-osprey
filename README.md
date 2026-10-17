@@ -58,27 +58,29 @@ make build
 ./kube-osprey
 ```
 
-### Upstream Releases (Kite)
+### Install a Release
 
-The upstream project publishes ready-made Helm charts, Docker images, and manifests under the Kite name:
+Every tagged release publishes a container image, an OCI Helm chart, and standalone binaries (Linux, macOS, Windows) on the [Releases](https://github.com/fadewalk/kube-osprey/releases) page. The chart keeps the upstream name `kite`, so Kubernetes resource names and `KITE_*` environment variables stay compatible with existing deployments.
 
 ```bash
-helm install kite oci://ghcr.io/kite-org/charts/kite \
+helm install kite oci://ghcr.io/fadewalk/charts/kite \
   --namespace kite-system \
   --create-namespace
 ```
 
 ```bash
 mkdir -p data
-docker run -d --name kite \
+[ -f data/encrypt.key ] || openssl rand -hex 32 > data/encrypt.key
+docker run -d --name kube-osprey \
   -p 8080:8080 \
   -v "$(pwd)/data:/data" \
   -e DB_DSN=/data/db.sqlite \
-  ghcr.io/kite-org/kite:latest
+  -e KITE_ENCRYPT_KEY="$(cat data/encrypt.key)" \
+  ghcr.io/fadewalk/kube-osprey:latest
 ```
 
 > [!IMPORTANT]
-> The default chart values are intended for evaluation. Before using it in production, enable persistent storage or configure an external database, replace the default encryption key, and review the chart's cluster-wide RBAC permissions. See the upstream [installation guide](https://kitehq.dev/guide/installation) and [chart values](https://kitehq.dev/config/chart-values).
+> The default chart values are intended for evaluation. Before using it in production, enable persistent storage or configure an external database, pin `encryptKey` instead of relying on the generated one, and review the chart's cluster-wide RBAC permissions. KubeOsprey refuses to start with the upstream default encryption key or one shorter than 32 characters. See the upstream [installation guide](https://kitehq.dev/guide/installation) and [chart values](https://kitehq.dev/config/chart-values).
 
 ## Documentation
 

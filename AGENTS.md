@@ -42,6 +42,9 @@ diff and referenced paths or commands; skip application tests and builds.
 - When changing runtime environment variables, check both
   `pkg/common/common.go` and the relevant values/templates under `charts/kite`.
   Settings managed by `internal/config.go` must remain read-only in the UI.
+- Releases are cut by pushing a `vX.Y.Z` tag on `main`. The release workflow
+  stamps the chart version from the tag, so do not bump
+  `charts/kite/Chart.yaml` by hand.
 
 ## UI
 

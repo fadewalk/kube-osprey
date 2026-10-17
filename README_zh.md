@@ -58,27 +58,29 @@ make build
 ./kube-osprey
 ```
 
-### 上游发行版（Kite）
+### 安装发行版
 
-上游项目以 Kite 名称发布现成的 Helm Chart、Docker 镜像和 Manifest：
+每个 tag 版本都会在 [Releases](https://github.com/fadewalk/kube-osprey/releases) 页面发布容器镜像、OCI Helm Chart 以及 Linux / macOS / Windows 独立二进制。Chart 沿用上游名称 `kite`，因此 Kubernetes 资源名和 `KITE_*` 环境变量与既有部署保持兼容。
 
 ```bash
-helm install kite oci://ghcr.io/kite-org/charts/kite \
+helm install kite oci://ghcr.io/fadewalk/charts/kite \
   --namespace kite-system \
   --create-namespace
 ```
 
 ```bash
 mkdir -p data
-docker run -d --name kite \
+[ -f data/encrypt.key ] || openssl rand -hex 32 > data/encrypt.key
+docker run -d --name kube-osprey \
   -p 8080:8080 \
   -v "$(pwd)/data:/data" \
   -e DB_DSN=/data/db.sqlite \
-  ghcr.io/kite-org/kite:latest
+  -e KITE_ENCRYPT_KEY="$(cat data/encrypt.key)" \
+  ghcr.io/fadewalk/kube-osprey:latest
 ```
 
 > [!IMPORTANT]
-> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、替换默认加密密钥，并检查 Chart 创建的集群级 RBAC 权限。详见上游[安装指南](https://kitehq.dev/zh/guide/installation)和 [Chart Values](https://kitehq.dev/zh/config/chart-values)。
+> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、显式固定 `encryptKey` 而不要依赖自动生成的值，并检查 Chart 创建的集群级 RBAC 权限。KubeOsprey 会拒绝使用上游默认加密密钥或短于 32 个字符的密钥启动。详见上游[安装指南](https://kitehq.dev/zh/guide/installation)和 [Chart Values](https://kitehq.dev/zh/config/chart-values)。
 
 ## 文档
 

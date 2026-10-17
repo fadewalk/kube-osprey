@@ -6,7 +6,7 @@ on:
       - 'v[0-9]+\.[0-9]+\.[0-9]+'
 
 env:
-  IMAGE_NAME: kite
+  IMAGE_NAME: kube-osprey
   GO_VERSION: "1.26"
   NODE_VERSION: "24"
 
@@ -15,7 +15,7 @@ jobs:
   # See also https://docs.docker.com/docker-hub/builds/
   push:
     runs-on: ubuntu-latest
-    if: ${{ github.repository_owner == 'kite-org' }}
+    if: ${{ github.repository_owner == 'fadewalk' }}
     permissions:
       packages: write
       contents: write
@@ -31,11 +31,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Login to Docker hub Registry
-        uses: docker/login-action@v4
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
@@ -85,17 +80,18 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: |
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ steps.check_version.outputs.tag_name }}
-            zzde/${{ env.IMAGE_NAME }}:${{ steps.check_version.outputs.tag_name }}
             ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
-            zzde/${{ env.IMAGE_NAME }}:latest
           labels: runnumber=${{ github.run_id }}
 
       - name: Login Helm to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
 
+      # Chart version is stamped from the release tag so charts/kite/Chart.yaml
+      # stays as upstream ships it and keeps merging cleanly.
       - name: Package Helm chart
         run: |
-          helm package charts/kite/
+          TAG_NAME=${{ steps.check_version.outputs.tag_name }}
+          helm package charts/kite/ --version "${TAG_NAME#v}" --app-version "$TAG_NAME"
 
       - name: Push Helm chart to OCI registry
         run: |
