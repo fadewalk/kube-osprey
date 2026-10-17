@@ -666,6 +666,7 @@ export interface RoleAssignment {
   roleId: number
   subjectType: 'user' | 'group'
   subject: string
+  expiresAt?: string
   createdAt: string
   updatedAt: string
 }

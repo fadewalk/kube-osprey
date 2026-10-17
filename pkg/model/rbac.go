@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type Role struct {
 	Model
 
@@ -25,6 +27,10 @@ type RoleAssignment struct {
 
 	SubjectType string `json:"subjectType" gorm:"type:varchar(20);not null;index:idx_role_assignments_subject,priority:2"`
 	Subject     string `json:"subject" gorm:"type:varchar(255);not null;index:idx_role_assignments_subject,priority:1"`
+
+	// ExpiresAt is optional; once past, the assignment stops granting the
+	// role without needing an explicit unassign.
+	ExpiresAt *time.Time `json:"expiresAt,omitempty" gorm:"column:expires_at"`
 }
 
 // Convenience constants for SubjectType

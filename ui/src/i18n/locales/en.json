@@ -811,6 +811,12 @@
     "unreachable": "Unreachable",
     "openCluster": "Open cluster"
   },
+  "roleExpiry": {
+    "label": "Expiry date (optional)",
+    "hint": "Optional. Expired assignments automatically lose the role.",
+    "expiresAt": "expires {{date}}",
+    "expired": "Expired"
+  },
   "resourceTable": {
     "searchResources": "Search {{resource}}...",
     "toggleColumns": "Toggle columns",

@@ -190,7 +190,11 @@ export const deleteRole = async (id: number) => {
 
 export const assignRole = async (
   id: number,
-  data: { subjectType: 'user' | 'group' | 'apikey'; subject: string }
+  data: {
+    subjectType: 'user' | 'group' | 'apikey'
+    subject: string
+    expiresAt?: string
+  }
 ) => {
   return await apiClient.post(`/admin/roles/${id}/assign`, data)
 }

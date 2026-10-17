@@ -106,6 +106,10 @@ func GetUserRoles(user model.User) []common.Role {
 	}
 	userGroups := localGroupNamesForLocked(user)
 	for _, mapping := range RBACConfig.RoleMapping {
+		// Expired assignments stop granting without needing a re-sync.
+		if mapping.Expiry != nil && !time.Now().Before(*mapping.Expiry) {
+			continue
+		}
 		if contains(mapping.Users, "*") || contains(mapping.Users, user.Key()) {
 			if r := findRoleLocked(mapping.Name); r != nil {
 				rolesMap[r.Name] = *r

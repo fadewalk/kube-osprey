@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/zxh326/kite/pkg/common"
@@ -162,8 +163,9 @@ func DeleteRole(c *gin.Context) {
 
 // Assignment APIs
 type roleAssignmentReq struct {
-	SubjectType string `json:"subjectType" binding:"required"`
-	Subject     string `json:"subject" binding:"required"`
+	SubjectType string     `json:"subjectType" binding:"required"`
+	Subject     string     `json:"subject" binding:"required"`
+	ExpiresAt   *time.Time `json:"expiresAt"`
 }
 
 // AssignRole assigns a role to a user or group
@@ -199,6 +201,17 @@ func AssignRole(c *gin.Context) {
 	// check exists
 	var existing model.RoleAssignment
 	if err := model.DB.Where("role_id = ? AND subject_type = ? AND subject = ?", role.ID, req.SubjectType, req.Subject).First(&existing).Error; err == nil {
+		// Same subject already assigned: allow updating (or clearing) the expiry.
+		expiryChanged := req.ExpiresAt == nil || existing.ExpiresAt == nil ||
+			!req.ExpiresAt.Equal(*existing.ExpiresAt)
+		if expiryChanged {
+			existing.ExpiresAt = req.ExpiresAt
+			if err := model.DB.Save(&existing).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update assignment: " + err.Error()})
+				return
+			}
+			TriggerSync()
+		}
 		c.JSON(http.StatusOK, gin.H{"assignment": existing})
 		return
 	}
@@ -207,6 +220,7 @@ func AssignRole(c *gin.Context) {
 		RoleID:      role.ID,
 		SubjectType: req.SubjectType,
 		Subject:     req.Subject,
+		ExpiresAt:   req.ExpiresAt,
 	}
 	if err := model.DB.Create(&assignment).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create assignment: " + err.Error()})

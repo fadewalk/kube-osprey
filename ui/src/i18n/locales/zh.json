@@ -811,6 +811,12 @@
     "unreachable": "无法连接",
     "openCluster": "进入集群"
   },
+  "roleExpiry": {
+    "label": "失效日期（可选）",
+    "hint": "可选。过期后将自动失去该角色权限。",
+    "expiresAt": "{{date}} 到期",
+    "expired": "已过期"
+  },
   "resourceTable": {
     "searchResources": "搜索{{resource}}…",
     "toggleColumns": "显示列",

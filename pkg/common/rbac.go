@@ -1,5 +1,7 @@
 package common
 
+import "time"
+
 type Verb string
 
 const (
@@ -24,6 +26,10 @@ type RoleMapping struct {
 	Name       string   `yaml:"name" json:"name"`
 	Users      []string `yaml:"users,omitempty" json:"users,omitempty"`
 	OIDCGroups []string `yaml:"oidcGroups,omitempty" json:"oidcGroups,omitempty"`
+
+	// Expiry is when this mapping stops applying. It is populated from
+	// DB-backed assignments with an expiry; declarative config never sets it.
+	Expiry *time.Time `yaml:"-" json:"-"`
 }
 
 type RolesConfig struct {

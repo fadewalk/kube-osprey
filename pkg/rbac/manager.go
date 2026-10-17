@@ -57,6 +57,9 @@ func loadRolesFromDB() error {
 			} else {
 				rm.OIDCGroups = append(rm.OIDCGroups, a.Subject)
 			}
+			if a.ExpiresAt != nil {
+				rm.Expiry = a.ExpiresAt
+			}
 			cfg.RoleMapping = append(cfg.RoleMapping, rm)
 		}
 	}
