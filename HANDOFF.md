@@ -551,6 +551,7 @@ Kuboard v4.3 走查加固：
 - 本地 `upstream` remote 已设 `tagOpt --no-tags`：fork 自有 tag 与上游将来同号 tag 不会在 fetch 时互相覆盖；`scripts/get-version.sh` 据本仓库 tag 算版本。
 - 同日修复的两处 CI 常红：`pkg/mfa` TestURL 硬编码 `Kite:`（10-15 改名后一直失败，改用 `issuer` 常量）；E2E 起不来是 `scripts/e2e-start-app.sh` 默认 `KITE_ENCRYPT_KEY` 只有 23 字符，不满足 fork 自己加的 32 字符下限（`a8f8a73`），已改为 40 字符默认值。
 - **`27e2e6c`（v0.17.1）修复 operation_audit 差一错误**：审计中间件预读 4097 字节探测超长 body，但回放时把第 4097 个字节切掉了——所有超过 4KB 的写请求体（kubeconfig 导入、大 YAML apply、webhook payload）都被静默破坏一个字节，kubeconfig 导入表现为 `illegal base64 data at input byte N`，是 key 长度修复后 E2E 仍红的第二个根因。修法：预读字节（含探测字节）全量回放给 handler，审计落库时才单独截断。E2E 最后一次绿在 `7eddcc6`（10-16 快进前），fork 功能线此前的失败分别由 key 长度、本 bug、resource-table 测试缺 Router/mock 叠加造成。
+- **E2E 套件仍有面上破坏（按需修复项）**：三个叠加根因修完后（v0.17.1），全量套件能跑了但 30 分钟 job 超时杀不完——上游最后绿的 7eddcc6 全程只要 ~6 分钟，fork 线 ≥30 分钟，说明大量上游 spec 因 fork 的 UI 改动（强制改密页、侧边栏/总览改版等）各自耗满 180s 测试超时。`timeout-minutes` 已提到 60；下一次 E2E 运行会列出完整失败清单，按清单修 spec 或按需求裁剪即可。
 
 ### 本地验证环境（2026-10-13 实测）
 
