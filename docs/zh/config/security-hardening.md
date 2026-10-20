@@ -1,20 +1,20 @@
 # 生产环境安全基线与加固
 
-本文档是 Kite 的生产环境安全基线，适用于 Helm 安装、独立 Kubernetes 清单和 Cluster Agent 部署。
+本文档是 KubeOsprey 的生产环境安全基线，适用于 Helm 安装、独立 Kubernetes 清单和 Cluster Agent 部署。
 
-Kite 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户端、终端 Pod、exec 会话、代理请求，并执行 AI 辅助的资源变更。请把 Kite 视为集群管理边界来部署和审计。
+KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户端、终端 Pod、exec 会话、代理请求，并执行 AI 辅助的资源变更。请把 KubeOsprey 视为集群管理边界来部署和审计。
 
 ## 生产环境基线
 
-向用户开放 Kite 前，请确认：
+向用户开放 KubeOsprey 前，请确认：
 
-- Kite、OAuth/OIDC 回调、Cluster Agent 连接和 WebSocket 流量均使用 HTTPS。
+- KubeOsprey、OAuth/OIDC 回调、Cluster Agent 连接和 WebSocket 流量均使用 HTTPS。
 - 设置高熵的 `KITE_ENCRYPT_KEY` 并存储在外部 Secret 中，不要使用开发文档中的公开示例值。
 - 如果需要重启后或多副本之间保持会话稳定，请显式设置 `JWT_SECRET`。
 - 设置 `ANONYMOUS_USER_ENABLED=false`，并验证匿名访问已关闭。
 - 将 `TRUSTED_PROXIES` 限制为实际的反向代理地址，不要信任任意客户端转发头。
 - 使用外部 PostgreSQL/MySQL，或为 SQLite 配置持久化卷。
-- 将 Kite、终端和 Cluster Agent 镜像固定到发布版本或 digest，生产环境不要使用 `latest`。
+- 将 KubeOsprey、终端和 Cluster Agent 镜像固定到发布版本或 digest，生产环境不要使用 `latest`。
 - 部署前检查每一条 `cluster-admin`、通配符 RBAC、privileged 容器、主机 namespace 和 hostPath 配置。
 - 只启用运维人员确实需要的终端和 Cluster Agent 能力。
 - 同时备份数据库和加密密钥。没有加密密钥的数据库备份无法恢复加密字段。
@@ -39,11 +39,11 @@ secret:
 
 ## Kubernetes 权限
 
-Kite 有应用层 RBAC，Kubernetes 还会独立检查 Kite Server 和 Cluster Agent 使用的 ServiceAccount 或 kubeconfig。最终权限受两套系统共同影响，但过大的 Kubernetes 身份仍会放大误操作或会话被攻破后的影响。
+KubeOsprey 有应用层 RBAC，Kubernetes 还会独立检查 KubeOsprey Server 和 Cluster Agent 使用的 ServiceAccount 或 kubeconfig。最终权限受两套系统共同影响，但过大的 Kubernetes 身份仍会放大误操作或会话被攻破后的影响。
 
 请分别检查：
 
-- Kite Server 的 ServiceAccount 和 ClusterRole；
+- KubeOsprey Server 的 ServiceAccount 和 ClusterRole；
 - Cluster Agent 的 ServiceAccount 和 ClusterRoleBinding；
 - kubectl Terminal 的 ServiceAccount 和 ClusterRoleBinding；
 - Node Terminal 的 host 访问、privileged、主机 namespace 和 hostPath；
@@ -64,7 +64,7 @@ Cluster Agent Manifest 支持权限档位：
 - `admin`：绑定 `cluster-admin`（兼容旧的高信任行为）。
 - `custom`：绑定指定的已有 ClusterRole。
 
-默认档位为 `admin`（向后兼容）；生产环境建议使用 `operator` 或 `readOnly`。注意 `operator` 档位可以读 Secrets（Kite 控制台的 Secret 页面和 Helm Release 浏览依赖 Secret 数据）；如不可接受请使用 `custom`。
+默认档位为 `admin`（向后兼容）；生产环境建议使用 `operator` 或 `readOnly`。注意 `operator` 档位可以读 Secrets（KubeOsprey 控制台的 Secret 页面和 Helm Release 浏览依赖 Secret 数据）；如不可接受请使用 `custom`。
 
 Kubernetes 中 ClusterRoleBinding 的 `roleRef` 不可修改。切换已有 Cluster Agent 的权限档位时，必须先删除 `kite-cluster-agent` ClusterRoleBinding，再应用新 Manifest。
 
@@ -82,7 +82,7 @@ Pod exec、kubectl Terminal 和 Node Terminal 都不是普通的只读功能：
 
 PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Prometheus 数据源的用户才应获得该能力。Kubernetes namespace RBAC 不会自动过滤 Prometheus 查询结果。
 
-如果 Kite 用作多租户平台，应在 Prometheus 层实现租户隔离，或改用审核过的查询模板。不要通过给任意 PromQL 盲目追加 namespace selector 来伪造数据隔离。
+如果 KubeOsprey 用作多租户平台，应在 Prometheus 层实现租户隔离，或改用审核过的查询模板。不要通过给任意 PromQL 盲目追加 namespace selector 来伪造数据隔离。
 
 ## 数据库与持久化
 
@@ -137,8 +137,8 @@ pnpm --dir ui exec tsc --noEmit -p tsconfig.app.json
 
 以下问题需要独立设计，不应直接粗暴收紧权限：
 
-- Cluster Agent 当前使用注册的 Kubernetes 凭据转发请求，不会在 Kubernetes API 层模拟 Kite 用户身份；
+- Cluster Agent 当前使用注册的 Kubernetes 凭据转发请求，不会在 Kubernetes API 层模拟 KubeOsprey 用户身份；
 - kubectl 和 Node Terminal 需要更强的 Break-glass 控制和更小权限的身份；
 - 加密密钥轮换需要兼容已有 `SecretString` 的迁移流程；
-- Kite 不会对原始 PromQL 做 namespace 改写，多租户隔离应由指标架构或受限查询模型提供；
+- KubeOsprey 不会对原始 PromQL 做 namespace 改写，多租户隔离应由指标架构或受限查询模型提供；
 - Passkey、Cluster Agent 会话和其他进程内状态在正式支持多副本前需要共享存储。

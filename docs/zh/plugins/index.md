@@ -4,11 +4,11 @@ outline: deep
 
 # 插件简介
 
-插件功能自 Kite **v0.16.0** 起提供。
+插件功能自 KubeOsprey **v0.16.0** 起提供。
 
-Kite 插件是一个运行在 Kite 内部的 React 前端模块。它可以在不重新编译 Kite 的前提下，为 Kite 增加页面、侧边栏菜单和针对自定义资源的专属管理界面。
+KubeOsprey 插件是一个运行在 KubeOsprey 内部的 React 前端模块。它可以在不重新编译 KubeOsprey 的前提下，为 KubeOsprey 增加页面、侧边栏菜单和针对自定义资源的专属管理界面。
 
-插件通过 [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk) 编写和构建，打包为 `.tar.gz` 归档，由 Kite 管理员在 **插件管理** 页面安装。安装后，供所有登录用户使用。
+插件通过 [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk) 编写和构建，打包为 `.tar.gz` 归档，由 KubeOsprey 管理员在 **插件管理** 页面安装。安装后，供所有登录用户使用。
 
 ## 插件能做什么
 
@@ -27,12 +27,12 @@ Kite 插件是一个运行在 Kite 内部的 React 前端模块。它可以在�
 
 ## 运行与安全模型
 
-1. **插件以当前登录用户的身份运行**。插件发起的所有 Kubernetes 请求都经由 Kite 后端转发，并受该用户的 RBAC 权限约束——用户看不到自己无权访问的资源，这与在 Kite 原生页面中操作完全一致。插件不会获得任何额外权限。
-2. **插件管理是管理员操作**。安装、停用、卸载、目录配置均需要 Kite 管理员权限；普通用户只能使用已启用的插件。
-3. **插件是受信任代码**。插件 JavaScript 在您的浏览器中执行，等同于其作者可以直接使用您在 Kite 中的全部操作能力。只安装来自可信作者的插件。
-4. **运行时共享**。插件与 Kite 共享 React、React Router、TanStack Query 等运行时和 SDK 实现，不要创建自己的 React 根、Router 或 QueryClient。
+1. **插件以当前登录用户的身份运行**。插件发起的所有 Kubernetes 请求都经由 KubeOsprey 后端转发，并受该用户的 RBAC 权限约束——用户看不到自己无权访问的资源，这与在 KubeOsprey 原生页面中操作完全一致。插件不会获得任何额外权限。
+2. **插件管理是管理员操作**。安装、停用、卸载、目录配置均需要 KubeOsprey 管理员权限；普通用户只能使用已启用的插件。
+3. **插件是受信任代码**。插件 JavaScript 在您的浏览器中执行，等同于其作者可以直接使用您在 KubeOsprey 中的全部操作能力。只安装来自可信作者的插件。
+4. **运行时共享**。插件与 KubeOsprey 共享 React、React Router、TanStack Query 等运行时和 SDK 实现，不要创建自己的 React 根、Router 或 QueryClient。
 
-插件通过 `@kite-dev/plugin-sdk` 使用宿主能力，不要直接导入 Kite 的内部模块。
+插件通过 `@kite-dev/plugin-sdk` 使用宿主能力，不要直接导入 KubeOsprey 的内部模块。
 
 ## 安装与使用
 

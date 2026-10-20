@@ -1,10 +1,10 @@
 # Prometheus Setup Guide
 
-This guide explains how to configure Kite's monitoring integration with Prometheus to achieve real-time metrics and monitoring functionality.
+This guide explains how to configure KubeOsprey's monitoring integration with Prometheus to achieve real-time metrics and monitoring functionality.
 
 ## Overview
 
-Kite's integration with Prometheus provides:
+KubeOsprey's integration with Prometheus provides:
 
 - Real-time cluster resource metrics
 - Historical data visualization
@@ -45,7 +45,7 @@ For more control over the installation, you can manually install Prometheus comp
 
 Follow the official documentation for each component for detailed installation instructions.
 
-## Connecting Kite to Prometheus
+## Connecting KubeOsprey to Prometheus
 
 Users with the **admin** role can access the settings entry in the upper right corner of the page to enter the cluster management interface.
 

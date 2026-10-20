@@ -4,12 +4,12 @@ outline: deep
 
 # Quick Start
 
-Create a plugin project with the scaffolding tool, write a React page, then package it as a `.tar.gz` archive and install it in Kite.
+Create a plugin project with the scaffolding tool, write a React page, then package it as a `.tar.gz` archive and install it in KubeOsprey.
 
 ## Prerequisites
 
 - Node.js `^20.19.0 || >=22.12.0` and pnpm 10.x
-- An accessible Kite instance whose version satisfies the plugin's `engines.kite` range, currently `>=0.16.0` by default
+- An accessible KubeOsprey instance whose version satisfies the plugin's `engines.kite` range, currently `>=0.16.0` by default
 - Administrator access to install plugins
 
 ## Create a Project
@@ -84,7 +84,7 @@ export default definePlugin({
 ```
 
 - Route paths are relative to `/plugins/my-plugin`. An empty string (`''`) is the plugin home page. Paths support named parameters such as `:namespace/:name`.
-- A menu's `parent` can be a built-in Kite group (`core:workloads`, `core:storage`, `core:other`, etc.). Omit it to place the menu at the top level. `route` points to a plugin route, while `resource: { group, resource }` points directly to a custom resource list. These fields are mutually exclusive; a menu with neither is a group heading.
+- A menu's `parent` can be a built-in KubeOsprey group (`core:workloads`, `core:storage`, `core:other`, etc.). Omit it to place the menu at the top level. `route` points to a plugin route, while `resource: { group, resource }` points directly to a custom resource list. These fields are mutually exclusive; a menu with neither is a group heading.
 - `routes`, `menus`, and `resources` are optional. `resources` can add list columns or detail tabs, or replace complete custom resource pages. See [Plugin Configuration: Resource Extensions](./api/plugin-config#resource-extensions).
 - `element` accepts any React node. Load page components with `React.lazy(() => import(...))`, keeping CSS and browser dependencies in the page modules.
 - `plugin.config.tsx` runs once in Node.js during the build to extract route and menu metadata, so its declarations cannot depend on browser globals.
@@ -172,19 +172,19 @@ Common scripts:
 | `pnpm run dev` | Start the development server, watch files, and print the plugin's development URL |
 | `pnpm run pack` | Package the current `dist/` directory |
 
-## Install in Kite
+## Install in KubeOsprey
 
 1. Click your avatar in the upper right corner and select **Plugin management**.
 2. Click **Install from file** and select `my-plugin-0.1.0.tar.gz`.
 3. The plugin is enabled automatically. Open its new menu item under **Other** in the sidebar.
 
-During development, run `pnpm dev` and set Kite's `PLUGIN_DEV_URL` environment variable to the printed URL. After changing code, wait for the build to finish and refresh Kite. You do not need to package and install every change. See [Debugging](./debugging).
+During development, run `pnpm dev` and set KubeOsprey's `PLUGIN_DEV_URL` environment variable to the printed URL. After changing code, wait for the build to finish and refresh KubeOsprey. You do not need to package and install every change. See [Debugging](./debugging).
 
-To distribute an update, increment `version` in `package.json`, run `pnpm run build && pnpm run pack`, and install the new archive. Package contents for the same ID and version are immutable. If the contents change without a version increment, Kite rejects the installation.
+To distribute an update, increment `version` in `package.json`, run `pnpm run build && pnpm run pack`, and install the new archive. Package contents for the same ID and version are immutable. If the contents change without a version increment, KubeOsprey rejects the installation.
 
 ## Styling
 
-Host components include their own styles. For custom layouts, use CSS Modules and Kite's CSS variables to support light and dark themes:
+Host components include their own styles. For custom layouts, use CSS Modules and KubeOsprey's CSS variables to support light and dark themes:
 
 ```css
 /* src/pages/home.module.css */
@@ -199,12 +199,12 @@ Host components include their own styles. For custom layouts, use CSS Modules an
 
 Common variables include `--background`, `--foreground`, `--card`, `--card-foreground`, `--primary`, `--primary-foreground`, `--muted`, `--muted-foreground`, and `--border`.
 
-Kite's Tailwind build does not scan plugin source files. Your plugin's build must generate any utility classes it uses. Scope plugin styles to avoid global resets affecting Kite.
+KubeOsprey's Tailwind build does not scan plugin source files. Your plugin's build must generate any utility classes it uses. Scope plugin styles to avoid global resets affecting KubeOsprey.
 
 ## Next Steps
 
 - [Plugin Configuration](./api/plugin-config): configure routes, menus, resource extensions, themes, a settings page, and internationalization
-- [Resource Queries and Operations](./api/resources): read resources, perform mutations, and call Kite APIs
+- [Resource Queries and Operations](./api/resources): read resources, perform mutations, and call KubeOsprey APIs
 - [UI Components](./api/ui): reuse resource lists, detail layouts, and YAML editors
 - [Internationalization](./i18n): add English and Chinese translations
 - [Debugging](./debugging): local development and troubleshooting

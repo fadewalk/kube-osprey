@@ -2,17 +2,7 @@
 
 ## 数据共享
 
-默认情况下，Kite 不会收集任何分析数据。
-如果您希望帮助改进产品，您可以在初始化页面或通用设置中，通过「启用数据统计」开关开启或关闭统计。
-
-开启后，Kite 服务端每 24 小时上报一次安装统计，用于帮助改进产品。上报内容包括：
-
-- 随机生成的安装 ID
-- Kite 版本及已连接的 Kubernetes 集群版本
-- 已安装插件的 ID、版本和启用状态
-- 运行平台的操作系统和 CPU 架构
-
-上报实现见[源代码](https://github.com/kite-org/kite/blob/main/pkg/telemetry/telemetry.go)。
+KubeOsprey 不收集任何分析或遥测数据。上游 Kite 中可选的使用统计已在本 fork 中移除——不会向集群外发送任何安装统计或使用数据。
 
 ## 权限问题
 
@@ -28,15 +18,15 @@
 
 ## 托管 Kubernetes 集群连接问题
 
-如果您使用托管 Kubernetes 集群（AKS、EKS、GKE 等）并在将集群添加到 Kite 时遇到身份验证错误，这通常是因为默认的 kubeconfig 使用了需要 CLI 工具（如 `kubelogin`、`aws` 或 `gcloud`）的 `exec` 插件。
+如果您使用托管 Kubernetes 集群（AKS、EKS、GKE 等）并在将集群添加到 KubeOsprey 时遇到身份验证错误，这通常是因为默认的 kubeconfig 使用了需要 CLI 工具（如 `kubelogin`、`aws` 或 `gcloud`）的 `exec` 插件。
 
-Kite 作为服务端应用运行，无法执行这些客户端身份验证工具。相反，您应该使用基于 Service Account token 的身份验证。
+KubeOsprey 作为服务端应用运行，无法执行这些客户端身份验证工具。相反，您应该使用基于 Service Account token 的身份验证。
 
 请参考[托管 Kubernetes 集群配置指南](./config/managed-k8s-auth)，了解如何创建和使用 Service Account token 进行身份验证的详细说明。
 
 ## 持久化相关
 
-Kite 支持使用 SQLite、MySQL 或 PostgreSQL 作为数据库。
+KubeOsprey 支持使用 SQLite、MySQL 或 PostgreSQL 作为数据库。
 
 你可以通过环境变量 `DB_DSN` 来配置数据库连接字符串，`DB_TYPE` 来指定数据库类型（默认为 `sqlite`）。
 
@@ -53,7 +43,7 @@ Kite 支持使用 SQLite、MySQL 或 PostgreSQL 作为数据库。
 panic: failed to connect database: unable to open database file: out of memory (14)
 ```
 
-此问题与 Kite 使用的纯 Go SQLite 驱动有关（为避免 CGO 依赖）。该驱动在访问某些存储后端上的数据
+此问题与 KubeOsprey 使用的纯 Go SQLite 驱动有关（为避免 CGO 依赖）。该驱动在访问某些存储后端上的数据
 库文件时存在限制。
 
 **解决方案**：添加 SQLite 连接选项以提高与 hostPath 存储的兼容性。在 Helm values 中设置：
@@ -72,7 +62,7 @@ db:
 
 ## 如何更改字体
 
-Kite 默认提供三种字体：系统默认、`Maple Mono` 和 `JetBrains Mono`。
+KubeOsprey 默认提供三种字体：系统默认、`Maple Mono` 和 `JetBrains Mono`。
 
 如果您想使用其他字体，则需要自己构建项目。
 
@@ -96,7 +86,7 @@ body {
 }
 ```
 
-## 我如何为 Kite 做出贡献？
+## 我如何为 KubeOsprey 做出贡献？
 
 我们欢迎贡献！您可以：
 

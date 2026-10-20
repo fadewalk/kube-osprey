@@ -4,7 +4,7 @@ outline: deep
 
 # Resource Queries and Operations
 
-Import query and mutation APIs from `@kite-dev/plugin-sdk/resources` to read, create, update, and delete Kubernetes resources. Queries default to Kite's selected cluster, and all requests are subject to the current user's permissions.
+Import query and mutation APIs from `@kite-dev/plugin-sdk/resources` to read, create, update, and delete Kubernetes resources. Queries default to KubeOsprey's selected cluster, and all requests are subject to the current user's permissions.
 
 ## Querying Lists and Details
 
@@ -49,7 +49,7 @@ Both default to the current cluster and the plugin's namespace context. Query ca
 
 `ResourceListQueryOptions` extends the shared `ResourceQueryOptions` with `labelSelector`, `fieldSelector`, and `reduce`. Only `useResources` accepts these options. Detail, event, Describe, history, and related resource queries do not accept list filters.
 
-Use `_all` for all namespaces, or a comma-separated list of namespaces; the hook makes parallel requests and merges their results. Queries for a single resource need its actual namespace. Declare `scope: 'Cluster'` for cluster-scoped custom resources. Kite determines the scope of built-in resources automatically.
+Use `_all` for all namespaces, or a comma-separated list of namespaces; the hook makes parallel requests and merges their results. Queries for a single resource need its actual namespace. Declare `scope: 'Cluster'` for cluster-scoped custom resources. KubeOsprey determines the scope of built-in resources automatically.
 
 ## Reading the Current Resource in an Extension
 
@@ -101,7 +101,7 @@ const certificates = useResources<Certificate>(
 )
 ```
 
-Kite reads and writes custom resources using the first `served` version in the CRD, so plugins do not specify an API version. Hooks return complete resource arrays without exposing server-side pagination. Use `refreshInterval` for periodic updates.
+KubeOsprey reads and writes custom resources using the first `served` version in the CRD, so plugins do not specify an API version. Hooks return complete resource arrays without exposing server-side pagination. Use `refreshInterval` for periodic updates.
 
 Capabilities differ between built-in and custom resources:
 
@@ -128,7 +128,7 @@ Capabilities differ between built-in and custom resources:
 | `deleteResource(ref, name, options?)` | Delete a built-in or custom resource; returns `void` |
 
 - Shared options are `namespace`, `cluster`, and `signal`. Deletion also supports `force` and `wait`. Mutations on namespaced resources must specify the actual namespace.
-- `applyResource` uses Kite's create/update flow. An explicit `namespace` overrides the namespace in the YAML; cluster-scoped resources ignore it.
+- `applyResource` uses KubeOsprey's create/update flow. An explicit `namespace` overrides the namespace in the YAML; cluster-scoped resources ignore it.
 - Mutations do not refresh queries automatically. Call `refetch()` or invalidate the relevant TanStack Query caches after success.
 
 Create a Certificate, then change its target Secret:
@@ -153,7 +153,7 @@ await patchResource(certificates, 'example-tls', {
 }, options)
 ```
 
-Creation requires `create` permission; updates and patches require `update` permission on the target resource and namespace. Kite records these operations in resource history.
+Creation requires `create` permission; updates and patches require `update` permission on the target resource and namespace. KubeOsprey records these operations in resource history.
 
 ## Events and Operational Actions
 
@@ -168,7 +168,7 @@ Import these APIs from `@kite-dev/plugin-sdk/resources`. Parameters without `?` 
 | Pod files | `usePodFiles(namespace, podName, container, path, options?)`, `podDownloadFile(namespace, podName, container, path)`, `podPreviewFile(namespace, podName, container, path)`, `podUploadFile(namespace, podName, container, path, file)` |
 | Configuration helpers | `useTemplates(options?)`, `useImageTags(image, options?)` |
 
-- Inspection hooks accept a resource reference, name, and query options. `useResourceHistory` also supports `page` and `pageSize`. It returns Kite's operation history, not a complete resource revision history.
+- Inspection hooks accept a resource reference, name, and query options. `useResourceHistory` also supports `page` and `pageSize`. It returns KubeOsprey's operation history, not a complete resource revision history.
 - `useRelatedResources` discovers relationships for only some built-in resources. For custom resources, query with `useResources` and match `ownerReferences` or other fields yourself.
 - `scaleDeployment` applies only to Deployments. `restartWorkload` accepts `'deployments'` or `'statefulsets'` as `resource`; `useWorkloadRevisions` and `rollbackWorkload` also support `'daemonsets'`.
 - `drainNode` accepts `{ force, gracePeriod, deleteLocalData, ignoreDaemonsets }` as `options`. `taintNode` accepts `{ key, value, effect }`, with `effect` set to `NoSchedule`, `PreferNoSchedule`, or `NoExecute`.
@@ -191,7 +191,7 @@ Other groups include `AutoscalingV1`, `AutoscalingV2`, `NetworkingV1`, and `Rbac
 
 ## Custom API Requests
 
-Use `apiClient` from `@kite-dev/plugin-sdk/api` to call Kite's existing backend APIs. The client handles Kite authentication, the current cluster (`x-cluster-name` header), and the deployment base path. It cannot register new backend APIs.
+Use `apiClient` from `@kite-dev/plugin-sdk/api` to call KubeOsprey's existing backend APIs. The client handles KubeOsprey authentication, the current cluster (`x-cluster-name` header), and the deployment base path. It cannot register new backend APIs.
 
 Combine `apiClient` with TanStack Query to manage loading, errors, and caching for custom queries. Use the host's shared `QueryClient` rather than creating another instance:
 

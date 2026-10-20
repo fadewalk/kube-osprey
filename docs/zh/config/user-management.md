@@ -1,6 +1,6 @@
 # 用户管理
 
-Kite 支持多种用户管理方式，结合 OAuth 与本地密码用户，配合 RBAC 权限系统，实现灵活的访问控制。
+KubeOsprey 支持多种用户管理方式，结合 OAuth 与本地密码用户，配合 RBAC 权限系统，实现灵活的访问控制。
 
 ## 用户类型
 
@@ -9,7 +9,7 @@ Kite 支持多种用户管理方式，结合 OAuth 与本地密码用户，配�
 如何配置 OAuth 见 [OAuth 配置指南](./oauth-setup)
 
 - **密码用户**： 通过用户名和密码登录。密码用户可以启用认证器应用 MFA，也可以注册 Passkey 用于免密码登录。
-- **API 密钥**：用于脚本、CI/CD 或外部系统调用 Kite API。参见 [API 认证](../api/authentication)。
+- **API 密钥**：用于脚本、CI/CD 或外部系统调用 KubeOsprey API。参见 [API 认证](../api/authentication)。
 
 ## 用户管理
 

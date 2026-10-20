@@ -1,13 +1,13 @@
 # Chart Values
 
-本文档描述了 Kite Helm Chart 的所有可用配置选项。
+本文档描述了 KubeOsprey Helm Chart 的所有可用配置选项。
 
 ## 基础配置
 
 | 参数               | 描述                                               | 默认值                  |
 | ------------------ | -------------------------------------------------- | ----------------------- |
 | `replicaCount`     | 副本数量                                           | `1`                     |
-| `image.repository` | 容器镜像仓库                                       | `ghcr.io/kite-org/kite` |
+| `image.repository` | 容器镜像仓库                                       | `ghcr.io/fadewalk/kube-osprey` |
 | `image.pullPolicy` | 镜像拉取策略                                       | `IfNotPresent`          |
 | `image.tag`        | 镜像标签。如果设置，将覆盖 chart 的 `appVersion`。 | `""`                    |
 | `imagePullSecrets` | 私有镜像仓库的拉取密钥                             | `[]`                    |
@@ -49,7 +49,7 @@
 
 ## 插件存储
 
-适用于 Kite `v0.16.0` 及以上版本。插件目录默认为 `/data/plugins`，可复用 SQLite 挂载在 `/data` 的存储卷。默认不启用持久化。
+适用于 KubeOsprey `v0.16.0` 及以上版本。插件目录默认为 `/data/plugins`，可复用 SQLite 挂载在 `/data` 的存储卷。默认不启用持久化。
 
 | 参数 | 描述 | 默认值 |
 | ---- | ---- | ------ |
@@ -94,7 +94,7 @@ plugins:
     size: 1Gi
 ```
 
-如需使用已有 PVC，将 `plugins.persistence.existingClaim` 设为 Kite 所在命名空间中的 PVC 名称。单副本使用 `ReadWriteOnce` 存储时，将部署策略设为 `Recreate`，避免升级时卷挂载冲突。
+如需使用已有 PVC，将 `plugins.persistence.existingClaim` 设为 KubeOsprey 所在命名空间中的 PVC 名称。单副本使用 `ReadWriteOnce` 存储时，将部署策略设为 `Recreate`，避免升级时卷挂载冲突。
 
 ## 环境变量
 
@@ -161,7 +161,7 @@ rbac:
 ```yaml
 ingress:
   hosts:
-    - host: kitehq.dev
+    - host: kite.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific

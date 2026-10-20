@@ -1,14 +1,14 @@
 # Configuration File
 
-Kite supports loading cluster, OAuth/LDAP, and RBAC configuration from a YAML file. When a section is configured this way, it becomes **read-only** in the UI — users can view the settings but cannot modify them through the dashboard.
+KubeOsprey supports loading cluster, OAuth/LDAP, and RBAC configuration from a YAML file. When a section is configured this way, it becomes **read-only** in the UI — users can view the settings but cannot modify them through the dashboard.
 
 This is useful for GitOps workflows where configuration is version-controlled and applied via Helm.
 
-> Available in Kite `v0.10.0` and later.
+> Available in KubeOsprey `v0.10.0` and later.
 
 ## How It Works
 
-1. Kite reads a YAML config file from the path specified by the `KITE_CONFIG_FILE` environment variable.
+1. KubeOsprey reads a YAML config file from the path specified by the `KITE_CONFIG_FILE` environment variable.
 2. On every startup, the config is applied to the database, overwriting existing values for managed sections.
 3. Sensitive values in the config file support `${ENV_VAR}` placeholder expansion from environment variables.
 4. The UI automatically detects managed sections and displays them as read-only with an informational banner.

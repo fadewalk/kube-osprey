@@ -4,7 +4,7 @@ outline: deep
 
 # UI 组件
 
-从 `@kite-dev/plugin-sdk/ui` 导入组件，复用 Kite 的资源表格、详情页、YAML 编辑器和基础控件。组件负责展示与交互，资源数据通过[资源查询与操作](./resources)获取；也可以用这些接口搭配自己的布局。
+从 `@kite-dev/plugin-sdk/ui` 导入组件，复用 KubeOsprey 的资源表格、详情页、YAML 编辑器和基础控件。组件负责展示与交互，资源数据通过[资源查询与操作](./resources)获取；也可以用这些接口搭配自己的布局。
 
 ## ResourceTable
 
@@ -148,7 +148,7 @@ export default function DeploymentPage() {
 | `onDeleted` | 删除成功后的回调 |
 | `headerActions`、`titleIcon`、`loadingMessage` | 自定义页头操作、标题图标和加载文案 |
 
-用户可通过 Kite 的 Tab 控件调整插件 Tab 的顺序和可见性。
+用户可通过 KubeOsprey 的 Tab 控件调整插件 Tab 的顺序和可见性。
 
 ## ResourceOverview
 
@@ -184,7 +184,7 @@ import { ResourceEvents } from '@kite-dev/plugin-sdk/ui'
 
 ## ResourceHistoryTable
 
-展示 Kite 的操作历史，包含 YAML 差异比较和回滚操作，支持内置资源和自定义资源。传入 `currentResource` 可将历史记录与当前对象比较。
+展示 KubeOsprey 的操作历史，包含 YAML 差异比较和回滚操作，支持内置资源和自定义资源。传入 `currentResource` 可将历史记录与当前对象比较。
 
 ```tsx
 import { ResourceHistoryTable } from '@kite-dev/plugin-sdk/ui'
@@ -212,7 +212,7 @@ import { RelatedResourcesTable } from '@kite-dev/plugin-sdk/ui'
 
 ## LogViewer
 
-嵌入 Kite 的 Pod 日志查看器，支持容器选择、搜索、流式日志控制和下载。使用当前集群，并检查用户在目标命名空间的 `pods/log` 权限。
+嵌入 KubeOsprey 的 Pod 日志查看器，支持容器选择、搜索、流式日志控制和下载。使用当前集群，并检查用户在目标命名空间的 `pods/log` 权限。
 
 ```tsx
 import { LogViewer } from '@kite-dev/plugin-sdk/ui'
@@ -231,7 +231,7 @@ import { LogViewer } from '@kite-dev/plugin-sdk/ui'
 
 ## Terminal
 
-嵌入 Kite 的 Pod、节点或 kubectl 终端。Pod exec 使用当前集群，并检查目标命名空间的 `pods/exec` 权限。
+嵌入 KubeOsprey 的 Pod、节点或 kubectl 终端。Pod exec 使用当前集群，并检查目标命名空间的 `pods/exec` 权限。
 
 ```tsx
 import { Terminal } from '@kite-dev/plugin-sdk/ui'
@@ -249,7 +249,7 @@ import { Terminal } from '@kite-dev/plugin-sdk/ui'
 
 ## Toast 通知
 
-`toast` 使用 Kite 现有通知区域，插件无需额外挂载通知容器。
+`toast` 使用 KubeOsprey 现有通知区域，插件无需额外挂载通知容器。
 
 ```ts
 import { toast } from '@kite-dev/plugin-sdk/ui'

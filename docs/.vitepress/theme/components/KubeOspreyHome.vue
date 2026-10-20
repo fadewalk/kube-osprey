@@ -443,4 +443,4 @@ const copy = computed(() =>
   </div>
 </template>
 
-<style scoped src="./kite-home.css"></style>
+<style scoped src="./kube-osprey-home.css"></style>

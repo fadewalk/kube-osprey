@@ -1,6 +1,6 @@
 # User Management
 
-Kite supports multiple user management methods, combining OAuth with local password users, and working with the RBAC permission system to achieve flexible access control.
+KubeOsprey supports multiple user management methods, combining OAuth with local password users, and working with the RBAC permission system to achieve flexible access control.
 
 ## User Types
 
@@ -9,7 +9,7 @@ Kite supports multiple user management methods, combining OAuth with local passw
 For how to configure OAuth, see [OAuth Configuration Guide](./oauth-setup)
 
 - **Password Users**: Login through username and password. Password users can enable authenticator app MFA and register passkeys for passwordless login.
-- **API Keys**: Used for scripts, CI/CD, or external systems calling Kite APIs. See [API Authentication](../api/authentication).
+- **API Keys**: Used for scripts, CI/CD, or external systems calling KubeOsprey APIs. See [API Authentication](../api/authentication).
 
 ## User Management
 

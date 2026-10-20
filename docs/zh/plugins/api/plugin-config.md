@@ -102,7 +102,7 @@ export default definePlugin({
 | `parent` 取值 | 位置 |
 | ------------- | ---- |
 | 省略 | 侧边栏顶级菜单或分组 |
-| `core:workloads` 等 | Kite 内置分组内 |
+| `core:workloads` 等 | KubeOsprey 内置分组内 |
 | `my-plugin:tools` | 本插件中 ID 为 `tools` 的分组内 |
 
 内置分组 ID 为 `core:application`、`core:workloads`、`core:traffic`、`core:storage`、`core:config`、`core:security`、`core:other`，可从 `/validation` 导入 `coreMenuGroupIds`。
@@ -137,7 +137,7 @@ IconKey           IconBoxMultiple      IconServer2       IconBell         IconCo
 
 ## 资源扩展
 
-通过 `plugin.config.tsx` 的 `resources` 配置，为 Kite 的资源列表添加列、为详情页添加 Tab，或替换某种 CRD 的完整页面。查询和修改资源数据见[资源查询与操作](./resources)。
+通过 `plugin.config.tsx` 的 `resources` 配置，为 KubeOsprey 的资源列表添加列、为详情页添加 Tab，或替换某种 CRD 的完整页面。查询和修改资源数据见[资源查询与操作](./resources)。
 
 `resources` 中的每一项用 `group`（API 组）和 `resource`（复数资源名）定位一种资源，类型是 `PluginResourceView<T>`。核心 API 组用空字符串，例如 Pod 是 `{ group: '', resource: 'pods' }`，StorageClass 是 `{ group: 'storage.k8s.io', resource: 'storageclasses' }`；API 组按格式校验，不限制 `k8s.io` 这类后缀。
 
@@ -243,7 +243,7 @@ export default definePlugin({
 
 ### 接管 CRD 列表和详情
 
-`list`、`detail` 接收实际的 React 节点。只提供其中一项时，另一页仍使用 Kite 的通用视图。无需声明插件路由，菜单也可以直接指向该 CRD：
+`list`、`detail` 接收实际的 React 节点。只提供其中一项时，另一页仍使用 KubeOsprey 的通用视图。无需声明插件路由，菜单也可以直接指向该 CRD：
 
 ```tsx
 // plugin.config.tsx
@@ -275,7 +275,7 @@ export default definePlugin({
 
 接管页面自行通过资源 Hook 请求数据，详情页用 `useParams()` 读取 `name` 和 `namespace`。菜单、CRD 浏览器和页面内链接使用同一套 CRD URL，见[打开资源页面](./navigation#打开资源页面)。表格、详情页和 YAML 编辑器可以复用 [UI 组件](./ui)。
 
-多个活动插件接管同一资源的同一种页面时，只有活动插件列表中的第一个匹配项生效。插件被禁用、卸载、不兼容或模块加载失败时，Kite 回退到通用视图。
+多个活动插件接管同一资源的同一种页面时，只有活动插件列表中的第一个匹配项生效。插件被禁用、卸载、不兼容或模块加载失败时，KubeOsprey 回退到通用视图。
 
 ### 扩展的标识与深链
 
@@ -291,7 +291,7 @@ export default definePlugin({
 
 ## 主题
 
-插件可以提供配色主题。一个主题就是一份样式表，用来覆盖 Kite 的 CSS 变量，因此一份文件就能同时改变所有页面、YAML 编辑器和终端的配色。
+插件可以提供配色主题。一个主题就是一份样式表，用来覆盖 KubeOsprey 的 CSS 变量，因此一份文件就能同时改变所有页面、YAML 编辑器和终端的配色。
 
 ```tsx
 import { definePlugin } from '@kite-dev/plugin-sdk'
@@ -318,7 +318,7 @@ export default definePlugin({
 
 样式表建议放在 `public/` 下，构建时会原样复制进归档，`styles` 中填写同样的相对路径。主题插件不需要声明路由、菜单或资源；三者都不声明时插件的 JavaScript 不会被加载，只会使用样式表。
 
-已启用插件提供的主题会出现在用户菜单的 **Color Theme** 中，按插件名分组。只有选中该主题时 Kite 才加载对应样式表，因此样式表可以直接写 `:root` 和 `.dark`：
+已启用插件提供的主题会出现在用户菜单的 **Color Theme** 中，按插件名分组。只有选中该主题时 KubeOsprey 才加载对应样式表，因此样式表可以直接写 `:root` 和 `.dark`：
 
 ```css
 /* public/themes/nord.css */
@@ -335,7 +335,7 @@ export default definePlugin({
 }
 ```
 
-`ui/src/styles/themes/default.css` 中定义的变量都可以覆盖，未覆盖的沿用默认值。主题生效期间 Kite 还会在根节点加上 `color-<插件 ID>-<主题 ID>` 类，需要限定作用域时可以只用这个类。样式表中的相对 `url()` 会解析到插件包内的文件，随插件分发的图片和字体都可以正常引用：
+`ui/src/styles/themes/default.css` 中定义的变量都可以覆盖，未覆盖的沿用默认值。主题生效期间 KubeOsprey 还会在根节点加上 `color-<插件 ID>-<主题 ID>` 类，需要限定作用域时可以只用这个类。样式表中的相对 `url()` 会解析到插件包内的文件，随插件分发的图片和字体都可以正常引用：
 
 ```css
 body::before {
@@ -372,7 +372,7 @@ export default definePlugin({
 
 `label` 可选，省略时用插件名作为弹窗标题；`element` 是任意 React 节点，`plugin.config.tsx` 里要用 `React.lazy` 引入。没有声明 `settings` 的插件不会显示这个按钮。
 
-配置本身存在 Kite 的后端数据库里，字段结构完全由插件决定，通过 `usePluginSettings()` 读写：
+配置本身存在 KubeOsprey 的后端数据库里，字段结构完全由插件决定，通过 `usePluginSettings()` 读写：
 
 ```tsx
 import { useState } from 'react'
@@ -425,4 +425,4 @@ export default definePlugin({
 })
 ```
 
-声明菜单、路由或 Tab 标签时使用同一模块的 `label()`；页面组件通过 `useTranslation()` 读取文案，随 Kite 的语言切换更新。翻译文件的组织方式和完整示例见[国际化指南](../i18n)。
+声明菜单、路由或 Tab 标签时使用同一模块的 `label()`；页面组件通过 `useTranslation()` 读取文案，随 KubeOsprey 的语言切换更新。翻译文件的组织方式和完整示例见[国际化指南](../i18n)。

@@ -4,7 +4,7 @@ outline: deep
 
 # 宿主状态与交互
 
-从 `@kite-dev/plugin-sdk/hooks` 读取 Kite 当前集群、命名空间、用户和主题，或控制收藏、终端等宿主功能。这些 React Hook 让插件与宿主保持同步，不需要自己维护一份状态。
+从 `@kite-dev/plugin-sdk/hooks` 读取 KubeOsprey 当前集群、命名空间、用户和主题，或控制收藏、终端等宿主功能。这些 React Hook 让插件与宿主保持同步，不需要自己维护一份状态。
 
 ## 当前集群与命名空间
 
@@ -29,7 +29,7 @@ export function CurrentScope() {
 | `useClusters(options?)` | 可访问集群的查询结果，默认启用，可用 `{ enabled }` 关闭 |
 | `useNamespace()` | `{ namespace, setNamespace }`，即插件的命名空间上下文 |
 
-`ClusterInfo` 只含 `name`、`isDefault` 和可选的 `version`、`error`，不包含集群凭据。认证始终由 Kite 管理。
+`ClusterInfo` 只含 `name`、`isDefault` 和可选的 `version`、`error`，不包含集群凭据。认证始终由 KubeOsprey 管理。
 
 ## 用户与插件配置
 
@@ -47,7 +47,7 @@ export function CurrentScope() {
 | `useTheme()` | `{ theme, actualTheme, setTheme }` |
 | `usePageTitle(title)` | 设置页面标题 |
 | `useIsMobile()` | 是否移动端布局 |
-| `useVersionInfo()` | Kite 版本信息（`UseQueryResult<VersionInfo, Error>`） |
+| `useVersionInfo()` | KubeOsprey 版本信息（`UseQueryResult<VersionInfo, Error>`） |
 
 ## 收藏与终端
 
@@ -67,7 +67,7 @@ import { useHostInfo } from '@kite-dev/plugin-sdk/hooks'
 
 export function HostVersion() {
   const { kiteVersion, sdkVersion } = useHostInfo()
-  return <p>Kite {kiteVersion} · SDK {sdkVersion}</p>
+  return <p>KubeOsprey {kiteVersion} · SDK {sdkVersion}</p>
 }
 ```
 

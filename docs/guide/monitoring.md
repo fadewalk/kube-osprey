@@ -1,6 +1,6 @@
 # Monitoring
 
-Kite provides comprehensive monitoring capabilities for your Kubernetes clusters through integration with Prometheus and built-in visualization tools.
+KubeOsprey provides comprehensive monitoring capabilities for your Kubernetes clusters through integration with Prometheus and built-in visualization tools.
 
 ![Monitoring](/screenshots/monitor.png)
 

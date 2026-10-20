@@ -1,6 +1,6 @@
 # Global Search
 
-Kite provides a powerful global search feature that allows you to quickly find any resource in your cluster. You can search by resource name, labels, or annotations.
+KubeOsprey provides a powerful global search feature that allows you to quickly find any resource in your cluster. You can search by resource name, labels, or annotations.
 
 You can activate the global search via the search bar at the top or by using the shortcut `Ctrl + K` (Windows/Linux) or `Cmd + K` (macOS) on any page.
 

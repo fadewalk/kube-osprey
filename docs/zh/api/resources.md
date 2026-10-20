@@ -1,6 +1,6 @@
 # 资源操作
 
-Kite 在 `/api/v1/<resource>` 下为内置 Kubernetes 资源提供通用的 CRUD 风格接口。
+KubeOsprey 在 `/api/v1/<resource>` 下为内置 Kubernetes 资源提供通用的 CRUD 风格接口。
 
 ## 调用前提
 
@@ -32,7 +32,7 @@ Kite 在 `/api/v1/<resource>` 下为内置 Kubernetes 资源提供通用的 CRUD
 
 ## 支持的操作
 
-对于内置资源，Kite 暴露了这些通用路由：
+对于内置资源，KubeOsprey 暴露了这些通用路由：
 
 ### namespace 级资源
 

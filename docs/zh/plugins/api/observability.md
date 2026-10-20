@@ -4,7 +4,7 @@ outline: deep
 
 # 指标与日志
 
-从 `@kite-dev/plugin-sdk/observability` 查询集群概览、资源用量和 Pod 指标，或订阅 Pod 日志流。插件负责组织图表和日志界面，Kite 提供数据和当前集群的访问权限。
+从 `@kite-dev/plugin-sdk/observability` 查询集群概览、资源用量和 Pod 指标，或订阅 Pod 日志流。插件负责组织图表和日志界面，KubeOsprey 提供数据和当前集群的访问权限。
 
 ## 查询指标
 
@@ -70,7 +70,7 @@ const data = await queryPrometheusRange(
 
 `PrometheusResult` 包含 `resultType`、`result` 和可选的 `warnings`。先按 `resultType`（`vector`、`matrix`、`scalar` 或 `string`）区分结果，再读取 `result`。数值采样格式为 `[timestamp, value]`，其中 `value` 是字符串；vector 和 matrix 结果也支持原生直方图。
 
-任意 PromQL 可以跨命名空间读取数据，因此必须有同一个 Kite 角色允许目标集群的 `prometheus/get`，且 `namespaces` 包含 `"*"`、没有命名空间排除规则。仅有某个命名空间的权限不能执行通用查询。例如：
+任意 PromQL 可以跨命名空间读取数据，因此必须有同一个 KubeOsprey 角色允许目标集群的 `prometheus/get`，且 `namespaces` 包含 `"*"`、没有命名空间排除规则。仅有某个命名空间的权限不能执行通用查询。例如：
 
 ```json
 {
@@ -81,7 +81,7 @@ const data = await queryPrometheusRange(
 }
 ```
 
-无权限时返回 403，集群未配置可用 Prometheus 时返回 503。查询超时为 30 秒；每条序列超过 11,000 个采样间隔时需增大 `step`。认证由 Kite 处理，插件不会收到 Prometheus 凭据。
+无权限时返回 403，集群未配置可用 Prometheus 时返回 503。查询超时为 30 秒；每条序列超过 11,000 个采样间隔时需增大 `step`。认证由 KubeOsprey 处理，插件不会收到 Prometheus 凭据。
 
 ## 订阅 Pod 日志
 

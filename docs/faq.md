@@ -2,17 +2,9 @@
 
 ## Data Sharing
 
-By default, Kite does not collect any analytics data.
-If you would like to help improve the product, you can turn reporting on or off using **Enable analytics** during initial setup or in General settings.
-
-When enabled, the Kite server reports installation statistics once every 24 hours to help improve the product. Reports contain:
-
-- A randomly generated installation ID
-- The Kite version and connected Kubernetes cluster versions
-- Installed plugin IDs, versions, and enabled status
-- The operating system and CPU architecture
-
-The reporting implementation is available in [the source code](https://github.com/kite-org/kite/blob/main/pkg/telemetry/telemetry.go).
+KubeOsprey does not collect any analytics or telemetry data. The optional
+usage reporting that existed in upstream Kite has been removed from this
+fork — no installation statistics or usage data ever leave your cluster.
 
 ## Permission Issues
 
@@ -28,15 +20,15 @@ You need to refer to the [RBAC Configuration Guide](./config/rbac-config) to con
 
 ## Managed Kubernetes Cluster Connection Issues
 
-If you're using a managed Kubernetes cluster (AKS, EKS, GKE, etc.) and encounter authentication errors when adding the cluster to Kite, this is usually because the default kubeconfig uses `exec` plugins that require CLI tools (like `kubelogin`, `aws`, or `gcloud`).
+If you're using a managed Kubernetes cluster (AKS, EKS, GKE, etc.) and encounter authentication errors when adding the cluster to KubeOsprey, this is usually because the default kubeconfig uses `exec` plugins that require CLI tools (like `kubelogin`, `aws`, or `gcloud`).
 
-Kite runs as a server-side application and cannot execute these client-side authentication tools. Instead, you should use Service Account token-based authentication.
+KubeOsprey runs as a server-side application and cannot execute these client-side authentication tools. Instead, you should use Service Account token-based authentication.
 
 Please refer to the [Managed Kubernetes Cluster Configuration Guide](./config/managed-k8s-auth) for detailed instructions on creating and using Service Account tokens for authentication.
 
 ## Persistence Issues
 
-Kite supports the use of SQLite, MySQL, or PostgreSQL as databases.
+KubeOsprey supports the use of SQLite, MySQL, or PostgreSQL as databases.
 
 You can configure the database connection string using the `DB_DSN` environment variable, and specify the type of database using `DB_TYPE` (default is `sqlite`).
 
@@ -44,7 +36,7 @@ You can configure the database connection string using the `DB_DSN` environment 
 
 - If MySQL or PostgreSQL is used, you need to provide the appropriate connection string, such as `DB_DSN=user:password@tcp(host:port)/dbname`.
 
-It’s recommended to install Kite using a Helm Chart. This makes it easier to configure persistent storage and database connections.
+It’s recommended to install KubeOsprey using a Helm Chart. This makes it easier to configure persistent storage and database connections.
 
 ## SQLite with hostPath Storage
 
@@ -54,7 +46,7 @@ If you're using SQLite as the database and encountering an "out of memory" error
 panic: failed to connect database: unable to open database file: out of memory (14)
 ```
 
-This issue is related to the pure Go SQLite driver used by Kite (to avoid CGO dependencies). The driver has limitations when accessing database files on certain storage backends.
+This issue is related to the pure Go SQLite driver used by KubeOsprey (to avoid CGO dependencies). The driver has limitations when accessing database files on certain storage backends.
 
 **Solution**: Add SQLite connection options to improve compatibility with hostPath storage. In your Helm values, set:
 
@@ -72,7 +64,7 @@ For more details, see [Issue #204](https://github.com/kite-org/kite/issues/204).
 
 ## How to Change Font
 
-By default, Kite provides three fonts: system default, `Maple Mono`, and `JetBrains Mono`.
+By default, KubeOsprey provides three fonts: system default, `Maple Mono`, and `JetBrains Mono`.
 
 If you want to use a different font, you need to build the project yourself.
 
@@ -96,7 +88,7 @@ body {
 }
 ```
 
-## How Can I Contribute to Kite?
+## How Can I Contribute to KubeOsprey?
 
 We welcome contributions! You can:
 

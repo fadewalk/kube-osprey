@@ -34,7 +34,7 @@ export function DeploymentActions() {
 
 ## Opening Resource Pages
 
-Import `ResourceLink` and `resolveResourcePath` from `/navigation` to open Kite's custom resource pages without declaring plugin routes:
+Import `ResourceLink` and `resolveResourcePath` from `/navigation` to open KubeOsprey's custom resource pages without declaring plugin routes:
 
 ```tsx
 import { ResourceLink } from '@kite-dev/plugin-sdk/navigation'
@@ -55,7 +55,7 @@ const gateways = { group: 'gateway.networking.k8s.io', resource: 'gateways' }
 | Namespaced detail | `/crds/gateways.gateway.networking.k8s.io/default/demo` |
 | Cluster-scoped detail | `/crds/clusterissuers.cert-manager.io/demo` |
 
-`resolveResourcePath(target, item?)` returns the same paths, with `item` shaped as `{ name, namespace? }`. Parameters are encoded automatically, and Kite's Router handles the deployment base path. Use React Router's `useNavigate()` in an event handler:
+`resolveResourcePath(target, item?)` returns the same paths, with `item` shaped as `{ name, namespace? }`. Parameters are encoded automatically, and KubeOsprey's Router handles the deployment base path. Use React Router's `useNavigate()` in an event handler:
 
 ```tsx
 import { resolveResourcePath } from '@kite-dev/plugin-sdk/navigation'

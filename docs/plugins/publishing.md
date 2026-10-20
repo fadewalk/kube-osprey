@@ -9,12 +9,12 @@ Plugins are packaged as `.tar.gz` archives. Distribute them directly, host your 
 ## Version Rules
 
 - Use a **semantic version without a `v` prefix**, such as `0.1.3`.
-- **Package contents for the same ID and version are immutable.** Kite stores assets by their SHA-256 digest. Any content change, even a single string, requires a version increment; otherwise, Kite rejects the installation.
-- `engines.kite` specifies the Kite versions the plugin supports. Only stable releases (`X.Y.Z` or `vX.Y.Z`) enforce this range during installation and when displaying the catalog. Development, prerelease, and other non-release builds skip Kite version matching. All builds still check SDK compatibility.
+- **Package contents for the same ID and version are immutable.** KubeOsprey stores assets by their SHA-256 digest. Any content change, even a single string, requires a version increment; otherwise, KubeOsprey rejects the installation.
+- `engines.kite` specifies the KubeOsprey versions the plugin supports. Only stable releases (`X.Y.Z` or `vX.Y.Z`) enforce this range during installation and when displaying the catalog. Development, prerelease, and other non-release builds skip KubeOsprey version matching. All builds still check SDK compatibility.
 
 ## README
 
-The plugin's root `README.md` is copied into `dist/` and included in the archive. When distributed through a catalog, Kite can preview this README. Use full repository URLs for links to files that are not included in the package.
+The plugin's root `README.md` is copied into `dist/` and included in the archive. When distributed through a catalog, KubeOsprey can preview this README. Use full repository URLs for links to files that are not included in the package.
 
 ## Private Distribution
 
@@ -39,7 +39,7 @@ dist/catalog/
 └── readmes/              # README preview files
 ```
 
-Upload `dist/catalog/` to any HTTP(S) static host, then enter the `catalog.json` URL under **Settings → General → Plugin catalog** in Kite. To host archives separately from the catalog:
+Upload `dist/catalog/` to any HTTP(S) static host, then enter the `catalog.json` URL under **Settings → General → Plugin catalog** in KubeOsprey. To host archives separately from the catalog:
 
 ```sh
 pnpm run catalog \
@@ -62,4 +62,4 @@ After the PR is merged into `main`, the publishing workflow builds unpublished p
 | Catalog | URL |
 | ------- | --- |
 | GitHub Pages | `https://kite-org.github.io/kite-plugins/catalog.json` |
-| EdgeOne | `https://plugins.kitehq.dev/catalog.json` (Kite's default catalog) |
+| EdgeOne | `https://plugins.kitehq.dev/catalog.json` (KubeOsprey's default catalog) |

@@ -1,10 +1,10 @@
 # RBAC Configuration Guide
 
-This guide explains how to configure Role-Based Access Control (RBAC) in Kite to efficiently manage user permissions and resource access.
+This guide explains how to configure Role-Based Access Control (RBAC) in KubeOsprey to efficiently manage user permissions and resource access.
 
 ## Overview
 
-Kite's RBAC system supports:
+KubeOsprey's RBAC system supports:
 
 - Defining custom roles with specific permissions
 - Assigning roles to users or OAuth groups
@@ -101,4 +101,4 @@ You can select a role and set the username to `*` to assign that role. See the e
 
 ## Common Questions
 
-- The `Describe` action only checks the current user's `get` permission on the target resource. The Kubernetes describer runs queries using the cluster credentials configured in Kite, and its output may include Events and related resource summaries. Kite does not perform separate RBAC checks for this additional information.
+- The `Describe` action only checks the current user's `get` permission on the target resource. The Kubernetes describer runs queries using the cluster credentials configured in KubeOsprey, and its output may include Events and related resource summaries. KubeOsprey does not perform separate RBAC checks for this additional information.

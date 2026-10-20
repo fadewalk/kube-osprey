@@ -4,12 +4,12 @@ outline: deep
 
 # 快速开始
 
-使用脚手架创建插件项目，编写 React 页面后，打包为 `.tar.gz` 安装到 Kite。
+使用脚手架创建插件项目，编写 React 页面后，打包为 `.tar.gz` 安装到 KubeOsprey。
 
 ## 前置要求
 
 - Node.js `^20.19.0 || >=22.12.0`，pnpm 10.x
-- 一个可以访问的 Kite 实例（版本需满足插件的 `engines.kite` 范围，当前默认 `>=0.16.0`）
+- 一个可以访问的 KubeOsprey 实例（版本需满足插件的 `engines.kite` 范围，当前默认 `>=0.16.0`）
 - 管理员权限（用于安装插件）
 
 ## 创建项目
@@ -86,7 +86,7 @@ export default definePlugin({
 要点：
 
 - 路由路径相对于 `/plugins/my-plugin`。空字符串 `''` 是插件首页；路径支持 `:namespace/:name` 这样的命名参数。
-- `menus` 中的 `parent` 可以是 Kite 内置分组（`core:workloads`、`core:storage`、`core:other` 等），也可以省略形成顶级菜单。`route` 指向插件路由，`resource: { group, resource }` 直接指向 CRD 列表；两者都不带的菜单是分组标题。
+- `menus` 中的 `parent` 可以是 KubeOsprey 内置分组（`core:workloads`、`core:storage`、`core:other` 等），也可以省略形成顶级菜单。`route` 指向插件路由，`resource: { group, resource }` 直接指向 CRD 列表；两者都不带的菜单是分组标题。
 - `routes`、`menus`、`resources` 均可省略。`resources` 可追加列表列、详情 Tab 或接管自定义资源页面，详见[插件配置：资源扩展](./api/plugin-config#资源扩展)。
 - `element` 接收任意 React 节点。页面组件用 `React.lazy(() => import(...))` 懒加载，CSS 和浏览器依赖放在页面模块里。
 - `plugin.config.tsx` 会在构建时于 Node.js 中执行一次以提取路由和菜单元数据，因此其中的声明不能依赖浏览器全局变量。
@@ -174,19 +174,19 @@ pnpm run pack    # 打包 dist/ 为归档
 | `pnpm run dev`                     | 启动开发服务并监听文件变更，输出开发插件地址 |
 | `pnpm run pack`                    | 打包当前 `dist/`                             |
 
-## 安装到 Kite
+## 安装到 KubeOsprey
 
 1. 点击右上角头像，选择 **插件管理**。
 2. 点击 **从文件安装**，选择 `my-plugin-0.1.0.tar.gz`。
 3. 安装完成后插件自动启用，侧边栏 **其他** 分组中出现菜单项，点击即可打开插件页面。
 
-开发时运行 `pnpm dev`，将输出地址配置到 Kite 的 `PLUGIN_DEV_URL` 启动环境变量。修改代码并等待构建完成后，刷新 Kite 页面即可，无需反复打包安装。详见[调试](./debugging)。
+开发时运行 `pnpm dev`，将输出地址配置到 KubeOsprey 的 `PLUGIN_DEV_URL` 启动环境变量。修改代码并等待构建完成后，刷新 KubeOsprey 页面即可，无需反复打包安装。详见[调试](./debugging)。
 
-发布安装包时，递增 `package.json` 中的 `version` → `pnpm run build && pnpm run pack` → 再次从文件安装。同一 ID + 版本的安装包内容不可变，内容变了就必须换版本号，否则 Kite 会拒绝安装。
+发布安装包时，递增 `package.json` 中的 `version` → `pnpm run build && pnpm run pack` → 再次从文件安装。同一 ID + 版本的安装包内容不可变，内容变了就必须换版本号，否则 KubeOsprey 会拒绝安装。
 
 ## 样式
 
-宿主组件自带样式。自定义布局请使用 CSS Modules 并引用 Kite 的 CSS 变量，这样能自动适配明暗主题：
+宿主组件自带样式。自定义布局请使用 CSS Modules 并引用 KubeOsprey 的 CSS 变量，这样能自动适配明暗主题：
 
 ```css
 /* src/pages/home.module.css */
@@ -201,12 +201,12 @@ pnpm run pack    # 打包 dist/ 为归档
 
 常用变量：`--background`、`--foreground`、`--card`、`--card-foreground`、`--primary`、`--primary-foreground`、`--muted`、`--muted-foreground`、`--border`。
 
-注意 Kite 的 Tailwind 构建不会扫描插件源码，插件内使用的工具类需要由自己的构建生成；插件样式应限制作用域，避免全局 reset 影响 Kite。
+注意 KubeOsprey 的 Tailwind 构建不会扫描插件源码，插件内使用的工具类需要由自己的构建生成；插件样式应限制作用域，避免全局 reset 影响 KubeOsprey。
 
 ## 下一步
 
 - [插件配置](./api/plugin-config)：配置路由、菜单、资源扩展、主题、配置页和国际化
-- [资源查询与操作](./api/resources)：读取资源、执行写操作和调用 Kite API
+- [资源查询与操作](./api/resources)：读取资源、执行写操作和调用 KubeOsprey API
 - [UI 组件](./api/ui)：复用资源列表、详情页和 YAML 编辑器
 - [国际化](./i18n)：添加中英文翻译
 - [调试](./debugging)：本地开发与问题排查

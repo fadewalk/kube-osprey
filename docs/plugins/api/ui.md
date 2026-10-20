@@ -4,7 +4,7 @@ outline: deep
 
 # UI Components
 
-Import components from `@kite-dev/plugin-sdk/ui` to reuse Kite's resource tables, detail layouts, YAML editor, and basic controls. Components handle display and interaction; fetch data through [Resource Queries and Operations](./resources). You can also combine those APIs with your own layouts.
+Import components from `@kite-dev/plugin-sdk/ui` to reuse KubeOsprey's resource tables, detail layouts, YAML editor, and basic controls. Components handle display and interaction; fetch data through [Resource Queries and Operations](./resources). You can also combine those APIs with your own layouts.
 
 ## ResourceTable
 
@@ -148,7 +148,7 @@ export default function DeploymentPage() {
 | `onDeleted` | Callback after successful deletion |
 | `headerActions`, `titleIcon`, `loadingMessage` | Custom header actions, title icon, and loading text |
 
-Users can change tab order and visibility through Kite's tab controls.
+Users can change tab order and visibility through KubeOsprey's tab controls.
 
 ## ResourceOverview
 
@@ -184,7 +184,7 @@ import { ResourceEvents } from '@kite-dev/plugin-sdk/ui'
 
 ## ResourceHistoryTable
 
-Displays Kite's operation history, including YAML diffs and rollback actions. Supports built-in and custom resources. Pass `currentResource` to compare a historical record with the current object.
+Displays KubeOsprey's operation history, including YAML diffs and rollback actions. Supports built-in and custom resources. Pass `currentResource` to compare a historical record with the current object.
 
 ```tsx
 import { ResourceHistoryTable } from '@kite-dev/plugin-sdk/ui'
@@ -212,7 +212,7 @@ import { RelatedResourcesTable } from '@kite-dev/plugin-sdk/ui'
 
 ## LogViewer
 
-Embeds Kite's Pod log viewer with container selection, search, streaming controls, and download. Queries use the current cluster and require the user's `pods/log` permission for the namespace.
+Embeds KubeOsprey's Pod log viewer with container selection, search, streaming controls, and download. Queries use the current cluster and require the user's `pods/log` permission for the namespace.
 
 ```tsx
 import { LogViewer } from '@kite-dev/plugin-sdk/ui'
@@ -231,7 +231,7 @@ import { LogViewer } from '@kite-dev/plugin-sdk/ui'
 
 ## Terminal
 
-Embeds Kite's terminal for a Pod, node, or kubectl session. Pod exec uses the current cluster and requires `pods/exec` permission for the namespace.
+Embeds KubeOsprey's terminal for a Pod, node, or kubectl session. Pod exec uses the current cluster and requires `pods/exec` permission for the namespace.
 
 ```tsx
 import { Terminal } from '@kite-dev/plugin-sdk/ui'
@@ -249,7 +249,7 @@ import { Terminal } from '@kite-dev/plugin-sdk/ui'
 
 ## Toast Notifications
 
-`toast` displays notifications in Kite's existing notification area; plugins do not need a separate provider.
+`toast` displays notifications in KubeOsprey's existing notification area; plugins do not need a separate provider.
 
 ```ts
 import { toast } from '@kite-dev/plugin-sdk/ui'
@@ -264,7 +264,7 @@ Use `toast(message, options?)`, `toast.success`, `toast.error`, `toast.info`, `t
 
 ## WorkloadPodsCard
 
-Display Kite's compact Pod card, including status, ready container count, restarts, node, IP, and age. Clicking a Pod name opens the host's Pod detail dialog.
+Display KubeOsprey's compact Pod card, including status, ready container count, restarts, node, IP, and age. Clicking a Pod name opens the host's Pod detail dialog.
 
 ```tsx
 import { WorkloadPodsCard } from '@kite-dev/plugin-sdk/ui'

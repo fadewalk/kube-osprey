@@ -1,20 +1,20 @@
 # Production Security Hardening
 
-This guide is the production security baseline for Kite. It applies to Helm installations, the standalone Kubernetes manifest, and Cluster Agent deployments.
+This guide is the production security baseline for KubeOsprey. It applies to Helm installations, the standalone Kubernetes manifest, and Cluster Agent deployments.
 
-Kite is a Kubernetes control plane. It can create privileged Kubernetes clients, terminal pods, exec sessions, proxy requests, and AI-assisted resource changes. Treat a Kite installation as a cluster administration boundary.
+KubeOsprey is a Kubernetes control plane. It can create privileged Kubernetes clients, terminal pods, exec sessions, proxy requests, and AI-assisted resource changes. Treat a KubeOsprey installation as a cluster administration boundary.
 
 ## Production baseline
 
-Before exposing Kite to users, verify all of the following:
+Before exposing KubeOsprey to users, verify all of the following:
 
-- Use HTTPS for Kite, OAuth/OIDC callbacks, Cluster Agent connections, and WebSocket traffic.
+- Use HTTPS for KubeOsprey, OAuth/OIDC callbacks, Cluster Agent connections, and WebSocket traffic.
 - Set `KITE_ENCRYPT_KEY` to a high-entropy value and store it in an external Secret. Never use the public example value from development documentation.
 - Set `JWT_SECRET` explicitly when you need stable sessions across restarts or multiple replicas.
 - Set `ANONYMOUS_USER_ENABLED=false` and verify that anonymous access is disabled.
 - Use a narrow `TRUSTED_PROXIES` list. Do not trust arbitrary client-supplied forwarding headers.
 - Use an external PostgreSQL or MySQL database, or provision a persistent volume for SQLite.
-- Pin Kite, terminal, and Cluster Agent images to a release tag or digest. Do not use `latest` in production.
+- Pin KubeOsprey, terminal, and Cluster Agent images to a release tag or digest. Do not use `latest` in production.
 - Review every `cluster-admin`, wildcard RBAC rule, privileged container, host namespace, and host path before deployment.
 - Enable only the terminal and Cluster Agent capabilities that your operators need.
 - Back up the database and the encryption key together. A database backup without its encryption key cannot restore encrypted fields.
@@ -39,11 +39,11 @@ Do not put real keys in `values.yaml`, Git, shell history, issue trackers, or ge
 
 ## Kubernetes permissions
 
-Kite has application-level RBAC, while Kubernetes separately evaluates the ServiceAccount or kubeconfig used by the Kite server and Cluster Agent. The effective permission is the intersection of both systems, but an overly privileged Kubernetes identity can still make a mistake or compromised session more damaging.
+KubeOsprey has application-level RBAC, while Kubernetes separately evaluates the ServiceAccount or kubeconfig used by the KubeOsprey server and Cluster Agent. The effective permission is the intersection of both systems, but an overly privileged Kubernetes identity can still make a mistake or compromised session more damaging.
 
 Review these areas separately:
 
-- Kite server ServiceAccount and ClusterRole;
+- KubeOsprey server ServiceAccount and ClusterRole;
 - Cluster Agent ServiceAccount and ClusterRoleBinding;
 - kubectl terminal ServiceAccount and ClusterRoleBinding;
 - Node Terminal host access, privileged mode, host namespaces, and host paths;
@@ -58,7 +58,7 @@ Cluster Agent manifests support permission profiles:
 - `admin`: binds `cluster-admin` (legacy high-trust behavior).
 - `custom`: binds an existing ClusterRole of your choice.
 
-The default profile is `admin` for backward compatibility; prefer `operator` or `readOnly` for production. Note that Secrets are readable under `operator` because the Kite console and Helm release browsing read Secret-backed data; use `custom` if that is unacceptable.
+The default profile is `admin` for backward compatibility; prefer `operator` or `readOnly` for production. Note that Secrets are readable under `operator` because the KubeOsprey console and Helm release browsing read Secret-backed data; use `custom` if that is unacceptable.
 
 ClusterRoleBinding `roleRef` is immutable in Kubernetes. When switching an existing Cluster Agent to a different profile, delete the `kite-cluster-agent` ClusterRoleBinding before applying the new manifest.
 
@@ -76,7 +76,7 @@ Use explicit administrator permissions, short sessions, automatic cleanup, and a
 
 The PromQL Explorer is a cluster-level observability tool. It should be granted only to users who are allowed to query the configured Prometheus data source. Kubernetes namespace RBAC does not automatically filter Prometheus results.
 
-If Kite is used as a multi-tenant platform, enforce tenant isolation in the Prometheus layer or replace unrestricted PromQL with approved query templates. Do not attempt to provide isolation by blindly appending a namespace selector to arbitrary PromQL.
+If KubeOsprey is used as a multi-tenant platform, enforce tenant isolation in the Prometheus layer or replace unrestricted PromQL with approved query templates. Do not attempt to provide isolation by blindly appending a namespace selector to arbitrary PromQL.
 
 ## Database and persistence
 
@@ -96,7 +96,7 @@ The default SQLite setup is suitable for evaluation only. Without a persistent v
 - Inspect the ServiceAccount, ClusterRoleBinding, Secret, and Deployment before applying.
 - When changing the permission profile, delete the existing `kite-cluster-agent` ClusterRoleBinding first (`roleRef` cannot be updated in place).
 - Ensure the reverse proxy supports WebSocket upgrade and long-lived connections.
-- For multiple Kite replicas, validate session routing and shared state before production use.
+- For multiple KubeOsprey replicas, validate session routing and shared state before production use.
 
 ## Verification commands
 
@@ -131,8 +131,8 @@ Check readiness separately from process liveness. A process can be running while
 
 The following items require separate design work rather than a blind permission reduction:
 
-- Cluster Agent currently uses its registered Kubernetes credentials when forwarding requests; it does not impersonate the Kite user at the Kubernetes API.
+- Cluster Agent currently uses its registered Kubernetes credentials when forwarding requests; it does not impersonate the KubeOsprey user at the Kubernetes API.
 - kubectl terminal sessions now support configurable permission modes (`admin` / `operator` / `custom`) with per-session roles; node terminal still requires break-glass controls and a more narrowly scoped identity.
 - Encryption-key rotation needs a migration path for existing `SecretString` values.
-- Raw PromQL is not namespace-rewritten by Kite. Multi-tenant Prometheus isolation must be provided by the metrics architecture or a restricted query model.
+- Raw PromQL is not namespace-rewritten by KubeOsprey. Multi-tenant Prometheus isolation must be provided by the metrics architecture or a restricted query model.
 - Passkey ceremonies, Cluster Agent sessions, and other in-memory state need shared storage before a multi-replica deployment is considered fully supported.

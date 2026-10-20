@@ -4,7 +4,7 @@ outline: deep
 
 # Metrics and Logs
 
-Use `@kite-dev/plugin-sdk/observability` to query the cluster overview, resource usage, and Pod metrics, or subscribe to Pod log streams. Plugins build the charts and log interfaces; Kite provides data using the current user's access to the current cluster.
+Use `@kite-dev/plugin-sdk/observability` to query the cluster overview, resource usage, and Pod metrics, or subscribe to Pod log streams. Plugins build the charts and log interfaces; KubeOsprey provides data using the current user's access to the current cluster.
 
 ## Querying Metrics
 
@@ -70,7 +70,7 @@ const data = await queryPrometheusRange(
 
 `PrometheusResult` contains `resultType`, `result`, and optional `warnings`. Narrow by `resultType` (`vector`, `matrix`, `scalar`, or `string`) before reading `result`. Numeric samples are `[timestamp, value]` pairs, where `value` is a string; vector and matrix results also support native histograms.
 
-Arbitrary PromQL can read across namespaces. A matching Kite role must grant `get` on `prometheus` for the target cluster, with `namespaces: ["*"]` and no namespace exclusions. Namespace-scoped grants do not qualify. For example:
+Arbitrary PromQL can read across namespaces. A matching KubeOsprey role must grant `get` on `prometheus` for the target cluster, with `namespaces: ["*"]` and no namespace exclusions. Namespace-scoped grants do not qualify. For example:
 
 ```json
 {
@@ -81,7 +81,7 @@ Arbitrary PromQL can read across namespaces. A matching Kite role must grant `ge
 }
 ```
 
-Kite returns 403 without this permission and 503 when Prometheus is unavailable. Queries time out after 30 seconds; increase `step` for ranges exceeding 11,000 intervals per series. Authentication stays with Kite; no Prometheus credentials are sent to the plugin.
+KubeOsprey returns 403 without this permission and 503 when Prometheus is unavailable. Queries time out after 30 seconds; increase `step` for ranges exceeding 11,000 intervals per series. Authentication stays with KubeOsprey; no Prometheus credentials are sent to the plugin.
 
 ## Subscribing to Pod Logs
 

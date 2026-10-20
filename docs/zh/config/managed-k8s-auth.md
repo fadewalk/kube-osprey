@@ -12,7 +12,7 @@ title: 托管 Kubernetes 集群配置
 - **EKS** 使用 `aws` CLI
 - **GKE** 使用 `gcloud` 命令
 
-这种认证方式在本地客户端环境中运行良好,但在 Kite 这样的服务端环境中会失败,因为:
+这种认证方式在本地客户端环境中运行良好,但在 KubeOsprey 这样的服务端环境中会失败,因为:
 
 1. 服务器上可能没有安装这些 CLI 工具
 2. 即使安装了,服务器环境也可能没有相应的身份认证配置
@@ -20,7 +20,7 @@ title: 托管 Kubernetes 集群配置
 
 ### 使用 Service Account Tok
 
-为 Kite 创建一个专用的 Service Account,并使用其 token 进行认证。
+为 KubeOsprey 创建一个专用的 Service Account,并使用其 token 进行认证。
 
 kite 提供了一个辅助创建的脚本
 

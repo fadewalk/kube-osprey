@@ -34,7 +34,7 @@ export function DeploymentActions() {
 
 ## 打开资源页面
 
-`ResourceLink` 和 `resolveResourcePath` 从 `/navigation` 导入，用于跳转 Kite 的自定义资源页面，不依赖插件路由：
+`ResourceLink` 和 `resolveResourcePath` 从 `/navigation` 导入，用于跳转 KubeOsprey 的自定义资源页面，不依赖插件路由：
 
 ```tsx
 import { ResourceLink } from '@kite-dev/plugin-sdk/navigation'
@@ -55,7 +55,7 @@ const gateways = { group: 'gateway.networking.k8s.io', resource: 'gateways' }
 | 命名空间级详情 | `/crds/gateways.gateway.networking.k8s.io/default/demo` |
 | 集群级详情 | `/crds/clusterissuers.cert-manager.io/demo` |
 
-`resolveResourcePath(target, item?)` 返回同样的路径，`item` 为 `{ name, namespace? }`。参数自动编码，部署基路径由 Kite 的 Router 处理。事件回调中可以配合 React Router 的 `useNavigate()` 跳转：
+`resolveResourcePath(target, item?)` 返回同样的路径，`item` 为 `{ name, namespace? }`。参数自动编码，部署基路径由 KubeOsprey 的 Router 处理。事件回调中可以配合 React Router 的 `useNavigate()` 跳转：
 
 ```tsx
 import { resolveResourcePath } from '@kite-dev/plugin-sdk/navigation'

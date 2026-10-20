@@ -90,7 +90,10 @@ async function completeForcedPasswordChangeIfPresent(
     data: { current_password: password, new_password: password },
   })
   if (response.status() === 200) {
-    await page.reload()
+    // The login flow may still be settling; a reload can race it and abort.
+    await expect(async () => {
+      await page.reload()
+    }).toPass({ timeout: 15_000 })
   }
 }
 

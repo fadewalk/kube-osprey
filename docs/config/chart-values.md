@@ -1,20 +1,20 @@
 # Chart Values
 
-This document describes all available configuration options for the Kite Helm Chart.
+This document describes all available configuration options for the KubeOsprey Helm Chart.
 
 ## Basic Configuration
 
 | Parameter          | Description                                                | Default                 |
 | ------------------ | ---------------------------------------------------------- | ----------------------- |
 | `replicaCount`     | Number of replicas                                         | `1`                     |
-| `image.repository` | Container image repository                                 | `ghcr.io/kite-org/kite` |
+| `image.repository` | Container image repository                                 | `ghcr.io/fadewalk/kube-osprey` |
 | `image.pullPolicy` | Image pull policy                                          | `IfNotPresent`          |
 | `image.tag`        | Image tag. If set, will override the chart's `appVersion`. | `""`                    |
 | `imagePullSecrets` | Image pull secrets for private repositories                | `[]`                    |
 | `nameOverride`     | Override chart name                                        | `""`                    |
 | `fullnameOverride` | Override full name                                         | `""`                    |
 | `debug`            | Enable debug mode                                          | `false`                 |
-| `basePath`         | Base path where Kite is served. See notes below.           | `""`                    |
+| `basePath`         | Base path where KubeOsprey is served. See notes below.           | `""`                    |
 
 ## Authentication & Security
 
@@ -49,7 +49,7 @@ This document describes all available configuration options for the Kite Helm Ch
 
 ## Plugin Storage
 
-Available in Kite `v0.16.0` and later. The default plugin directory is `/data/plugins`, which shares SQLite's `/data` volume. Persistence is disabled by default.
+Available in KubeOsprey `v0.16.0` and later. The default plugin directory is `/data/plugins`, which shares SQLite's `/data` volume. Persistence is disabled by default.
 
 | Parameter | Description | Default |
 | --------- | ----------- | ------- |
@@ -94,7 +94,7 @@ plugins:
     size: 1Gi
 ```
 
-Set `plugins.persistence.existingClaim` to reuse a PVC in Kite's namespace. With `ReadWriteOnce` storage, use `Recreate` for a single replica to avoid volume attachment conflicts during upgrades.
+Set `plugins.persistence.existingClaim` to reuse a PVC in KubeOsprey's namespace. With `ReadWriteOnce` storage, use `Recreate` for a single replica to avoid volume attachment conflicts during upgrades.
 
 ## Environment Variables
 
@@ -104,9 +104,9 @@ Set `plugins.persistence.existingClaim` to reuse a PVC in Kite's namespace. With
 
 ## Application Configuration
 
-Kite supports loading cluster, OAuth/LDAP, and RBAC configuration from a YAML config file. When enabled, managed sections become read-only in the UI.
+KubeOsprey supports loading cluster, OAuth/LDAP, and RBAC configuration from a YAML config file. When enabled, managed sections become read-only in the UI.
 
-Available in Kite `v0.10.0` and later.
+Available in KubeOsprey `v0.10.0` and later.
 
 See [Configuration File](./config-file) for the full config file format, usage examples, and reference.
 
@@ -180,7 +180,7 @@ rbac:
 ```yaml
 ingress:
   hosts:
-    - host: kitehq.dev
+    - host: kite.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific

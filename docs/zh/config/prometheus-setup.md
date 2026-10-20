@@ -1,10 +1,10 @@
 # Prometheus 设置指南
 
-本指南介绍如何配置 Kite 与 Prometheus 的监控集成，以实现实时指标和监控功能。
+本指南介绍如何配置 KubeOsprey 与 Prometheus 的监控集成，以实现实时指标和监控功能。
 
 ## 概述
 
-Kite 与 Prometheus 集成提供：
+KubeOsprey 与 Prometheus 集成提供：
 
 - 实时集群资源指标
 - 历史数据可视化
@@ -45,7 +45,7 @@ helm install prometheus prometheus-community/kube-prometheus-stack \
 
 按照每个组件的官方文档获取详细的安装说明。
 
-## 连接 Kite 到 Prometheus
+## 连接 KubeOsprey 到 Prometheus
 
 拥有 **admin** 角色的用户，可在页面右上角进入设置入口，进入集群管理界面。
 

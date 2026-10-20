@@ -1,6 +1,6 @@
 # 安装指南
 
-本指南详细介绍如何在 Kubernetes 环境下安装 Kite。
+本指南详细介绍如何在 Kubernetes 环境下安装 KubeOsprey。
 
 ## 前提条件
 
@@ -12,23 +12,16 @@
 
 ### 方式一：Helm Chart（推荐）
 
-使用 Helm 可灵活配置和升级 Kite：
+使用 Helm 可灵活配置和升级 KubeOsprey：
 
 ```bash
-helm install kite oci://ghcr.io/kite-org/charts/kite -n kite-system --create-namespace
+helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace
 ```
 
-或从 Helm 仓库安装：
+或锁定 Chart 版本以保证安装可复现：
 
 ```bash
-# 添加 Kite 仓库
-helm repo add kite https://charts.kitehq.dev
-
-# 更新仓库信息
-helm repo update
-
-# 使用默认配置安装
-helm install kite kite/kite -n kite-system --create-namespace
+helm install kite oci://ghcr.io/fadewalk/charts/kite --version 0.17.1 -n kite-system --create-namespace
 ```
 
 #### 自定义安装
@@ -40,10 +33,7 @@ helm install kite kite/kite -n kite-system --create-namespace
 使用自定义值安装：
 
 ```bash
-helm install kite oci://ghcr.io/kite-org/charts/kite -n kite-system -f values.yaml
-
-# 或使用 Helm 仓库
-helm install kite kite/kite -n kite-system -f values.yaml
+helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system -f values.yaml
 ```
 
 ### 方式二：YAML 清单
@@ -57,16 +47,16 @@ helm install kite kite/kite -n kite-system -f values.yaml
 :::
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/kite-org/kite/main/deploy/install.yaml
+kubectl apply -f https://raw.githubusercontent.com/fadewalk/kube-osprey/main/deploy/install.yaml
 ```
 
-此方法将使用默认配置安装 Kite。如需高级定制，建议使用 Helm Chart。
+此方法将使用默认配置安装 KubeOsprey。如需高级定制，建议使用 Helm Chart。
 
-## 访问 Kite
+## 访问 KubeOsprey
 
 ### 端口转发（测试环境）
 
-测试期间可通过端口转发快速访问 Kite：
+测试期间可通过端口转发快速访问 KubeOsprey：
 
 ```bash
 kubectl port-forward -n kite-system svc/kite 8080:8080
@@ -74,7 +64,7 @@ kubectl port-forward -n kite-system svc/kite 8080:8080
 
 ### LoadBalancer 服务
 
-如集群支持 LoadBalancer，可直接暴露 Kite 服务：
+如集群支持 LoadBalancer，可直接暴露 KubeOsprey 服务：
 
 ```bash
 kubectl patch svc kite -n kite-system -p '{"spec": {"type": "LoadBalancer"}}'
@@ -88,10 +78,10 @@ kubectl get svc kite -n kite-system
 
 ### Ingress（生产环境推荐）
 
-生产环境建议通过 Ingress 控制器并启用 TLS 暴露 Kite：
+生产环境建议通过 Ingress 控制器并启用 TLS 暴露 KubeOsprey：
 
 ::: warning
-Kite 的日志和 Web 终端功能需支持 websocket。
+KubeOsprey 的日志和 Web 终端功能需支持 websocket。
 部分 Ingress 控制器可能需额外配置以正确处理 websocket。
 :::
 
@@ -122,7 +112,7 @@ spec:
 
 ## 在子路径下部署（basePath）
 
-如果您希望将 Kite 部署在一个子路径下，例如 `https://example.com/kite`，可以使用 Helm Chart 的 `basePath` 值来配置。
+如果您希望将 KubeOsprey 部署在一个子路径下，例如 `https://example.com/kite`，可以使用 Helm Chart 的 `basePath` 值来配置。
 
 如何设置：
 
@@ -135,7 +125,7 @@ basePath: "/kite"
 - 或使用 Helm CLI：
 
 ```fish
-helm install kite oci://ghcr.io/kite-org/charts/kite -n kite-system --create-namespace --set basePath="/kite"
+helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace --set basePath="/kite"
 ```
 
 说明：
@@ -156,10 +146,10 @@ ingress:
 
 ## 验证安装
 
-安装完成后，可访问仪表盘验证 Kite 是否部署成功。预期界面如下：
+安装完成后，可访问仪表盘验证 KubeOsprey 是否部署成功。预期界面如下：
 
 ::: tip
-如需通过环境变量配置 Kite，请参考 [环境变量](../config/env)。
+如需通过环境变量配置 KubeOsprey，请参考 [环境变量](../config/env)。
 :::
 
 ![setup](../../screenshots/setup.png)
@@ -168,7 +158,7 @@ ingress:
 
 可根据页面提示完成集群设置。
 
-## 卸载 Kite
+## 卸载 KubeOsprey
 
 ### Helm 卸载
 
@@ -179,12 +169,12 @@ helm uninstall kite -n kite-system
 ### YAML 卸载
 
 ```bash
-kubectl delete -f https://raw.githubusercontent.com/kite-org/kite/main/deploy/install.yaml
+kubectl delete -f https://raw.githubusercontent.com/fadewalk/kube-osprey/main/deploy/install.yaml
 ```
 
 ## 后续步骤
 
-Kite 安装完成后，您可以继续：
+KubeOsprey 安装完成后，您可以继续：
 
 - [添加用户](../config/user-management)
 - [配置 RBAC](../config/rbac-config)

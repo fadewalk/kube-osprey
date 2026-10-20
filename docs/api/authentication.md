@@ -1,6 +1,6 @@
 # Authentication
 
-Kite supports interactive login through OAuth, password users, LDAP, MFA, and passkeys, plus programmatic access through API keys. API keys authenticate as special users and follow the same RBAC model as interactive users.
+KubeOsprey supports interactive login through OAuth, password users, LDAP, MFA, and passkeys, plus programmatic access through API keys. API keys authenticate as special users and follow the same RBAC model as interactive users.
 
 ## Interactive login
 
@@ -104,9 +104,9 @@ Relevant request fields:
 
 ## Login attempt blocking
 
-Credential-based logins are temporarily blocked by client IP after repeated invalid password or MFA attempts. Kite allows up to 10 failures within 1 minute; the next failure blocks further credential login attempts from that client IP for 5 minutes.
+Credential-based logins are temporarily blocked by client IP after repeated invalid password or MFA attempts. KubeOsprey allows up to 10 failures within 1 minute; the next failure blocks further credential login attempts from that client IP for 5 minutes.
 
-When Kite runs behind an ingress or load balancer, the client IP used by this limiter depends on `TRUSTED_PROXIES`. See [Environment Variables](/config/env#environment-variables) for how to configure trusted proxy ranges.
+When KubeOsprey runs behind an ingress or load balancer, the client IP used by this limiter depends on `TRUSTED_PROXIES`. See [Environment Variables](/config/env#environment-variables) for how to configure trusted proxy ranges.
 
 ## API key format
 

@@ -1,16 +1,16 @@
-# What is Kite?
+# What is KubeOsprey?
 
-Kite is a lightweight, open-source Kubernetes workspace for platform teams. It brings multi-cluster operations, observability, access control, and AI-assisted troubleshooting into one interface.
+KubeOsprey is a lightweight, open-source Kubernetes workspace for platform teams. It brings multi-cluster operations, observability, access control, and AI-assisted troubleshooting into one interface.
 
-![Kite dashboard showing cluster health, workloads, events, and resource usage](/screenshots/overview.png)
+![KubeOsprey dashboard showing cluster health, workloads, events, and resource usage](/screenshots/overview.png)
 
 ## Start here
 
 ::: tip Fastest evaluation path
-Install Kite with Helm, use port forwarding for the first visit, then connect the in-cluster Kubernetes API. You can complete the initial setup without preparing a kubeconfig.
+Install KubeOsprey with Helm, use port forwarding for the first visit, then connect the in-cluster Kubernetes API. You can complete the initial setup without preparing a kubeconfig.
 :::
 
-1. [Install Kite](./installation) and open the dashboard.
+1. [Install KubeOsprey](./installation) and open the dashboard.
 2. [Set up users](/config/user-management) and [RBAC](/config/rbac-config) before inviting your team.
 3. [Connect Prometheus](/config/prometheus-setup) when you are ready to add cluster metrics.
 
@@ -23,7 +23,7 @@ Install Kite with Helm, use port forwarding for the first visit, then connect th
 - **Install and manage releases:** [Helm Management](./helm-management)
 - **Review resource changes:** [Resource History](./resource-history)
 - **Troubleshoot with an AI agent:** [AI Assistant](./ai-assistant)
-- **Connect private or remote clusters:** [Kite Cluster Agent](./kite-cluster-agent)
+- **Connect private or remote clusters:** [KubeOsprey Cluster Agent](./kite-cluster-agent)
 
 ## Platform at a glance
 
@@ -39,8 +39,8 @@ Create and edit Kubernetes resources, manage Helm releases, open Pod and Node te
 
 Manage team access with OAuth, MFA, passkeys, users, RBAC, role mappings, and audit logs across multiple clusters.
 
-## Where Kite fits
+## Where KubeOsprey fits
 
-Headlamp and Kubernetes Dashboard are strong tools for inspecting and operating individual clusters. Kite adds a shared workspace for multi-cluster operations, built-in team governance, observability, and AI-assisted workflows.
+Headlamp and Kubernetes Dashboard are strong tools for inspecting and operating individual clusters. KubeOsprey adds a shared workspace for multi-cluster operations, built-in team governance, observability, and AI-assisted workflows.
 
-If you are evaluating Kite, continue with the [installation guide](./installation).
+If you are evaluating KubeOsprey, continue with the [installation guide](./installation).

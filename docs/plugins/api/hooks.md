@@ -4,7 +4,7 @@ outline: deep
 
 # Host State and Interaction
 
-Use `@kite-dev/plugin-sdk/hooks` to access Kite's current cluster, namespace, user, and theme, or control host features such as favorites and the terminal. These React hooks keep plugins in sync with Kite without maintaining a separate copy of its state.
+Use `@kite-dev/plugin-sdk/hooks` to access KubeOsprey's current cluster, namespace, user, and theme, or control host features such as favorites and the terminal. These React hooks keep plugins in sync with KubeOsprey without maintaining a separate copy of its state.
 
 ## Current Cluster and Namespace
 
@@ -29,7 +29,7 @@ export function CurrentScope() {
 | `useClusters(options?)` | Query result for accessible clusters. Enabled by default; use `{ enabled }` to disable it |
 | `useNamespace()` | `{ namespace, setNamespace }`, the plugin's namespace context |
 
-`ClusterInfo` contains only `name`, `isDefault`, and optional `version` and `error` fields. It does not include cluster credentials. Kite manages authentication.
+`ClusterInfo` contains only `name`, `isDefault`, and optional `version` and `error` fields. It does not include cluster credentials. KubeOsprey manages authentication.
 
 ## User and Plugin Settings
 
@@ -47,7 +47,7 @@ export function CurrentScope() {
 | `useTheme()` | `{ theme, actualTheme, setTheme }` |
 | `usePageTitle(title)` | Sets the page title |
 | `useIsMobile()` | Whether the mobile layout is active |
-| `useVersionInfo()` | Kite version information (`UseQueryResult<VersionInfo, Error>`) |
+| `useVersionInfo()` | KubeOsprey version information (`UseQueryResult<VersionInfo, Error>`) |
 
 ## Favorites and Terminal
 
@@ -67,7 +67,7 @@ import { useHostInfo } from '@kite-dev/plugin-sdk/hooks'
 
 export function HostVersion() {
   const { kiteVersion, sdkVersion } = useHostInfo()
-  return <p>Kite {kiteVersion} · SDK {sdkVersion}</p>
+  return <p>KubeOsprey {kiteVersion} · SDK {sdkVersion}</p>
 }
 ```
 

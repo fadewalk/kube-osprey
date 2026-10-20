@@ -12,7 +12,7 @@ Managed Kubernetes clusters like AKS (Azure Kubernetes Service), EKS (Amazon Ela
 - **EKS** uses the `aws` CLI
 - **GKE** uses the `gcloud` command
 
-This authentication method works well in local client environments, but fails in server-side environments like Kite because:
+This authentication method works well in local client environments, but fails in server-side environments like KubeOsprey because:
 
 1. These CLI tools may not be installed on the server
 2. Even if installed, the server environment may not have the corresponding authentication configuration
@@ -20,12 +20,12 @@ This authentication method works well in local client environments, but fails in
 
 ### Using Service Account Token
 
-Create a dedicated Service Account for Kite and use its token for authentication.
+Create a dedicated Service Account for KubeOsprey and use its token for authentication.
 
-Kite provides a helper script for creation:
+KubeOsprey provides a helper script for creation:
 
 ```sh
-wget https://raw.githubusercontent.com/kite-org/kite/refs/heads/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
+wget https://raw.githubusercontent.com/fadewalk/kube-osprey/refs/heads/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
 chmod +x generate-kite-kubeconfig.sh
 ./generate-kite-kubeconfig.sh
 ```

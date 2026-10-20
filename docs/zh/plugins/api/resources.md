@@ -4,7 +4,7 @@ outline: deep
 
 # 资源查询与操作
 
-从 `@kite-dev/plugin-sdk/resources` 导入查询和操作接口，用于读取、创建、修改和删除 Kubernetes 资源。查询默认跟随 Kite 当前选择的集群，所有请求都受当前用户的权限约束。
+从 `@kite-dev/plugin-sdk/resources` 导入查询和操作接口，用于读取、创建、修改和删除 Kubernetes 资源。查询默认跟随 KubeOsprey 当前选择的集群，所有请求都受当前用户的权限约束。
 
 ## 查询列表和详情
 
@@ -49,7 +49,7 @@ export function DeploymentCount() {
 
 `ResourceListQueryOptions` 在公共的 `ResourceQueryOptions` 基础上增加 `labelSelector`、`fieldSelector`、`reduce`，只有 `useResources` 接受这些选项。详情、事件、Describe、历史和关联资源查询都不接受列表筛选参数。
 
-命名空间传 `_all` 表示全部命名空间，也可以传逗号分隔的多个命名空间（Hook 会拆分成并行请求后合并结果）。单资源查询需要对象的真实命名空间。集群级（cluster-scoped）自定义资源需声明 `scope: 'Cluster'`；内置资源的 scope 由 Kite 自动识别。
+命名空间传 `_all` 表示全部命名空间，也可以传逗号分隔的多个命名空间（Hook 会拆分成并行请求后合并结果）。单资源查询需要对象的真实命名空间。集群级（cluster-scoped）自定义资源需声明 `scope: 'Cluster'`；内置资源的 scope 由 KubeOsprey 自动识别。
 
 ## 读取扩展中的当前资源
 
@@ -128,7 +128,7 @@ const certificates = useResources<Certificate>(
 | `deleteResource(ref, name, options?)` | 删除内置或自定义资源，返回 `void` |
 
 - 通用选项：`namespace`、`cluster`、`signal`；删除额外支持 `force` 和 `wait`。命名空间级资源的写操作必须给出真实命名空间。
-- `applyResource` 走 Kite 的创建 / 更新流程；显式 `namespace` 会覆盖 YAML 中的命名空间，集群级资源忽略它。
+- `applyResource` 走 KubeOsprey 的创建 / 更新流程；显式 `namespace` 会覆盖 YAML 中的命名空间，集群级资源忽略它。
 - 写操作不会自动刷新查询，成功后请调用 `refetch()` 或用 TanStack Query 失效相关缓存。
 
 例如，创建 Certificate 后修改它的目标 Secret：
@@ -153,7 +153,7 @@ await patchResource(certificates, 'example-tls', {
 }, options)
 ```
 
-创建需要目标资源和命名空间的 `create` 权限，更新和 PATCH 需要 `update` 权限。Kite 会记录这些操作的资源历史。
+创建需要目标资源和命名空间的 `create` 权限，更新和 PATCH 需要 `update` 权限。KubeOsprey 会记录这些操作的资源历史。
 
 ## 事件与运维操作
 
@@ -170,7 +170,7 @@ await patchResource(certificates, 'example-tls', {
 
 补充说明：
 
-- 检视类 Hook 接收资源引用、名称和查询选项；`useResourceHistory` 额外支持 `page` / `pageSize`，返回的是 Kite 记录的操作历史而非完整版本历史。
+- 检视类 Hook 接收资源引用、名称和查询选项；`useResourceHistory` 额外支持 `page` / `pageSize`，返回的是 KubeOsprey 记录的操作历史而非完整版本历史。
 - `useRelatedResources` 的关系发现只覆盖部分内置资源；自定义资源的关系请用 `useResources` 自行按 `ownerReferences` 或字段匹配。
 - `scaleDeployment` 只作用于 Deployment；`restartWorkload` 的 `resource` 可以是 `'deployments'` 或 `'statefulsets'`；`useWorkloadRevisions`、`rollbackWorkload` 的 `resource` 还支持 `'daemonsets'`。
 - `drainNode` 的 `options` 为 `{ force, gracePeriod, deleteLocalData, ignoreDaemonsets }`；`taintNode` 的 `taint` 为 `{ key, value, effect }`，`effect` 取 `NoSchedule`、`PreferNoSchedule` 或 `NoExecute`。
@@ -193,7 +193,7 @@ type ObjectMeta = MetaV1.ObjectMeta
 
 ## 自定义 API 请求
 
-使用 `@kite-dev/plugin-sdk/api` 的 `apiClient` 调用 Kite 的现有后端接口。客户端自动携带 Kite 认证、当前集群（`x-cluster-name` 请求头）和部署基路径。插件不能通过它注册新的后端接口。
+使用 `@kite-dev/plugin-sdk/api` 的 `apiClient` 调用 KubeOsprey 的现有后端接口。客户端自动携带 KubeOsprey 认证、当前集群（`x-cluster-name` 请求头）和部署基路径。插件不能通过它注册新的后端接口。
 
 自定义查询可以用 `apiClient` 搭配 TanStack Query 管理加载状态、错误和缓存。使用宿主共享的 `QueryClient`，不要创建新的实例：
 

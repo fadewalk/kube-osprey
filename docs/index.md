@@ -1,7 +1,7 @@
 ---
 layout: false
 title: All your clusters. One workspace.
-description: Kite is the lightweight, open-source Kubernetes workspace for clusters, observability, access control, and AI operations.
+description: KubeOsprey is the lightweight, open-source Kubernetes workspace for clusters, observability, access control, and AI operations.
 head:
   - - link
     - rel: preload
@@ -24,7 +24,7 @@ head:
 ---
 
 <script setup>
-import KiteHome from './.vitepress/theme/components/KiteHome.vue'
+import KubeOspreyHome from './.vitepress/theme/components/KubeOspreyHome.vue'
 </script>
 
-<KiteHome />
+<KubeOspreyHome />

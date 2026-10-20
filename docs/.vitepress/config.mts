@@ -2,11 +2,11 @@ import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "Kite",
+  title: "KubeOsprey",
   description: "A modern Kubernetes dashboard",
 
   sitemap: {
-    hostname: "https://kitehq.dev",
+    hostname: "https://fadewalk.github.io/kube-osprey/",
     lastmodDateOnly: false,
   },
 
@@ -26,7 +26,7 @@ export default defineConfig({
       label: "中文",
       lang: "zh-CN",
       link: "/zh/",
-      title: "Kite",
+      title: "KubeOsprey",
       description: "一个现代 Kubernetes 仪表盘",
       themeConfig: {
         outline: { label: "本页目录" },
@@ -48,7 +48,7 @@ export default defineConfig({
           { text: "常见问题", link: "/zh/faq" },
         ],
         editLink: {
-          pattern: "https://github.com/kite-org/kite/tree/main/docs/:path",
+          pattern: "https://github.com/fadewalk/kube-osprey/tree/main/docs/:path",
           text: "在 GitHub 上编辑此页面",
         },
       },
@@ -107,7 +107,7 @@ export default defineConfig({
     },
     langMenuLabel: "Language",
     editLink: {
-      pattern: "https://github.com/kite-org/kite/tree/main/docs/:path",
+      pattern: "https://github.com/fadewalk/kube-osprey/tree/main/docs/:path",
       text: "Edit this page on GitHub",
     },
 
@@ -125,7 +125,7 @@ export default defineConfig({
         {
           text: "Introduction",
           items: [
-            { text: "What is Kite?", link: "/guide/" },
+            { text: "What is KubeOsprey?", link: "/guide/" },
             { text: "Getting Started", link: "/guide/installation" },
           ],
         },
@@ -153,7 +153,7 @@ export default defineConfig({
             { text: "Helm Management", link: "/guide/helm-management" },
             { text: "AI Assistant", link: "/guide/ai-assistant" },
             { text: "Web Terminal", link: "/guide/web-terminal" },
-            { text: "Kite Cluster Agent", link: "/guide/kite-cluster-agent" },
+            { text: "KubeOsprey Cluster Agent", link: "/guide/kite-cluster-agent" },
             { text: "Resource History", link: "/guide/resource-history" },
             { text: "Custom Sidebar", link: "/guide/custom-sidebar" },
             { text: "Kube Proxy", link: "/guide/kube-proxy" },
@@ -190,7 +190,7 @@ export default defineConfig({
         {
           text: "介绍",
           items: [
-            { text: "什么是 Kite?", link: "/zh/guide/" },
+            { text: "什么是 KubeOsprey?", link: "/zh/guide/" },
             { text: "开始", link: "/zh/guide/installation" },
           ],
         },
@@ -219,7 +219,7 @@ export default defineConfig({
             { text: "AI 助手", link: "/zh/guide/ai-assistant" },
             { text: "Web 终端", link: "/zh/guide/web-terminal" },
             {
-              text: "Kite Cluster Agent",
+              text: "KubeOsprey Cluster Agent",
               link: "/zh/guide/kite-cluster-agent",
             },
             { text: "资源历史", link: "/zh/guide/resource-history" },
@@ -317,11 +317,13 @@ export default defineConfig({
       ],
     },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/kite-org/kite" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/fadewalk/kube-osprey" },
+    ],
 
     footer: {
       message: "Released under the Apache License.",
-      copyright: "Copyright © 2025-present Kite Contributors",
+      copyright: "Copyright © 2025-present KubeOsprey Contributors",
     },
   },
 });

@@ -4,11 +4,11 @@ outline: deep
 
 # Introduction to Plugins
 
-Plugins are available starting with Kite **v0.16.0**.
+Plugins are available starting with KubeOsprey **v0.16.0**.
 
-A Kite plugin is a React frontend module that runs inside Kite. It can add pages, sidebar menus, and dedicated management interfaces for custom resources without rebuilding Kite.
+A KubeOsprey plugin is a React frontend module that runs inside KubeOsprey. It can add pages, sidebar menus, and dedicated management interfaces for custom resources without rebuilding KubeOsprey.
 
-Plugins are written and built with [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk), packaged as `.tar.gz` archives, and installed by a Kite administrator on the **Plugin management** page. Once installed and enabled, they are available to all signed-in users.
+Plugins are written and built with [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk), packaged as `.tar.gz` archives, and installed by a KubeOsprey administrator on the **Plugin management** page. Once installed and enabled, they are available to all signed-in users.
 
 ## What Plugins Can Do
 
@@ -27,12 +27,12 @@ The [cert-manager plugin](https://github.com/kite-org/kite-plugins/tree/main/plu
 
 ## Runtime and Security Model
 
-1. **Plugins run as the signed-in user.** All Kubernetes requests from plugins go through the Kite backend and are subject to that user's RBAC permissions. Users cannot access resources they are not authorized to see, just as on native Kite pages. Plugins receive no additional permissions.
-2. **Plugin management requires administrator access.** Installing, disabling, uninstalling, and configuring the catalog require Kite administrator permissions. Regular users can only use enabled plugins.
-3. **Plugins are trusted code.** Plugin JavaScript executes in your browser with the same capabilities you have in Kite. Only install plugins from authors you trust.
-4. **The runtime is shared.** Plugins and Kite share React, React Router, TanStack Query, and SDK implementations. Do not create another React root, Router, or QueryClient.
+1. **Plugins run as the signed-in user.** All Kubernetes requests from plugins go through the KubeOsprey backend and are subject to that user's RBAC permissions. Users cannot access resources they are not authorized to see, just as on native KubeOsprey pages. Plugins receive no additional permissions.
+2. **Plugin management requires administrator access.** Installing, disabling, uninstalling, and configuring the catalog require KubeOsprey administrator permissions. Regular users can only use enabled plugins.
+3. **Plugins are trusted code.** Plugin JavaScript executes in your browser with the same capabilities you have in KubeOsprey. Only install plugins from authors you trust.
+4. **The runtime is shared.** Plugins and KubeOsprey share React, React Router, TanStack Query, and SDK implementations. Do not create another React root, Router, or QueryClient.
 
-Use host capabilities through `@kite-dev/plugin-sdk`. Do not import Kite's internal modules directly.
+Use host capabilities through `@kite-dev/plugin-sdk`. Do not import KubeOsprey's internal modules directly.
 
 ## Installing and Using Plugins
 

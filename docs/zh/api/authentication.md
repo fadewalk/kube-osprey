@@ -1,6 +1,6 @@
 # 认证
 
-Kite 支持通过 OAuth、密码用户、LDAP、MFA 和 Passkey 进行页面登录，也支持通过 API 密钥进行程序化访问。API 密钥会以一个特殊用户身份完成认证，并沿用与页面登录用户相同的 RBAC 模型。
+KubeOsprey 支持通过 OAuth、密码用户、LDAP、MFA 和 Passkey 进行页面登录，也支持通过 API 密钥进行程序化访问。API 密钥会以一个特殊用户身份完成认证，并沿用与页面登录用户相同的 RBAC 模型。
 
 ## 页面登录
 
@@ -104,9 +104,9 @@ PUT /api/v1/admin/general-setting/
 
 ## 登录尝试封禁
 
-基于账号密码的登录会在连续失败时按客户端 IP 临时封禁。Kite 允许 1 分钟内最多 10 次错误密码或 MFA 验证失败；第 11 次失败会封禁该客户端 IP 的账号密码登录 5 分钟。
+基于账号密码的登录会在连续失败时按客户端 IP 临时封禁。KubeOsprey 允许 1 分钟内最多 10 次错误密码或 MFA 验证失败；第 11 次失败会封禁该客户端 IP 的账号密码登录 5 分钟。
 
-当 Kite 运行在 Ingress 或负载均衡器后面时，封禁使用的客户端 IP 取决于 `TRUSTED_PROXIES` 配置。详见[环境变量](/zh/config/env)。
+当 KubeOsprey 运行在 Ingress 或负载均衡器后面时，封禁使用的客户端 IP 取决于 `TRUSTED_PROXIES` 配置。详见[环境变量](/zh/config/env)。
 
 ## API 密钥格式
 

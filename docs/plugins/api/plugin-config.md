@@ -102,7 +102,7 @@ export default definePlugin({
 | `parent` value | Location |
 | -------------- | -------- |
 | Omitted | Top-level sidebar menu or group |
-| `core:workloads`, etc. | Inside a built-in Kite group |
+| `core:workloads`, etc. | Inside a built-in KubeOsprey group |
 | `my-plugin:tools` | Inside this plugin's group with ID `tools` |
 
 Built-in group IDs are `core:application`, `core:workloads`, `core:traffic`, `core:storage`, `core:config`, `core:security`, and `core:other`. Import `coreMenuGroupIds` from `/validation` to access them.
@@ -137,7 +137,7 @@ IconKey           IconBoxMultiple      IconServer2       IconBell         IconCo
 
 ## Resource Extensions
 
-Use `resources` in `plugin.config.tsx` to add columns to Kite's resource lists, add tabs to detail pages, or replace complete pages for a CRD. To query or modify resource data, see [Resource Queries and Operations](./resources).
+Use `resources` in `plugin.config.tsx` to add columns to KubeOsprey's resource lists, add tabs to detail pages, or replace complete pages for a CRD. To query or modify resource data, see [Resource Queries and Operations](./resources).
 
 Each entry has type `PluginResourceView<T>` and identifies a resource by `group` (API group) and `resource` (plural resource name). Use an empty string for the core API group: a Pod is `{ group: '', resource: 'pods' }`, and a StorageClass is `{ group: 'storage.k8s.io', resource: 'storageclasses' }`. API groups are validated for format without restricting suffixes such as `k8s.io`.
 
@@ -149,7 +149,7 @@ Each entry has type `PluginResourceView<T>` and identifies a resource by `group`
 | `list` | `ReactNode` | Replace the complete custom resource list page |
 | `detail` | `ReactNode` | Replace the complete custom resource detail page |
 
-Provide at least one of these four extensions. A plugin cannot declare the same resource target more than once. Kite loads plugin modules on demand: when a column is visible, a tab is selected, or a replacement page is opened. `columns` and `tabs` apply to both native resource pages and generic custom resource pages. `list` and `detail` replace only custom resource pages, not native resource pages.
+Provide at least one of these four extensions. A plugin cannot declare the same resource target more than once. KubeOsprey loads plugin modules on demand: when a column is visible, a tab is selected, or a replacement page is opened. `columns` and `tabs` apply to both native resource pages and generic custom resource pages. `list` and `detail` replace only custom resource pages, not native resource pages.
 
 ### Adding List Columns
 
@@ -243,7 +243,7 @@ To access the current resource or refresh the page from a column or tab componen
 
 ### Replacing CRD List and Detail Pages
 
-`list` and `detail` accept React nodes. If you provide only one, the other page uses Kite's generic view. You do not need plugin routes, and menus can point directly to the CRD:
+`list` and `detail` accept React nodes. If you provide only one, the other page uses KubeOsprey's generic view. You do not need plugin routes, and menus can point directly to the CRD:
 
 ```tsx
 // plugin.config.tsx
@@ -275,11 +275,11 @@ export default definePlugin({
 
 Replacement pages fetch their data through resource hooks. Detail pages use `useParams()` to read `name` and `namespace`. Menus, the CRD browser, and page links use the same CRD URLs; see [Opening Resource Pages](./navigation#opening-resource-pages). Reuse [UI Components](./ui) for tables, detail layouts, and YAML editing.
 
-If multiple active plugins replace the same page type for the same resource, the first match in the active plugin list takes effect. Kite falls back to its generic view when a plugin is disabled, uninstalled, incompatible, or fails to load.
+If multiple active plugins replace the same page type for the same resource, the first match in the active plugin list takes effect. KubeOsprey falls back to its generic view when a plugin is disabled, uninstalled, incompatible, or fails to load.
 
 ### Extension IDs and Deep Links
 
-Kite prefixes extension IDs with the plugin ID, for example `plugin:my-plugin:column:team` and `plugin:my-plugin:tab:policy`. These IDs do not include a version, so plugin upgrades preserve user preferences. Use `?tab=plugin:my-plugin:tab:policy` to select a tab directly. If that tab does not exist on the page, Kite selects the first visible tab.
+KubeOsprey prefixes extension IDs with the plugin ID, for example `plugin:my-plugin:column:team` and `plugin:my-plugin:tab:policy`. These IDs do not include a version, so plugin upgrades preserve user preferences. Use `?tab=plugin:my-plugin:tab:policy` to select a tab directly. If that tab does not exist on the page, KubeOsprey selects the first visible tab.
 
 For example, open the Pod named `demo` in the `default` namespace and select the Policy tab provided by `my-plugin`:
 
@@ -291,7 +291,7 @@ Column and tab extensions apply to pages that use the host's resource table and 
 
 ## Themes
 
-Plugins can provide color themes. A theme is a stylesheet that overrides Kite's CSS variables, so one file can change the colors of pages, YAML editors, and terminals.
+Plugins can provide color themes. A theme is a stylesheet that overrides KubeOsprey's CSS variables, so one file can change the colors of pages, YAML editors, and terminals.
 
 ```tsx
 import { definePlugin } from '@kite-dev/plugin-sdk'
@@ -316,9 +316,9 @@ export default definePlugin({
 | `label` | Optional name shown in the theme selector; defaults to the ID and supports localized labels |
 | `styles` | One or more stylesheet paths, included in the plugin package |
 
-Place stylesheets in `public/`; the build copies them unchanged into the package. Use the corresponding relative paths in `styles`. Theme plugins do not need routes, menus, or resources. If all three are absent, Kite loads only the stylesheets, without loading the plugin's JavaScript.
+Place stylesheets in `public/`; the build copies them unchanged into the package. Use the corresponding relative paths in `styles`. Theme plugins do not need routes, menus, or resources. If all three are absent, KubeOsprey loads only the stylesheets, without loading the plugin's JavaScript.
 
-Themes from enabled plugins appear under **Color Theme** in the user menu, grouped by plugin name. Kite loads a stylesheet only when its theme is selected, so it can target `:root` and `.dark` directly:
+Themes from enabled plugins appear under **Color Theme** in the user menu, grouped by plugin name. KubeOsprey loads a stylesheet only when its theme is selected, so it can target `:root` and `.dark` directly:
 
 ```css
 /* public/themes/nord.css */
@@ -335,7 +335,7 @@ Themes from enabled plugins appear under **Color Theme** in the user menu, group
 }
 ```
 
-You can override any variable defined in `ui/src/styles/themes/default.css`. Unspecified variables retain their defaults. While a theme is active, Kite adds `color-<plugin ID>-<theme ID>` to the root element; use that class when you need to limit selector scope. Relative `url()` values resolve to files in the plugin package, so bundled images and fonts can be referenced normally:
+You can override any variable defined in `ui/src/styles/themes/default.css`. Unspecified variables retain their defaults. While a theme is active, KubeOsprey adds `color-<plugin ID>-<theme ID>` to the root element; use that class when you need to limit selector scope. Relative `url()` values resolve to files in the plugin package, so bundled images and fonts can be referenced normally:
 
 ```css
 body::before {
@@ -372,7 +372,7 @@ export default definePlugin({
 
 `label` is optional; the dialog title defaults to the plugin's name. `element` accepts any React node and should be imported with `React.lazy` in `plugin.config.tsx`. Plugins without `settings` do not show this button.
 
-Settings are stored in Kite's backend database. The plugin defines their structure and reads and writes them through `usePluginSettings()`:
+Settings are stored in KubeOsprey's backend database. The plugin defines their structure and reads and writes them through `usePluginSettings()`:
 
 ```tsx
 import { useState } from 'react'
@@ -409,7 +409,7 @@ export default function Settings() {
 }
 ```
 
-Settings are shared across the Kite instance: an administrator configures them once for all users. All signed-in users can read them, but only administrators can write them. Kite shows a confirmation after a successful save. Each JSON submission is limited to 16 KiB. Before configuration, `settings` is an empty object, so the plugin should handle unset values. Uninstalling the plugin also removes its settings.
+Settings are shared across the KubeOsprey instance: an administrator configures them once for all users. All signed-in users can read them, but only administrators can write them. KubeOsprey shows a confirmation after a successful save. Each JSON submission is limited to 16 KiB. Before configuration, `settings` is an empty object, so the plugin should handle unset values. Uninstalling the plugin also removes its settings.
 
 ## Internationalization
 
@@ -425,4 +425,4 @@ export default definePlugin({
 })
 ```
 
-Use `label()` from the same module for menu labels, route titles, and tab labels. Page components use `useTranslation()` so their text updates when Kite's language changes. See the [Internationalization guide](../i18n) for organizing translation files and complete examples.
+Use `label()` from the same module for menu labels, route titles, and tab labels. Page components use `useTranslation()` so their text updates when KubeOsprey's language changes. See the [Internationalization guide](../i18n) for organizing translation files and complete examples.

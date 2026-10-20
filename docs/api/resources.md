@@ -1,6 +1,6 @@
 # Resources
 
-Kite exposes generic CRUD-style APIs for built-in Kubernetes resources under `/api/v1/<resource>`.
+KubeOsprey exposes generic CRUD-style APIs for built-in Kubernetes resources under `/api/v1/<resource>`.
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ Examples:
 
 ## Supported operations
 
-For built-in resources, Kite exposes these generic routes:
+For built-in resources, KubeOsprey exposes these generic routes:
 
 ### Namespaced resources
 

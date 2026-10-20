@@ -1,10 +1,10 @@
 # RBAC 配置指南
 
-本指南介绍如何在 Kite 中配置基于角色的访问控制（RBAC），以高效管理用户权限和资源访问。
+本指南介绍如何在 KubeOsprey 中配置基于角色的访问控制（RBAC），以高效管理用户权限和资源访问。
 
 ## 概述
 
-Kite 的 RBAC 系统支持：
+KubeOsprey 的 RBAC 系统支持：
 
 - 定义具备特定权限的自定义角色
 - 将角色分配给用户或 OAuth 组
@@ -101,4 +101,4 @@ verbs: *
 
 ## 常见问题
 
-- `Describe` 操作只检查当前用户对目标资源的 `get` 权限。Kubernetes describer 使用 Kite 中配置的集群凭据执行查询，其输出可能包含 Events 和关联资源摘要，Kite 不会再对这些附带信息执行独立的 RBAC 检查。
+- `Describe` 操作只检查当前用户对目标资源的 `get` 权限。Kubernetes describer 使用 KubeOsprey 中配置的集群凭据执行查询，其输出可能包含 Events 和关联资源摘要，KubeOsprey 不会再对这些附带信息执行独立的 RBAC 检查。

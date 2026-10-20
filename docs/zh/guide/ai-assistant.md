@@ -1,6 +1,6 @@
 # AI 助手
 
-Kite 内置了面向 Kubernetes 运维场景的 AI 助手。它可以在当前工作空间内帮助你理解集群状态、检查资源、查看日志、查询 Prometheus 指标，以及辅助完成常见变更操作。
+KubeOsprey 内置了面向 Kubernetes 运维场景的 AI 助手。它可以在当前工作空间内帮助你理解集群状态、检查资源、查看日志、查询 Prometheus 指标，以及辅助完成常见变更操作。
 
 ![AI](../../screenshots/ai-chat.png)
 
@@ -41,11 +41,11 @@ Kite 内置了面向 Kubernetes 运维场景的 AI 助手。它可以在当前�
 - 在已配置 Prometheus 的情况下查询监控指标
 - 在确认后创建、更新、补丁修改或删除 Kubernetes 资源
 
-Kite 会把当前页面上下文传给 AI，因此它会优先结合当前选中的集群、命名空间和资源页面来理解你的问题。
+KubeOsprey 会把当前页面上下文传给 AI，因此它会优先结合当前选中的集群、命名空间和资源页面来理解你的问题。
 
 ## 确认与结构化输入
 
-对于写操作，Kite 不会直接执行。助手会先生成待执行动作，再在聊天界面中请求你确认。
+对于写操作，KubeOsprey 不会直接执行。助手会先生成待执行动作，再在聊天界面中请求你确认。
 
 如果执行某个操作还缺少必要信息，助手也可以直接在聊天界面里请求：
 
@@ -58,11 +58,11 @@ Kite 会把当前页面上下文传给 AI，因此它会优先结合当前选中
 
 ## 权限与边界
 
-AI 助手遵循 Kite 现有的权限模型。
+AI 助手遵循 KubeOsprey 现有的权限模型。
 
 - 只会在当前选中的集群内执行操作
 - 会遵循当前用户的 RBAC 权限
-- `describe_resource` 以当前用户对目标资源的 `get` 权限作为授权依据。其输出可能同时包含 Kubernetes describer 查询到的 Events 和关联资源摘要，Kite 不会再对这些附带信息执行独立的 RBAC 检查；这是 describe 操作的既定授权边界
+- `describe_resource` 以当前用户对目标资源的 `get` 权限作为授权依据。其输出可能同时包含 Kubernetes describer 查询到的 Events 和关联资源摘要，KubeOsprey 不会再对这些附带信息执行独立的 RBAC 检查；这是 describe 操作的既定授权边界
 - 如果当前用户没有日志、执行命令或资源修改权限，AI 也无法绕过这些限制
 - 只有当前集群配置了 Prometheus，AI 才能查询 Prometheus 指标
 
