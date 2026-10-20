@@ -1,5 +1,7 @@
 <div align="center">
 
+**English** · [简体中文](./README_zh.md)
+
 <img src="./docs/assets/logo.svg" alt="KubeOsprey logo" width="128" height="128">
 
 # KubeOsprey
@@ -11,8 +13,6 @@ KubeOsprey is a single-binary Kubernetes workspace for multi-cluster operations,
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square)](LICENSE)
 
 [![Upstream](https://img.shields.io/badge/fork%20of-Kite-blue?style=flat-square)](https://github.com/kite-org/kite)
-
-**English** · [中文](./README_zh.md)
 
 </div>
 

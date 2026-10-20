@@ -1,5 +1,7 @@
 <div align="center">
 
+[English](./README.md) · **简体中文**
+
 <img src="./docs/assets/logo.svg" alt="KubeOsprey Logo" width="128" height="128">
 
 # KubeOsprey
@@ -11,8 +13,6 @@ KubeOsprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维
 [![License](https://img.shields.io/badge/License-Apache%202.0-green.svg?style=flat-square)](LICENSE)
 
 [![Upstream](https://img.shields.io/badge/fork%20of-Kite-blue?style=flat-square)](https://github.com/kite-org/kite)
-
-[English](./README.md) · **中文**
 
 </div>
 
