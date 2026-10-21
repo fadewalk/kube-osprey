@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/fadewalk/kube-osprey/discussions
+    about: Usage questions and ideas — please search existing issues first.
+  - name: Security vulnerability
+    url: https://github.com/fadewalk/kube-osprey/blob/main/SECURITY.md
+    about: Please do not report security issues through public GitHub issues.
