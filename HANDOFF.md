@@ -532,6 +532,7 @@ Kuboard v4.3 走查加固：
 
 | 项 | 说明 |
 | --- | --- |
+| 通知渠道：告警/事件轮询 | 变更计划生命周期通知已交付（`023fda1`，pkg/notify：钉钉/企微/飞书/Slack/通用 webhook，渠道 CRUD + 测试按钮 + 投递状态记录，设置页 Notifications tab）；后续可把 AlertManager 轮询和 k8s 警告事件接入同一 dispatcher |
 | CI/CD webhook 进阶 | 基础 webhook + change-plan 审批闸门均已交付（`59fc9c5`）；剩余可选项：chart 版本号语义 |
 | 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠 |
 | G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
