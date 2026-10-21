@@ -532,7 +532,7 @@ Kuboard v4.3 走查加固：
 
 | 项 | 说明 |
 | --- | --- |
-| CI/CD webhook 进阶 | 基础 webhook 已交付；可选进阶：change-plan 审批闸门接入、chart 版本号语义 |
+| CI/CD webhook 进阶 | 基础 webhook + change-plan 审批闸门均已交付（`59fc9c5`）；剩余可选项：chart 版本号语义 |
 | 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠 |
 | G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
@@ -552,6 +552,7 @@ Kuboard v4.3 走查加固：
 - 同日修复的两处 CI 常红：`pkg/mfa` TestURL 硬编码 `Kite:`（10-15 改名后一直失败，改用 `issuer` 常量）；E2E 起不来是 `scripts/e2e-start-app.sh` 默认 `KITE_ENCRYPT_KEY` 只有 23 字符，不满足 fork 自己加的 32 字符下限（`a8f8a73`），已改为 40 字符默认值。
 - **`27e2e6c`（v0.17.1）修复 operation_audit 差一错误**：审计中间件预读 4097 字节探测超长 body，但回放时把第 4097 个字节切掉了——所有超过 4KB 的写请求体（kubeconfig 导入、大 YAML apply、webhook payload）都被静默破坏一个字节，kubeconfig 导入表现为 `illegal base64 data at input byte N`，是 key 长度修复后 E2E 仍红的第二个根因。修法：预读字节（含探测字节）全量回放给 handler，审计落库时才单独截断。E2E 最后一次绿在 `7eddcc6`（10-16 快进前），fork 功能线此前的失败分别由 key 长度、本 bug、resource-table 测试缺 Router/mock 叠加造成。
 - **E2E 套件破坏已修复（`7771b9b`）**：面上的根因是 fork 的 UI/流程改动让上游 spec 失配——① admin 建号/重置密码现在带 `mustChangePassword` 标记，强制改密页拦截所有"以次要用户登录"的用例（API 用例改经 `/api/users/me/password` 清标记，UI 用例走 `context.request`，与页面渲染时序无关）；② Add Role 对话框改为 Simple/Advanced 两档，spec 先点 Advanced 再驱动列表；③ 资源列表搜索占位符改为按资源动态生成，用 `/^Search\b/i` 匹配；④ kubectl 终端默认关闭（fork 安全加固），spec 从"先开启"开始循环。修复后本地全量 **22 过 / 0 挂 / 8 跳（外部认证需 LDAP/Dex，本地预期跳过）仅 1.3 分钟**；CI 上 external-auth 用例也会执行。上游同号绿灯基线 7eddcc6 为 ~6 分钟。
+- **Webhook 审批闸门已交付（`59fc9c5`，2026-10-21）**：新增 `webhookChangePlanMode` 设置（General 设置页新卡片，默认关）。开启后 CI webhook 的 helm upgrade 不再立即执行，而是创建 PENDING 变更计划（client `webhook`）并返回 **202 + planId**；dryRun 仍即时返回 diff。在 Change Plans UI 审批后计划自动执行（执行时按创建者 RBAC 逐步校验，与 chat 计划同机制）。支撑改动：helm 升级核心抽到 `helmutil.RunUpgrade`（handler 变薄壳），新增 `helm_upgrade_release` 计划工具（RBAC = release 命名空间 secrets update；dry-run 标记不支持——预览走 webhook 自带 dryRun）；`autoApplyChatPlan` 扩展为 chat/webhook 两类客户端审批后自动执行。端到端实测：闸门开 → webhook 202 计划 → admin 审批 → 自动执行 → release revision 2；闸门关 → webhook 直接升级 revision 3。
 - **docs 站点已发布上线（2026-10-17）**：https://fadewalk.github.io/kube-osprey/ （Pages 已用 API 切到 build_type=workflow，部署 workflow = `.github/workflows/docs-deploy.yml`，push main 且 docs/** 变更时自动构建发布，BASE_PATH=/kube-osprey 驱动 VitePress base）。README 文档链接已全部切到自有站点（kitehq.dev 零残留）。**已移除上游 Umami 统计脚本**（docs 不得向上游统计账户汇报流量）。**23 张产品截图全部重拍**（1580×1167@2x，真实 kind 集群 + demo 负载；仅 AI 三张恢复旧图——重制需配置真实模型提供商）。kube-proxy2 截的是 pod 详情态（端口链接选择器未命中裸 "80"，后续可精修）。docs/screenshots 旧图如需找回在 git 历史（f560483 之前）。
 - **E2E flaky 已修（同 `eda7a8b` 提交）**：flaky 用例是 user-password-reset，首败原因是强制改密 helper 里的 `page.reload()` 与登录流程自身导航竞态（`net::ERR_ABORTED`），已用 `expect(...).toPass()` 包裹重试。
 - **发布链路 dogfood 验证通过（2026-10-17）**：按 README 路径 `helm install kite oci://ghcr.io/fadewalk/charts/kite --version 0.17.1` 装进一次性 kind 集群，Deployment 正常 rollout、镜像 `ghcr.io/fadewalk/kube-osprey:v0.17.1`、加密 key 经自动生成 Secret 注入并通过 fail-closed 校验、`/healthz` ok、页面标题 KubeOsprey、`/api/v1/version` 返回正确版本且更新检查工作（`hasNewVersion:false`）。验证后已卸载并删除集群。
