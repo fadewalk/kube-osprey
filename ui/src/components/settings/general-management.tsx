@@ -10,6 +10,7 @@ import {
   IconRobot,
   IconSettings,
   IconTerminal2,
+  IconWebhook,
 } from '@tabler/icons-react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -53,6 +54,7 @@ interface GeneralSettingsFormData {
   aiBaseUrl: string
   aiMaxTokens: number
   aiChangePlanMode: boolean
+  webhookChangePlanMode: boolean
   kubectlEnabled: boolean
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
@@ -92,6 +94,7 @@ export function GeneralManagement() {
     aiBaseUrl: '',
     aiMaxTokens: 16384,
     aiChangePlanMode: false,
+    webhookChangePlanMode: false,
     kubectlEnabled: false,
     kubectlImage: DEFAULT_KUBECTL_IMAGE,
     kubectlPermissionMode: 'operator',
@@ -128,6 +131,7 @@ export function GeneralManagement() {
       aiBaseUrl: data.aiBaseUrl || '',
       aiMaxTokens: data.aiMaxTokens || 16384,
       aiChangePlanMode: data.aiChangePlanMode ?? false,
+      webhookChangePlanMode: data.webhookChangePlanMode ?? false,
       kubectlEnabled: data.kubectlEnabled ?? false,
       kubectlImage: data.kubectlImage || DEFAULT_KUBECTL_IMAGE,
       kubectlPermissionMode: data.kubectlPermissionMode || 'operator',
@@ -247,6 +251,7 @@ export function GeneralManagement() {
         formData.clusterAgentImage.trim() || DEFAULT_CLUSTER_AGENT_IMAGE,
       pluginCatalogUrl: formData.pluginCatalogUrl.trim(),
       mcpEnabled: formData.mcpEnabled,
+      webhookChangePlanMode: formData.webhookChangePlanMode,
       mcpRateLimitPerMinute:
         formData.mcpRateLimitPerMinute > 0
           ? formData.mcpRateLimitPerMinute
@@ -483,6 +488,32 @@ export function GeneralManagement() {
               </div>
             </div>
           )}
+        </div>
+
+        <div className="rounded-lg border">
+          <div className="flex items-center justify-between p-3">
+            <div className="space-y-1">
+              <Label className="flex items-center gap-2 text-sm font-medium">
+                <IconWebhook className="h-4 w-4" />
+                {t('generalManagement.webhook.title', 'CI/CD Webhook')}
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  'generalManagement.webhook.description',
+                  'Route webhook-triggered helm upgrades through the change plan approval flow.'
+                )}
+              </p>
+            </div>
+            <Switch
+              checked={formData.webhookChangePlanMode}
+              onCheckedChange={(checked) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  webhookChangePlanMode: checked,
+                }))
+              }
+            />
+          </div>
         </div>
 
         <div className="rounded-lg border">

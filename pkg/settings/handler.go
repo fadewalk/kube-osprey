@@ -33,6 +33,7 @@ func generalSettingResponse(setting *model.GeneralSetting) gin.H {
 		"aiBaseUrl":                setting.AIBaseURL,
 		"aiMaxTokens":              setting.AIMaxTokens,
 		"aiChangePlanMode":         setting.AIChangePlanMode,
+		"webhookChangePlanMode":    setting.WebhookChangePlanMode,
 		"kubectlEnabled":           setting.KubectlEnabled,
 		"kubectlImage":             setting.KubectlImage,
 		"kubectlPermissionMode":    setting.KubectlPermissionMode,
@@ -80,6 +81,7 @@ type UpdateGeneralSettingRequest struct {
 	MCPEnabled            *bool   `json:"mcpEnabled"`
 	MCPRateLimitPerMinute *int    `json:"mcpRateLimitPerMinute"`
 	AIChangePlanMode      *bool   `json:"aiChangePlanMode"`
+	WebhookChangePlanMode *bool   `json:"webhookChangePlanMode"`
 	SyncEngineEnabled     *bool   `json:"syncEngineEnabled"`
 	SyncEngineResources   *string `json:"syncEngineResources"`
 	EnableVersionCheck    *bool   `json:"enableVersionCheck"`
@@ -263,6 +265,9 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	}
 	if req.AIChangePlanMode != nil {
 		updates["ai_change_plan_mode"] = *req.AIChangePlanMode
+	}
+	if req.WebhookChangePlanMode != nil {
+		updates["webhook_change_plan_mode"] = *req.WebhookChangePlanMode
 	}
 	if req.SyncEngineEnabled != nil {
 		updates["sync_engine_enabled"] = *req.SyncEngineEnabled

@@ -965,6 +965,10 @@
         "changePlanModeHint": "助手写操作将生成变更计划：先 dry-run，经人工在变更计划页批准后才会执行。"
       }
     },
+    "webhook": {
+      "title": "CI/CD Webhook",
+      "description": "让 Webhook 触发的 Helm 升级走变更计划审批流程，而非立即执行。"
+    },
     "kubectl": {
       "title": "Kubectl",
       "description": "启用 kubectl 终端，配置运行镜像。",

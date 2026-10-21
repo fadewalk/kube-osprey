@@ -162,6 +162,21 @@ func requiredToolPermissions(ctx context.Context, cs *cluster.ClientSet, toolNam
 			Verb:      string(common.VerbDelete),
 			Namespace: permissionNamespace(resource, namespace),
 		}}, nil
+	case "helm_upgrade_release":
+		// A helm release upgrade writes release storage (secrets) in the
+		// release namespace; require update on secrets there.
+		namespace, err := getRequiredString(args, "namespace")
+		if err != nil {
+			return nil, err
+		}
+		if _, err := getRequiredString(args, "release"); err != nil {
+			return nil, err
+		}
+		return []toolPermission{{
+			Resource:  common.HistoryResourceType("secrets", ""),
+			Verb:      string(common.VerbUpdate),
+			Namespace: namespace,
+		}}, nil
 	case "query_prometheus":
 		// Prometheus queries can access metrics from any namespace
 		// Require at least read permission on pods in all namespaces
@@ -254,11 +269,12 @@ func RunTool(ctx context.Context, cs *cluster.ClientSet, user pkgmodel.User, too
 // carry. Execution goes exclusively through ExecuteMutation, which re-checks
 // RBAC at apply time; nothing else may trigger these against a cluster.
 var planMutationTools = map[string]struct{}{
-	"create_resource": {},
-	"apply_resource":  {},
-	"update_resource": {},
-	"patch_resource":  {},
-	"delete_resource": {},
+	"create_resource":      {},
+	"apply_resource":       {},
+	"update_resource":      {},
+	"patch_resource":       {},
+	"delete_resource":      {},
+	"helm_upgrade_release": {},
 }
 
 // IsPlanMutationTool reports whether toolName is an approvable write tool.
@@ -328,6 +344,12 @@ func executeBuiltinTool(ctx context.Context, cs *cluster.ClientSet, user pkgmode
 		return executePatchResource(ctx, cs, user, args)
 	case "delete_resource":
 		return executeDeleteResource(ctx, cs, user, args)
+	case "helm_upgrade_release":
+		result, err := executeHelmUpgradeRelease(ctx, cs, user, args)
+		if err != nil {
+			return "Error: " + err.Error(), true
+		}
+		return result, false
 	case "query_prometheus":
 		return executeQueryPrometheus(ctx, cs, args)
 	default:

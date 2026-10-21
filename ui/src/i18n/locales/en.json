@@ -959,6 +959,10 @@
         "changePlanModeHint": "Assistant mutations become change plans: dry-run first, then a human approves in Change Plans before anything is applied."
       }
     },
+    "webhook": {
+      "title": "CI/CD Webhook",
+      "description": "Route webhook-triggered helm upgrades through the change plan approval flow."
+    },
     "kubectl": {
       "title": "Kubectl",
       "description": "Enable kubectl terminal and configure runtime image.",

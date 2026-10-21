@@ -39,6 +39,10 @@ func DryRunMutation(ctx context.Context, cs *cluster.ClientSet, toolName string,
 		}
 		before, err := objectToMap(beforeObj)
 		return before, nil, false, err
+	case "helm_upgrade_release":
+		// The webhook's own dryRun payload already previews the upgrade;
+		// plan steps record it as dry-run unsupported.
+		return nil, nil, false, nil
 	default:
 		return nil, nil, false, fmt.Errorf("tool %q does not support dry-run", toolName)
 	}

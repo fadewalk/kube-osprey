@@ -18,6 +18,11 @@ import (
 // trigger and execution re-checks the creator's RBAC per step.
 const ChatClientName = "kite-chat"
 
+// WebhookClientName marks plans created by CI/CD webhooks. Like chat plans
+// they auto-apply on approval: the human approval is the gate, and the
+// upgrade step re-checks the creator's RBAC at execution time.
+const WebhookClientName = "webhook"
+
 type chatRouter struct {
 	svc *Service
 }
@@ -52,7 +57,10 @@ func (r chatRouter) SubmitMutation(ctx context.Context, cs *cluster.ClientSet, u
 // autoApplyChatPlan applies an approved chat plan in the background; the
 // approval itself was the human gate.
 func (s *Service) autoApplyChatPlan(plan model.ChangePlan) {
-	if plan.ClientName != ChatClientName || plan.Status != model.ChangePlanApproved {
+	if plan.Status != model.ChangePlanApproved {
+		return
+	}
+	if plan.ClientName != ChatClientName && plan.ClientName != WebhookClientName {
 		return
 	}
 	go func() {
@@ -60,9 +68,9 @@ func (s *Service) autoApplyChatPlan(plan model.ChangePlan) {
 		defer cancel()
 		creator := model.User{Model: model.Model{ID: plan.UserID}, Username: plan.Username}
 		if _, err := s.applyPlanSteps(ctx, plan.ID, creator); err != nil {
-			klog.Warningf("Chat plan %d auto-apply failed: %v", plan.ID, err)
+			klog.Warningf("Plan %d auto-apply failed: %v", plan.ID, err)
 		} else {
-			klog.Infof("Chat plan %d auto-applied after approval", plan.ID)
+			klog.Infof("Plan %d auto-applied after approval", plan.ID)
 		}
 	}()
 }

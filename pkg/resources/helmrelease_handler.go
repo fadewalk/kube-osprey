@@ -31,11 +31,6 @@ const (
 
 type HelmReleaseHandler struct{}
 
-type helmReleaseRunResult struct {
-	current *release.Release
-	release *release.Release
-}
-
 type helmReleaseInstallRequest struct {
 	ReleaseName     string                 `json:"releaseName" binding:"required"`
 	Namespace       string                 `json:"namespace"`
@@ -297,81 +292,30 @@ func (h *HelmReleaseHandler) DryRunUpgrade(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, helmutil.ToHelmReleaseDryRunDiffResponse(result.current, result.release))
+	c.JSON(http.StatusOK, helmutil.ToHelmReleaseDryRunDiffResponse(result.Current, result.Release))
 }
 
-func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result helmReleaseRunResult, status int, err error) {
+func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result helmutil.RunResult, status int, err error) {
 	cs := c.MustGet("cluster").(*cluster.ClientSet)
 	user := c.MustGet("user").(model.User)
 	var req helmReleaseActionRequest
 	if err := c.ShouldBindJSON(&req); err != nil && !errors.Is(err, io.EOF) {
-		return helmReleaseRunResult{}, http.StatusBadRequest, err
+		return helmutil.RunResult{}, http.StatusBadRequest, err
 	}
 	return h.executeUpgrade(c.Request.Context(), cs, user, c.Param("namespace"), c.Param("name"), req, dryRun)
 }
 
-func (h *HelmReleaseHandler) executeUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, namespace, name string, req helmReleaseActionRequest, dryRun bool) (result helmReleaseRunResult, status int, err error) {
-	cfg, err := h.actionConfigForClientSet(cs, helmutil.StorageNamespace(namespace))
-	if err != nil {
-		return helmReleaseRunResult{}, http.StatusInternalServerError, err
-	}
-	current, err := helmutil.GetRelease(cfg, name)
-	if err != nil {
-		return helmReleaseRunResult{}, http.StatusInternalServerError, err
-	}
-	if current.Chart == nil {
-		return helmReleaseRunResult{}, http.StatusInternalServerError, fmt.Errorf("helm release chart is missing")
-	}
-	result.current = current
-	if !dryRun {
-		defer func() {
-			helmutil.RecordReleaseHistory(cs.Name, user.ID, "manual", "upgrade", name, namespace, current, result.release, err == nil, err)
-		}()
-	}
-
-	chartToUpgrade := current.Chart
-	if strings.TrimSpace(req.ChartURL) != "" {
-		req.ChartURL = strings.TrimSpace(req.ChartURL)
-		repository, err := helmutil.ResolveChartRepository(
-			strings.TrimSpace(req.RepositoryName),
-			strings.TrimSpace(req.Source),
-		)
-		if err != nil {
-			return helmReleaseRunResult{}, http.StatusBadRequest, fmt.Errorf("repository not found")
-		}
-		chartToUpgrade, err = helmutil.LoadArchive(req.ChartURL, repository)
-		if err != nil {
-			return helmReleaseRunResult{}, http.StatusBadRequest, err
-		}
-	}
-
-	values := req.Values
-	if values == nil {
-		values = map[string]interface{}{}
-	}
-	description := req.Description
-	if description == "" {
-		description = "Dry run upgrade requested from KubeOsprey"
-		if !dryRun {
-			description = "Upgrade requested from KubeOsprey"
-		}
-	}
-
-	rel, err := helmutil.UpgradeRelease(ctx, cfg, name, chartToUpgrade, values, helmutil.UpgradeReleaseOptions{
-		Namespace:         namespace,
-		Timeout:           helmActionTimeout,
-		ReuseValues:       req.Values == nil,
-		Description:       description,
+func (h *HelmReleaseHandler) executeUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, namespace, name string, req helmReleaseActionRequest, dryRun bool) (helmutil.RunResult, int, error) {
+	return helmutil.RunUpgrade(ctx, cs, user, namespace, name, helmutil.UpgradeRequest{
+		ChartURL:          req.ChartURL,
+		RepositoryName:    req.RepositoryName,
+		Source:            req.Source,
+		Values:            req.Values,
+		Description:       req.Description,
 		ForceConflicts:    req.ForceConflicts,
 		RollbackOnFailure: req.RollbackOnFailure,
-		DryRun:            dryRun,
 		Wait:              req.Wait,
-	})
-	if err != nil {
-		return helmReleaseRunResult{}, http.StatusInternalServerError, err
-	}
-	result.release = rel
-	return result, http.StatusOK, nil
+	}, dryRun)
 }
 
 func (h *HelmReleaseHandler) Rollback(c *gin.Context) {

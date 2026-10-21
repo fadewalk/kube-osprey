@@ -444,6 +444,7 @@ export interface GeneralSetting {
   aiBaseUrl: string
   aiMaxTokens: number
   aiChangePlanMode: boolean
+  webhookChangePlanMode: boolean
   kubectlEnabled: boolean
   kubectlImage: string
   kubectlPermissionMode: KubectlPermissionMode
@@ -480,6 +481,7 @@ export interface GeneralSettingUpdateRequest {
   aiBaseUrl?: string
   aiMaxTokens?: number
   aiChangePlanMode?: boolean
+  webhookChangePlanMode?: boolean
   kubectlEnabled?: boolean
   kubectlImage?: string
   kubectlPermissionMode?: KubectlPermissionMode

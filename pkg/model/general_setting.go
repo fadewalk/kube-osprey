@@ -78,7 +78,10 @@ type GeneralSetting struct {
 	SyncEngineResources string `json:"syncEngineResources" gorm:"column:sync_engine_resources;type:text"`
 	// AIChangePlanMode routes chat-assistant mutations through the change
 	// plan approval flow instead of the in-chat single-step confirmation.
-	AIChangePlanMode      bool   `json:"aiChangePlanMode" gorm:"column:ai_change_plan_mode;type:boolean;not null;default:false"`
+	AIChangePlanMode bool `json:"aiChangePlanMode" gorm:"column:ai_change_plan_mode;type:boolean;not null;default:false"`
+	// WebhookChangePlanMode routes CI webhook helm upgrades through the
+	// change plan approval flow instead of upgrading immediately.
+	WebhookChangePlanMode bool   `json:"webhookChangePlanMode" gorm:"column:webhook_change_plan_mode;type:boolean;not null;default:false"`
 	EnableVersionCheck    bool   `json:"enableVersionCheck" gorm:"column:enable_version_check;type:boolean;not null;default:true"`
 	PasswordLoginDisabled bool   `json:"passwordLoginDisabled" gorm:"column:password_login_disabled;type:boolean;not null;default:false"`
 	EnableMFA             bool   `json:"enableMFA" gorm:"column:enable_mfa;type:boolean;not null;default:true"`
@@ -200,6 +203,7 @@ func GetGeneralSetting() (*GeneralSetting, error) {
 		AIProvider:            DefaultGeneralAIProvider,
 		AIModel:               DefaultGeneralAIModel,
 		AIMaxTokens:           16384,
+		WebhookChangePlanMode: false,
 		KubectlEnabled:        false,
 		KubectlImage:          DefaultGeneralKubectlImageValue(),
 		KubectlPermissionMode: DefaultKubectlPermissionMode,
