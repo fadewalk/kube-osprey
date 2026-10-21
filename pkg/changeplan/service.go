@@ -11,6 +11,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 
 	"gorm.io/gorm"
@@ -19,6 +20,7 @@ import (
 	"github.com/zxh326/kite/pkg/ai"
 	"github.com/zxh326/kite/pkg/cluster"
 	"github.com/zxh326/kite/pkg/model"
+	"github.com/zxh326/kite/pkg/notify"
 )
 
 // DefaultServiceTTL matches the model default; overridable in tests.
@@ -193,7 +195,25 @@ func (s *Service) FinalizePlan(user model.User, planID uint) error {
 		return fmt.Errorf("plan %d is not in CREATED state or not owned by you", planID)
 	}
 	klog.V(1).Infof("Change plan %d finalized by %s", planID, user.Username)
+	var plan model.ChangePlan
+	if err := model.DB.Preload("Steps").First(&plan, planID).Error; err == nil {
+		notify.DispatchPlanEvent(notify.EventPlanPending, notify.PlanEvent{
+			PlanID:      plan.ID,
+			Description: plan.Description,
+			Creator:     user.Username,
+			Detail:      stepsSummary(plan.Steps),
+		})
+	}
 	return nil
+}
+
+// stepsSummary renders a compact per-step list for notification bodies.
+func stepsSummary(steps []model.ChangePlanStep) string {
+	parts := make([]string, 0, len(steps))
+	for _, s := range steps {
+		parts = append(parts, fmt.Sprintf("%d. %s (%s)", s.Seq, s.ToolName, s.Status))
+	}
+	return strings.Join(parts, "; ")
 }
 
 func (s *Service) expireStalePlans() {
@@ -361,6 +381,17 @@ func (s *Service) applyPlanSteps(ctx context.Context, planID uint, creator model
 	if err := model.DB.Preload("Steps", func(db *gorm.DB) *gorm.DB { return db.Order("seq ASC") }).First(&plan, planID).Error; err != nil {
 		return nil, err
 	}
+	notifyEvent := notify.EventPlanApplied
+	if failed {
+		notifyEvent = notify.EventPlanFailed
+	}
+	notify.DispatchPlanEvent(notifyEvent, notify.PlanEvent{
+		PlanID:      plan.ID,
+		Status:      finalStatus,
+		Description: plan.Description,
+		Creator:     plan.Username,
+		Detail:      stepsSummary(plan.Steps),
+	})
 	if failed {
 		return &plan, fmt.Errorf("%s", errMsg)
 	}

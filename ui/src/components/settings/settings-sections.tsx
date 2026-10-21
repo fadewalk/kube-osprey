@@ -10,6 +10,7 @@ import { RBACManagement } from './rbac-management'
 import { TemplateManagement } from './template-management'
 import { UserGroupManagement } from './user-group-management'
 import { UserManagement } from './user-management'
+import { NotificationManagement } from './notification-management'
 
 export interface SettingsSectionDefinition {
   value: string
@@ -86,6 +87,12 @@ export const settingsSectionRegistry: SettingsSectionDefinition[] = [
     'settings.tabs.audit',
     'Audit',
     AuditLog
+  ),
+  createSettingsSectionDefinition(
+    'notifications',
+    'settings.tabs.notifications',
+    'Notifications',
+    NotificationManagement
   ),
 ]
 

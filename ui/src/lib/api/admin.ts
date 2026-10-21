@@ -606,6 +606,71 @@ export const fetchAPIKeyList = async (): Promise<APIKey[]> => {
   )
 }
 
+// --- Notification channels ---
+
+export interface NotificationChannel {
+  id: number
+  name: string
+  type: 'dingtalk' | 'wecom' | 'feishu' | 'slack' | 'webhook'
+  endpoint: string
+  events: string
+  enabled: boolean
+  lastStatus: string
+  lastError: string
+  lastSentAt?: string
+}
+
+export interface NotificationChannelRequest {
+  name: string
+  type: string
+  endpoint: string
+  secret?: string
+  events: string
+  enabled: boolean
+}
+
+export const fetchNotificationChannels = async (): Promise<
+  NotificationChannel[]
+> => {
+  const data = await fetchAPI<{ channels: NotificationChannel[] }>(
+    '/admin/notifications/channels'
+  )
+  return data.channels
+}
+
+export const useNotificationChannels = (options?: { enabled?: boolean }) => {
+  return useQuery({
+    queryKey: ['notification-channels'],
+    queryFn: fetchNotificationChannels,
+    enabled: options?.enabled ?? true,
+  })
+}
+
+export const createNotificationChannel = async (
+  request: NotificationChannelRequest
+): Promise<NotificationChannel> => {
+  return await apiClient.post('/admin/notifications/channels', request)
+}
+
+export const updateNotificationChannel = async (
+  id: number,
+  request: NotificationChannelRequest
+): Promise<NotificationChannel> => {
+  return await apiClient.put(`/admin/notifications/channels/${id}`, request)
+}
+
+export const deleteNotificationChannel = async (
+  id: number
+): Promise<void> => {
+  return await apiClient.delete(`/admin/notifications/channels/${id}`)
+}
+
+export const testNotificationChannel = async (
+  id: number
+): Promise<{ message: string }> => {
+  return await apiClient.post(`/admin/notifications/channels/${id}/test`)
+}
+
 export const useAPIKeyList = (options?: { staleTime?: number }) => {
   return useQuery({
     queryKey: ['apikey-list'],

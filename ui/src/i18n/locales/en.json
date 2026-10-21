@@ -939,7 +939,8 @@
       "oauth": "Authentication",
       "rbac": "RBAC",
       "users": "User",
-      "groups": "Groups"
+      "groups": "Groups",
+      "notifications": "Notifications"
     }
   },
   "generalManagement": {
@@ -1897,5 +1898,40 @@
     "clearScreen": "Clear Screen",
     "reconnecting": "Reconnecting (attempt {{attempt}}/3)...",
     "reconnectGiveUp": "Auto-reconnect gave up. Use the reconnect button."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "addChannel": "Add Channel",
+    "editChannel": "Edit Channel",
+    "type": "Type",
+    "endpoint": "Webhook URL",
+    "secret": "Signing secret (optional)",
+    "secretPlaceholder": "Leave empty to keep the current secret",
+    "eventsTitle": "Events",
+    "enabled": "enabled",
+    "disabled": "disabled",
+    "lastFailed": "last delivery failed",
+    "test": "Send test notification",
+    "empty": "No notification channels configured yet.",
+    "deleteTitle": "Delete notification channel",
+    "deleteDescription": "This will permanently remove the notification channel.",
+    "events": {
+      "planPending": "Plan awaiting approval",
+      "planApplied": "Plan applied",
+      "planFailed": "Plan failed",
+      "other": "other"
+    },
+    "types": {
+      "dingtalk": "DingTalk",
+      "wecom": "WeCom",
+      "feishu": "Feishu",
+      "slack": "Slack",
+      "webhook": "Generic webhook"
+    },
+    "messages": {
+      "saved": "Notification channel saved",
+      "deleted": "Channel deleted",
+      "testSent": "Test notification sent"
+    }
   }
 }

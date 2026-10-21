@@ -17,6 +17,7 @@ import (
 	"github.com/zxh326/kite/pkg/mcpserver"
 	"github.com/zxh326/kite/pkg/metrics"
 	"github.com/zxh326/kite/pkg/middleware"
+	"github.com/zxh326/kite/pkg/notify"
 	"github.com/zxh326/kite/pkg/plugins"
 	"github.com/zxh326/kite/pkg/proxy"
 	"github.com/zxh326/kite/pkg/rbac"
@@ -163,6 +164,8 @@ func registerAdminRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *
 	generalSettingAPI := adminAPI.Group("/general-setting")
 	generalSettingAPI.GET("/", settings.HandleGetGeneralSetting)
 	generalSettingAPI.PUT("/", settings.HandleUpdateGeneralSetting)
+
+	notify.RegisterAdminRoutes(adminAPI)
 
 	adminAPI.GET("/sync-engine/status", syncengine.HandleStatus)
 	adminAPI.POST("/sync-engine/restart-full-sync", syncengine.HandleRestartFullSync)

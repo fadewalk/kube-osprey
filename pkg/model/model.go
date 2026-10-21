@@ -115,6 +115,7 @@ func InitDB() error {
 		PasswordHistory{},
 		ChangePlan{},
 		ChangePlanStep{},
+		NotificationChannel{},
 		SyncObject{},
 		SyncTask{},
 		PendingSession{},
