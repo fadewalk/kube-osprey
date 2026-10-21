@@ -1,7 +1,10 @@
 import { defineConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
+// BASE_PATH is set by the docs deploy workflow; GitHub Pages serves the
+// project site from /kube-osprey/.
 export default defineConfig({
+  base: process.env.BASE_PATH || "/",
   title: "KubeOsprey",
   description: "A modern Kubernetes dashboard",
 
@@ -56,14 +59,9 @@ export default defineConfig({
   },
 
   head: [
-    ["link", { rel: "icon", href: "/logo.svg" }],
     [
-      "script",
-      {
-        src: "https://cloud.umami.is/script.js",
-        "data-website-id": "764af8e4-8fa4-4fc5-83e2-304718cc15fe",
-        defer: "true",
-      },
+      "link",
+      { rel: "icon", href: `${process.env.BASE_PATH || ""}/logo.svg` },
     ],
   ],
 
