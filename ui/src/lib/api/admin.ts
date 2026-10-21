@@ -435,6 +435,7 @@ export interface APIKeyCreateRequest {
 export type KubectlPermissionMode = 'admin' | 'operator' | 'custom'
 
 export interface GeneralSetting {
+  aiManaged: boolean
   aiAgentEnabled: boolean
   aiProvider: 'openai' | 'anthropic'
   aiModel: string
