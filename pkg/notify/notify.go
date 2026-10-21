@@ -39,7 +39,9 @@ func Send(channel model.NotificationChannel, msg Message) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	_, _ = io.Copy(io.Discard, resp.Body)
 	if resp.StatusCode >= 300 {
 		return fmt.Errorf("unexpected status %s", resp.Status)
@@ -110,12 +112,15 @@ func formatPayload(channel model.NotificationChannel, msg Message) ([]byte, stri
 			mac := hmac.New(sha256.New, []byte(timestamp+"\n"+string(secret)))
 			mac.Write([]byte(""))
 			sign := base64.StdEncoding.EncodeToString(mac.Sum(nil))
-			bodyMap, _ := json.Marshal(map[string]any{
+			bodyMap, err := json.Marshal(map[string]any{
 				"msg_type":  "text",
 				"content":   map[string]string{"text": text},
 				"timestamp": timestamp,
 				"sign":      sign,
 			})
+			if err != nil {
+				return nil, "", err
+			}
 			encoded = bodyMap
 		}
 	}
