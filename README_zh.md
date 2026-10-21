@@ -80,18 +80,18 @@ docker run -d --name kube-osprey \
 ```
 
 > [!IMPORTANT]
-> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、显式固定 `encryptKey` 而不要依赖自动生成的值，并检查 Chart 创建的集群级 RBAC 权限。KubeOsprey 会拒绝使用上游默认加密密钥或短于 32 个字符的密钥启动。详见上游[安装指南](https://kitehq.dev/zh/guide/installation)和 [Chart Values](https://kitehq.dev/zh/config/chart-values)。
+> Chart 默认值仅适合快速体验。用于生产环境前，请启用持久化存储或配置外部数据库、显式固定 `encryptKey` 而不要依赖自动生成的值，并检查 Chart 创建的集群级 RBAC 权限。KubeOsprey 会拒绝使用上游默认加密密钥或短于 32 个字符的密钥启动。详见上游[安装指南](https://fadewalk.github.io/kube-osprey/zh/guide/installation)和 [Chart Values](https://fadewalk.github.io/kube-osprey/zh/config/chart-values)。
 
 ## 文档
 
 | 主题             | 上游指南                                                                                                                        |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 安装与访问       | [安装指南](https://kitehq.dev/zh/guide/installation)                                                                            |
-| 用户、认证和权限 | [用户管理](https://kitehq.dev/zh/config/user-management) · [RBAC](https://kitehq.dev/zh/config/rbac-config)                     |
-| 监控             | [Prometheus 配置](https://kitehq.dev/zh/config/prometheus-setup)                                                                |
-| 运维             | [Helm 管理](https://kitehq.dev/zh/guide/helm-management) · [Kite Cluster Agent](https://kitehq.dev/zh/guide/kite-cluster-agent) |
-| AI               | [AI 助手](https://kitehq.dev/zh/guide/ai-assistant)                                                                             |
-| API              | [API 文档](https://kitehq.dev/zh/api/authentication)                                                                            |
+| 安装与访问       | [安装指南](https://fadewalk.github.io/kube-osprey/zh/guide/installation)                                                                            |
+| 用户、认证和权限 | [用户管理](https://fadewalk.github.io/kube-osprey/zh/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/zh/config/rbac-config)                     |
+| 监控             | [Prometheus 配置](https://fadewalk.github.io/kube-osprey/zh/config/prometheus-setup)                                                                |
+| 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/kite-cluster-agent) |
+| AI               | [AI 助手](https://fadewalk.github.io/kube-osprey/zh/guide/ai-assistant)                                                                             |
+| API              | [API 文档](https://fadewalk.github.io/kube-osprey/zh/api/authentication)                                                                            |
 
 ## 许可证
 

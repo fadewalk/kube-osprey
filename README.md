@@ -80,18 +80,18 @@ docker run -d --name kube-osprey \
 ```
 
 > [!IMPORTANT]
-> The default chart values are intended for evaluation. Before using it in production, enable persistent storage or configure an external database, pin `encryptKey` instead of relying on the generated one, and review the chart's cluster-wide RBAC permissions. KubeOsprey refuses to start with the upstream default encryption key or one shorter than 32 characters. See the upstream [installation guide](https://kitehq.dev/guide/installation) and [chart values](https://kitehq.dev/config/chart-values).
+> The default chart values are intended for evaluation. Before using it in production, enable persistent storage or configure an external database, pin `encryptKey` instead of relying on the generated one, and review the chart's cluster-wide RBAC permissions. KubeOsprey refuses to start with the upstream default encryption key or one shorter than 32 characters. See the upstream [installation guide](https://fadewalk.github.io/kube-osprey/guide/installation) and [chart values](https://fadewalk.github.io/kube-osprey/config/chart-values).
 
 ## Documentation
 
 | Topic                                  | Upstream guide                                                                                                                  |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Installation and exposure              | [Installation](https://kitehq.dev/guide/installation)                                                                           |
-| Users, authentication, and permissions | [User management](https://kitehq.dev/config/user-management) · [RBAC](https://kitehq.dev/config/rbac-config)                    |
-| Monitoring                             | [Prometheus setup](https://kitehq.dev/config/prometheus-setup)                                                                  |
-| Operations                             | [Helm management](https://kitehq.dev/guide/helm-management) · [Kite Cluster Agent](https://kitehq.dev/guide/kite-cluster-agent) |
-| AI                                     | [AI assistant](https://kitehq.dev/guide/ai-assistant)                                                                           |
-| API                                    | [API documentation](https://kitehq.dev/api/authentication)                                                                      |
+| Installation and exposure              | [Installation](https://fadewalk.github.io/kube-osprey/guide/installation)                                                                           |
+| Users, authentication, and permissions | [User management](https://fadewalk.github.io/kube-osprey/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/config/rbac-config)                    |
+| Monitoring                             | [Prometheus setup](https://fadewalk.github.io/kube-osprey/config/prometheus-setup)                                                                  |
+| Operations                             | [Helm management](https://fadewalk.github.io/kube-osprey/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/guide/kite-cluster-agent) |
+| AI                                     | [AI assistant](https://fadewalk.github.io/kube-osprey/guide/ai-assistant)                                                                           |
+| API                                    | [API documentation](https://fadewalk.github.io/kube-osprey/api/authentication)                                                                      |
 
 ## License
 
