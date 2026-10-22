@@ -4,7 +4,7 @@ outline: deep
 
 # Publishing Plugins
 
-Plugins are packaged as `.tar.gz` archives. Distribute them directly, host your own catalog, or publish through the official [kite-plugins](https://github.com/kite-org/kite-plugins) repository.
+Plugins are packaged as `.tar.gz` archives. Distribute them directly or host your own catalog — these are the recommended ways to make plugins available to KubeOsprey users. You can also contribute a plugin to the upstream [kite-plugins](https://github.com/kite-org/kite-plugins) repository, which maintains the official catalog of the Kite plugin ecosystem that KubeOsprey is compatible with.
 
 ## Version Rules
 
@@ -49,9 +49,9 @@ pnpm run catalog \
 
 Upload `packages/` first, then publish `catalog.json` and `readmes/`.
 
-## Publish to the Official Catalog
+## Contribute to the Upstream Kite Catalog
 
-Submit a completed plugin to [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins). Once reviewed and merged, it can be published to the official catalog.
+Submitting a completed plugin to [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) is the contribution flow of the upstream Kite plugin ecosystem. Once a contribution is reviewed and merged upstream, the plugin becomes available in the catalog that KubeOsprey uses by default. For internal or self-managed plugins, prefer [Private Distribution](#private-distribution) instead.
 
 1. Fork and clone the repository.
 2. Place the plugin source in `plugins/<plugin ID>/`, with the directory name matching `name` in `package.json`. Include a `README.md` describing the plugin's features and usage. Do not commit `dist/` or installation archives.
@@ -62,4 +62,4 @@ After the PR is merged into `main`, the publishing workflow builds unpublished p
 | Catalog | URL |
 | ------- | --- |
 | GitHub Pages | `https://kite-org.github.io/kite-plugins/catalog.json` |
-| EdgeOne | `https://plugins.kitehq.dev/catalog.json` (KubeOsprey's default catalog) |
+| EdgeOne | `https://plugins.kitehq.dev/catalog.json` (KubeOsprey's default catalog, maintained by the upstream ecosystem) |

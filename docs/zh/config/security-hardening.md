@@ -23,6 +23,10 @@ KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户
 
 数据库中的 `SecretString` 字段包括 kubeconfig、OAuth/LDAP 密钥、Helm 仓库密码、API Key、MFA Secret 和 Cluster Agent 私钥等凭据，它们使用 `KITE_ENCRYPT_KEY` 加密。
 
+启动时会校验 `KITE_ENCRYPT_KEY`：密钥不能为空、长度至少 32 个字符、且不能等于内置的开发用默认值，否则服务拒绝启动。仅本地开发环境可以设置 `KITE_ALLOW_INSECURE_DEFAULTS=true` 跳过默认值检查。
+
+`TRUSTED_PROXIES` 建议配置为实际反向代理的网段或 IP；设置为 `none` 表示忽略所有客户端转发头。
+
 用户密码使用单向密码哈希保存，不能通过 `KITE_ENCRYPT_KEY` 恢复。
 
 建议使用已有 Kubernetes Secret：
@@ -30,7 +34,7 @@ KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户
 ```yaml
 secret:
   create: false
-  existingSecret: kite-secrets
+  existingSecret: kube-osprey-secrets
 ```
 
 该 Secret 必须包含当前部署模式需要的配置项。恢复已有数据库时，必须保持原加密密钥不变。密钥轮换需要专门的迁移流程：使用旧密钥解密，再使用新密钥重加密。

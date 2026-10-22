@@ -60,7 +60,7 @@ These options enable Write-Ahead Logging (WAL) mode and increase the busy timeou
 
 **Recommended for Production**: For production deployments requiring persistent storage, use MySQL or PostgreSQL instead of SQLite. These databases are better suited for containerized environments and persistent storage scenarios.
 
-For more details, see [Issue #204](https://github.com/kite-org/kite/issues/204).
+For more details, see the upstream Kite issue ([kite-org/kite#204](https://github.com/kite-org/kite/issues/204)).
 
 ## How to Change Font
 
@@ -68,7 +68,7 @@ By default, KubeOsprey provides three fonts: system default, `Maple Mono`, and `
 
 If you want to use a different font, you need to build the project yourself.
 
-Build kite with make and change the font in `./ui/src/index.css`:
+Build KubeOsprey with make and change the font in `./ui/src/index.css`:
 
 ```css
 @font-face {
@@ -92,7 +92,7 @@ body {
 
 We welcome contributions! You can:
 
-- Report bugs and feature requests on [GitHub Issues](https://github.com/kite-org/kite/issues)
+- Report bugs and feature requests on [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues)
 - Submit pull requests
 - Improve documentation
 - Share feedback and use cases
@@ -101,9 +101,9 @@ We welcome contributions! You can:
 
 You can get support through:
 
-- [GitHub Issues](https://github.com/kite-org/kite/issues) for bug reports and feature requests
-- [Slack Community](https://join.slack.com/t/kite-dashboard/shared_invite/zt-3amy6f23n-~QZYoricIOAYtgLs_JagEw) for questions and community support
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) for bug reports and feature requests
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) for questions and community support
 
 ---
 
-**Didn't find what you're looking for?** Feel free to [open an issue](https://github.com/kite-org/kite/issues/new) on GitHub or start a [discussion](https://github.com/kite-org/kite/discussions).
+**Didn't find what you're looking for?** Feel free to [open an issue](https://github.com/fadewalk/kube-osprey/issues) on GitHub.

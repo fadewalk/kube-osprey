@@ -19,8 +19,13 @@ KubeOsprey 是面向平台团队的轻量、开源 Kubernetes 工作空间，将
 - **快速找到任意资源：** [全局搜索](./global-search)
 - **了解工作负载及其依赖关系：** [相关资源](./related-resources)
 - **排查正在运行的 Pod：** [日志](./logs)与 [Web 终端](./web-terminal)
+- **一次聚合多个 Pod 的日志：** [日志中心](./log-center)
 - **查看集群健康状态和用量：** [监控](./monitoring)
+- **处理告警与静默：** [告警中心](./alert-center)
+- **一眼评估集群健康度：** [健康诊断](./health-diagnostics)
+- **批量编辑多个工作负载：** [批量运维](./batch-operations)
 - **安装和管理应用：** [Helm 管理](./helm-management)
+- **为敏感变更增加审批闸门：** [变更计划](./change-plans)
 - **审查资源变更：** [资源历史](./resource-history)
 - **使用 AI Agent 辅助排障：** [AI 助手](./ai-assistant)
 - **连接私有或远程集群：** [KubeOsprey Cluster Agent](./kite-cluster-agent)
@@ -29,15 +34,15 @@ KubeOsprey 是面向平台团队的轻量、开源 Kubernetes 工作空间，将
 
 ### 观察
 
-通过实时 CPU、内存和网络图表、Pod 日志、事件与资源关系，从异常现象快速定位所需上下文。
+通过实时 CPU、内存和网络图表、Pod 日志、事件与资源关系，从异常现象快速定位所需上下文。[日志中心](./log-center)聚合多 Pod 日志，[告警中心](./alert-center)呈现 Alertmanager 告警，[健康诊断](./health-diagnostics)为每个集群给出健康评分。
 
 ### 运维
 
-创建和编辑 Kubernetes 资源、管理 Helm Release、打开 Pod 与 Node 终端、运行 kubectl，并通过 Kube Proxy 访问工作负载。
+创建和编辑 Kubernetes 资源、管理 Helm Release、打开 Pod 与 Node 终端、运行 kubectl，并通过 Kube Proxy 访问工作负载。[批量运维](./batch-operations)一次对多个工作负载执行改镜像、重启与伸缩，[变更计划](./change-plans)为 AI 与 CI 触发的变更加上人工审批闸门并支持回滚。
 
 ### 治理
 
-使用 OAuth、MFA、Passkey、用户管理、RBAC、角色映射和审计日志，统一管理多集群中的团队访问。
+使用 OAuth、MFA、Passkey、用户管理、RBAC、角色映射和审计日志，统一管理多集群中的团队访问。角色授权支持过期时间，密码策略与强制改密保障本地账号安全。
 
 ## KubeOsprey 适合什么场景
 

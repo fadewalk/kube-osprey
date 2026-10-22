@@ -6,6 +6,8 @@ outline: deep
 
 Cluster Agent is used to onboard Kubernetes clusters that KubeOsprey Server cannot reach directly. The Cluster Agent runs inside the target cluster, initiates the connection to KubeOsprey, and forwards Kubernetes API requests issued by KubeOsprey over that connection.
 
+The Cluster Agent is not a separate binary or image. It is the same KubeOsprey binary run with the `cluster-agent` subcommand: when building from source, run `kite cluster-agent`; in release binaries and container images the binary is named `kube-osprey`, so the same subcommand is `kube-osprey cluster-agent`. The examples in this guide use the source-build form.
+
 ## Background
 
 In private networks, edge environments, or firewall-restricted scenarios, the target cluster may be able to reach KubeOsprey while KubeOsprey Server cannot connect to the cluster's kube-apiserver. The traditional kubeconfig onboarding method requires KubeOsprey Server to connect to kube-apiserver, so it cannot cover this one-way network topology.
@@ -99,7 +101,7 @@ Copy the YAML from the connection info dialog, save it to a file, and then deplo
 kubectl apply -f kite-cluster-agent.yaml
 ```
 
-The image used by the Deployment is configured via **Cluster Agent Image** in the platform settings, defaulting to `ghcr.io/kite-org/kite:latest`. The token is injected into the Cluster Agent process via a Secret.
+The image used by the Deployment is configured via **Cluster Agent Image** in the platform settings. The default value `ghcr.io/kite-org/kite:latest` is inherited from the upstream Kite image; override it in the settings, for example to the KubeOsprey release image `ghcr.io/fadewalk/kube-osprey`, if you prefer. There is no dedicated agent image — the agent is the same KubeOsprey binary running the `cluster-agent` subcommand. The token is injected into the Cluster Agent process via a Secret.
 
 ### 2. Start It in the Target Cluster
 

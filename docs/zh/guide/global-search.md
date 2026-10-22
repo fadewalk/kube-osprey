@@ -26,14 +26,14 @@ pod nginx
 
 更多支持的资源类型和缩写，您可通过代码找到
 
-https://github.com/kite-org/kite/blob/b16a4701994e32e5251ee21707f940aa312a449d/pkg/utils/search.go#L12-L35
+https://github.com/fadewalk/kube-osprey/blob/dev/pkg/utils/search.go
 
 ## 限制
 
 - 为了性能考虑，当输入的字符长度小于 3 时，搜索将不会被触发
 - 不支持模糊搜索
 - 不支持跨集群搜索
-- 搜索会对集群发起 listAll 请求，因此如果集群中资源数量过多，可能会导致搜索变慢。（kite 会对搜索结果缓存 10 分钟）
+- 搜索会对集群发起 listAll 请求，因此如果集群中资源数量过多，可能会导致搜索变慢。（KubeOsprey 会对搜索结果缓存 10 分钟）
 
 ## 已知问题
 

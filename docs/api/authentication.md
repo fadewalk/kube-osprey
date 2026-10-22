@@ -145,7 +145,7 @@ Example:
 curl \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  https://kite.example.com/api/v1/pods/default
+  https://kube-osprey.example.com/api/v1/pods/default
 ```
 
 Notes:

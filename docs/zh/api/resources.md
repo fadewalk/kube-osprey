@@ -78,7 +78,7 @@ curl \
       "LOG_LEVEL": "info"
     }
   }' \
-  https://kite.example.com/api/v1/configmaps/default
+  https://kube-osprey.example.com/api/v1/configmaps/default
 ```
 
 ## Update 示例
@@ -106,7 +106,7 @@ curl \
       "LOG_LEVEL": "debug"
     }
   }' \
-  https://kite.example.com/api/v1/configmaps/default/example-config
+  https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
 ## Patch 示例
@@ -130,7 +130,7 @@ curl \
       "LOG_LEVEL": "warn"
     }
   }' \
-  "https://kite.example.com/api/v1/configmaps/default/example-config?patchType=merge"
+  "https://kube-osprey.example.com/api/v1/configmaps/default/example-config?patchType=merge"
 ```
 
 如果要通过 `PATCH` 重启一个 Deployment，可以更新 `spec.template.metadata.annotations` 下的一个时间戳字段。这样会修改 Pod template，从而触发一次新的 rollout。
@@ -152,7 +152,7 @@ curl \
       }
     }
   }' \
-  "https://kite.example.com/api/v1/deployments/default/example-app?patchType=merge"
+  "https://kube-osprey.example.com/api/v1/deployments/default/example-app?patchType=merge"
 ```
 
 ## Delete 示例
@@ -164,7 +164,7 @@ curl \
   -X DELETE \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  https://kite.example.com/api/v1/configmaps/default/example-config
+  https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
 可选删除参数：
@@ -180,7 +180,7 @@ curl \
   -X DELETE \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  "https://kite.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
+  "https://kube-osprey.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
 ```
 
 ## 集群级资源示例
@@ -202,7 +202,7 @@ curl \
       }
     }
   }' \
-  https://kite.example.com/api/v1/namespaces/_all/demo
+  https://kube-osprey.example.com/api/v1/namespaces/_all/demo
 ```
 
 ## 自定义资源

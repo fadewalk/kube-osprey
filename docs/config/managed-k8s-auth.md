@@ -25,7 +25,7 @@ Create a dedicated Service Account for KubeOsprey and use its token for authenti
 KubeOsprey provides a helper script for creation:
 
 ```sh
-wget https://raw.githubusercontent.com/fadewalk/kube-osprey/refs/heads/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
+wget https://raw.githubusercontent.com/fadewalk/kube-osprey/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
 chmod +x generate-kite-kubeconfig.sh
 ./generate-kite-kubeconfig.sh
 ```

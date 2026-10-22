@@ -4,7 +4,7 @@ outline: deep
 
 # 发布插件
 
-插件打包为 `.tar.gz` 安装包，支持直接分发、自建 catalog，或通过官方 [kite-plugins](https://github.com/kite-org/kite-plugins) 仓库发布。
+插件打包为 `.tar.gz` 安装包，支持直接分发或自建 catalog。对 KubeOsprey 用户，这是推荐的分发方式。KubeOsprey 兼容上游 Kite 插件生态，也可以按上游流程把插件提交到由 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) 维护的官方目录，供包括 KubeOsprey 在内的下游发行版使用。
 
 ## 版本规则
 
@@ -49,9 +49,9 @@ pnpm run catalog \
 
 先上传 `packages/`，再发布 `catalog.json` 和 `readmes/`。
 
-## 发布到官方目录
+## 提交到上游官方目录
 
-将开发完成的插件提交到 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins)，审核合并后即可发布到官方目录。
+以下属于上游 Kite 插件生态的贡献流程：将开发完成的插件提交到 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins)，审核合并后发布到官方目录。不想走上游流程的团队，可继续使用上文的自建 catalog（`catalog.json` 格式不变）或直接分发安装包。
 
 1. Fork 并 clone 仓库。
 2. 将插件源码放入 `plugins/<插件 ID>/`，目录名与 `package.json` 中的 `name` 一致。附上介绍插件功能和使用方法的 `README.md`，不要提交 `dist/` 或安装包。

@@ -44,7 +44,7 @@ KubeOsprey passes the current page context to the assistant, so it can use the c
 
 ## Confirmation And Structured Input
 
-For write operations, KubeOsprey does not immediately execute the change. The assistant first prepares the action, then asks for confirmation in the chat UI.
+For write operations, KubeOsprey does not immediately execute the change. The assistant first prepares the action, then asks for confirmation in the chat UI. For stronger governance, AI write operations can also go through the Change Plan approval flow: enable `aiChangePlanMode` under `Settings → General` (see [Change Plans](./change-plans)).
 
 When required details are missing, the assistant can also ask for:
 

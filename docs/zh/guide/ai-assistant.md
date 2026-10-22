@@ -47,6 +47,8 @@ KubeOsprey 会把当前页面上下文传给 AI，因此它会优先结合当前
 
 对于写操作，KubeOsprey 不会直接执行。助手会先生成待执行动作，再在聊天界面中请求你确认。
 
+AI 的写操作也可以走变更计划（Change Plan）审批流：在 `Settings → General` 中开启 `aiChangePlanMode` 后，助手产生的变更会先生成变更计划，经审批后再执行。详见 [变更计划](/zh/guide/change-plans)。
+
 如果执行某个操作还缺少必要信息，助手也可以直接在聊天界面里请求：
 
 - 一个简短的选项选择

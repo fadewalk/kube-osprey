@@ -56,6 +56,14 @@ You can assign roles to specified users to give them corresponding permissions.
 
 ![RBAC User Mapping](../screenshots/assign-role2.png)
 
+### Role Assignment Expiry
+
+When assigning a role (from **Settings → RBAC**), administrators can set an optional expiry time for the assignment. After the expiry time passes, the assignment stops granting the role immediately on the next permission check — no re-sync or manual cleanup is required.
+
+Re-assigning the same user or group updates the assignment, so you can extend or clear the expiry this way.
+
+The underlying API is `POST /api/v1/admin/roles/:id/assign`; its request body accepts an optional `expiresAt` (RFC 3339 timestamp). See [RBAC Management API](../api/rbac-management#assign-a-role).
+
 ## Example Scenarios
 
 ### Scenario 1: Testing Environment

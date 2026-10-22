@@ -7,9 +7,9 @@
 1. 登录到您的 OAuth 供应商账户（如 GitHub、Google 等）。
 2. 创建一个新的 OAuth 应用，填写必要的信息。
 3. 在重定向 URI 中填写 `https://${HOST}/api/auth/callback`，将 `${HOST}` 替换为您的 KubeOsprey 部署地址。
-   1. 例如，如果您的 KubeOsprey 部署在 `kite.example.com`，则重定向 URI 应为 `https://kite.example.com/api/auth/callback`。
-   2. kite 默认使用请求的后端 Host 和协议来生成重定向 Host。
-   3. 如果 kite 部署在代理后面，默认会读取 `X-Forwarded-Host` 和 `X-Forwarded-Proto` 头部。
+   1. 例如，如果您的 KubeOsprey 部署在 `kube-osprey.example.com`，则重定向 URI 应为 `https://kube-osprey.example.com/api/auth/callback`。
+   2. KubeOsprey 默认使用请求的后端 Host 和协议来生成重定向 Host。
+   3. 如果 KubeOsprey 部署在代理后面，默认会读取 `X-Forwarded-Host` 和 `X-Forwarded-Proto` 头部。
    4. 如果上述信息不可用，你可以配置 `HOST` 环境变量显示指定。
 4. 记录下生成的 Client ID 和 Client Secret。
 

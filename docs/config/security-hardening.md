@@ -12,7 +12,7 @@ Before exposing KubeOsprey to users, verify all of the following:
 - Set `KITE_ENCRYPT_KEY` to a high-entropy value and store it in an external Secret. Never use the public example value from development documentation.
 - Set `JWT_SECRET` explicitly when you need stable sessions across restarts or multiple replicas.
 - Set `ANONYMOUS_USER_ENABLED=false` and verify that anonymous access is disabled.
-- Use a narrow `TRUSTED_PROXIES` list. Do not trust arbitrary client-supplied forwarding headers.
+- Use a narrow `TRUSTED_PROXIES` list. Do not trust arbitrary client-supplied forwarding headers. Set `TRUSTED_PROXIES=none` to make KubeOsprey ignore all client-supplied forwarding headers.
 - Use an external PostgreSQL or MySQL database, or provision a persistent volume for SQLite.
 - Pin KubeOsprey, terminal, and Cluster Agent images to a release tag or digest. Do not use `latest` in production.
 - Review every `cluster-admin`, wildcard RBAC rule, privileged container, host namespace, and host path before deployment.
@@ -30,8 +30,10 @@ Use an existing Kubernetes Secret when possible:
 ```yaml
 secret:
   create: false
-  existingSecret: kite-secrets
+  existingSecret: kube-osprey-secrets
 ```
+
+`KITE_ENCRYPT_KEY` is validated at startup. KubeOsprey refuses to start when the key is empty, shorter than 32 characters, or still set to the built-in development default. The only escape hatch is `KITE_ALLOW_INSECURE_DEFAULTS=true`, which is intended for local development only.
 
 The Secret must contain the keys required by the selected deployment mode. Keep the encryption key stable while restoring an existing database. Rotating it requires a planned migration that can decrypt with the old key and re-encrypt with the new key.
 

@@ -58,7 +58,7 @@ db:
 
 **生产环境推荐**：对于需要持久化存储的生产环境部署，建议使用 MySQL 或 PostgreSQL 代替 SQLite。这些数据库更适合容器化环境和持久化存储场景。
 
-更多详情请参见 [Issue #204](https://github.com/kite-org/kite/issues/204)。
+更多详情请参见 [上游 Kite 的 issue（kite-org/kite#204）](https://github.com/kite-org/kite/issues/204)。
 
 ## 如何更改字体
 
@@ -66,7 +66,7 @@ KubeOsprey 默认提供三种字体：系统默认、`Maple Mono` 和 `JetBrains
 
 如果您想使用其他字体，则需要自己构建项目。
 
-用 make 构建 kite，并在 `./ui/src/index.css` 中更改字体
+用 make 构建 KubeOsprey，并在 `./ui/src/index.css` 中更改字体
 
 ```css
 @font-face {
@@ -90,7 +90,7 @@ body {
 
 我们欢迎贡献！您可以：
 
-- 在 [GitHub Issues](https://github.com/kite-org/kite/issues) 上报告错误和功能请求
+- 在 [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 上报告错误和功能请求
 - 提交拉取请求
 - 改进文档
 - 分享反馈和使用案例
@@ -99,9 +99,9 @@ body {
 
 您可以通过以下方式获得支持：
 
-- [GitHub Issues](https://github.com/kite-org/kite/issues) 用于提交错误报告和功能请求
-- [Slack Community](https://join.slack.com/t/kite-dashboard/shared_invite/zt-3amy6f23n-~QZYoricIOAYtgLs_JagEw) 用于提问和社区支持
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 用于提交错误报告和功能请求
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 用于提问和社区支持
 
 ---
 
-**没有找到您要找的内容？** 欢迎在 GitHub 上[提交问题](https://github.com/kite-org/kite/issues/new)或开始一个[讨论](https://github.com/kite-org/kite/discussions)。
+**没有找到您要找的内容？** 欢迎在 GitHub 上[提交问题](https://github.com/fadewalk/kube-osprey/issues/new)。

@@ -15,7 +15,7 @@ GET /api/v1/admin/roles/
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/roles/
+  https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
 响应示例：
@@ -79,7 +79,7 @@ curl \
     "resources":["deployments","pods","services"],
     "verbs":["get","create","update","delete","log"]
   }' \
-  https://kite.example.com/api/v1/admin/roles/
+  https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
 ## 更新角色
@@ -103,7 +103,7 @@ DELETE /api/v1/admin/roles/:id
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/roles/3
+  https://kube-osprey.example.com/api/v1/admin/roles/3
 ```
 
 响应示例：
@@ -126,9 +126,12 @@ Content-Type: application/json
 ```json
 {
   "subjectType": "user",
-  "subject": "alice"
+  "subject": "alice",
+  "expiresAt": "2026-12-31T23:59:59Z"
 }
 ```
+
+`expiresAt` 为可选字段，RFC3339 格式，用于设置授权的过期时间；省略或传 `null` 表示永不过期。过期后授权立即失效（无需重新同步权限）；对同一主体重复调用时，会更新已有授权的过期时间。
 
 当前服务端实现支持的 `subjectType`：
 
@@ -143,7 +146,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"subjectType":"group","subject":"platform-team"}' \
-  https://kite.example.com/api/v1/admin/roles/3/assign
+  https://kube-osprey.example.com/api/v1/admin/roles/3/assign
 ```
 
 ## 移除角色分配
@@ -158,5 +161,5 @@ DELETE /api/v1/admin/roles/:id/assign?subjectType=user&subject=alice
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  "https://kite.example.com/api/v1/admin/roles/3/assign?subjectType=group&subject=platform-team"
+  "https://kube-osprey.example.com/api/v1/admin/roles/3/assign?subjectType=group&subject=platform-team"
 ```

@@ -18,14 +18,14 @@ title: 托管 Kubernetes 集群配置
 2. 即使安装了,服务器环境也可能没有相应的身份认证配置
 3. 多租户场景下难以管理不同用户的凭证
 
-### 使用 Service Account Tok
+### 使用 Service Account Token
 
 为 KubeOsprey 创建一个专用的 Service Account,并使用其 token 进行认证。
 
-kite 提供了一个辅助创建的脚本
+KubeOsprey 提供了一个辅助创建的脚本
 
 ```sh
-wget https://raw.githubusercontent.com/kite-org/kite/refs/heads/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
+wget https://raw.githubusercontent.com/fadewalk/kube-osprey/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
 chmod +x generate-kite-kubeconfig.sh
 ./generate-kite-kubeconfig.sh
 ```

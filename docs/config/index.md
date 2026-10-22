@@ -6,4 +6,5 @@ KubeOsprey offers a variety of configuration options to adapt to your specific K
 - [OAuth Setup](./oauth-setup)
 - [Authorization](./rbac-config)
 - [Monitoring](./prometheus-setup)
+- [Notification Channels](./notification-channels)
 - [Chart Configuration](./chart-values)

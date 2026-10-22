@@ -6,6 +6,8 @@ outline: deep
 
 Cluster Agent 用于接入 KubeOsprey Server 无法主动访问的 Kubernetes 集群。Cluster Agent 运行在目标集群一侧，主动连接 KubeOsprey，并通过这条连接转发 KubeOsprey 发起的 Kubernetes API 请求。
 
+Cluster Agent 没有独立的二进制和镜像，它是 KubeOsprey 主程序同一个二进制的子命令：源码构建的产物名为 `kite`，对应 `kite cluster-agent`；release 发布包中的二进制名为 `kube-osprey`，对应 `kube-osprey cluster-agent`。下文示例使用 release 包中的 `kube-osprey`。
+
 ## 背景
 
 在私有网络、边缘环境或受防火墙限制的场景中，目标集群可能只能访问 KubeOsprey，KubeOsprey Server 却无法直接访问集群的 kube-apiserver。传统的 kubeconfig 接入方式要求 KubeOsprey Server 能够连接 kube-apiserver，因此无法覆盖这种单向网络环境。
@@ -61,13 +63,13 @@ Cluster Agent 代拨 TCP
 命令行方式：
 
 ```bash
-kite cluster-agent --server='https://kite.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kube-osprey cluster-agent --server='https://kite.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 `--server` 可以包含 KubeOsprey 的 Base Path。例如：
 
 ```bash
-kite cluster-agent --server='https://kite.example.com/kite' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kube-osprey cluster-agent --server='https://kite.example.com/kite' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 Cluster Agent 会按需自动追加 `/api/v1/cluster-agent/register` 和 `/api/v1/cluster-agent/connect` 路径，`--server` 只需填写 KubeOsprey Server 的基础地址。
@@ -99,7 +101,7 @@ kubectl apply -f 'https://kite.example.com/api/v1/cluster-agent/manifest?grant=<
 kubectl apply -f kite-cluster-agent.yaml
 ```
 
-Deployment 使用的镜像由平台设置中的 **Cluster Agent Image** 配置，默认为 `ghcr.io/kite-org/kite:latest`。通过 Secret 将 Token 注入 Cluster Agent 进程。
+Deployment 使用的镜像由平台设置中的 **Cluster Agent Image** 配置，默认沿用上游镜像地址 `ghcr.io/kite-org/kite:latest`，可在设置中修改。通过 Secret 将 Token 注入 Cluster Agent 进程。
 
 ### 2. 在目标集群中启动
 
@@ -112,7 +114,7 @@ Cluster Agent 成功连接后，集群管理页面会显示为“已连接”。
 本地开发和测试时，可以显式指定 kubeconfig：
 
 ```bash
-kite cluster-agent \
+kube-osprey cluster-agent \
   --server='http://localhost:8080' \
   --token='<cluster-agent-token>' \
   --public-key='<registration-public-key>' \

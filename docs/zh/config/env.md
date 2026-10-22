@@ -11,6 +11,9 @@ KubeOsprey 默认支持一些环境变量，来改变一些配置项的默认值
 - **KUBECONFIG**：兼容旧配置的 kubeconfig 环境变量。仅在未设置 `KITE_CONFIG_FILE` 时读取并导入集群配置。
 - **ANONYMOUS_USER_ENABLED**：启用匿名用户访问，默认值为 `false`，当启用后所有访问将不再需要身份验证，并且默认拥有最高权限。
 
+- **KITE_BASE**：应用的部署基路径（如 `/kite`），用于在子路径下部署时的静态资源和路由前缀。
+- **NAMESPACE**：Cluster Agent Pod 与终端等辅助 Pod 所在的命名空间，默认值为 `kube-system`。
+
 - **JWT_SECRET**：用于签名和验证 JWT 的密钥
 - **KITE_ENCRYPT_KEY**：用于加密敏感数据的密钥，例如 OAuth client secret、kubeconfig 和 Cluster Agent 私钥。生产环境必须显式配置；恢复已有数据库时必须保持该密钥不变。
 - **KITE_ALLOW_INSECURE_DEFAULTS**：仅用于本地开发，设置为 `true` 后允许使用公开的开发环境加密密钥回退值。生产环境禁止设置。
@@ -19,13 +22,23 @@ KubeOsprey 默认支持一些环境变量，来改变一些配置项的默认值
 
 - **TRUSTED_PROXIES**：以逗号分隔的反向代理、Ingress 或负载均衡器 IP/CIDR 列表；只有这些直连 KubeOsprey 的上一跳才会被信任，KubeOsprey 才会读取其转发的 `X-Forwarded-For` / `X-Real-IP` 来判断客户端 IP。默认信任本地和常见私网网段（`127.0.0.0/8`、`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16`、`::1`、`fc00::/7`），方便常见 Ingress 部署拿到真实用户 IP。生产环境建议配置为更窄的范围，例如 `TRUSTED_PROXIES=10.42.0.0/16,192.168.1.10`；如需忽略所有客户端转发头，可设置 `TRUSTED_PROXIES=none`。
 
-- **KUBECTL_TERMINAL_IMAGE**: 用于 kubectl 终端的 Docker 镜像。
+- **DB_TYPE**：数据库类型，取值为 `sqlite`、`mysql` 或 `postgres`，默认值为 `sqlite`。
+- **DB_DSN**：数据库连接串。SQLite 模式下为数据库文件路径，默认值为 `dev.db`；MySQL/PostgreSQL 模式下为完整的 DSN。
+- **DISABLE_CACHE**：设置为 `true` 时禁用 Kubernetes 资源的客户端缓存（informer），所有读取直接访问 API Server。默认启用缓存。
 
-- **NODE_TERMINAL_IMAGE**: 用于生成 Node Terminal Agent 的 Docker 镜像。
+- **KITE_CACHE_SYNC_TIMEOUT**：启动时等待 Kubernetes 资源缓存同步完成的超时时间（秒），默认值为 `60`。大型或远程集群可适当调大。
+- **KITE_KUBE_API_QPS**：Kubernetes API 客户端的 QPS 限制，默认值为 `50`。
+- **KITE_KUBE_API_BURST**：Kubernetes API 客户端的突发请求上限，默认值为 `100`。
 
-- **CLUSTER_AGENT_IMAGE**: 为 Cluster Agent 类型集群生成 Cluster Agent 部署清单时使用的 Docker 镜像。
+- **DISABLE_GZIP**：是否禁用响应的 GZIP 压缩，默认值为 `true`；设置为 `false` 时启用压缩。
+- **DISABLE_VERSION_CHECK**：设置为 `true` 时关闭版本更新检查，默认值为 `false`。
+- **CORS_ALLOWED_ORIGINS**：以逗号分隔的允许跨域来源列表，默认为空（不开启 CORS）。仅在需要让其他站点的前端直接调用 API 时配置。
 
-- **ENABLE_ANALYTICS**：启用数据分析功能，默认值为 `false`。当启用后，KubeOsprey 将收集有限数据以帮助改进产品。
+- **KUBECTL_TERMINAL_IMAGE**: 用于 kubectl 终端的 Docker 镜像，默认值为 `zzde/kubectl:latest`。
+
+- **NODE_TERMINAL_IMAGE**: 用于生成 Node Terminal Agent 的 Docker 镜像，默认值为 `busybox:latest`。
+
+- **CLUSTER_AGENT_IMAGE**: 为 Cluster Agent 类型集群生成 Cluster Agent 部署清单时使用的 Docker 镜像，默认值为 `ghcr.io/kite-org/kite:latest`。
 
 - **PORT**：KubeOsprey 运行的端口，默认值为 `8080`。
 

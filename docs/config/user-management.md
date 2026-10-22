@@ -24,6 +24,21 @@ In this interface, you can:
 
 ![User Management](../screenshots/user-m.png)
 
+## Forced Password Change
+
+Accounts created by an administrator and passwords reset by an administrator are flagged for a forced password change. When such a user signs in, the console only shows the password-change page; every other API returns `403 password_change_required` until the password has been changed. Completing the change clears the flag automatically.
+
+## Password Policy
+
+Administrators can configure a password policy in **Settings → General**:
+
+- Password validity period in days (`0` disables expiration)
+- Minimum password length (default `8`)
+- Complexity requirements: uppercase letters, lowercase letters, digits, and special characters
+- Number of previous passwords that cannot be reused
+
+The policy applies to every password set through the console, including administrator-created users, password resets, and self-service changes. When a password expires, login is refused until an administrator resets the password.
+
 ## Account Security
 
 MFA and passkey login are enabled by default and can be managed by admins in **Settings -> Authentication**.

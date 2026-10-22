@@ -15,15 +15,32 @@
 | `fullnameOverride` | 覆盖完整名称                                       | `""`                    |
 | `debug`            | 启用调试模式                                       | `false`                 |
 | `basePath`         | 应用的基础路径，详见安装文档中的说明。             | `""`                    |
+| `deploymentStrategy.type` | 部署策略类型。SQLite 配合 ReadWriteOnce 存储时必须使用 `Recreate`，避免升级时同一个卷被两个 Pod 同时挂载 | `Recreate` |
 
 ## 认证与安全
 
 | 参数                   | 描述                                                       | 默认值                                               |
 | ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------- |
 | `anonymousUserEnabled` | 启用匿名用户访问，拥有完全管理员权限。生产环境请谨慎使用。 | `false`                                              |
-| `jwtSecret`            | 用于签名 JWT 令牌的密钥。为空时首次启动自动生成。         | `""`                                                 |
+| `jwtSecret`            | 用于签名 JWT 令牌的密钥。为空时首次启动自动生成。使用 `secret.existingSecret` 时被忽略。 | `""`                                                 |
 | `encryptKey`           | 用于加密敏感数据的密钥。留空时为新建的 Chart Secret 生成随机值，或使用 `secret.existingSecret`。恢复已有数据库时必须保持不变。 | `""` |
 | `host`                 | 应用程序的主机名                                           | `""`                                                 |
+
+### Secret 配置
+
+默认情况下，Chart 会根据 `jwtSecret`、`encryptKey`、`db.type`、`db.dsn` 生成一个 Kubernetes Secret。
+
+| 参数                    | 描述                                                       | 默认值   |
+| ----------------------- | ---------------------------------------------------------- | -------- |
+| `secret.create`         | 是否由 Chart 创建 Secret                                   | `true`   |
+| `secret.existingSecret` | 使用已有 Secret 的名称。设置后忽略 `jwtSecret`、`encryptKey`、`db.type` 和 `db.dsn` | `""` |
+
+已有 Secret 必须包含以下键：
+
+- `JWT_SECRET`
+- `KITE_ENCRYPT_KEY`
+- `DB_TYPE`（取值 `sqlite`、`postgres`、`mysql`；未设置时默认 `sqlite`）
+- `DB_DSN`（SQLite 时可不填）
 
 ## 数据库配置
 
@@ -96,6 +113,24 @@ plugins:
 
 如需使用已有 PVC，将 `plugins.persistence.existingClaim` 设为 KubeOsprey 所在命名空间中的 PVC 名称。单副本使用 `ReadWriteOnce` 存储时，将部署策略设为 `Recreate`，避免升级时卷挂载冲突。
 
+## MCP 服务
+
+| 参数                     | 描述                                                                                              | 默认值 |
+| ------------------------ | ------------------------------------------------------------------------------------------------- | ------ |
+| `mcp.enabled`            | 内置 MCP 服务（`POST /api/v1/mcp`）的初始默认值。首次运行写入通用设置，之后可在管理界面调整       | `false` |
+| `mcp.rateLimitPerMinute` | MCP 工具调用每用户每分钟的限流次数                                                               | `60`   |
+
+## 配置文件
+
+通过 Helm 值管理配置文件时，Chart 将其挂载到容器的 `/etc/kite/config.yaml`（对应 `KITE_CONFIG_FILE` 环境变量），相关配置部分在 UI 中变为只读。
+
+| 参数                    | 描述                                                         | 默认值 |
+| ----------------------- | ------------------------------------------------------------ | ------ |
+| `config.enabled`        | 是否启用配置文件管理                                         | `false` |
+| `config.existingSecret` | 包含 `config.yaml` 键的已有 Secret 名称，设置后忽略内联配置  | `""`   |
+
+配置文件的完整格式与两种提供方式（已有 Secret / 内联）见[配置文件](./config-file)。
+
 ## 环境变量
 
 | 参数        | 描述               | 默认值 |
@@ -161,7 +196,7 @@ rbac:
 ```yaml
 ingress:
   hosts:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific
@@ -203,10 +238,12 @@ livenessProbe:
   periodSeconds: 10
 readinessProbe:
   httpGet:
-    path: /healthz
+    path: /readyz
     port: http
   initialDelaySeconds: 10
   periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 6
 ```
 
 ## 存储配置

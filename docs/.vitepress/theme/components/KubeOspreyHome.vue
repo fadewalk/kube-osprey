@@ -1,7 +1,9 @@
 <script setup>
 import {
   IconArrowUpRight,
+  IconBellRinging,
   IconChartLine,
+  IconClipboardCheck,
   IconCode,
   IconGitBranch,
   IconHistory,
@@ -25,10 +27,10 @@ const content = {
     docsHref: "/guide/",
     pluginsHref: "/plugins/",
     installHref: "/guide/installation",
-    homeLabel: "Kite home",
+    homeLabel: "KubeOsprey home",
     navigationLabel: "Primary navigation",
     skipLabel: "Skip to content",
-    starLabel: "View Kite stars on GitHub",
+    starLabel: "View KubeOsprey stars on GitHub",
     nav: {
       docs: "Docs",
       plugins: "Plugins",
@@ -39,7 +41,7 @@ const content = {
       firstLine: "All your clusters.",
       secondLine: "One workspace.",
       description:
-        "Kite is the lightweight, open-source Kubernetes workspace for clusters, observability, access control, and AI operations.",
+        "KubeOsprey is the lightweight, open-source Kubernetes workspace for clusters, observability, access control, and AI operations.",
       primaryAction: "Get started",
       secondaryAction: "View on GitHub",
     },
@@ -47,24 +49,26 @@ const content = {
       { icon: IconCode, label: "Single binary" },
       { icon: IconWorld, label: "Multi-cluster" },
       { icon: IconSparkles, label: "AI-native" },
+      { icon: IconBellRinging, label: "Alert Center" },
+      { icon: IconClipboardCheck, label: "Change approval" },
       { icon: IconPackage, label: "Helm" },
       { icon: IconHistory, label: "Audit logs" },
       { icon: IconShieldCheck, label: "RBAC" },
       { icon: IconGitBranch, label: "GitOps friendly" },
     ],
-    strengthsLabel: "Kite strengths",
+    strengthsLabel: "KubeOsprey strengths",
     platform: {
       title:
         "The control plane for platform teams—observe, operate, and govern any Kubernetes environment from a single workspace.",
       description:
-        "Kite brings clusters, workloads, access, and AI together in one fast, extensible interface. Ship with confidence and sleep better at night.",
+        "KubeOsprey brings clusters, workloads, access, and AI together in one fast, extensible interface. Ship with confidence and sleep better at night.",
     },
     features: [
       {
         icon: IconChartLine,
         title: "Observe",
         description:
-          "Real-time visibility into clusters, workloads, and performance. Dashboards and events help you act, not just react.",
+          "Real-time visibility into clusters, workloads, and performance—with the Alert Center, Health Diagnostics, and Log Center built in.",
         link: "Explore observability",
         href: "/guide/monitoring",
       },
@@ -72,15 +76,15 @@ const content = {
         icon: IconTerminal2,
         title: "Operate",
         description:
-          "Deploy, troubleshoot, and scale with confidence. Everything you need to run Kubernetes day to day, without context switching.",
+          "Deploy, troubleshoot, and scale with confidence. Batch image updates, restarts, and scaling across many workloads at once.",
         link: "Explore operations",
-        href: "/guide/installation",
+        href: "/guide/batch-operations",
       },
       {
         icon: IconShieldLock,
         title: "Govern",
         description:
-          "Access control, policies, and audit-ready workflows that keep your platform secure and your teams productive.",
+          "Access control, policies, and audit-ready workflows—with change plan approval gates, role expiry, and password policies built in.",
         link: "Explore governance",
         href: "/config/rbac-config",
       },
@@ -90,10 +94,10 @@ const content = {
       titleFirstLine: "One workspace.",
       titleSecondLine: "All your clusters.",
       description:
-        "From cluster health to workloads and events, Kite gives you the real-time context to move fast and stay safe.",
+        "From cluster health to workloads and events, KubeOsprey gives you the real-time context to move fast and stay safe.",
       link: "Explore the guide",
       imageAlt:
-        "Kite dashboard showing Kubernetes cluster resources and live health signals",
+        "KubeOsprey dashboard showing Kubernetes cluster resources and live health signals",
     },
     productDetails: [
       {
@@ -142,10 +146,10 @@ const content = {
     docsHref: "/zh/guide/",
     pluginsHref: "/zh/plugins/",
     installHref: "/zh/guide/installation",
-    homeLabel: "Kite 首页",
+    homeLabel: "KubeOsprey 首页",
     navigationLabel: "主导航",
     skipLabel: "跳至主要内容",
-    starLabel: "在 GitHub 上查看 Kite 星标数",
+    starLabel: "在 GitHub 上查看 KubeOsprey 星标数",
     nav: {
       docs: "文档",
       plugins: "插件",
@@ -156,7 +160,7 @@ const content = {
       firstLine: "所有集群。",
       secondLine: "一个工作空间。",
       description:
-        "Kite 是轻量、开源的 Kubernetes 工作空间，将集群管理、可观测性、访问控制和 AI 运维整合在一起。",
+        "KubeOsprey 是轻量、开源的 Kubernetes 工作空间，将集群管理、可观测性、访问控制和 AI 运维整合在一起。",
       primaryAction: "快速开始",
       secondaryAction: "查看 GitHub",
     },
@@ -164,24 +168,26 @@ const content = {
       { icon: IconCode, label: "单一二进制" },
       { icon: IconWorld, label: "多集群" },
       { icon: IconSparkles, label: "AI 原生" },
+      { icon: IconBellRinging, label: "告警中心" },
+      { icon: IconClipboardCheck, label: "变更审批" },
       { icon: IconPackage, label: "Helm" },
       { icon: IconHistory, label: "审计日志" },
       { icon: IconShieldCheck, label: "RBAC" },
       { icon: IconGitBranch, label: "GitOps 友好" },
     ],
-    strengthsLabel: "Kite 核心能力",
+    strengthsLabel: "KubeOsprey 核心能力",
     platform: {
       title:
         "面向平台团队的控制面——在一个工作空间中观察、运维并治理任意 Kubernetes 环境。",
       description:
-        "Kite 将集群、工作负载、权限和 AI 汇聚到快速、可扩展的界面中，让交付更可靠，让日常运维更从容。",
+        "KubeOsprey 将集群、工作负载、权限和 AI 汇聚到快速、可扩展的界面中，让交付更可靠，让日常运维更从容。",
     },
     features: [
       {
         icon: IconChartLine,
         title: "观察",
         description:
-          "实时了解集群、工作负载和性能。通过仪表盘、指标与事件快速定位真正需要处理的问题。",
+          "实时了解集群、工作负载和性能——内置告警中心、健康诊断与日志中心。",
         link: "了解可观测性",
         href: "/zh/guide/monitoring",
       },
@@ -189,15 +195,15 @@ const content = {
         icon: IconTerminal2,
         title: "运维",
         description:
-          "在一个界面中完成部署、排障与扩缩容，覆盖 Kubernetes 日常运维所需的核心工作流。",
+          "批量更新镜像、滚动重启与伸缩，在一个界面中完成 Kubernetes 日常运维的核心工作流。",
         link: "了解运维能力",
-        href: "/zh/guide/installation",
+        href: "/zh/guide/batch-operations",
       },
       {
         icon: IconShieldLock,
         title: "治理",
         description:
-          "通过访问控制、权限策略和完整审计记录保障平台安全，同时保持团队协作效率。",
+          "访问控制、权限策略、变更计划审批与完整审计记录，保障平台安全与团队协作效率。",
         link: "了解权限治理",
         href: "/zh/config/rbac-config",
       },
@@ -207,9 +213,9 @@ const content = {
       titleFirstLine: "一个工作空间。",
       titleSecondLine: "管理所有集群。",
       description:
-        "从集群健康状态到工作负载与事件，Kite 提供实时上下文，帮助团队快速且安全地采取行动。",
+        "从集群健康状态到工作负载与事件，KubeOsprey 提供实时上下文，帮助团队快速且安全地采取行动。",
       link: "浏览使用指南",
-      imageAlt: "Kite 仪表盘展示 Kubernetes 集群资源和实时健康状态",
+      imageAlt: "KubeOsprey 仪表盘展示 Kubernetes 集群资源和实时健康状态",
     },
     productDetails: [
       {
@@ -219,7 +225,7 @@ const content = {
         description:
           "在同一处查看状态、配置、事件、条件和相关工作负载，从异常现象直接抵达排障所需的信息。",
         image: detailScreenshot,
-        imageAlt: "Kite Kubernetes 资源详情页展示状态、Pod、事件、关联资源、标签和配置",
+        imageAlt: "KubeOsprey Kubernetes 资源详情页展示状态、Pod、事件、关联资源、标签和配置",
         imageWidth: 3118,
         imageHeight: 2250,
         mediaLeft: true,
@@ -231,7 +237,7 @@ const content = {
         description:
           "浏览 Chart、管理仓库，并在其创建的 Kubernetes 资源旁完成 Release 的安装、升级与检查。",
         image: helmScreenshot,
-        imageAlt: "Kite Helm Release 页面展示部署状态、关联资源、发布历史和配置",
+        imageAlt: "KubeOsprey Helm Release 页面展示部署状态、关联资源、发布历史和配置",
         imageWidth: 3118,
         imageHeight: 2250,
         mediaLeft: false,
@@ -243,7 +249,7 @@ const content = {
         description:
           "通过基于角色的权限和清晰的审计记录，管理用户访问与跨集群资源变更。",
         image: auditScreenshot,
-        imageAlt: "Kite 审计日志展示操作用户、Kubernetes 资源变更、集群、状态和差异",
+        imageAlt: "KubeOsprey 审计日志展示操作用户、Kubernetes 资源变更、集群、状态和差异",
         imageWidth: 3118,
         imageHeight: 2250,
         mediaLeft: true,
@@ -266,7 +272,7 @@ const copy = computed(() =>
       <div class="site-shell site-header__inner">
         <a class="brand" :href="copy.homeHref" :aria-label="copy.homeLabel">
           <img src="/logo.svg" alt="" width="35" height="35" />
-          <span>Kite</span>
+          <span>KubeOsprey</span>
         </a>
 
         <nav class="site-nav" :aria-label="copy.navigationLabel">
@@ -274,14 +280,14 @@ const copy = computed(() =>
           <a :href="copy.pluginsHref">{{ copy.nav.plugins }}</a>
           <a
             class="nav__optional"
-            href="https://join.slack.com/t/kite-dashboard/shared_invite/zt-3cl9mccs7-eQZ1_t6IoTPHZkxXED1ceg"
+            href="https://github.com/fadewalk/kube-osprey/issues"
             target="_blank"
             rel="noreferrer"
           >
             {{ copy.nav.community }}
           </a>
           <a
-            href="https://github.com/kite-org/kite"
+            href="https://github.com/fadewalk/kube-osprey"
             target="_blank"
             rel="noreferrer"
           >
@@ -306,7 +312,7 @@ const copy = computed(() =>
             </a>
             <a
               class="button button--secondary"
-              href="https://github.com/kite-org/kite"
+              href="https://github.com/fadewalk/kube-osprey"
               target="_blank"
               rel="noreferrer"
             >
@@ -427,11 +433,11 @@ const copy = computed(() =>
       <div class="site-shell site-footer__inner">
         <div>
           <img src="/logo.svg" alt="" width="35" height="35" />
-          <strong>Kite</strong>
+          <strong>KubeOsprey</strong>
         </div>
         <a
           class="arrow-link"
-          href="https://github.com/kite-org/kite"
+          href="https://github.com/fadewalk/kube-osprey"
           target="_blank"
           rel="noreferrer"
         >

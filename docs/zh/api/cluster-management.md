@@ -15,7 +15,7 @@ GET /api/v1/admin/clusters/
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/clusters/
+  https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
 响应示例：
@@ -71,7 +71,7 @@ curl \
     "inCluster":false,
     "isDefault":true
   }' \
-  https://kite.example.com/api/v1/admin/clusters/
+  https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
 响应示例：
@@ -112,7 +112,7 @@ curl \
     "description":"production cluster",
     "enabled":true
   }' \
-  https://kite.example.com/api/v1/admin/clusters/1
+  https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
 响应示例：
@@ -140,7 +140,7 @@ DELETE /api/v1/admin/clusters/:id
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/clusters/1
+  https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
 响应示例：

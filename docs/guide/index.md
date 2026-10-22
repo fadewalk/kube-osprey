@@ -19,8 +19,13 @@ Install KubeOsprey with Helm, use port forwarding for the first visit, then conn
 - **Find any resource quickly:** [Global Search](./global-search)
 - **Understand a workload and its dependencies:** [Related Resources](./related-resources)
 - **Investigate a running Pod:** [Logs](./logs) and [Web Terminal](./web-terminal)
+- **Stream logs from many pods at once:** [Log Center](./log-center)
 - **Track cluster health and usage:** [Monitoring](./monitoring)
+- **Triage alerts and silences:** [Alert Center](./alert-center)
+- **Assess cluster health at a glance:** [Health Diagnostics](./health-diagnostics)
+- **Edit many workloads at once:** [Batch Operations](./batch-operations)
 - **Install and manage releases:** [Helm Management](./helm-management)
+- **Gate sensitive changes behind approval:** [Change Plans](./change-plans)
 - **Review resource changes:** [Resource History](./resource-history)
 - **Troubleshoot with an AI agent:** [AI Assistant](./ai-assistant)
 - **Connect private or remote clusters:** [KubeOsprey Cluster Agent](./kite-cluster-agent)
@@ -29,15 +34,15 @@ Install KubeOsprey with Helm, use port forwarding for the first visit, then conn
 
 ### Observe
 
-Use real-time CPU, memory, and network charts, live Pod logs, events, and resource relationships to move from a symptom to its context.
+Use real-time CPU, memory, and network charts, live Pod logs, events, and resource relationships to move from a symptom to its context. The [Log Center](./log-center) aggregates logs across pods, the [Alert Center](./alert-center) surfaces Alertmanager alerts, and [Health Diagnostics](./health-diagnostics) scores each cluster's health.
 
 ### Operate
 
-Create and edit Kubernetes resources, manage Helm releases, open Pod and Node terminals, run kubectl, and access workloads through Kube Proxy.
+Create and edit Kubernetes resources, manage Helm releases, open Pod and Node terminals, run kubectl, and access workloads through Kube Proxy. [Batch Operations](./batch-operations) applies image updates, restarts, and scaling to many workloads at once, and [Change Plans](./change-plans) puts AI and CI-triggered changes behind a human approval gate with rollback support.
 
 ### Govern
 
-Manage team access with OAuth, MFA, passkeys, users, RBAC, role mappings, and audit logs across multiple clusters.
+Manage team access with OAuth, MFA, passkeys, users, RBAC, role mappings, and audit logs across multiple clusters. Role assignments support expiry, and password policies with forced password change keep local accounts safe.
 
 ## Where KubeOsprey fits
 

@@ -32,7 +32,7 @@ pnpm --filter cert-manager dev
 Pass the development URL to KubeOsprey as an environment variable:
 
 ```sh
-PLUGIN_DEV_URL=http://localhost:5174/plugin.json ./kite
+PLUGIN_DEV_URL=http://localhost:5174/plugin.json ./kube-osprey
 ```
 
 For Helm deployments, use the existing `extraEnvs` option:

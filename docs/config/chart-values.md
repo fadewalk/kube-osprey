@@ -15,6 +15,7 @@ This document describes all available configuration options for the KubeOsprey H
 | `fullnameOverride` | Override full name                                         | `""`                    |
 | `debug`            | Enable debug mode                                          | `false`                 |
 | `basePath`         | Base path where KubeOsprey is served. See notes below.           | `""`                    |
+| `deploymentStrategy.type` | Deployment update strategy. Keep `Recreate` for SQLite on a `ReadWriteOnce` volume, so two Pods never mount the same volume during upgrades | `Recreate` |
 
 ## Authentication & Security
 
@@ -24,6 +25,22 @@ This document describes all available configuration options for the KubeOsprey H
 | `jwtSecret`            | Secret key for signing JWT tokens. Auto-generated on first boot if empty.                | `""`                                                 |
 | `encryptKey`           | Secret key used for encrypting sensitive data. Leave empty to generate a key for a new chart Secret or use `secret.existingSecret`. Keep it stable when restoring an existing database. | `""` |
 | `host`                 | Hostname for the application                                                             | `""`                                                 |
+
+### Secret Configuration
+
+| Parameter                | Description                                                                        | Default |
+| ------------------------ | ---------------------------------------------------------------------------------- | ------- |
+| `secret.create`          | Create a Kubernetes Secret from chart values (`jwtSecret`, `encryptKey`, `db.*`)   | `true`  |
+| `secret.existingSecret`  | Reference an existing Secret instead of creating one. Ignored when `create: true`. | `""`    |
+
+When `secret.existingSecret` is set, the referenced Secret must contain all required keys:
+
+- `JWT_SECRET`
+- `KITE_ENCRYPT_KEY`
+- `DB_TYPE` — supported values: `sqlite`, `postgres`, `mysql` (defaults to `sqlite` if not set)
+- `DB_DSN` — not required for `sqlite`
+
+With an existing Secret, the `jwtSecret`, `encryptKey`, `db.type`, and `db.dsn` chart values are ignored. See [Production Security Hardening](./security-hardening) for key handling guidance.
 
 ## Database Configuration
 
@@ -46,6 +63,16 @@ This document describes all available configuration options for the KubeOsprey H
 | `db.sqlite.persistence.hostPath.type`     | hostPath type                                             | `DirectoryOrCreate` |
 | `db.sqlite.persistence.mountPath`         | Mount path inside container                               | `/data`             |
 | `db.sqlite.persistence.filename`          | SQLite filename inside mountPath                          | `kite.db`           |
+| `db.sqlite.options`                       | Additional SQLite connection options, e.g. `_journal_mode=WAL&_busy_timeout=5000` | `""`        |
+
+## MCP Server
+
+Available in KubeOsprey `v0.17.0` and later. These values seed the runtime settings on first run; enablement can also be changed later by administrators in **Settings → General**.
+
+| Parameter                 | Description                                                 | Default |
+| ------------------------- | ----------------------------------------------------------- | ------- |
+| `mcp.enabled`             | Bootstrap default for the built-in MCP server (`POST /api/v1/mcp`) | `false` |
+| `mcp.rateLimitPerMinute`  | Per-user MCP tool call budget per minute                    | `60`    |
 
 ## Plugin Storage
 
@@ -118,6 +145,7 @@ See [Configuration File](./config-file) for the full config file format, usage e
 | `config.clusters`         | Inline cluster configurations (when no existingSecret)                           | `[]`    |
 | `config.oauth`            | Inline OAuth provider configurations                                             | `[]`    |
 | `config.ldap`             | Inline LDAP configuration                                                        | `{}`    |
+| `config.ai`               | Inline AI assistant configuration                                                | `{}`    |
 | `config.rbac.roles`       | Inline RBAC role definitions                                                     | `[]`    |
 | `config.rbac.roleMapping` | Inline RBAC role mappings                                                        | `[]`    |
 
@@ -180,17 +208,32 @@ rbac:
 ```yaml
 ingress:
   hosts:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific
 ```
 
+## Gateway API Configuration
+
+Requires Gateway API CRDs to be installed in the cluster. Enables exposing KubeOsprey through a `Gateway` and `HTTPRoute` instead of an Ingress.
+
+| Parameter                | Description                                                              | Default           |
+| ------------------------ | ------------------------------------------------------------------------ | ----------------- |
+| `gateway.enabled`        | Whether to create Gateway API resources                                  | `false`           |
+| `gateway.className`      | Existing `GatewayClass` name (e.g. `istio`, `cilium`, `envoy-gateway`)   | `""`              |
+| `gateway.create`         | Create a new `Gateway` (`true`) or reference an existing one (`false`)   | `false`           |
+| `gateway.name`           | Name of the `Gateway` (created or referenced)                            | `""`              |
+| `gateway.namespace`      | Namespace of the existing `Gateway`; defaults to the release namespace   | `""`              |
+| `gateway.annotations`    | Annotations for the created `Gateway`                                    | `{}`              |
+| `gateway.listeners`      | Listener configuration for the created `Gateway`                         | See `values.yaml` |
+| `gateway.httpRoutes`     | `HTTPRoute` configuration (supports multiple routes)                     | See `values.yaml` |
+
 ## Resource Limits
 
 | Parameter   | Description                            | Default |
 | ----------- | -------------------------------------- | ------- |
-| `resources` | Container resource limits and requests | `{}`    |
+| `resources` | Container resource limits and requests | `{}` (no default requests or limits are set) |
 
 ### Resource Limits Example
 
@@ -222,10 +265,12 @@ livenessProbe:
   periodSeconds: 10
 readinessProbe:
   httpGet:
-    path: /healthz
+    path: /readyz
     port: http
   initialDelaySeconds: 10
   periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 6
 ```
 
 ## Storage Configuration

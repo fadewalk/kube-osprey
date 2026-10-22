@@ -7,9 +7,9 @@ This guide explains how to configure OAuth authentication for KubeOsprey, suppor
 1. Log in to your OAuth provider account (such as GitHub, Google, etc.).
 2. Create a new OAuth application and fill in the necessary information.
 3. In the redirect URI, fill in `https://${HOST}/api/auth/callback`, replacing `${HOST}` with your KubeOsprey deployment address.
-   1. For example, if your KubeOsprey is deployed at `kite.example.com`, the redirect URI should be `https://kite.example.com/api/auth/callback`.
+   1. For example, if your KubeOsprey is deployed at `kube-osprey.example.com`, the redirect URI should be `https://kube-osprey.example.com/api/auth/callback`.
    2. KubeOsprey uses the backend Host and protocol from the request to generate the redirect Host by default.
-   3. If kite is deployed behind a proxy, it will read the `X-Forwarded-Host` and `X-Forwarded-Proto` headers by default.
+   3. If KubeOsprey is deployed behind a proxy, it will read the `X-Forwarded-Host` and `X-Forwarded-Proto` headers by default.
    4. If the above information is not available, you can configure the `HOST` environment variable to specify explicitly.
 4. Record the generated Client ID and Client Secret.
 

@@ -45,7 +45,7 @@ GET /api/v1/admin/users/
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  "https://kite.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
+  "https://kube-osprey.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
 ```
 
 响应示例：
@@ -91,6 +91,8 @@ Content-Type: application/json
 }
 ```
 
+新创建的密码用户会被自动标记为首次登录需修改密码（`mustChangePassword`）：在完成修改密码前，除改密相关接口外的其他接口返回 `403 password_change_required`。密码本身受[密码策略](/zh/config/user-management#密码策略)约束。
+
 示例：
 
 ```bash
@@ -99,7 +101,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"username":"alice","password":"change-me","name":"Alice"}' \
-  https://kite.example.com/api/v1/admin/users/
+  https://kube-osprey.example.com/api/v1/admin/users/
 ```
 
 ## 更新用户
@@ -126,7 +128,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice Zhang"}' \
-  https://kite.example.com/api/v1/admin/users/12
+  https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
 ## 删除用户
@@ -141,7 +143,7 @@ DELETE /api/v1/admin/users/:id
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/users/12
+  https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
 响应示例：
@@ -166,6 +168,8 @@ Content-Type: application/json
   "password": "new-password"
 }
 ```
+
+重置密码后，该用户同样会被标记为首次登录需修改密码：完成修改前，除改密相关接口外的其他接口返回 `403 password_change_required`。
 
 ## 启用或禁用用户
 

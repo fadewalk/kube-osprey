@@ -78,7 +78,7 @@ curl \
       "LOG_LEVEL": "info"
     }
   }' \
-  https://kite.example.com/api/v1/configmaps/default
+  https://kube-osprey.example.com/api/v1/configmaps/default
 ```
 
 ## Update example
@@ -106,7 +106,7 @@ curl \
       "LOG_LEVEL": "debug"
     }
   }' \
-  https://kite.example.com/api/v1/configmaps/default/example-config
+  https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
 ## Patch example
@@ -130,7 +130,7 @@ curl \
       "LOG_LEVEL": "warn"
     }
   }' \
-  "https://kite.example.com/api/v1/configmaps/default/example-config?patchType=merge"
+  "https://kube-osprey.example.com/api/v1/configmaps/default/example-config?patchType=merge"
 ```
 
 To restart a Deployment with `PATCH`, update an annotation under `spec.template.metadata.annotations`. This changes the Pod template and triggers a new rollout.
@@ -152,7 +152,7 @@ curl \
       }
     }
   }' \
-  "https://kite.example.com/api/v1/deployments/default/example-app?patchType=merge"
+  "https://kube-osprey.example.com/api/v1/deployments/default/example-app?patchType=merge"
 ```
 
 ## Delete example
@@ -164,7 +164,7 @@ curl \
   -X DELETE \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  https://kite.example.com/api/v1/configmaps/default/example-config
+  https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
 Optional delete query parameters:
@@ -180,7 +180,7 @@ curl \
   -X DELETE \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  "https://kite.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
+  "https://kube-osprey.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
 ```
 
 ## Cluster-scoped example
@@ -202,7 +202,7 @@ curl \
       }
     }
   }' \
-  https://kite.example.com/api/v1/namespaces/_all/demo
+  https://kube-osprey.example.com/api/v1/namespaces/_all/demo
 ```
 
 ## Custom resources

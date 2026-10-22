@@ -26,14 +26,14 @@ This will only search for Pods whose names start with `nginx`.
 
 More supported resource types and their abbreviations can be found in the code:
 
-https://github.com/kite-org/kite/blob/b16a4701994e32e5251ee21707f940aa312a449d/pkg/utils/search.go#L12-L35
+https://github.com/fadewalk/kube-osprey/blob/dev/pkg/utils/search.go
 
 ## Limitations
 
 - For performance reasons, the search will not be triggered when the input character length is less than 3.
 - Fuzzy search is not supported.
 - Does not support cross-cluster search.
-- Search will initiate a listAll request to the cluster, so if there are too many resources in the cluster, it may cause the search to slow down. (kite will cache search results for 10 minutes)
+- Search will initiate a listAll request to the cluster, so if there are too many resources in the cluster, it may cause the search to slow down. (KubeOsprey will cache search results for 10 minutes)
 
 ## Known Issue
 

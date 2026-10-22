@@ -25,6 +25,8 @@ Content-Type: application/json
 
 LDAP 登录使用相同请求体，接口为 `POST /api/auth/login/ldap`。
 
+OAuth 登录使用浏览器跳转流程：`GET /api/auth/login` 按名称跳转到对应的身份提供商，授权完成后回调 `GET /api/auth/callback` 换取会话。Passkey 与 MFA 的管理接口见下文。
+
 ## MFA
 
 MFA 适用于密码用户。用户可以在账号设置中管理 MFA，也可以使用以下已认证接口：
@@ -145,7 +147,7 @@ API 密钥与普通用户共用同一套 RBAC 权限模型。
 curl \
   -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
-  https://kite.example.com/api/v1/pods/default
+  https://kube-osprey.example.com/api/v1/pods/default
 ```
 
 说明：

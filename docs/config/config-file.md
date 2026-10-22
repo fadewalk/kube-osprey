@@ -60,7 +60,7 @@ oauth:
 ldap:
   enabled: true
   serverUrl: "ldaps://ldap.example.com:636"
-  bindDn: "cn=svc-kite,ou=services,dc=example,dc=com"
+  bindDn: "cn=svc-kube-osprey,ou=services,dc=example,dc=com"
   bindPassword: "bind-password"
   userBaseDn: "ou=users,dc=example,dc=com"
   userFilter: "(uid=%s)"
@@ -123,7 +123,7 @@ Create and manage your own Kubernetes Secret containing the config file. This is
 **Step 2:** Create the Kubernetes Secret:
 
 ```bash
-kubectl create secret generic kite-config \
+kubectl create secret generic kube-osprey-config \
   --from-file=config.yaml=./config.yaml \
   -n <namespace>
 ```
@@ -133,7 +133,7 @@ kubectl create secret generic kite-config \
 ```yaml
 config:
   enabled: true
-  existingSecret: "kite-config"
+  existingSecret: "kube-osprey-config"
 ```
 
 ::: tip

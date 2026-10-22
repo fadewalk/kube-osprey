@@ -19,7 +19,7 @@ Plugins are written and built with [`@kite-dev/plugin-sdk`](https://github.com/k
 - Provide color themes
 - Provide plugin settings pages
 
-The [cert-manager plugin](https://github.com/kite-org/kite-plugins/tree/main/plugins/cert-manager) is a typical example. It provides management interfaces for custom resources such as Certificate, Issuer, CertificateRequest, Order, and Challenge, including resource lists, detail pages, status badges, and YAML editing.
+The [cert-manager plugin](https://github.com/kite-org/kite-plugins/tree/main/plugins/cert-manager) from the upstream Kite ecosystem is a typical example. It provides management interfaces for custom resources such as Certificate, Issuer, CertificateRequest, Order, and Challenge, including resource lists, detail pages, status badges, and YAML editing.
 
 ## What Plugins Cannot Do
 
@@ -37,22 +37,24 @@ Use host capabilities through `@kite-dev/plugin-sdk`. Do not import KubeOsprey's
 ## Installing and Using Plugins
 
 1. Click your avatar in the upper right corner and select **Plugin management**. This option is only visible to administrators.
-2. Go to **Settings → General**, enter the `catalog.json` URL under **Plugin catalog**, and save. Leave it empty to use the default catalog at `https://plugins.kitehq.dev/catalog.json`.
+2. Go to **Settings → General**, enter the `catalog.json` URL under **Plugin catalog**, and save. Leave it empty to use the default catalog of the upstream Kite plugin ecosystem at `https://plugins.kitehq.dev/catalog.json`.
 3. Return to **Plugin management**, select a plugin in the **Plugin catalog**, and click **Install**. Click a plugin's name to preview its README.
 4. Open the plugin from the sidebar. Newly installed plugins are enabled automatically.
 
 You can also use **Install from file** to upload a plugin's `.tar.gz` archive directly. Under **Installed plugins**, you can disable, enable, or uninstall a plugin.
 
 ::: warning Plugin persistence
-The Helm Chart stores plugins in `/data/plugins`. Enabling SQLite persistence also preserves plugins with the default paths; MySQL/PostgreSQL deployments need separate plugin storage. Without persistent storage, recreating the Pod loses plugin files: plugins installed from the official catalog are downloaded again, while manually uploaded plugins must be uploaded again. Automatic downloads require the installation records in the database to be preserved. See [Plugin Storage](../config/chart-values#plugin-storage) for configuration.
+The Helm Chart stores plugins in `/data/plugins`. Enabling SQLite persistence also preserves plugins with the default paths; MySQL/PostgreSQL deployments need separate plugin storage. Without persistent storage, recreating the Pod loses plugin files: plugins installed from a catalog are downloaded again, while manually uploaded plugins must be uploaded again. Automatic downloads require the installation records in the database to be preserved. See [Plugin Storage](../config/chart-values#plugin-storage) for configuration.
 :::
 
-## Related Repositories
+## Plugin Ecosystem
 
-| Repository                                               | Purpose                                                                                          |
+KubeOsprey is compatible with the upstream Kite plugin ecosystem: plugins built with the SDK install and run unchanged in KubeOsprey. The SDK, the scaffolding tool, the official plugins, and the default plugin catalog are maintained by the upstream [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) repository. The KubeOsprey host application lives at [fadewalk/kube-osprey](https://github.com/fadewalk/kube-osprey).
+
+| Repository | Purpose |
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [kite](https://github.com/kite-org/kite)                 | Host application: plugin loading, asset serving, and management APIs                             |
-| [kite-plugins](https://github.com/kite-org/kite-plugins) | SDK, scaffolding tool, official plugins, and plugin catalog; the SDK is in `packages/plugin-sdk` |
+| [kube-osprey](https://github.com/fadewalk/kube-osprey)   | Host application: plugin loading, asset serving, and management APIs                             |
+| [kite-plugins (upstream Kite)](https://github.com/kite-org/kite-plugins) | SDK, scaffolding tool, official plugins, and plugin catalog; the SDK is in `packages/plugin-sdk` |
 
 ## Next Steps
 
@@ -61,4 +63,4 @@ The Helm Chart stores plugins in `/data/plugins`. Enabling SQLite persistence al
 - [Resource Queries and Operations](./api/resources): query and modify Kubernetes resources
 - [Internationalization](./i18n): support multiple languages
 - [Debugging](./debugging): development workflow and troubleshooting
-- [Publishing Plugins](./publishing): distribute plugins and contribute to the official repository
+- [Publishing Plugins](./publishing): distribute plugins, host your own catalog, or contribute to the upstream Kite catalog

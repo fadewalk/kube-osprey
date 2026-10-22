@@ -15,7 +15,7 @@ Example:
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/roles/
+  https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
 Response example:
@@ -79,7 +79,7 @@ curl \
     "resources":["deployments","pods","services"],
     "verbs":["get","create","update","delete","log"]
   }' \
-  https://kite.example.com/api/v1/admin/roles/
+  https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
 ## Update a role
@@ -103,7 +103,7 @@ Example:
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/roles/3
+  https://kube-osprey.example.com/api/v1/admin/roles/3
 ```
 
 Response example:
@@ -126,7 +126,8 @@ Request body:
 ```json
 {
   "subjectType": "user",
-  "subject": "alice"
+  "subject": "alice",
+  "expiresAt": "2026-12-31T23:59:59Z"
 }
 ```
 
@@ -134,6 +135,8 @@ Supported `subjectType` values in the current server implementation:
 
 - `user`
 - `group`
+
+`expiresAt` is optional and takes an RFC 3339 timestamp. An expired assignment stops granting the role immediately on the next permission check. Assigning the same subject again updates the assignment, so you can extend or clear the expiry this way. See [Role Assignment Expiry](/config/rbac-config#role-assignment-expiry) for the UI flow.
 
 Example:
 
@@ -143,7 +146,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"subjectType":"group","subject":"platform-team"}' \
-  https://kite.example.com/api/v1/admin/roles/3/assign
+  https://kube-osprey.example.com/api/v1/admin/roles/3/assign
 ```
 
 ## Unassign a role
@@ -158,5 +161,5 @@ Example:
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  "https://kite.example.com/api/v1/admin/roles/3/assign?subjectType=group&subject=platform-team"
+  "https://kube-osprey.example.com/api/v1/admin/roles/3/assign?subjectType=group&subject=platform-team"
 ```

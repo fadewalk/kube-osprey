@@ -8,6 +8,8 @@ outline: deep
 
 KubeOsprey 插件是一个运行在 KubeOsprey 内部的 React 前端模块。它可以在不重新编译 KubeOsprey 的前提下，为 KubeOsprey 增加页面、侧边栏菜单和针对自定义资源的专属管理界面。
 
+KubeOsprey 完全兼容上游 Kite（[kite-org/kite](https://github.com/kite-org/kite)）的插件生态：插件 SDK 与官方插件目录由上游 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) 维护，为上游编写的插件无需修改即可在 KubeOsprey 中安装使用。
+
 插件通过 [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk) 编写和构建，打包为 `.tar.gz` 归档，由 KubeOsprey 管理员在 **插件管理** 页面安装。安装后，供所有登录用户使用。
 
 ## 插件能做什么
@@ -49,10 +51,10 @@ Helm Chart 将插件存放在 `/data/plugins`。使用默认路径时，开启 S
 
 ## 相关仓库
 
-| 仓库                                                     | 作用                                                                |
-| -------------------------------------------------------- | ------------------------------------------------------------------- |
-| [kite](https://github.com/kite-org/kite)                 | 宿主应用：插件加载、资产分发、管理 API                              |
-| [kite-plugins](https://github.com/kite-org/kite-plugins) | SDK、创建器、官方插件集合与插件目录；SDK 位于 `packages/plugin-sdk` |
+| 仓库                                                              | 作用                                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [KubeOsprey](https://github.com/fadewalk/kube-osprey)             | 宿主应用：插件加载、资产分发、管理 API                              |
+| [kite-plugins](https://github.com/kite-org/kite-plugins)（上游）  | 插件 SDK、创建器、官方插件集合与官方目录；SDK 位于 `packages/plugin-sdk` |
 
 ## 接下来
 
@@ -61,4 +63,4 @@ Helm Chart 将插件存放在 `/data/plugins`。使用默认路径时，开启 S
 - [资源查询与操作](./api/resources)：查询和修改 Kubernetes 资源
 - [国际化](./i18n)：多语言支持
 - [调试](./debugging)：开发迭代与问题排查
-- [发布插件](./publishing)：分发插件并提交到官方仓库
+- [发布插件](./publishing)：分发插件或提交到上游官方目录

@@ -45,7 +45,7 @@ Example:
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  "https://kite.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
+  "https://kube-osprey.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
 ```
 
 Response example:
@@ -91,6 +91,8 @@ Request body:
 }
 ```
 
+The created user is returned with `mustChangePassword: true`: the account is flagged for a forced password change and the user must set a new password at first login before other APIs become available.
+
 Example:
 
 ```bash
@@ -99,7 +101,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"username":"alice","password":"change-me","name":"Alice"}' \
-  https://kite.example.com/api/v1/admin/users/
+  https://kube-osprey.example.com/api/v1/admin/users/
 ```
 
 ## Update a user
@@ -126,7 +128,7 @@ curl \
   -H "Authorization: kite1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice Zhang"}' \
-  https://kite.example.com/api/v1/admin/users/12
+  https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
 ## Delete a user
@@ -141,7 +143,7 @@ Example:
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/users/12
+  https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
 Response example:
@@ -166,6 +168,8 @@ Request body:
   "password": "new-password"
 }
 ```
+
+The new password must satisfy the configured password policy. After a successful reset, the user is flagged for a forced password change again and must set a new password at the next login.
 
 ## Enable or disable a user
 

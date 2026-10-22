@@ -4,15 +4,15 @@ import { onMounted, ref } from "vue";
 defineProps({
   ariaLabel: {
     type: String,
-    default: "View Kite stars on GitHub",
+    default: "View KubeOsprey stars on GitHub",
   },
 });
 
-const starCount = ref(3_100);
+const starCount = ref(0);
 
 onMounted(async () => {
   try {
-    const response = await fetch("https://api.github.com/repos/kite-org/kite");
+    const response = await fetch("https://api.github.com/repos/fadewalk/kube-osprey");
 
     if (response.ok) {
       const repository = await response.json();
@@ -28,7 +28,7 @@ onMounted(async () => {
 <template>
   <a
     class="star-count"
-    href="https://github.com/kite-org/kite/stargazers"
+    href="https://github.com/fadewalk/kube-osprey/stargazers"
     target="_blank"
     rel="noreferrer"
     :aria-label="ariaLabel"

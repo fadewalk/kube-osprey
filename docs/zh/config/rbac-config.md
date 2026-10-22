@@ -56,6 +56,14 @@ KubeOsprey 的 RBAC 系统支持：
 
 ![RBAC 用户映射](../../screenshots/assign-role2.png)
 
+### 角色授权过期时间
+
+在用户或组映射上可以设置过期时间（`expiresAt`）。到期后授权立即失效，无需等待或重新触发权限同步。
+
+适合为临时支持、值班或外部协作者发放有时限的权限：到期后无需手动回收。
+
+对应的 API 为 `POST /api/v1/admin/roles/:id/assign`，请求体中可选传入 `expiresAt`（RFC3339 格式，如 `2026-12-31T23:59:59Z`）；不传或传 `null` 表示永不过期。同一个主体重复调用该接口时，服务端会更新已有授权的过期时间。参见 [RBAC 管理 API](../api/rbac-management)。
+
 ## 示例场景
 
 ### 场景 1：测试环境

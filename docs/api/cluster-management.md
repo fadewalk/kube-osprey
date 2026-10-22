@@ -15,7 +15,7 @@ Example:
 ```bash
 curl \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/clusters/
+  https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
 Response example:
@@ -71,7 +71,7 @@ curl \
     "inCluster":false,
     "isDefault":true
   }' \
-  https://kite.example.com/api/v1/admin/clusters/
+  https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
 Response example:
@@ -112,7 +112,7 @@ curl \
     "description":"production cluster",
     "enabled":true
   }' \
-  https://kite.example.com/api/v1/admin/clusters/1
+  https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
 Response example:
@@ -140,7 +140,7 @@ Example:
 curl \
   -X DELETE \
   -H "Authorization: kite1-adminsecret" \
-  https://kite.example.com/api/v1/admin/clusters/1
+  https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
 Response example:
