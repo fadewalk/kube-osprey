@@ -1919,6 +1919,8 @@
       "planPending": "Plan awaiting approval",
       "planApplied": "Plan applied",
       "planFailed": "Plan failed",
+      "alertFiring": "Alert firing",
+      "eventWarning": "Warning event",
       "other": "other"
     },
     "types": {
@@ -1933,5 +1935,14 @@
       "deleted": "Channel deleted",
       "testSent": "Test notification sent"
     }
+  },
+  "auditPolicy": {
+    "title": "Audit policy",
+    "retentionDays": "Log retention (days)",
+    "retentionHint": "Older operation logs are purged automatically (1–3650 days).",
+    "skippedModules": "Skipped modules",
+    "skippedModulesHint": "Changes in the selected modules are not written to the audit log.",
+    "save": "Save policy",
+    "saved": "Audit policy saved"
   }
 }

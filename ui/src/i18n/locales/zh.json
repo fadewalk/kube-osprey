@@ -2001,6 +2001,8 @@
       "planPending": "计划待审批",
       "planApplied": "计划执行成功",
       "planFailed": "计划执行失败",
+      "alertFiring": "告警触发",
+      "eventWarning": "警告事件",
       "other": "其他"
     },
     "types": {
@@ -2015,5 +2017,14 @@
       "deleted": "渠道已删除",
       "testSent": "测试通知已发送"
     }
+  },
+  "auditPolicy": {
+    "title": "审计策略",
+    "retentionDays": "日志保留期（天）",
+    "retentionHint": "超过保留期的操作日志会被自动清理（1–3650 天）。",
+    "skippedModules": "跳过模块",
+    "skippedModulesHint": "所选模块的变更不会写入审计日志。",
+    "save": "保存策略",
+    "saved": "审计策略已保存"
   }
 }

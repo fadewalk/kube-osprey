@@ -9,6 +9,9 @@ const (
 	NotifyEventPlanPending = "plan_pending" // a change plan awaits approval
 	NotifyEventPlanApplied = "plan_applied" // a plan finished successfully
 	NotifyEventPlanFailed  = "plan_failed"  // a plan finished with failures
+
+	NotifyEventAlertFiring  = "alert_firing"  // a cluster alert started firing
+	NotifyEventEventWarning = "event_warning" // a new kubernetes warning event appeared
 )
 
 // NotificationChannel is an outbound webhook-style sink (DingTalk, WeCom,

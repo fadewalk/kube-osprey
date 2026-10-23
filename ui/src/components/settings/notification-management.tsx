@@ -66,6 +66,16 @@ const EVENTS = [
     labelKey: 'notifications.events.planFailed',
     fallback: 'Plan failed',
   },
+  {
+    key: 'alert_firing',
+    labelKey: 'notifications.events.alertFiring',
+    fallback: 'Alert firing',
+  },
+  {
+    key: 'event_warning',
+    labelKey: 'notifications.events.eventWarning',
+    fallback: 'Warning event',
+  },
 ] as const
 
 interface ChannelForm {

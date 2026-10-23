@@ -14,9 +14,27 @@ const (
 	EventPlanPending = model.NotifyEventPlanPending
 	EventPlanApplied = model.NotifyEventPlanApplied
 	EventPlanFailed  = model.NotifyEventPlanFailed
+
+	EventAlertFiring  = model.NotifyEventAlertFiring
+	EventEventWarning = model.NotifyEventEventWarning
 )
 
 var dispatchMu sync.Mutex
+
+// HasSubscriber reports whether any enabled channel subscribes to event.
+// Polling sources use it to skip work when nobody is listening.
+func HasSubscriber(event string) bool {
+	channels, err := model.ListEnabledNotificationChannels()
+	if err != nil {
+		return false
+	}
+	for _, channel := range channels {
+		if channel.SubscribesTo(event) {
+			return true
+		}
+	}
+	return false
+}
 
 // Dispatch delivers msg to every enabled channel subscribed to event,
 // updating each channel's delivery bookkeeping. Failures are logged and

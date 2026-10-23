@@ -16,13 +16,24 @@ Notification Channels let KubeOsprey push Change Plan lifecycle events to your t
 
 ## Events
 
-| Event          | Meaning                                |
-| -------------- | -------------------------------------- |
-| `plan_pending` | A change plan is awaiting approval      |
-| `plan_applied` | A change plan finished successfully     |
-| `plan_failed`  | A change plan finished with failures    |
+| Event           | Meaning                                |
+| --------------- | -------------------------------------- |
+| `plan_pending`  | A change plan is awaiting approval      |
+| `plan_applied`  | A change plan finished successfully     |
+| `plan_failed`   | A change plan finished with failures    |
+| `alert_firing`  | A cluster alert started firing          |
+| `event_warning` | A new kubernetes warning event appeared |
 
 Each channel stores its subscribed events as a comma-separated list, so one channel can receive several event kinds.
+
+## Cluster alerts and warning events
+
+KubeOsprey polls every connected cluster once a minute and pushes newly observed Alertmanager alerts (`alert_firing`) and kubernetes warning events (`event_warning`) to the subscribed channels.
+
+- Only **new** alerts and events are delivered. The first poll after a restart records the current state without notifying, so a fresh deployment does not replay everything already firing.
+- Silenced alerts are not delivered — silencing means exactly that.
+- Repeated warning events notify once per event lifecycle, not once per occurrence.
+- Polling only runs when at least one enabled channel subscribes to these two event kinds.
 
 ## Channel fields
 

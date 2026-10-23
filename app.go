@@ -14,6 +14,7 @@ import (
 	"github.com/zxh326/kite/pkg/common"
 	"github.com/zxh326/kite/pkg/middleware"
 	"github.com/zxh326/kite/pkg/model"
+	"github.com/zxh326/kite/pkg/notifypoller"
 	"github.com/zxh326/kite/pkg/plugins"
 	"github.com/zxh326/kite/pkg/rbac"
 	"github.com/zxh326/kite/pkg/scheduler"
@@ -58,6 +59,7 @@ func initializeApp(ctx context.Context) (*cluster.ClusterManager, error) {
 		klog.Warningf("Failed to watch config file: %v", err)
 	}
 	scheduler.Start(ctx, cm)
+	notifypoller.New(cm).Start(ctx)
 	plugins.Start(ctx)
 	syncengine.Init(cm)
 	ai.SetChangePlanRouter(changeplan.NewService(cm).ChatRouter())
