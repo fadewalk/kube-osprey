@@ -60,6 +60,8 @@ func generalSettingResponse(setting *model.GeneralSetting) gin.H {
 		"passwordRequireDigit":     setting.PasswordRequireDigit,
 		"passwordRequireSpecial":   setting.PasswordRequireSpecial,
 		"passwordHistoryCount":     setting.PasswordHistoryCount,
+		"auditRetentionDays":       setting.AuditRetentionDays,
+		"auditSkippedModules":      setting.AuditSkippedModules,
 	}
 }
 
@@ -99,6 +101,9 @@ type UpdateGeneralSettingRequest struct {
 	PasswordRequireDigit     *bool `json:"passwordRequireDigit"`
 	PasswordRequireSpecial   *bool `json:"passwordRequireSpecial"`
 	PasswordHistoryCount     *int  `json:"passwordHistoryCount"`
+
+	AuditRetentionDays  *int    `json:"auditRetentionDays"`
+	AuditSkippedModules *string `json:"auditSkippedModules"`
 }
 
 func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
@@ -325,6 +330,17 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	if req.PasswordHistoryCount != nil {
 		updates["password_history_count"] = max(0, *req.PasswordHistoryCount)
 	}
+	if req.AuditRetentionDays != nil {
+		days := *req.AuditRetentionDays
+		if days < 1 || days > 3650 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "auditRetentionDays must be between 1 and 3650"})
+			return
+		}
+		updates["audit_retention_days"] = days
+	}
+	if req.AuditSkippedModules != nil {
+		updates["audit_skipped_modules"] = normalizeAuditSkippedModules(*req.AuditSkippedModules)
+	}
 	if shouldUpdateAIAPIKey {
 		updates["ai_api_key"] = model.SecretString(aiAPIKey)
 	}
@@ -337,4 +353,24 @@ func HandleUpdateGeneralSetting(c *gin.Context) { //nolint:gocyclo
 	syncengine.ReloadFromSetting()
 
 	c.JSON(http.StatusOK, generalSettingResponse(updated))
+}
+
+// normalizeAuditSkippedModules trims, lowercases and dedupes the module CSV
+// so the audit middleware can match against a clean set.
+func normalizeAuditSkippedModules(raw string) string {
+	fields := strings.Split(raw, ",")
+	seen := map[string]struct{}{}
+	var kept []string
+	for _, f := range fields {
+		name := strings.ToLower(strings.TrimSpace(f))
+		if name == "" {
+			continue
+		}
+		if _, dup := seen[name]; dup {
+			continue
+		}
+		seen[name] = struct{}{}
+		kept = append(kept, name)
+	}
+	return strings.Join(kept, ",")
 }

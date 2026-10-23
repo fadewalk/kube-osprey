@@ -101,6 +101,11 @@ type GeneralSetting struct {
 	PasswordRequireDigit     bool `json:"passwordRequireDigit" gorm:"column:password_require_digit;type:boolean;not null;default:false"`
 	PasswordRequireSpecial   bool `json:"passwordRequireSpecial" gorm:"column:password_require_special;type:boolean;not null;default:false"`
 	PasswordHistoryCount     int  `json:"passwordHistoryCount" gorm:"column:password_history_count;type:integer;not null;default:0"`
+
+	// Audit policy: how long operation logs are kept and which modules are
+	// not audited (comma-separated). Retention clamps to 1..3650 days.
+	AuditRetentionDays  int    `json:"auditRetentionDays" gorm:"column:audit_retention_days;type:integer;not null;default:30"`
+	AuditSkippedModules string `json:"auditSkippedModules" gorm:"column:audit_skipped_modules;type:varchar(500)"`
 }
 
 func NormalizeGeneralAIProvider(provider string) string {

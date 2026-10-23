@@ -89,6 +89,15 @@ The default SQLite setup is suitable for evaluation only. Without a persistent v
 - Test restore procedures, not only backup creation.
 - Back up the database, encryption key, and deployment configuration as one recovery set.
 
+## Audit policy
+
+Every state-changing console request is written to the operation audit log. The policy is configured in **Settings → Audit**:
+
+- **Log retention** — how many days operation logs are kept (1–3650, default 30). Older entries are purged automatically.
+- **Skipped modules** — changes in the selected modules are not written to the audit log. Keep the list as small as possible; skipping a module means its changes leave no audit trail.
+
+If the audit policy cannot be read, auditing fails open: mutations keep being recorded with the default retention.
+
 ## Cluster Agent checklist
 
 - Use an HTTPS server URL with a certificate trusted by the Agent.

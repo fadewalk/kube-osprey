@@ -471,6 +471,8 @@ export interface GeneralSetting {
   passwordRequireDigit: boolean
   passwordRequireSpecial: boolean
   passwordHistoryCount: number
+  auditRetentionDays: number
+  auditSkippedModules: string
 }
 
 export interface GeneralSettingUpdateRequest {
@@ -508,6 +510,8 @@ export interface GeneralSettingUpdateRequest {
   passwordRequireDigit?: boolean
   passwordRequireSpecial?: boolean
   passwordHistoryCount?: number
+  auditRetentionDays?: number
+  auditSkippedModules?: string
 }
 
 export interface LDAPSetting {

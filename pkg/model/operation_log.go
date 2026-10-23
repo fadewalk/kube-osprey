@@ -34,7 +34,9 @@ type OperationLog struct {
 
 const (
 	operationLogQueueSize = 512
-	operationLogRetention = 30 * 24 * time.Hour
+	// Fallback when the configured audit retention is unreadable.
+	defaultOperationLogRetention = 30 * 24 * time.Hour
+	maxOperationLogRetention     = 3650 * 24 * time.Hour
 )
 
 var (
@@ -87,12 +89,26 @@ func startOperationLogWorker() {
 }
 
 func purgeOperationLogs() {
-	result := DB.Where("created_at < ?", time.Now().Add(-operationLogRetention)).Delete(&OperationLog{})
+	retention := auditLogRetention()
+	result := DB.Where("created_at < ?", time.Now().Add(-retention)).Delete(&OperationLog{})
 	if result.Error != nil {
 		klog.Warningf("Failed to purge operation audit logs: %v", result.Error)
 	} else if result.RowsAffected > 0 {
-		klog.Infof("Purged %d operation audit logs older than %s", result.RowsAffected, operationLogRetention)
+		klog.Infof("Purged %d operation audit logs older than %s", result.RowsAffected, retention)
 	}
+}
+
+// auditLogRetention returns the configured audit retention. It fails open
+// to the default on read errors and clamps the configured value.
+func auditLogRetention() time.Duration {
+	retention := defaultOperationLogRetention
+	if setting, err := GetGeneralSetting(); err == nil && setting.AuditRetentionDays > 0 {
+		retention = time.Duration(setting.AuditRetentionDays) * 24 * time.Hour
+		if retention > maxOperationLogRetention {
+			retention = maxOperationLogRetention
+		}
+	}
+	return retention
 }
 
 // ListOperationLogs returns a page of operation logs with optional filters.

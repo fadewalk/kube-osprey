@@ -3,6 +3,7 @@ import type { TFunction } from 'i18next'
 
 import { APIKeyManagement } from './apikey-management'
 import { AuditLog } from './audit-log'
+import { AuditPolicy } from './audit-policy'
 import { AuthenticationManagement } from './authentication-management'
 import { ClusterManagement } from './cluster-management'
 import { GeneralManagement } from './general-management'
@@ -11,6 +12,15 @@ import { RBACManagement } from './rbac-management'
 import { TemplateManagement } from './template-management'
 import { UserGroupManagement } from './user-group-management'
 import { UserManagement } from './user-management'
+
+function AuditManagement() {
+  return (
+    <div className="space-y-4">
+      <AuditPolicy />
+      <AuditLog />
+    </div>
+  )
+}
 
 export interface SettingsSectionDefinition {
   value: string
@@ -86,7 +96,7 @@ export const settingsSectionRegistry: SettingsSectionDefinition[] = [
     'audit',
     'settings.tabs.audit',
     'Audit',
-    AuditLog
+    AuditManagement
   ),
   createSettingsSectionDefinition(
     'notifications',

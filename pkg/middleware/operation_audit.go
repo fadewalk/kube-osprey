@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -199,6 +200,9 @@ func OperationAudit() gin.HandlerFunc {
 		}
 
 		info := classifyOperation(method, c.FullPath(), c)
+		if auditModuleSkipped(info.Module) {
+			return
+		}
 		requestBody := body
 		if truncated {
 			requestBody = body[:operationAuditMaxBody]
@@ -225,4 +229,39 @@ func OperationAudit() gin.HandlerFunc {
 		model.RecordOperationLog(entry)
 		klog.V(4).Infof("Operation audit: %s %s -> %d by %s", method, c.Request.URL.Path, c.Writer.Status(), user.Key())
 	}
+}
+
+// auditPolicyCacheTTL bounds how often the skip list is re-read from the
+// settings table; audit policy changes take effect within a minute.
+const auditPolicyCacheTTL = 30 * time.Second
+
+var (
+	auditPolicyMu       sync.Mutex
+	auditPolicyModules  map[string]struct{}
+	auditPolicyLoadedAt time.Time
+)
+
+// auditModuleSkipped reports whether the module is excluded by the audit
+// policy. On settings read errors the skip set stays empty, so auditing
+// fails open — mutations keep being recorded.
+func auditModuleSkipped(module string) bool {
+	auditPolicyMu.Lock()
+	defer auditPolicyMu.Unlock()
+	if auditPolicyModules == nil || time.Since(auditPolicyLoadedAt) > auditPolicyCacheTTL {
+		auditPolicyModules = map[string]struct{}{}
+		auditPolicyLoadedAt = time.Now()
+		if setting, err := model.GetGeneralSetting(); err == nil {
+			for _, name := range strings.Split(setting.AuditSkippedModules, ",") {
+				name = strings.TrimSpace(strings.ToLower(name))
+				if name != "" {
+					auditPolicyModules[name] = struct{}{}
+				}
+			}
+		}
+	}
+	if len(auditPolicyModules) == 0 {
+		return false
+	}
+	_, skipped := auditPolicyModules[strings.ToLower(module)]
+	return skipped
 }
