@@ -2,6 +2,8 @@
 
 Batch Operations let you apply one action to many workloads or nodes at once, directly from the list pages, instead of repeating the same edit one resource at a time.
 
+![Bulk actions on selected deployments](/screenshots/batch-operations.png)
+
 ## Workloads
 
 From the list pages for Deployments, StatefulSets, and DaemonSets you can select multiple workloads and run:

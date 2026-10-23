@@ -2,6 +2,8 @@
 
 批量运维让你在列表页上一次对多个工作负载或节点执行同一操作，而不必逐个资源重复编辑。
 
+![对选中的 Deployment 执行批量操作](/screenshots/batch-operations.png)
+
 ## 工作负载
 
 在 Deployment、StatefulSet、DaemonSet 的列表页可以多选工作负载并执行：

@@ -2,7 +2,7 @@
 
 Health Diagnostics runs a set of built-in checks against a cluster and turns the results into a single health score with actionable findings. It answers the question "is this cluster healthy right now?" without writing your own queries.
 
-![Health Diagnostics](/screenshots/monitor.png)
+![Health Diagnostics](/screenshots/health-diagnostics.png)
 
 ## What the report contains
 

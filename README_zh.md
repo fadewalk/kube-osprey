@@ -48,7 +48,7 @@ KubeOsprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维
 
 ### 从源码构建
 
-构建 KubeOsprey 需要 Go 1.26、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
+构建 KubeOsprey 需要 Go 1.27、Node.js `^20.19.0` 或 `>=22.12.0`、pnpm 和 Make。
 
 ```bash
 git clone https://github.com/fadewalk/kube-osprey.git
@@ -88,8 +88,9 @@ docker run -d --name kube-osprey \
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | 安装与访问       | [安装指南](https://fadewalk.github.io/kube-osprey/zh/guide/installation)                                                                            |
 | 用户、认证和权限 | [用户管理](https://fadewalk.github.io/kube-osprey/zh/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/zh/config/rbac-config)                     |
-| 监控             | [Prometheus 配置](https://fadewalk.github.io/kube-osprey/zh/config/prometheus-setup)                                                                |
-| 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/kite-cluster-agent) |
+| 监控             | [Prometheus 配置](https://fadewalk.github.io/kube-osprey/zh/config/prometheus-setup) · [告警中心](https://fadewalk.github.io/kube-osprey/zh/guide/alert-center) · [健康诊断](https://fadewalk.github.io/kube-osprey/zh/guide/health-diagnostics)                                  |
+| 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/kite-cluster-agent) · [批量运维](https://fadewalk.github.io/kube-osprey/zh/guide/batch-operations)                             |
+| 变更管理         | [变更计划](https://fadewalk.github.io/kube-osprey/zh/guide/change-plans) · [通知渠道](https://fadewalk.github.io/kube-osprey/zh/config/notification-channels)                                                                                            |
 | AI               | [AI 助手](https://fadewalk.github.io/kube-osprey/zh/guide/ai-assistant)                                                                             |
 | API              | [API 文档](https://fadewalk.github.io/kube-osprey/zh/api/authentication)                                                                            |
 

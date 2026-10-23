@@ -2,7 +2,7 @@
 
 健康诊断对集群运行一组内置检查，把结果汇总为一个健康评分和可操作的风险项列表，回答"这个集群现在健康吗"，而不需要自己手写查询。
 
-![健康诊断](/screenshots/monitor.png)
+![健康诊断](/screenshots/health-diagnostics.png)
 
 ## 报告内容
 

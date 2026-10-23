@@ -2,7 +2,7 @@
 
 变更计划（Change Plan）为敏感操作增加审批闸门：变更不再立即执行，而是先记录为带明确步骤的计划，由审批人审核通过后才执行，且每个已执行的计划都支持回滚。
 
-![变更计划](/screenshots/audit.webp)
+![变更计划](/screenshots/change-plans.png)
 
 ## 计划何时产生
 

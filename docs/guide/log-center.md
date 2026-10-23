@@ -2,6 +2,8 @@
 
 The Log Center aggregates logs from many pods into a single streaming view. While the per-pod [Logs](./logs) page answers "what is this pod printing?", the Log Center answers "what are all the pods of this app printing?".
 
+![Log Center streaming logs from every pod in a namespace](/screenshots/log-center.png)
+
 ## How it works
 
 1. Pick a **namespace** and enter a **label selector** (for example `app=nginx`).

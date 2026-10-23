@@ -2,6 +2,8 @@
 
 通知渠道让 KubeOsprey 把变更计划（Change Plan）生命周期事件推送到团队的聊天工具。管理员在 **Settings → Notification Channels** 中配置渠道，每个渠道订阅自己关心的事件。
 
+![通知渠道设置页](/screenshots/notification-channels.png)
+
 ## 支持的渠道类型
 
 | 类型       | 协议                                                                 | 说明                                   |

@@ -2,7 +2,7 @@
 
 Change Plans add an approval gate in front of sensitive operations. Instead of applying a change immediately, KubeOsprey records it as a plan with explicit steps; an approver reviews and approves it; only then is the change executed, and every applied plan can be rolled back.
 
-![Change Plans](/screenshots/audit.webp)
+![Change Plans](/screenshots/change-plans.png)
 
 ## When plans are created
 

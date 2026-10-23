@@ -2,6 +2,8 @@
 
 Notification Channels let KubeOsprey push Change Plan lifecycle events to your team's chat tools. Administrators configure channels in **Settings → Notification Channels**; each channel subscribes to the events it cares about.
 
+![Notification channels settings page](/screenshots/notification-channels.png)
+
 ## Supported channel types
 
 | Type       | Protocol                                                                        | Notes                                        |

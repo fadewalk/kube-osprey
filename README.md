@@ -48,7 +48,7 @@ KubeOsprey is a single-binary Kubernetes workspace for multi-cluster operations,
 
 ### Build from Source
 
-Building KubeOsprey requires Go 1.26, Node.js `^20.19.0` or `>=22.12.0`, pnpm, and Make.
+Building KubeOsprey requires Go 1.27, Node.js `^20.19.0` or `>=22.12.0`, pnpm, and Make.
 
 ```bash
 git clone https://github.com/fadewalk/kube-osprey.git
@@ -88,8 +88,9 @@ docker run -d --name kube-osprey \
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | Installation and exposure              | [Installation](https://fadewalk.github.io/kube-osprey/guide/installation)                                                                           |
 | Users, authentication, and permissions | [User management](https://fadewalk.github.io/kube-osprey/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/config/rbac-config)                    |
-| Monitoring                             | [Prometheus setup](https://fadewalk.github.io/kube-osprey/config/prometheus-setup)                                                                  |
-| Operations                             | [Helm management](https://fadewalk.github.io/kube-osprey/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/guide/kite-cluster-agent) |
+| Monitoring                             | [Prometheus setup](https://fadewalk.github.io/kube-osprey/config/prometheus-setup) · [Alert Center](https://fadewalk.github.io/kube-osprey/guide/alert-center) · [Health diagnostics](https://fadewalk.github.io/kube-osprey/guide/health-diagnostics)                                 |
+| Operations                             | [Helm management](https://fadewalk.github.io/kube-osprey/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/guide/kite-cluster-agent) · [Batch operations](https://fadewalk.github.io/kube-osprey/guide/batch-operations)                                            |
+| Change management                      | [Change plans](https://fadewalk.github.io/kube-osprey/guide/change-plans) · [Notification channels](https://fadewalk.github.io/kube-osprey/config/notification-channels)                                                                                              |
 | AI                                     | [AI assistant](https://fadewalk.github.io/kube-osprey/guide/ai-assistant)                                                                           |
 | API                                    | [API documentation](https://fadewalk.github.io/kube-osprey/api/authentication)                                                                      |
 

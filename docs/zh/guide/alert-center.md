@@ -2,7 +2,7 @@
 
 告警中心将每个集群中 [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) 触发的告警汇聚到统一视图，并支持在 KubeOsprey 内直接管理静默规则。
 
-![告警中心](/screenshots/monitor.png)
+![告警中心](/screenshots/alert-center.png)
 
 ## 前置条件
 

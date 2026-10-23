@@ -2,7 +2,7 @@
 
 The Alert Center gives you a unified view of the alerts fired by [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) in each cluster, together with silence management, directly inside KubeOsprey.
 
-![Alert Center](/screenshots/monitor.png)
+![Alert Center](/screenshots/alert-center.png)
 
 ## Prerequisites
 
