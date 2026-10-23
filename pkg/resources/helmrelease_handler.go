@@ -267,6 +267,7 @@ func (h *HelmReleaseHandler) Delete(c *gin.Context) {
 type helmReleaseActionRequest struct {
 	Revision          int                    `json:"revision"`
 	ChartURL          string                 `json:"chartUrl"`
+	ChartVersion      string                 `json:"chartVersion"`
 	RepositoryName    string                 `json:"repositoryName"`
 	Source            string                 `json:"source"`
 	Values            map[string]interface{} `json:"values"`
@@ -308,6 +309,7 @@ func (h *HelmReleaseHandler) runUpgrade(c *gin.Context, dryRun bool) (result hel
 func (h *HelmReleaseHandler) executeUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, namespace, name string, req helmReleaseActionRequest, dryRun bool) (helmutil.RunResult, int, error) {
 	return helmutil.RunUpgrade(ctx, cs, user, namespace, name, helmutil.UpgradeRequest{
 		ChartURL:          req.ChartURL,
+		ChartVersion:      req.ChartVersion,
 		RepositoryName:    req.RepositoryName,
 		Source:            req.Source,
 		Values:            req.Values,

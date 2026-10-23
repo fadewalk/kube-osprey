@@ -18,7 +18,10 @@ const helmUpgradeTimeout = 5 * time.Minute
 // UpgradeRequest describes a helm release upgrade. It carries the fields the
 // console upgrade action and the CI webhook accept.
 type UpgradeRequest struct {
-	ChartURL          string
+	ChartURL string
+	// ChartVersion upgrades to that version from the release's repository
+	// catalog. Ignored when ChartURL is set; empty keeps the current chart.
+	ChartVersion      string
 	RepositoryName    string
 	Source            string
 	Values            map[string]interface{}
@@ -66,6 +69,21 @@ func RunUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, nam
 			return RunResult{}, http.StatusBadRequest, fmt.Errorf("repository not found")
 		}
 		chartToUpgrade, err = LoadArchive(req.ChartURL, repository)
+		if err != nil {
+			return RunResult{}, http.StatusBadRequest, err
+		}
+	} else if strings.TrimSpace(req.ChartVersion) != "" {
+		repository, err := ResolveChartRepository(
+			strings.TrimSpace(req.RepositoryName),
+			strings.TrimSpace(req.Source),
+		)
+		if err != nil {
+			return RunResult{}, http.StatusBadRequest, fmt.Errorf("repository not found")
+		}
+		if current.Chart == nil || current.Chart.Metadata == nil || current.Chart.Metadata.Name == "" {
+			return RunResult{}, http.StatusBadRequest, fmt.Errorf("current release chart metadata is missing, cannot resolve chart version")
+		}
+		chartToUpgrade, err = loadChartVersion(repository, current.Chart.Metadata.Name, strings.TrimSpace(req.ChartVersion))
 		if err != nil {
 			return RunResult{}, http.StatusBadRequest, err
 		}

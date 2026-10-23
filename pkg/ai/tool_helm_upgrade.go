@@ -28,6 +28,7 @@ func executeHelmUpgradeRelease(ctx context.Context, cs *cluster.ClientSet, user 
 	}
 	req := helmutil.UpgradeRequest{
 		ChartURL:       str("chartUrl"),
+		ChartVersion:   str("chartVersion"),
 		RepositoryName: str("repositoryName"),
 		Source:         str("source"),
 		Description:    str("description"),

@@ -10,6 +10,7 @@ Two switches in **Settings → General** control which operations are gated:
 
 - **AI change plan mode (`aiChangePlanMode`)** — when enabled, write operations requested through the [AI Assistant](./ai-assistant) do not run directly. The assistant records the intended steps as a plan and hands it to a human for approval.
 - **Webhook change plan mode (`webhookChangePlanMode`)** — when enabled, Helm upgrades submitted through the CI webhook endpoint (`POST /api/v1/webhooks/helm-upgrade`) are held as pending plans instead of executing immediately. This turns your CI/CD pipeline into a review-before-deploy flow.
+- The webhook payload accepts an optional `chartVersion`: the upgrade then pulls that version from the release's repository catalog instead of keeping the current chart. `chartUrl`, when provided, takes precedence; without either, the upgrade re-uses the currently deployed chart with the submitted values.
 
 ## Plan lifecycle
 

@@ -17,6 +17,7 @@ type helmUpgradeWebhookRequest struct {
 	Namespace         string                 `json:"namespace" binding:"required"`
 	Release           string                 `json:"release" binding:"required"`
 	ChartURL          string                 `json:"chartUrl"`
+	ChartVersion      string                 `json:"chartVersion"`
 	RepositoryName    string                 `json:"repositoryName"`
 	Source            string                 `json:"source"`
 	Values            map[string]interface{} `json:"values"`
@@ -61,6 +62,7 @@ func (h *HelmReleaseHandler) HelmUpgradeWebhook(cm *cluster.ClusterManager) gin.
 				"namespace":         req.Namespace,
 				"release":           req.Release,
 				"chartUrl":          req.ChartURL,
+				"chartVersion":      req.ChartVersion,
 				"repositoryName":    req.RepositoryName,
 				"source":            req.Source,
 				"values":            req.Values,
@@ -90,6 +92,7 @@ func (h *HelmReleaseHandler) HelmUpgradeWebhook(cm *cluster.ClusterManager) gin.
 
 		action := helmReleaseActionRequest{
 			ChartURL:          req.ChartURL,
+			ChartVersion:      req.ChartVersion,
 			RepositoryName:    req.RepositoryName,
 			Source:            req.Source,
 			Values:            req.Values,

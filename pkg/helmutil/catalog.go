@@ -94,3 +94,18 @@ func listOCIChartVersions(repository *model.HelmRepository, chartURL string) ([]
 func ociChartVersionURL(repositoryURL, tag string) string {
 	return strings.TrimRight(repositoryURL, "/") + ":" + tag
 }
+
+// loadChartVersion loads a specific chart version from the repository
+// catalog, matching against the chart name of the release being upgraded.
+func loadChartVersion(repository *model.HelmRepository, chartName, version string) (*chart.Chart, error) {
+	index, err := LoadRepositoryCatalog(*repository)
+	if err != nil {
+		return nil, err
+	}
+	for _, entry := range index.Entries[chartName] {
+		if entry.Metadata != nil && entry.Version == version {
+			return LoadRepositoryArchive(*repository, entry)
+		}
+	}
+	return nil, fmt.Errorf("chart %s version %s not found in repository %s", chartName, version, repository.Name)
+}

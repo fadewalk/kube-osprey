@@ -10,6 +10,7 @@
 
 - **AI 变更计划模式（`aiChangePlanMode`）**：启用后，通过 [AI 助手](./ai-assistant)发起的写操作不再直接执行。助手把意图操作记录为计划，交由人工审批。
 - **Webhook 变更计划模式（`webhookChangePlanMode`）**：启用后，通过 CI webhook 接口（`POST /api/v1/webhooks/helm-upgrade`）提交的 Helm 升级会挂起为待审批计划而非立即执行，把 CI/CD 流水线变成"先审批、后部署"的流程。
+- Webhook 负载支持可选的 `chartVersion`：升级时从 Release 所属仓库目录中拉取该版本，而不是沿用当前 Chart。若同时提供 `chartUrl` 则以 `chartUrl` 为准；两者都缺省时，使用当前已部署的 Chart 配合提交的 values 升级。
 
 ## 计划生命周期
 
