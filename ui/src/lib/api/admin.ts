@@ -659,9 +659,7 @@ export const updateNotificationChannel = async (
   return await apiClient.put(`/admin/notifications/channels/${id}`, request)
 }
 
-export const deleteNotificationChannel = async (
-  id: number
-): Promise<void> => {
+export const deleteNotificationChannel = async (id: number): Promise<void> => {
   return await apiClient.delete(`/admin/notifications/channels/${id}`)
 }
 

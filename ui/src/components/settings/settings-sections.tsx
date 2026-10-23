@@ -6,11 +6,11 @@ import { AuditLog } from './audit-log'
 import { AuthenticationManagement } from './authentication-management'
 import { ClusterManagement } from './cluster-management'
 import { GeneralManagement } from './general-management'
+import { NotificationManagement } from './notification-management'
 import { RBACManagement } from './rbac-management'
 import { TemplateManagement } from './template-management'
 import { UserGroupManagement } from './user-group-management'
 import { UserManagement } from './user-management'
-import { NotificationManagement } from './notification-management'
 
 export interface SettingsSectionDefinition {
   value: string

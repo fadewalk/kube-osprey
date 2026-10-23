@@ -23,12 +23,7 @@ import {
 } from '@/lib/api/admin'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
   Dialog,
   DialogContent,
@@ -48,11 +43,29 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { DeleteConfirmationDialog } from '@/components/delete-confirmation-dialog'
 
-const CHANNEL_TYPES = ['dingtalk', 'wecom', 'feishu', 'slack', 'webhook'] as const
+const CHANNEL_TYPES = [
+  'dingtalk',
+  'wecom',
+  'feishu',
+  'slack',
+  'webhook',
+] as const
 const EVENTS = [
-  { key: 'plan_pending', labelKey: 'notifications.events.planPending', fallback: 'Plan awaiting approval' },
-  { key: 'plan_applied', labelKey: 'notifications.events.planApplied', fallback: 'Plan applied' },
-  { key: 'plan_failed', labelKey: 'notifications.events.planFailed', fallback: 'Plan failed' },
+  {
+    key: 'plan_pending',
+    labelKey: 'notifications.events.planPending',
+    fallback: 'Plan awaiting approval',
+  },
+  {
+    key: 'plan_applied',
+    labelKey: 'notifications.events.planApplied',
+    fallback: 'Plan applied',
+  },
+  {
+    key: 'plan_failed',
+    labelKey: 'notifications.events.planFailed',
+    fallback: 'Plan failed',
+  },
 ] as const
 
 interface ChannelForm {
@@ -137,7 +150,10 @@ export function NotificationManagement() {
 
   const testMutation = useMutation({
     mutationFn: (id: number) => testNotificationChannel(id),
-    onSuccess: () => toast.success(t('notifications.messages.testSent', 'Test notification sent')),
+    onSuccess: () =>
+      toast.success(
+        t('notifications.messages.testSent', 'Test notification sent')
+      ),
     onError: (err: Error) => toast.error(err.message),
   })
 
@@ -163,7 +179,9 @@ export function NotificationManagement() {
   }
 
   const canSave =
-    form.name.trim() !== '' && form.endpoint.trim() !== '' && form.events.length > 0
+    form.name.trim() !== '' &&
+    form.endpoint.trim() !== '' &&
+    form.events.length > 0
 
   return (
     <Card>
@@ -243,7 +261,9 @@ export function NotificationManagement() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    disabled={testMutation.isPending && testingId === channel.id}
+                    disabled={
+                      testMutation.isPending && testingId === channel.id
+                    }
                     onClick={() => {
                       setTestingId(channel.id)
                       testMutation.mutate(channel.id)
@@ -296,7 +316,9 @@ export function NotificationManagement() {
               <Input
                 id="notification-name"
                 value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, name: e.target.value }))
+                }
               />
             </div>
 
