@@ -1026,7 +1026,6 @@ function UpgradeHelmReleaseDialog({
     activeChart,
     activeChartSource,
     activeRepository,
-    selectedChart,
     currentVersionChart,
   } = chartSelection
   const latestChartQuery = useHelmChart(
@@ -1046,14 +1045,11 @@ function UpgradeHelmReleaseDialog({
     latestChartQuery.data?.version ||
     activeChart?.version ||
     ''
-  const canUseCurrentChart =
-    isSameHelmVersion(activeVersion, currentVersion) && !selectedChart
   const selectedChartQuery = useHelmChart(
     activeRepository || undefined,
     chartName,
     activeVersion || undefined,
-    activeChartSource,
-    !canUseCurrentChart
+    activeChartSource
   )
   const defaultValuesQuery = useHelmChartContent(
     activeRepository || undefined,
@@ -1083,12 +1079,9 @@ function UpgradeHelmReleaseDialog({
     }
     return [{ version: activeVersion }, ...versionOptions]
   }, [activeVersion, versionOptions])
-  const chartUrl = canUseCurrentChart
-    ? undefined
-    : selectedChartQuery.data?.chartUrl
+  const chartUrl = selectedChartQuery.data?.chartUrl
   const isVersionLoading = !!activeChart && latestChartQuery.isLoading
-  const isChartPackageLoading =
-    !!activeChart && !canUseCurrentChart && selectedChartQuery.isLoading
+  const isChartPackageLoading = !!activeChart && selectedChartQuery.isLoading
   const isDefaultValuesLoading = defaultValuesQuery.isLoading
   const readableError = error.replace(/\s&&\s/g, '\n')
   const defaultValues = isDefaultValuesLoading
@@ -1109,7 +1102,7 @@ function UpgradeHelmReleaseDialog({
   const buildUpgradeRequest = (): HelmReleaseUpgradeRequest | null => {
     setError('')
 
-    if (!chartUrl && !canUseCurrentChart) {
+    if (!chartUrl) {
       setError(t('helmCharts.messages.noChartUrl'))
       return null
     }
@@ -1130,13 +1123,9 @@ function UpgradeHelmReleaseDialog({
     }
 
     return {
-      ...(chartUrl
-        ? {
-            chartUrl,
-            repositoryName: activeChart?.repositoryName,
-            source: activeChart?.source,
-          }
-        : {}),
+      chartUrl,
+      repositoryName: activeChart?.repositoryName,
+      source: activeChart?.source,
       values,
       forceConflicts,
       wait,
@@ -1475,7 +1464,7 @@ function UpgradeHelmReleaseDialog({
                   isDryRunning ||
                   !activeVersion ||
                   isChartPackageLoading ||
-                  (!chartUrl && !canUseCurrentChart)
+                  !chartUrl
                 }
               >
                 {isDryRunning ? (
@@ -1492,7 +1481,7 @@ function UpgradeHelmReleaseDialog({
                 isDryRunning ||
                 !activeVersion ||
                 isChartPackageLoading ||
-                (!chartUrl && !canUseCurrentChart)
+                !chartUrl
               }
             >
               {isUpgrading ? <Loader2 className="size-4 animate-spin" /> : null}

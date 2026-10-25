@@ -87,6 +87,17 @@ func RunUpgrade(ctx context.Context, cs *cluster.ClientSet, user model.User, nam
 		if err != nil {
 			return RunResult{}, http.StatusBadRequest, err
 		}
+	} else if repository, err := ResolveChartRepository(
+		strings.TrimSpace(req.RepositoryName),
+		strings.TrimSpace(req.Source),
+	); err == nil && current.Chart.Metadata != nil && current.Chart.Metadata.Name != "" {
+		// Upstream #770: upgrades need a full chart package; the chart stored
+		// in the release may be incomplete. Reload the deployed version from
+		// the repository catalog, falling back to the stored chart when the
+		// repository is unavailable (e.g. values-only webhook upgrades).
+		if reloaded, err := loadChartVersion(repository, current.Chart.Metadata.Name, current.Chart.Metadata.Version); err == nil {
+			chartToUpgrade = reloaded
+		}
 	}
 
 	values := req.Values
