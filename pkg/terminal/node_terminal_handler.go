@@ -99,7 +99,7 @@ func (h *NodeTerminalHandler) HandleNodeTerminalWebSocket(c *gin.Context) {
 		}
 
 		session := kube.NewTerminalSession(cs.K8sClient, ws.Conn, common.AgentPodNamespace, nodeAgentName, common.NodeTerminalPodName)
-		if err := session.Start(ctx, "attach"); err != nil {
+		if err := session.Start(ctx, "attach", user.Key()); err != nil {
 			klog.Errorf("Terminal session error: %v", err)
 		}
 	})

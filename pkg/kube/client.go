@@ -4,10 +4,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	goruntime "runtime"
 	"strconv"
 	"time"
 
 	"github.com/go-logr/logr"
+	"github.com/zxh326/kite/pkg/version"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -148,6 +150,8 @@ type K8sClient struct {
 
 // NewClient creates a K8sClient from a rest.Config
 func NewClient(config *rest.Config) (*K8sClient, error) {
+	config.UserAgent = fmt.Sprintf("kite/%s (%s/%s)", version.Version, goruntime.GOOS, goruntime.GOARCH)
+
 	// Tune QPS/Burst so the initial cache sync LIST on large/remote clusters is
 	// not throttled by the client-go defaults (QPS=5, Burst=10). Values are
 	// overridable via KITE_KUBE_API_QPS and KITE_KUBE_API_BURST. A value
