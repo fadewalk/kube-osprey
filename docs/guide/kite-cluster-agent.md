@@ -63,13 +63,13 @@ After creation, KubeOsprey shows the connection info only once, and you can choo
 Command-line option:
 
 ```bash
-kite cluster-agent --server='https://kite.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kite cluster-agent --server='https://kube-osprey.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 `--server` may include KubeOsprey's Base Path. For example:
 
 ```bash
-kite cluster-agent --server='https://kite.example.com/kite' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kite cluster-agent --server='https://kube-osprey.example.com/kube-osprey' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 The Cluster Agent automatically appends the `/api/v1/cluster-agent/register` and `/api/v1/cluster-agent/connect` paths as needed; pass only the KubeOsprey Server base address to `--server`.
@@ -88,7 +88,7 @@ You can deploy in either of the following ways:
 After creation, KubeOsprey generates a manifest download URL that you can apply directly with `kubectl apply`:
 
 ```bash
-kubectl apply -f 'https://kite.example.com/api/v1/cluster-agent/manifest?grant=<manifest-grant>'
+kubectl apply -f 'https://kube-osprey.example.com/api/v1/cluster-agent/manifest?grant=<manifest-grant>'
 ```
 
 The URL contains an encrypted manifest grant that is separate from the Cluster Agent Token. The grant expires after 10 minutes and remains valid across KubeOsprey restarts while the JWT secret is unchanged. It can be reused until it expires, so apply it promptly or use the YAML shown in the dialog. The returned YAML contains the Cluster Agent Token and must still be handled as a secret.

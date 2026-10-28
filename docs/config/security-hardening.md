@@ -115,7 +115,7 @@ Render and lint the Chart:
 
 ```bash
 helm lint charts/kite
-helm template kite charts/kite --namespace kite-system
+helm template kube-osprey charts/kite --namespace kube-osprey-system
 bash scripts/validate-chart.sh
 ```
 

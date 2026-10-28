@@ -15,13 +15,13 @@
 使用 Helm 可灵活配置和升级 KubeOsprey：
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
 ```
 
 或锁定 Chart 版本以保证安装可复现：
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite --version 0.17.1 -n kite-system --create-namespace
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite --version 0.18.0 -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
 ```
 
 #### 自定义安装
@@ -33,7 +33,7 @@ helm install kite oci://ghcr.io/fadewalk/charts/kite --version 0.17.1 -n kite-sy
 使用自定义值安装：
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system -f values.yaml
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system -f values.yaml --set fullnameOverride=kube-osprey
 ```
 
 ### 方式二：YAML 清单
@@ -59,7 +59,7 @@ kubectl apply -f https://raw.githubusercontent.com/fadewalk/kube-osprey/main/dep
 测试期间可通过端口转发快速访问 KubeOsprey：
 
 ```bash
-kubectl port-forward -n kite-system svc/kite 8080:8080
+kubectl port-forward -n kube-osprey-system svc/kube-osprey 8080:8080
 ```
 
 ### LoadBalancer 服务
@@ -67,13 +67,13 @@ kubectl port-forward -n kite-system svc/kite 8080:8080
 如集群支持 LoadBalancer，可直接暴露 KubeOsprey 服务：
 
 ```bash
-kubectl patch svc kite -n kite-system -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc kube-osprey -n kube-osprey-system -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
 获取分配的 IP：
 
 ```bash
-kubectl get svc kite -n kite-system
+kubectl get svc kube-osprey -n kube-osprey-system
 ```
 
 ### Ingress（生产环境推荐）
@@ -89,43 +89,43 @@ KubeOsprey 的日志和 Web 终端功能需支持 websocket。
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kite
-  namespace: kite-system
+  name: kube-osprey
+  namespace: kube-osprey-system
 spec:
   ingressClassName: nginx
   rules:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: kite
+                name: kube-osprey
                 port:
                   number: 8080
   tls:
     - hosts:
-        - kite.example.com
-      secretName: kite-tls
+        - kube-osprey.example.com
+      secretName: kube-osprey-tls
 ```
 
 ## 在子路径下部署（basePath）
 
-如果您希望将 KubeOsprey 部署在一个子路径下，例如 `https://example.com/kite`，可以使用 Helm Chart 的 `basePath` 值来配置。
+如果您希望将 KubeOsprey 部署在一个子路径下，例如 `https://example.com/kube-osprey`，可以使用 Helm Chart 的 `basePath` 值来配置。
 
 如何设置：
 
 - 在 `values.yaml` 中：
 
 ```yaml
-basePath: "/kite"
+basePath: "/kube-osprey"
 ```
 
 - 或使用 Helm CLI：
 
 ```fish
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace --set basePath="/kite"
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey --set basePath="/kube-osprey"
 ```
 
 说明：
@@ -136,13 +136,13 @@ helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-nam
 ingress:
   enabled: true
   hosts:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       paths:
-        - path: /kite
+        - path: /kube-osprey
           pathType: Prefix
 ```
 
-- OAuth / 重定向：如果启用了 OAuth 或其他外部重定向，请在 OAuth 提供方中将重定向 URL 更新为包含子路径，例如 `https://kite.example.com/kite/oauth/callback`。
+- OAuth / 重定向：如果启用了 OAuth 或其他外部重定向，请在 OAuth 提供方中将重定向 URL 更新为包含子路径，例如 `https://kube-osprey.example.com/kube-osprey/oauth/callback`。
 
 ## 验证安装
 
@@ -163,7 +163,7 @@ ingress:
 ### Helm 卸载
 
 ```bash
-helm uninstall kite -n kite-system
+helm uninstall kube-osprey -n kube-osprey-system
 ```
 
 ### YAML 卸载

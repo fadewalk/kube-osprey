@@ -17,13 +17,15 @@ Using Helm provides flexibility for configuration and upgrades:
 Install from OCI registry:
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
 ```
+
+The `fullnameOverride` keeps every deployed resource named `kube-osprey` (the chart itself is still published under its upstream-compatible name `kite`).
 
 Or pin a chart version for reproducible installs:
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite --version 0.17.1 -n kite-system --create-namespace
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite --version 0.18.0 -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
 ```
 
 #### Custom Installation
@@ -35,7 +37,7 @@ For complete configuration, refer to [Chart Values](../config/chart-values).
 Install with custom values:
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system -f values.yaml
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system -f values.yaml --set fullnameOverride=kube-osprey
 ```
 
 ### Method 2: YAML Manifest
@@ -61,7 +63,7 @@ This method will install KubeOsprey with default configuration. For advanced cus
 During testing, you can quickly access KubeOsprey through port forwarding:
 
 ```bash
-kubectl port-forward -n kite-system svc/kite 8080:8080
+kubectl port-forward -n kube-osprey-system svc/kube-osprey 8080:8080
 ```
 
 ### LoadBalancer Service
@@ -69,13 +71,13 @@ kubectl port-forward -n kite-system svc/kite 8080:8080
 If the cluster supports LoadBalancer, you can directly expose the KubeOsprey service:
 
 ```bash
-kubectl patch svc kite -n kite-system -p '{"spec": {"type": "LoadBalancer"}}'
+kubectl patch svc kube-osprey -n kube-osprey-system -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
 Get the assigned IP:
 
 ```bash
-kubectl get svc kite -n kite-system
+kubectl get svc kube-osprey -n kube-osprey-system
 ```
 
 ### Ingress (Recommended for Production)
@@ -91,43 +93,43 @@ Some Ingress controllers may require additional configuration to handle websocke
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: kite
-  namespace: kite-system
+  name: kube-osprey
+  namespace: kube-osprey-system
 spec:
   ingressClassName: nginx
   rules:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: kite
+                name: kube-osprey
                 port:
                   number: 8080
   tls:
     - hosts:
-        - kite.example.com
-      secretName: kite-tls
+        - kube-osprey.example.com
+      secretName: kube-osprey-tls
 ```
 
 ## Serving under a subpath (basePath)
 
-If you want to serve KubeOsprey under a subpath (for example `https://example.com/kite`), use the Helm chart `basePath` value.
+If you want to serve KubeOsprey under a subpath (for example `https://example.com/kube-osprey`), use the Helm chart `basePath` value.
 
 How to set it:
 
 - In `values.yaml`:
 
 ```yaml
-basePath: "/kite"
+basePath: "/kube-osprey"
 ```
 
 - Or with Helm CLI:
 
 ```fish
-helm install kite oci://ghcr.io/fadewalk/charts/kite -n kite-system --create-namespace --set basePath="/kite"
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey --set basePath="/kube-osprey"
 ```
 
 Important notes:
@@ -138,13 +140,13 @@ Important notes:
 ingress:
   enabled: true
   hosts:
-    - host: kite.example.com
+    - host: kube-osprey.example.com
       paths:
-        - path: /kite
+        - path: /kube-osprey
           pathType: Prefix
 ```
 
-- OAuth / redirects: if you enable OAuth (or any external redirect flows), update the redirect URLs in your OAuth provider to include the base path, e.g. `https://kite.example.com/kite/oauth/callback`.
+- OAuth / redirects: if you enable OAuth (or any external redirect flows), update the redirect URLs in your OAuth provider to include the base path, e.g. `https://kube-osprey.example.com/kube-osprey/oauth/callback`.
 - Environment overrides: if you provide environment variables via `extraEnvs` or an existing secret, ensure `KITE_BASE` is set consistently with the `basePath` value (otherwise behavior may differ).
 
 ## Verifying Installation
@@ -176,7 +178,7 @@ This is the recommended option for getting started quickly, especially in develo
 ### Helm Uninstall
 
 ```bash
-helm uninstall kite -n kite-system
+helm uninstall kube-osprey -n kube-osprey-system
 ```
 
 ### YAML Uninstall

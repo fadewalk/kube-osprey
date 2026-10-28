@@ -63,13 +63,13 @@ Cluster Agent 代拨 TCP
 命令行方式：
 
 ```bash
-kube-osprey cluster-agent --server='https://kite.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kube-osprey cluster-agent --server='https://kube-osprey.example.com' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 `--server` 可以包含 KubeOsprey 的 Base Path。例如：
 
 ```bash
-kube-osprey cluster-agent --server='https://kite.example.com/kite' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
+kube-osprey cluster-agent --server='https://kube-osprey.example.com/kube-osprey' --token='<cluster-agent-token>' --public-key='<registration-public-key>'
 ```
 
 Cluster Agent 会按需自动追加 `/api/v1/cluster-agent/register` 和 `/api/v1/cluster-agent/connect` 路径，`--server` 只需填写 KubeOsprey Server 的基础地址。
@@ -88,7 +88,7 @@ Kubernetes YAML 方式会创建以下资源：
 创建成功后，KubeOsprey 会生成一个 Manifest 下载 URL，可以直接用 `kubectl apply` 部署：
 
 ```bash
-kubectl apply -f 'https://kite.example.com/api/v1/cluster-agent/manifest?grant=<manifest-grant>'
+kubectl apply -f 'https://kube-osprey.example.com/api/v1/cluster-agent/manifest?grant=<manifest-grant>'
 ```
 
 该 URL 包含一个与 Cluster Agent Token 分离的加密 Manifest Grant。Grant 会在 10 分钟后过期，只要 JWT Secret 不变，KubeOsprey 重启后仍然有效。Grant 在过期前可以重复使用，因此请尽快执行该命令，或改用对话框中展示的 YAML。返回的 YAML 仍包含 Cluster Agent Token，必须按敏感凭据处理。

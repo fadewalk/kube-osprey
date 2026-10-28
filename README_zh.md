@@ -43,6 +43,7 @@ KubeOsprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维
 
 - 使用内置 AI 助手检查资源、日志和 Prometheus 指标。
 - 写操作执行前需要用户确认，且 AI 助手遵循当前用户的 RBAC 权限。
+- Claude Code、Cursor 等 MCP 客户端可接入内置 [MCP 服务器](https://fadewalk.github.io/kube-osprey/zh/guide/mcp-server)；Agent 的写操作会以[变更计划](https://fadewalk.github.io/kube-osprey/zh/guide/change-plans)形式挂起，经人工批准后才会执行。
 
 ## 快速开始
 
@@ -60,12 +61,13 @@ make build
 
 ### 安装发行版
 
-每个 tag 版本都会在 [Releases](https://github.com/fadewalk/kube-osprey/releases) 页面发布容器镜像、OCI Helm Chart 以及 Linux / macOS / Windows 独立二进制。Chart 沿用上游名称 `kite`，因此 Kubernetes 资源名和 `KITE_*` 环境变量与既有部署保持兼容。
+每个 tag 版本都会在 [Releases](https://github.com/fadewalk/kube-osprey/releases) 页面发布容器镜像、OCI Helm Chart 以及 Linux / macOS / Windows 独立二进制。Chart 沿用上游名称 `kite`，因此 `KITE_*` 环境变量与既有部署保持兼容；`fullnameOverride` 让部署出来的资源统一命名为 `kube-osprey`。
 
 ```bash
-helm install kite oci://ghcr.io/fadewalk/charts/kite \
-  --namespace kite-system \
-  --create-namespace
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite \
+  --namespace kube-osprey-system \
+  --create-namespace \
+  --set fullnameOverride=kube-osprey
 ```
 
 ```bash
@@ -91,7 +93,8 @@ docker run -d --name kube-osprey \
 | 监控             | [Prometheus 配置](https://fadewalk.github.io/kube-osprey/zh/config/prometheus-setup) · [告警中心](https://fadewalk.github.io/kube-osprey/zh/guide/alert-center) · [健康诊断](https://fadewalk.github.io/kube-osprey/zh/guide/health-diagnostics)                                  |
 | 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/kite-cluster-agent) · [批量运维](https://fadewalk.github.io/kube-osprey/zh/guide/batch-operations)                             |
 | 变更管理         | [变更计划](https://fadewalk.github.io/kube-osprey/zh/guide/change-plans) · [通知渠道](https://fadewalk.github.io/kube-osprey/zh/config/notification-channels)                                                                                            |
-| AI               | [AI 助手](https://fadewalk.github.io/kube-osprey/zh/guide/ai-assistant)                                                                             |
+| 规模与搜索       | [资源同步](https://fadewalk.github.io/kube-osprey/zh/guide/resource-sync) · [全局搜索](https://fadewalk.github.io/kube-osprey/zh/guide/global-search)                                                                                                                   |
+| AI               | [AI 助手](https://fadewalk.github.io/kube-osprey/zh/guide/ai-assistant) · [MCP 服务器](https://fadewalk.github.io/kube-osprey/zh/guide/mcp-server)                                                                             |
 | API              | [API 文档](https://fadewalk.github.io/kube-osprey/zh/api/authentication)                                                                            |
 
 ## 许可证

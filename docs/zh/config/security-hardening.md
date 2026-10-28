@@ -123,7 +123,7 @@ PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Pro
 
 ```bash
 helm lint charts/kite
-helm template kite charts/kite --namespace kite-system
+helm template kube-osprey charts/kite --namespace kube-osprey-system
 bash scripts/validate-chart.sh
 ```
 
