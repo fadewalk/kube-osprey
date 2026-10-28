@@ -529,15 +529,16 @@ Kuboard v4.3 走查加固：
 > 2026-10-16 更新：① 批量操作已运行时实测通过（colima-xwssd 真实集群：批量缩容/改镜像/重启 + 容器名错误失败分支，UI 与集群状态双重复核）。② **MFA/TOTP 上游早已完整实现**（`pkg/mfa` TOTP、登录 `mfa_code` 挑战、账号设置与登录页 UI、全局 `enableMFA` 默认开启），此前"完全没有"的判断有误；已用一次性测试用户 API 级端到端验证全流程通过（setup 需重输密码 → enable → 无码登录 401 mfa_required → 正确码 204 → 错误码 401 → disable 恢复），otpauth issuer 已改为品牌名（现为 KubeOsprey）。**无需再开发 MFA**。③ 该会话同类过时情报已有两例（批量重启、MFA），吸收其结论前先 grep 代码库确认。
 > 2026-10-16 第二轮（三个功能交付并运行时实测，`3dc6142`/`40ed26c`/`07b9791`，main 已同步快进）：**CI/CD webhook** `POST /api/v1/webhooks/helm-upgrade`（API Key + admin 角色；payload cluster/namespace/release + 可选 chartUrl/values/dryRun；复用控制台升级执行路径 `executeUpgrade`，审计走操作日志；CI 用法 = 建 API Key 用户并绑 admin 角色，dryRun 返回渲染 diff）；**首登/重置强制改密**（User.mustChangePassword：建用户与 admin 重置时置位，登录 200 响应带标记，RequireAuth 除改密/whoami/logout/refresh 外全拦截 403 password_change_required，前端 ProtectedRoute 渲染强制改密页、api-client 对该错误自动 reload；坑：ResetPasswordByID 整行 Save 会把标记写回 true——自助改密后必须显式清除，SetMustChangePassword 必须 InvalidateUserCache）；**锁定解锁提示**（429 响应带 retryAfterSeconds，登录页本地化倒计时提示）；**G8 多集群总览** `GET /api/v1/clusters/overview` + `/multi-cluster` 页面（并行聚合各集群 nodes/pods/ns/services 计数与版本，不可达集群降级为 error 条目；卡片点击切换集群；sidebar 应用组新增入口，config version 9→10）。
 > 2026-10-16 第三轮（`c160259`）：**角色绑定失效日期已交付**——RoleAssignment 增 `expiresAt`（建/重绑时可传，重复分配视为更新到期时间）；过期判定在 GetUserRoles 匹配时进行（rm.Expiry，无需重新同步即生效），过期绑定不删除、可改期恢复；API Key 用户无角色时登录仍被既有 403 拦截——**先绑角色再做 MFA/expiry 类测试**。
+> 2026-10-23 第四轮（`ea6b214`/`192d84e`/`b9607a3`，dev+main 已同步，文档站已更新）：**剩余队列三项全部交付并运行时实测**（8081 测试实例 + dev.db 副本，8080 未动）。① **通知渠道告警/事件轮询**：新包 `pkg/notifypoller`（1 分钟 tick；内存 seen 集合 24h TTL，重启首扫只基线不发送；已静默告警跳过；无订阅者时零开销跳过）；新事件 `alert_firing`/`event_warning`。实测：本地接收器收到 4 条 event_warning（标题 `[集群] Warning 原因 对象`，含聚合计数），同事件生命周期去重正确。② **chart 版本号语义**：`helmutil.UpgradeRequest.ChartVersion`——无 chartUrl 时从 Release 所属仓库目录解析该版本（`loadChartVersion`）；贯通控制台动作、CI webhook 负载、`helm_upgrade_release` 计划工具 args。实测：podinfo 6.15.0 webhook 升级到 6.16.0（rev2），负路径 `9.9.9` 返回干净 400 not found。**坑：无 values 时 ReuseValues=true，跨大版本 values 树结构变化的 chart 会渲染报错（helm --reuse-values 通病）——CI 传 `values:{}` 即重置为 chart 默认**。③ **G6 审计策略 v1**：GeneralSetting 增 `auditRetentionDays`（1–3650，默认 30，原硬编码）+ `auditSkippedModules` CSV；purge 与审计中间件消费（中间件 30s 缓存 skip 集，**读取失败放行照常审计**）。实测：副本库自动迁移出字段；跳过 settings 模块后该模块变更不再入库（启用跳过的那个 PUT 自身也被跳过——策略在 handler 后读取，属预期）；未跳过模块正常记录。**刻意不做 MCP 调用审计**：MCP 工具全只读，调用审计只会刷爆日志。文档站新增告警中心/健康诊断/日志中心/变更计划/批量运维/通知渠道六组页面（中英）+ 真实截图；golangci-lint v2.15.0 + mockey v1.4.8 + 全线 Go 1.27（`03e150b`）。
 
 | 项 | 说明 |
 | --- | --- |
-| 通知渠道：告警/事件轮询 | 变更计划生命周期通知已交付（`023fda1`+`dcaf440`，pkg/notify：钉钉/企微/飞书/Slack/通用 webhook，渠道 CRUD + 测试按钮 + 投递状态记录，设置页 Notifications tab）；后续可把 AlertManager 轮询和 k8s 警告事件接入同一 dispatcher |
-| CI/CD webhook 进阶 | 基础 webhook + change-plan 审批闸门均已交付（`59fc9c5`）；剩余可选项：chart 版本号语义 |
-| 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠 |
-| G6 审计策略页 | 当前只有审计日志查看；策略模型未建模 |
-| 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键） |
-| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 KubeOsprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并） |
+| ~~通知渠道：告警/事件轮询~~ | **已交付（`ea6b214`，2026-10-23 实测）**：`pkg/notifypoller` 每分钟轮询，`alert_firing`/`event_warning` 两类事件，渠道表单可订阅；基线 priming + 24h 去重 + 无订阅者零开销 |
+| ~~CI/CD webhook 进阶~~ | **chart 版本号语义已交付（`192d84e`，实测）**；webhook 部分完结 |
+| ~~G6 审计策略页~~ | **v1 已交付（`b9607a3`，实测）**：保留期可配置 + 按模块跳过（Settings → Audit 策略卡）；MCP 调用审计刻意不做（工具全只读） |
+| 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠——**明确不做，除非真实需求出现** |
+| 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键）——**不再入队** |
+| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 KubeOsprey，代码层标识（module/KITE_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并）。截至 2026-10-23 upstream 零新提交 |
 
 ### 发布链路（2026-10-17 建立）
 
