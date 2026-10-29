@@ -19,9 +19,9 @@ export DB_TYPE=sqlite
 export DB_DSN="${DB_PATH}"
 export DISABLE_VERSION_CHECK=true
 export JWT_SECRET="${JWT_SECRET:-kube-osprey-e2e-jwt-secret}"
-export KUBE_OSPREY_ENCRYPT_KEY="${KUBE_OSPREY_ENCRYPT_KEY:-kite-e2e-encryption-key-must-be-32-chars}"
+export KUBE_OSPREY_ENCRYPT_KEY="${KUBE_OSPREY_ENCRYPT_KEY:-kube-osprey-e2e-encryption-key-must-be-32-chars}"
 export PORT
-export HOME="${KUBE_OSPREY_E2E_HOME:-$(mktemp -d "${TMPDIR:-/tmp}/kite-e2e-home.XXXXXX")}"
+export HOME="${KUBE_OSPREY_E2E_HOME:-$(mktemp -d "${TMPDIR:-/tmp}/kube-osprey-e2e-home.XXXXXX")}"
 unset KUBE_OSPREY_USERNAME
 unset KUBE_OSPREY_PASSWORD
 unset KUBECONFIG
