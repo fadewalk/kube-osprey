@@ -146,6 +146,7 @@ export default defineConfig({
           text: "Usage",
           items: [
             { text: "Global Search", link: "/guide/global-search" },
+            { text: "Resource Sync", link: "/guide/resource-sync" },
             { text: "Related Resources", link: "/guide/related-resources" },
             { text: "Logs", link: "/guide/logs" },
             { text: "Log Center", link: "/guide/log-center" },
@@ -155,6 +156,7 @@ export default defineConfig({
             { text: "Batch Operations", link: "/guide/batch-operations" },
             { text: "Helm Management", link: "/guide/helm-management" },
             { text: "AI Assistant", link: "/guide/ai-assistant" },
+            { text: "MCP Server", link: "/guide/mcp-server" },
             { text: "Change Plans", link: "/guide/change-plans" },
             { text: "Web Terminal", link: "/guide/web-terminal" },
             { text: "KubeOsprey Cluster Agent", link: "/guide/kite-cluster-agent" },
@@ -217,6 +219,7 @@ export default defineConfig({
           text: "使用指南",
           items: [
             { text: "全局搜索", link: "/zh/guide/global-search" },
+            { text: "资源同步", link: "/zh/guide/resource-sync" },
             { text: "相关资源", link: "/zh/guide/related-resources" },
             { text: "日志", link: "/zh/guide/logs" },
             { text: "日志中心", link: "/zh/guide/log-center" },
@@ -226,6 +229,7 @@ export default defineConfig({
             { text: "批量运维", link: "/zh/guide/batch-operations" },
             { text: "Helm 管理", link: "/zh/guide/helm-management" },
             { text: "AI 助手", link: "/zh/guide/ai-assistant" },
+            { text: "MCP 服务器", link: "/zh/guide/mcp-server" },
             { text: "变更计划", link: "/zh/guide/change-plans" },
             { text: "Web 终端", link: "/zh/guide/web-terminal" },
             {
