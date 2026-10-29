@@ -1,10 +1,10 @@
-# Configuration Overview
+# 配置概览
 
-KubeOsprey offers a variety of configuration options to adapt to your specific Kubernetes environment and requirements. This section covers the primary configuration areas.
+KubeOsprey 提供了各种配置选项，以适应您的特定 Kubernetes 环境和需求。本节涵盖了主要的配置领域。
 
-- [User Management and Account Security](./user-management)
-- [OAuth Setup](./oauth-setup)
-- [Authorization](./rbac-config)
-- [Monitoring](./prometheus-setup)
-- [Notification Channels](./notification-channels)
-- [Chart Configuration](./chart-values)
+- [用户管理与账号安全](./user-management)
+- [OAuth 设置](./oauth-setup)
+- [授权](./rbac-config)
+- [监控](./prometheus-setup)
+- [通知渠道](./notification-channels)
+- [Chart 配置](./chart-values)

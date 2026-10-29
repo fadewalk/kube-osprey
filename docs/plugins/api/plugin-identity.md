@@ -2,9 +2,9 @@
 outline: deep
 ---
 
-# Plugin Identity
+# 插件身份
 
-Define the plugin's ID, display name, version, and metadata in `package.json`.
+插件的 ID、显示名称、版本和元数据定义在 `package.json` 中。
 
 ## package.json
 
@@ -15,7 +15,7 @@ Define the plugin's ID, display name, version, and metadata in `package.json`.
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "My first KubeOsprey plugin",
+  "description": "我的第一个 KubeOsprey 插件",
   "author": "Your Team",
   "license": "Apache-2.0",
   "engines": {
@@ -24,12 +24,12 @@ Define the plugin's ID, display name, version, and metadata in `package.json`.
 }
 ```
 
-## Fields
+## 字段
 
-| Field | Description |
-| ----- | ----------- |
-| `name` | Plugin ID, also used in URLs. Use 1–64 lowercase letters, digits, or hyphens, starting and ending with a letter or digit. npm scopes are not supported |
-| `displayName` | Name shown in plugin management, 1–128 characters |
-| `version` | Semantic version without a `v` prefix. Increment it whenever the package contents change |
-| `engines.kite` | Supported KubeOsprey version range. Defaults to `>=0.16.0` when omitted |
-| `description` / `author` / `homepage` / `license` | Optional metadata |
+| 字段 | 说明 |
+| ---- | ---- |
+| `name` | 插件 ID，也是 URL 的一部分。1–64 个小写字母、数字或连字符，以字母或数字开头结尾；不使用 npm scope |
+| `displayName` | 插件管理中显示的名称，1–128 个字符 |
+| `version` | 语义化版本，不带 `v` 前缀。内容变更时必须递增版本 |
+| `engines.kite` | 支持的 KubeOsprey 版本范围，省略时默认 `>=0.16.0` |
+| `description` / `author` / `homepage` / `license` | 可选元数据 |

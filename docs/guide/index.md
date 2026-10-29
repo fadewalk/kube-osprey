@@ -1,52 +1,52 @@
-# What is KubeOsprey?
+# 什么是 KubeOsprey？
 
-KubeOsprey is a lightweight, open-source Kubernetes workspace for platform teams. It brings multi-cluster operations, observability, access control, and AI-assisted troubleshooting into one interface.
+KubeOsprey 是面向平台团队的轻量、开源 Kubernetes 工作空间，将多集群运维、可观测性、访问控制和 AI 辅助排障整合到同一个界面中。
 
-![KubeOsprey dashboard showing cluster health, workloads, events, and resource usage](/screenshots/overview.png)
+![KubeOsprey 仪表盘展示集群健康状态、工作负载、事件和资源用量](/screenshots/overview.png)
 
-## Start here
+## 从这里开始
 
-::: tip Fastest evaluation path
-Install KubeOsprey with Helm, use port forwarding for the first visit, then connect the in-cluster Kubernetes API. You can complete the initial setup without preparing a kubeconfig.
+::: tip 最快体验路径
+使用 Helm 安装 KubeOsprey，首次访问时通过端口转发打开界面，然后连接集群内的 Kubernetes API。整个初始设置不需要提前准备 kubeconfig。
 :::
 
-1. [Install KubeOsprey](./installation) and open the dashboard.
-2. [Set up users](/config/user-management) and [RBAC](/config/rbac-config) before inviting your team.
-3. [Connect Prometheus](/config/prometheus-setup) when you are ready to add cluster metrics.
+1. [安装 KubeOsprey](./installation) 并打开仪表盘。
+2. 邀请团队前，先配置[用户](/config/user-management)和 [RBAC](/config/rbac-config)。
+3. 需要集群指标时，再[连接 Prometheus](/config/prometheus-setup)。
 
-## Find the right guide
+## 找到对应指南
 
-- **See how the pieces fit together:** [Architecture](./architecture)
-- **Find any resource quickly:** [Global Search](./global-search)
-- **Understand a workload and its dependencies:** [Related Resources](./related-resources)
-- **Investigate a running Pod:** [Logs](./logs) and [Web Terminal](./web-terminal)
-- **Stream logs from many pods at once:** [Log Center](./log-center)
-- **Track cluster health and usage:** [Monitoring](./monitoring)
-- **Triage alerts and silences:** [Alert Center](./alert-center)
-- **Assess cluster health at a glance:** [Health Diagnostics](./health-diagnostics)
-- **Edit many workloads at once:** [Batch Operations](./batch-operations)
-- **Install and manage releases:** [Helm Management](./helm-management)
-- **Gate sensitive changes behind approval:** [Change Plans](./change-plans)
-- **Review resource changes:** [Resource History](./resource-history)
-- **Troubleshoot with an AI agent:** [AI Assistant](./ai-assistant)
-- **Connect private or remote clusters:** [KubeOsprey Cluster Agent](./cluster-agent)
+- **了解各组件如何协作：** [架构](./architecture)
+- **快速找到任意资源：** [全局搜索](./global-search)
+- **了解工作负载及其依赖关系：** [相关资源](./related-resources)
+- **排查正在运行的 Pod：** [日志](./logs)与 [Web 终端](./web-terminal)
+- **一次聚合多个 Pod 的日志：** [日志中心](./log-center)
+- **查看集群健康状态和用量：** [监控](./monitoring)
+- **处理告警与静默：** [告警中心](./alert-center)
+- **一眼评估集群健康度：** [健康诊断](./health-diagnostics)
+- **批量编辑多个工作负载：** [批量运维](./batch-operations)
+- **安装和管理应用：** [Helm 管理](./helm-management)
+- **为敏感变更增加审批闸门：** [变更计划](./change-plans)
+- **审查资源变更：** [资源历史](./resource-history)
+- **使用 AI Agent 辅助排障：** [AI 助手](./ai-assistant)
+- **连接私有或远程集群：** [KubeOsprey Cluster Agent](./cluster-agent)
 
-## Platform at a glance
+## 平台能力概览
 
-### Observe
+### 观察
 
-Use real-time CPU, memory, and network charts, live Pod logs, events, and resource relationships to move from a symptom to its context. The [Log Center](./log-center) aggregates logs across pods, the [Alert Center](./alert-center) surfaces Alertmanager alerts, and [Health Diagnostics](./health-diagnostics) scores each cluster's health.
+通过实时 CPU、内存和网络图表、Pod 日志、事件与资源关系，从异常现象快速定位所需上下文。[日志中心](./log-center)聚合多 Pod 日志，[告警中心](./alert-center)呈现 Alertmanager 告警，[健康诊断](./health-diagnostics)为每个集群给出健康评分。
 
-### Operate
+### 运维
 
-Create and edit Kubernetes resources, manage Helm releases, open Pod and Node terminals, run kubectl, and access workloads through Kube Proxy. [Batch Operations](./batch-operations) applies image updates, restarts, and scaling to many workloads at once, and [Change Plans](./change-plans) puts AI and CI-triggered changes behind a human approval gate with rollback support.
+创建和编辑 Kubernetes 资源、管理 Helm Release、打开 Pod 与 Node 终端、运行 kubectl，并通过 Kube Proxy 访问工作负载。[批量运维](./batch-operations)一次对多个工作负载执行改镜像、重启与伸缩，[变更计划](./change-plans)为 AI 与 CI 触发的变更加上人工审批闸门并支持回滚。
 
-### Govern
+### 治理
 
-Manage team access with OAuth, MFA, passkeys, users, RBAC, role mappings, and audit logs across multiple clusters. Role assignments support expiry, and password policies with forced password change keep local accounts safe.
+使用 OAuth、MFA、Passkey、用户管理、RBAC、角色映射和审计日志，统一管理多集群中的团队访问。角色授权支持过期时间，密码策略与强制改密保障本地账号安全。
 
-## Where KubeOsprey fits
+## KubeOsprey 适合什么场景
 
-Headlamp and Kubernetes Dashboard are strong tools for inspecting and operating individual clusters. KubeOsprey adds a shared workspace for multi-cluster operations, built-in team governance, observability, and AI-assisted workflows.
+Headlamp 和 Kubernetes Dashboard 都是优秀的单集群资源查看与操作工具。KubeOsprey 在此基础上增加了共享的多集群工作空间、团队治理、可观测性和 AI 辅助工作流。
 
-If you are evaluating KubeOsprey, continue with the [installation guide](./installation).
+如果你正在评估 KubeOsprey，请继续阅读[安装指南](./installation)。

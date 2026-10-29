@@ -1,46 +1,46 @@
-# Global Search
+# 全局搜索
 
-KubeOsprey provides a powerful global search feature that allows you to quickly find any resource in your cluster. You can search by resource name, labels, or annotations.
+KubeOsprey 提供强大的全局搜索功能，让您可以快速查找集群中的任何资源。您可以通过资源名称、标签或注解进行搜索。
 
-You can activate the global search via the search bar at the top or by using the shortcut `Ctrl + K` (Windows/Linux) or `Cmd + K` (macOS) on any page.
+你可以通过顶部的搜索栏或者在任意界面使用快捷键 `Ctrl + K` (Windows/Linux) 或 `Cmd + K` (macOS) 来激活全局搜索。
 
 ![Dashboard Overview](/screenshots/global-search.png)
 
-## Features
+## 支持功能
 
-### Favorites
+### 收藏
 
-After clicking the small star on the right side of a resource, you can favorite it. The next time you activate global search, you can quickly find it in the list.
+点击资源右边的小星星之后，即可以收藏这个资源，下次激活全局搜索时，可以在列表中快速找到。
 
-### Search for a specific resource
+### 搜索指定资源
 
-You can enter the prefix of the resource name followed by a space and the search term you want to input, for example:
+您可输入资源名称的前缀加上空格和你想输入的搜索词，例如：
 
 ```
 pod nginx
 ```
 
-This will only search for Pods whose names start with `nginx`.
+这样讲只搜索名称以 `nginx` 开头的 `Pod`。
 
-`pod` can also be abbreviated as `po`.
+`pod` 也可以缩写成 `po`
 
-More supported resource types and their abbreviations can be found in the code:
+更多支持的资源类型和缩写，您可通过代码找到
 
 https://github.com/fadewalk/kube-osprey/blob/dev/pkg/utils/search.go
 
-## Limitations
+## 限制
 
-- For performance reasons, the search will not be triggered when the input character length is less than 3.
-- Fuzzy search is not supported.
-- Does not support cross-cluster search.
-- Search will initiate a listAll request to the cluster, so if there are too many resources in the cluster, it may cause the search to slow down. (KubeOsprey will cache search results for 10 minutes)
+- 为了性能考虑，当输入的字符长度小于 3 时，搜索将不会被触发
+- 不支持模糊搜索
+- 不支持跨集群搜索
+- 搜索会对集群发起 listAll 请求，因此如果集群中资源数量过多，可能会导致搜索变慢。（KubeOsprey 会对搜索结果缓存 10 分钟）
 
-## Known Issue
+## 已知问题
 
-When RBAC rules restrict users from accessing certain resources, these resources still appear in search results.
+当 RBAC 规则限制用户无法访问某些资源时，这些资源仍然会出现在搜索结果中。
 
-However, if you try to access these resources, you will receive a permission error.
+但是如果您尝试访问这些资源，将会收到权限错误。
 
-This is a known issue. It will not be fixed temporarily.
+这是一个已知问题。暂时将不会修复。
 
-The search interface only returns the names and types of resources, not the specific content.
+搜索接口仅返回资源名字和类型，不会返回具体内容。

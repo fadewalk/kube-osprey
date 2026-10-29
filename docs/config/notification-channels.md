@@ -1,54 +1,54 @@
-# Notification Channels
+# 通知渠道
 
-Notification Channels let KubeOsprey push Change Plan lifecycle events to your team's chat tools. Administrators configure channels in **Settings → Notification Channels**; each channel subscribes to the events it cares about.
+通知渠道让 KubeOsprey 把变更计划（Change Plan）生命周期事件推送到团队的聊天工具。管理员在 **Settings → Notification Channels** 中配置渠道，每个渠道订阅自己关心的事件。
 
-![Notification channels settings page](/screenshots/notification-channels.png)
+![通知渠道设置页](/screenshots/notification-channels.png)
 
-## Supported channel types
+## 支持的渠道类型
 
-| Type       | Protocol                                                                        | Notes                                        |
-| ---------- | ------------------------------------------------------------------------------- | -------------------------------------------- |
-| `dingtalk` | DingTalk group robot, Markdown payload                                          | Optional HMAC-SHA256 signing via secret      |
-| `wecom`    | WeCom (企业微信) group bot, Markdown payload                                     | Messages longer than 4096 bytes are truncated |
-| `feishu`   | Feishu (Lark) bot, text payload                                                 | Optional timestamp-based signing via secret   |
-| `slack`    | Slack incoming webhook, `{"text": ...}`                                          |                                              |
-| `webhook`  | Generic receiver, JSON `{"title": ..., "text": ...}`                            | Point it at any HTTP endpoint                 |
+| 类型       | 协议                                                                 | 说明                                   |
+| ---------- | -------------------------------------------------------------------- | -------------------------------------- |
+| `dingtalk` | 钉钉群机器人，Markdown 消息体                                        | 可通过 secret 启用 HMAC-SHA256 加签     |
+| `wecom`    | 企业微信群机器人，Markdown 消息体                                    | 超过 4096 字节的消息会被截断            |
+| `feishu`   | 飞书机器人，文本消息体                                               | 可通过 secret 启用时间戳加签            |
+| `slack`    | Slack incoming webhook，`{"text": ...}`                              |                                        |
+| `webhook`  | 通用接收端，JSON `{"title": ..., "text": ...}`                       | 指向任意 HTTP 端点即可                  |
 
-## Events
+## 事件
 
-| Event           | Meaning                                |
-| --------------- | -------------------------------------- |
-| `plan_pending`  | A change plan is awaiting approval      |
-| `plan_applied`  | A change plan finished successfully     |
-| `plan_failed`   | A change plan finished with failures    |
-| `alert_firing`  | A cluster alert started firing          |
-| `event_warning` | A new kubernetes warning event appeared |
+| 事件            | 含义                       |
+| --------------- | -------------------------- |
+| `plan_pending`  | 变更计划待审批             |
+| `plan_applied`  | 变更计划执行成功           |
+| `plan_failed`   | 变更计划执行失败           |
+| `alert_firing`  | 集群告警开始触发           |
+| `event_warning` | 出现新的 kubernetes 警告事件 |
 
-Each channel stores its subscribed events as a comma-separated list, so one channel can receive several event kinds.
+每个渠道把订阅的事件以逗号分隔存储，一个渠道可以同时接收多种事件。
 
-## Cluster alerts and warning events
+## 集群告警与警告事件
 
-KubeOsprey polls every connected cluster once a minute and pushes newly observed Alertmanager alerts (`alert_firing`) and kubernetes warning events (`event_warning`) to the subscribed channels.
+KubeOsprey 每分钟轮询一次所有已连接集群，把新出现的 Alertmanager 告警（`alert_firing`）和 kubernetes 警告事件（`event_warning`）推送到订阅的渠道。
 
-- Only **new** alerts and events are delivered. The first poll after a restart records the current state without notifying, so a fresh deployment does not replay everything already firing.
-- Silenced alerts are not delivered — silencing means exactly that.
-- Repeated warning events notify once per event lifecycle, not once per occurrence.
-- Polling only runs when at least one enabled channel subscribes to these two event kinds.
+- 只推送**新出现**的告警和事件。重启后的第一次轮询只记录现状、不发送通知，避免重新部署时重放所有已触发的告警。
+- 已静默的告警不推送——静默本身就是"不要通知"。
+- 重复的警告事件按事件生命周期只通知一次，不会每次出现都发。
+- 仅当至少一个启用中的渠道订阅了这两类事件时，轮询才会运行。
 
-## Channel fields
+## 渠道字段
 
-- **Name** — unique identifier of the channel.
-- **Type** — one of the types above.
-- **Endpoint** — the webhook URL of the receiver.
-- **Secret** — signing secret for DingTalk/Feishu; stored encrypted with `KUBE_OSPREY_ENCRYPT_KEY` and never returned by the API.
-- **Events** — subscribed event kinds.
-- **Enabled** — disabled channels stop receiving deliveries.
+- **名称**：渠道的唯一标识。
+- **类型**：上表类型之一。
+- **Endpoint**：接收端的 webhook 地址。
+- **Secret**：钉钉/飞书的签名密钥；使用 `KUBE_OSPREY_ENCRYPT_KEY` 加密存储，API 永远不会返回。
+- **事件**：订阅的事件类型。
+- **启用**：停用的渠道不再接收投递。
 
-KubeOsprey records the delivery result of the last dispatch per channel (success/failure, error message, timestamp), so a misconfigured channel is visible in the settings list instead of silently dropping messages.
+KubeOsprey 会在渠道记录上保存最近一次投递的结果（成功/失败、错误信息、时间戳），配置错误的渠道会直接暴露在设置列表里，而不是悄悄丢消息。
 
-## Testing a channel
+## 测试渠道
 
-Use the **Test** button in the settings UI, or call the API directly, to send a sample message and verify the endpoint and signing configuration:
+在设置界面点 **Test** 按钮，或直接调用接口，发送一条样例消息验证地址与签名配置：
 
 ```bash
 POST /api/v1/admin/notifications/channels/:id/test
@@ -56,14 +56,14 @@ POST /api/v1/admin/notifications/channels/:id/test
 
 ## API
 
-All endpoints require administrator access:
+所有接口均要求管理员权限：
 
-| Method   | Path                                          | Purpose                    |
-| -------- | --------------------------------------------- | -------------------------- |
-| `GET`    | `/api/v1/admin/notifications/channels`        | List channels              |
-| `POST`   | `/api/v1/admin/notifications/channels`        | Create a channel           |
-| `PUT`    | `/api/v1/admin/notifications/channels/:id`    | Update a channel           |
-| `DELETE` | `/api/v1/admin/notifications/channels/:id`    | Delete a channel           |
-| `POST`   | `/api/v1/admin/notifications/channels/:id/test` | Send a test notification |
+| 方法     | 路径                                          | 用途           |
+| -------- | --------------------------------------------- | -------------- |
+| `GET`    | `/api/v1/admin/notifications/channels`        | 渠道列表       |
+| `POST`   | `/api/v1/admin/notifications/channels`        | 创建渠道       |
+| `PUT`    | `/api/v1/admin/notifications/channels/:id`    | 更新渠道       |
+| `DELETE` | `/api/v1/admin/notifications/channels/:id`    | 删除渠道       |
+| `POST`   | `/api/v1/admin/notifications/channels/:id/test` | 发送测试通知 |
 
-See [Change Plans](/guide/change-plans) for the workflow these notifications belong to.
+这些通知所属的工作流见[变更计划](/guide/change-plans)。

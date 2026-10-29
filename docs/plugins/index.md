@@ -2,65 +2,65 @@
 outline: deep
 ---
 
-# Introduction to Plugins
+# 插件简介
 
-Plugins are available starting with KubeOsprey **v0.16.0**.
+插件功能自 KubeOsprey **v0.16.0** 起提供。
 
-A KubeOsprey plugin is a React frontend module that runs inside KubeOsprey. It can add pages, sidebar menus, and dedicated management interfaces for custom resources without rebuilding KubeOsprey.
+KubeOsprey 插件是一个运行在 KubeOsprey 内部的 React 前端模块。它可以在不重新编译 KubeOsprey 的前提下，为 KubeOsprey 增加页面、侧边栏菜单和针对自定义资源的专属管理界面。
 
-Plugins are written and built with [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk), packaged as `.tar.gz` archives, and installed by a KubeOsprey administrator on the **Plugin management** page. Once installed and enabled, they are available to all signed-in users.
+KubeOsprey 完全兼容上游 Kite（[kite-org/kite](https://github.com/kite-org/kite)）的插件生态：插件 SDK 与官方插件目录由上游 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) 维护，为上游编写的插件无需修改即可在 KubeOsprey 中安装使用。
 
-## What Plugins Can Do
+插件通过 [`@kite-dev/plugin-sdk`](https://github.com/kite-org/kite-plugins/tree/main/packages/plugin-sdk) 编写和构建，打包为 `.tar.gz` 归档，由 KubeOsprey 管理员在 **插件管理** 页面安装。安装后，供所有登录用户使用。
 
-- Register pages and routes
-- Register sidebar menus
-- Extend resource lists and details
-- Provide custom resource pages
-- Provide color themes
-- Provide plugin settings pages
+## 插件能做什么
 
-The [cert-manager plugin](https://github.com/kite-org/kite-plugins/tree/main/plugins/cert-manager) from the upstream Kite ecosystem is a typical example. It provides management interfaces for custom resources such as Certificate, Issuer, CertificateRequest, Order, and Challenge, including resource lists, detail pages, status badges, and YAML editing.
+- 注册页面和路由
+- 注册侧边栏菜单
+- 扩展资源列表和详情
+- 接管自定义资源页面
+- 提供配色主题
+- 提供插件配置页
 
-## What Plugins Cannot Do
+[cert-manager 插件](https://github.com/kite-org/kite-plugins/tree/main/plugins/cert-manager)为 Certificate、Issuer、CertificateRequest、Order、Challenge 等 CRD 提供管理界面，包含资源列表、详情页、状态徽标和 YAML 编辑。
 
-- Run backend code. Plugins contain only frontend modules. They cannot register new backend APIs or extend Kubernetes controller or operator behavior.
+## 插件不能做什么
 
-## Runtime and Security Model
+- 不执行任何后端代码。插件只有前端模块，不能注册新的后端 API，也不能扩展 Kubernetes controller / operator 行为。
 
-1. **Plugins run as the signed-in user.** All Kubernetes requests from plugins go through the KubeOsprey backend and are subject to that user's RBAC permissions. Users cannot access resources they are not authorized to see, just as on native KubeOsprey pages. Plugins receive no additional permissions.
-2. **Plugin management requires administrator access.** Installing, disabling, uninstalling, and configuring the catalog require KubeOsprey administrator permissions. Regular users can only use enabled plugins.
-3. **Plugins are trusted code.** Plugin JavaScript executes in your browser with the same capabilities you have in KubeOsprey. Only install plugins from authors you trust.
-4. **The runtime is shared.** Plugins and KubeOsprey share React, React Router, TanStack Query, and SDK implementations. Do not create another React root, Router, or QueryClient.
+## 运行与安全模型
 
-Use host capabilities through `@kite-dev/plugin-sdk`. Do not import KubeOsprey's internal modules directly.
+1. **插件以当前登录用户的身份运行**。插件发起的所有 Kubernetes 请求都经由 KubeOsprey 后端转发，并受该用户的 RBAC 权限约束——用户看不到自己无权访问的资源，这与在 KubeOsprey 原生页面中操作完全一致。插件不会获得任何额外权限。
+2. **插件管理是管理员操作**。安装、停用、卸载、目录配置均需要 KubeOsprey 管理员权限；普通用户只能使用已启用的插件。
+3. **插件是受信任代码**。插件 JavaScript 在您的浏览器中执行，等同于其作者可以直接使用您在 KubeOsprey 中的全部操作能力。只安装来自可信作者的插件。
+4. **运行时共享**。插件与 KubeOsprey 共享 React、React Router、TanStack Query 等运行时和 SDK 实现，不要创建自己的 React 根、Router 或 QueryClient。
 
-## Installing and Using Plugins
+插件通过 `@kite-dev/plugin-sdk` 使用宿主能力，不要直接导入 KubeOsprey 的内部模块。
 
-1. Click your avatar in the upper right corner and select **Plugin management**. This option is only visible to administrators.
-2. Go to **Settings → General**, enter the `catalog.json` URL under **Plugin catalog**, and save. Leave it empty to use the default catalog of the upstream Kite plugin ecosystem at `https://plugins.kitehq.dev/catalog.json`.
-3. Return to **Plugin management**, select a plugin in the **Plugin catalog**, and click **Install**. Click a plugin's name to preview its README.
-4. Open the plugin from the sidebar. Newly installed plugins are enabled automatically.
+## 安装与使用
 
-You can also use **Install from file** to upload a plugin's `.tar.gz` archive directly. Under **Installed plugins**, you can disable, enable, or uninstall a plugin.
+1. 点击右上角头像，选择 **插件管理**（仅管理员可见）。
+2. 在 **设置 → 通用** 中找到 **插件目录**，填写 `catalog.json` 地址并保存。留空则使用默认目录 `https://plugins.kitehq.dev/catalog.json`。
+3. 回到 **插件管理**，在 **插件目录** 中选择插件并点击 **安装**，点击插件名可预览 README。
+4. 从侧边栏打开插件。新安装的插件自动启用。
 
-::: warning Plugin persistence
-The Helm Chart stores plugins in `/data/plugins`. Enabling SQLite persistence also preserves plugins with the default paths; MySQL/PostgreSQL deployments need separate plugin storage. Without persistent storage, recreating the Pod loses plugin files: plugins installed from a catalog are downloaded again, while manually uploaded plugins must be uploaded again. Automatic downloads require the installation records in the database to be preserved. See [Plugin Storage](../config/chart-values#plugin-storage) for configuration.
+也可以使用 **从文件安装** 直接上传插件的 `.tar.gz` 归档。在 **已安装插件** 中可以停用、启用或卸载插件。
+
+::: warning 插件持久化
+Helm Chart 将插件存放在 `/data/plugins`。使用默认路径时，开启 SQLite 持久化即可同时保留插件；MySQL/PostgreSQL 部署需单独配置插件存储。未使用持久化存储时，Pod 重建会丢失插件文件：官方插件会重新下载，手动上传的插件需要重新上传。自动下载要求数据库中的安装记录仍然保留。配置见[插件存储](../config/chart-values#插件存储)。
 :::
 
-## Plugin Ecosystem
+## 相关仓库
 
-KubeOsprey is compatible with the upstream Kite plugin ecosystem: plugins built with the SDK install and run unchanged in KubeOsprey. The SDK, the scaffolding tool, the official plugins, and the default plugin catalog are maintained by the upstream [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) repository. The KubeOsprey host application lives at [fadewalk/kube-osprey](https://github.com/fadewalk/kube-osprey).
+| 仓库                                                              | 作用                                                                |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [KubeOsprey](https://github.com/fadewalk/kube-osprey)             | 宿主应用：插件加载、资产分发、管理 API                              |
+| [kite-plugins](https://github.com/kite-org/kite-plugins)（上游）  | 插件 SDK、创建器、官方插件集合与官方目录；SDK 位于 `packages/plugin-sdk` |
 
-| Repository | Purpose |
-| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| [kube-osprey](https://github.com/fadewalk/kube-osprey)   | Host application: plugin loading, asset serving, and management APIs                             |
-| [kite-plugins (upstream Kite)](https://github.com/kite-org/kite-plugins) | SDK, scaffolding tool, official plugins, and plugin catalog; the SDK is in `packages/plugin-sdk` |
+## 接下来
 
-## Next Steps
-
-- [Quick Start](./quick-start): create and install a plugin from scratch
-- [Plugin Configuration](./api/plugin-config): configure pages, menus, resource extensions, themes, a settings page, and internationalization
-- [Resource Queries and Operations](./api/resources): query and modify Kubernetes resources
-- [Internationalization](./i18n): support multiple languages
-- [Debugging](./debugging): development workflow and troubleshooting
-- [Publishing Plugins](./publishing): distribute plugins, host your own catalog, or contribute to the upstream Kite catalog
+- [快速开始](./quick-start)：从零创建并安装一个插件
+- [插件配置](./api/plugin-config)：声明页面、菜单、资源扩展、主题、配置页和国际化配置
+- [资源查询与操作](./api/resources)：查询和修改 Kubernetes 资源
+- [国际化](./i18n)：多语言支持
+- [调试](./debugging)：开发迭代与问题排查
+- [发布插件](./publishing)：分发插件或提交到上游官方目录

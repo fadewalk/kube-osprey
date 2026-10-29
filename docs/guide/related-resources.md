@@ -1,5 +1,5 @@
-# Related Resources
+# 相关资源
 
-When viewing a resource, KubeOsprey shows you a list of related resources. This helps you to quickly navigate between related objects, for example, from a Deployment to its Pods, or from a Service to its backing Pods.
+在查看资源时，KubeOsprey 会向您显示相关资源的列表。这可以帮助您在相关对象之间快速导航，例如，从 Deployment 到其 Pod，或从 Service 到其后备 Pod。
 
 ![Related Resources](/screenshots/related.png)

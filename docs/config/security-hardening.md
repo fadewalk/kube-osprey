@@ -1,31 +1,35 @@
-# Production Security Hardening
+# 生产环境安全基线与加固
 
-This guide is the production security baseline for KubeOsprey. It applies to Helm installations, the standalone Kubernetes manifest, and Cluster Agent deployments.
+本文档是 KubeOsprey 的生产环境安全基线，适用于 Helm 安装、独立 Kubernetes 清单和 Cluster Agent 部署。
 
-KubeOsprey is a Kubernetes control plane. It can create privileged Kubernetes clients, terminal pods, exec sessions, proxy requests, and AI-assisted resource changes. Treat a KubeOsprey installation as a cluster administration boundary.
+KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户端、终端 Pod、exec 会话、代理请求，并执行 AI 辅助的资源变更。请把 KubeOsprey 视为集群管理边界来部署和审计。
 
-## Production baseline
+## 生产环境基线
 
-Before exposing KubeOsprey to users, verify all of the following:
+向用户开放 KubeOsprey 前，请确认：
 
-- Use HTTPS for KubeOsprey, OAuth/OIDC callbacks, Cluster Agent connections, and WebSocket traffic.
-- Set `KUBE_OSPREY_ENCRYPT_KEY` to a high-entropy value and store it in an external Secret. Never use the public example value from development documentation.
-- Set `JWT_SECRET` explicitly when you need stable sessions across restarts or multiple replicas.
-- Set `ANONYMOUS_USER_ENABLED=false` and verify that anonymous access is disabled.
-- Use a narrow `TRUSTED_PROXIES` list. Do not trust arbitrary client-supplied forwarding headers. Set `TRUSTED_PROXIES=none` to make KubeOsprey ignore all client-supplied forwarding headers.
-- Use an external PostgreSQL or MySQL database, or provision a persistent volume for SQLite.
-- Pin KubeOsprey, terminal, and Cluster Agent images to a release tag or digest. Do not use `latest` in production.
-- Review every `cluster-admin`, wildcard RBAC rule, privileged container, host namespace, and host path before deployment.
-- Enable only the terminal and Cluster Agent capabilities that your operators need.
-- Back up the database and the encryption key together. A database backup without its encryption key cannot restore encrypted fields.
+- KubeOsprey、OAuth/OIDC 回调、Cluster Agent 连接和 WebSocket 流量均使用 HTTPS。
+- 设置高熵的 `KUBE_OSPREY_ENCRYPT_KEY` 并存储在外部 Secret 中，不要使用开发文档中的公开示例值。
+- 如果需要重启后或多副本之间保持会话稳定，请显式设置 `JWT_SECRET`。
+- 设置 `ANONYMOUS_USER_ENABLED=false`，并验证匿名访问已关闭。
+- 将 `TRUSTED_PROXIES` 限制为实际的反向代理地址，不要信任任意客户端转发头。
+- 使用外部 PostgreSQL/MySQL，或为 SQLite 配置持久化卷。
+- 将 KubeOsprey、终端和 Cluster Agent 镜像固定到发布版本或 digest，生产环境不要使用 `latest`。
+- 部署前检查每一条 `cluster-admin`、通配符 RBAC、privileged 容器、主机 namespace 和 hostPath 配置。
+- 只启用运维人员确实需要的终端和 Cluster Agent 能力。
+- 同时备份数据库和加密密钥。没有加密密钥的数据库备份无法恢复加密字段。
 
-## Secrets and encryption
+## 密钥与加密
 
-`SecretString` fields in the database include credentials such as kubeconfig data, OAuth and LDAP secrets, Helm repository passwords, API keys, MFA secrets, and Cluster Agent private keys. They are encrypted with `KUBE_OSPREY_ENCRYPT_KEY`.
+数据库中的 `SecretString` 字段包括 kubeconfig、OAuth/LDAP 密钥、Helm 仓库密码、API Key、MFA Secret 和 Cluster Agent 私钥等凭据，它们使用 `KUBE_OSPREY_ENCRYPT_KEY` 加密。
 
-User passwords are stored as one-way password hashes; they are not recovered with `KUBE_OSPREY_ENCRYPT_KEY`.
+启动时会校验 `KUBE_OSPREY_ENCRYPT_KEY`：密钥不能为空、长度至少 32 个字符、且不能等于内置的开发用默认值，否则服务拒绝启动。仅本地开发环境可以设置 `KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true` 跳过默认值检查。
 
-Use an existing Kubernetes Secret when possible:
+`TRUSTED_PROXIES` 建议配置为实际反向代理的网段或 IP；设置为 `none` 表示忽略所有客户端转发头。
+
+用户密码使用单向密码哈希保存，不能通过 `KUBE_OSPREY_ENCRYPT_KEY` 恢复。
+
+建议使用已有 Kubernetes Secret：
 
 ```yaml
 secret:
@@ -33,85 +37,89 @@ secret:
   existingSecret: kube-osprey-secrets
 ```
 
-`KUBE_OSPREY_ENCRYPT_KEY` is validated at startup. KubeOsprey refuses to start when the key is empty, shorter than 32 characters, or still set to the built-in development default. The only escape hatch is `KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true`, which is intended for local development only.
+该 Secret 必须包含当前部署模式需要的配置项。恢复已有数据库时，必须保持原加密密钥不变。密钥轮换需要专门的迁移流程：使用旧密钥解密，再使用新密钥重加密。
 
-The Secret must contain the keys required by the selected deployment mode. Keep the encryption key stable while restoring an existing database. Rotating it requires a planned migration that can decrypt with the old key and re-encrypt with the new key.
+不要把真实密钥写入 `values.yaml`、Git、Shell 历史、工单或生成的 Manifest。
 
-Do not put real keys in `values.yaml`, Git, shell history, issue trackers, or generated manifests.
+## Kubernetes 权限
 
-## Kubernetes permissions
+KubeOsprey 有应用层 RBAC，Kubernetes 还会独立检查 KubeOsprey Server 和 Cluster Agent 使用的 ServiceAccount 或 kubeconfig。最终权限受两套系统共同影响，但过大的 Kubernetes 身份仍会放大误操作或会话被攻破后的影响。
 
-KubeOsprey has application-level RBAC, while Kubernetes separately evaluates the ServiceAccount or kubeconfig used by the KubeOsprey server and Cluster Agent. The effective permission is the intersection of both systems, but an overly privileged Kubernetes identity can still make a mistake or compromised session more damaging.
+请分别检查：
 
-Review these areas separately:
+- KubeOsprey Server 的 ServiceAccount 和 ClusterRole；
+- Cluster Agent 的 ServiceAccount 和 ClusterRoleBinding；
+- kubectl Terminal 的 ServiceAccount 和 ClusterRoleBinding；
+- Node Terminal 的 host 访问、privileged、主机 namespace 和 hostPath；
+- `imagePullSecrets` 以及终端 Pod 创建的 namespace。
 
-- KubeOsprey server ServiceAccount and ClusterRole;
-- Cluster Agent ServiceAccount and ClusterRoleBinding;
-- kubectl terminal ServiceAccount and ClusterRoleBinding;
-- Node Terminal host access, privileged mode, host namespaces, and host paths;
-- `imagePullSecrets` and the namespaces where terminal pods are created.
+生产环境避免使用以下通配符规则，除非该部署明确只用于管理员 Break-glass 场景：
 
-Avoid wildcard rules such as `apiGroups: ["*"]`, `resources: ["*"]`, and `verbs: ["*"]` for production unless the installation is intentionally an administrator-only break-glass system.
+```yaml
+apiGroups: ["*"]
+resources: ["*"]
+verbs: ["*"]
+```
 
-Cluster Agent manifests support permission profiles:
+Cluster Agent Manifest 支持权限档位：
 
-- `readOnly`: read-only on all resources.
-- `operator`: read/write on common workload resources (pods including exec/attach/portforward, services, configmaps, PVCs, deployments, statefulsets, daemonsets, replicasets, jobs, cronjobs, ingresses, network policies, PDBs, HPAs) plus read-only on namespaces, nodes, persistent volumes, storage classes, events, CRDs, metrics, and Secrets. Secret and RBAC mutation is excluded.
-- `admin`: binds `cluster-admin` (legacy high-trust behavior).
-- `custom`: binds an existing ClusterRole of your choice.
+- `readOnly`：全资源只读。
+- `operator`：常见工作负载资源可读写（pods 含 exec/attach/portforward、services、configmaps、PVC、deployments、statefulsets、daemonsets、replicasets、jobs、cronjobs、ingresses、networkpolicies、PDB、HPA），并对 namespaces、nodes、PV、StorageClass、events、CRD、metrics、Secrets 只读；不授予 Secret 和 RBAC 的写权限。
+- `admin`：绑定 `cluster-admin`（兼容旧的高信任行为）。
+- `custom`：绑定指定的已有 ClusterRole。
 
-The default profile is `admin` for backward compatibility; prefer `operator` or `readOnly` for production. Note that Secrets are readable under `operator` because the KubeOsprey console and Helm release browsing read Secret-backed data; use `custom` if that is unacceptable.
+默认档位为 `admin`（向后兼容）；生产环境建议使用 `operator` 或 `readOnly`。注意 `operator` 档位可以读 Secrets（KubeOsprey 控制台的 Secret 页面和 Helm Release 浏览依赖 Secret 数据）；如不可接受请使用 `custom`。
 
-ClusterRoleBinding `roleRef` is immutable in Kubernetes. When switching an existing Cluster Agent to a different profile, delete the existing Cluster Agent ClusterRoleBinding before applying the new manifest (named `kube-osprey-cluster-agent`; installs upgraded from a pre-rename release use `kite-cluster-agent`).
+Kubernetes 中 ClusterRoleBinding 的 `roleRef` 不可修改。切换已有 Cluster Agent 的权限档位时，必须先删除已有的 Cluster Agent ClusterRoleBinding，再应用新 Manifest（新安装名为 `kube-osprey-cluster-agent`；从更名前版本升级的安装为 `kite-cluster-agent`）。
 
-## Terminal and exec capabilities
+## 终端与 exec 能力
 
-Pod exec, kubectl terminal, and node terminal are not ordinary read-only features:
+Pod exec、kubectl Terminal 和 Node Terminal 都不是普通的只读功能：
 
-- Pod exec can run commands inside workloads.
-- kubectl terminal can operate on the cluster using its configured ServiceAccount.
-- Node terminal can expose host-level capabilities.
+- Pod exec 可以在工作负载容器内执行命令；
+- kubectl Terminal 使用其 ServiceAccount 操作集群；
+- Node Terminal 可以获得主机级能力。
 
-Use explicit administrator permissions, short sessions, automatic cleanup, and audit logging. Keep kubectl and node terminal disabled unless they are required. Test that disabled capabilities do not create ServiceAccounts, bindings, or agent pods.
+应使用明确的管理员权限、短会话、自动清理和审计日志。除非确有需要，否则保持 kubectl 和 Node Terminal 关闭。请验证关闭后不会创建 ServiceAccount、Binding 或 Agent Pod。
 
-## Prometheus and raw PromQL
+## Prometheus 与原始 PromQL
 
-The PromQL Explorer is a cluster-level observability tool. It should be granted only to users who are allowed to query the configured Prometheus data source. Kubernetes namespace RBAC does not automatically filter Prometheus results.
+PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Prometheus 数据源的用户才应获得该能力。Kubernetes namespace RBAC 不会自动过滤 Prometheus 查询结果。
 
-If KubeOsprey is used as a multi-tenant platform, enforce tenant isolation in the Prometheus layer or replace unrestricted PromQL with approved query templates. Do not attempt to provide isolation by blindly appending a namespace selector to arbitrary PromQL.
+如果 KubeOsprey 用作多租户平台，应在 Prometheus 层实现租户隔离，或改用审核过的查询模板。不要通过给任意 PromQL 盲目追加 namespace selector 来伪造数据隔离。
 
-## Database and persistence
+## 数据库与持久化
 
-The default SQLite setup is suitable for evaluation only. Without a persistent volume, replacing the Pod loses the database. For production:
+默认 SQLite 适合评估环境。没有持久化卷时，Pod 替换会丢失数据库。生产环境建议：
 
-- Prefer PostgreSQL or MySQL for multiple replicas and operational backups.
-- If using SQLite, provision a persistent volume and use a deployment strategy compatible with a single-writer volume.
-- Test restore procedures, not only backup creation.
-- Back up the database, encryption key, and deployment configuration as one recovery set.
+- 多副本和运维备份优先使用 PostgreSQL 或 MySQL；
+- 使用 SQLite 时配置持久化卷，并使用适合单写卷的部署策略；
+- 不仅测试备份创建，还要定期测试恢复；
+- 将数据库、加密密钥和部署配置作为一个恢复集合备份。
 
-## Audit policy
+## 审计策略
 
-Every state-changing console request is written to the operation audit log. The policy is configured in **Settings → Audit**:
+所有改变状态的console请求都会写入操作审计日志。策略在 **Settings → Audit** 中配置：
 
-- **Log retention** — how many days operation logs are kept (1–3650, default 30). Older entries are purged automatically.
-- **Skipped modules** — changes in the selected modules are not written to the audit log. Keep the list as small as possible; skipping a module means its changes leave no audit trail.
+- **日志保留期**：操作日志保留的天数（1–3650，默认 30），超期条目自动清理。
+- **跳过模块**：所选模块的变更不写入审计日志。请尽量保持该列表为空——跳过一个模块意味着它的变更不留任何审计痕迹。
 
-If the audit policy cannot be read, auditing fails open: mutations keep being recorded with the default retention.
+若审计策略读取失败，审计按"失败放行"处理：变更仍会以默认保留期记录。
 
-## Cluster Agent checklist
+## Cluster Agent 检查清单
 
-- Use an HTTPS server URL with a certificate trusted by the Agent.
-- Treat the one-time Agent token and generated YAML as credentials.
-- Rotate or revoke the Agent token after suspected exposure.
-- Verify the Agent image and digest before applying the manifest.
-- Inspect the ServiceAccount, ClusterRoleBinding, Secret, and Deployment before applying.
-- When changing the permission profile, delete the existing ClusterRoleBinding first (`roleRef` cannot be updated in place; named `kube-osprey-cluster-agent`, or `kite-cluster-agent` on installs upgraded from a pre-rename release).
-- Ensure the reverse proxy supports WebSocket upgrade and long-lived connections.
-- For multiple KubeOsprey replicas, validate session routing and shared state before production use.
+- 使用 HTTPS Server URL，并确保 Agent 信任对应证书；
+- 将一次性 Agent Token 和生成的 YAML 当作凭据处理；
+- 怀疑泄露后及时轮换或吊销 Agent Token；
+- 应用 Manifest 前验证 Agent 镜像和 digest；
+- 应用前检查 ServiceAccount、ClusterRoleBinding、Secret 和 Deployment；
+- 切换权限档位时，先删除已有的 ClusterRoleBinding（`roleRef` 无法原地更新；新安装名为 `kube-osprey-cluster-agent`，从更名前版本升级的安装为 `kite-cluster-agent`）；
+- 确保反向代理支持 WebSocket Upgrade 和长连接；
+- 多副本部署前验证会话路由和共享状态。
 
-## Verification commands
+## 验证命令
 
-Render and lint the Chart:
+检查 Chart：
 
 ```bash
 helm lint charts/kube-osprey
@@ -119,7 +127,7 @@ helm template kube-osprey charts/kube-osprey --namespace kube-osprey-system
 bash scripts/validate-chart.sh
 ```
 
-Review effective Kubernetes permissions in a test cluster:
+在测试集群中检查实际 Kubernetes 权限：
 
 ```bash
 kubectl auth can-i --list \
@@ -129,21 +137,21 @@ kubectl get clusterrolebinding <binding-name> -o yaml
 kubectl get serviceaccount <service-account> -n <namespace> -o yaml
 ```
 
-Run application checks:
+运行应用检查：
 
 ```bash
 go test ./...
 pnpm --dir ui exec tsc --noEmit -p tsconfig.app.json
 ```
 
-Check readiness separately from process liveness. A process can be running while its database, encryption key, or cluster configuration is unusable.
+请区分进程存活和应用就绪。进程可以运行，但数据库、加密密钥或集群配置可能已经不可用。
 
-## Current limitations and roadmap
+## 当前限制与后续路线
 
-The following items require separate design work rather than a blind permission reduction:
+以下问题需要独立设计，不应直接粗暴收紧权限：
 
-- Cluster Agent currently uses its registered Kubernetes credentials when forwarding requests; it does not impersonate the KubeOsprey user at the Kubernetes API.
-- kubectl terminal sessions now support configurable permission modes (`admin` / `operator` / `custom`) with per-session roles; node terminal still requires break-glass controls and a more narrowly scoped identity.
-- Encryption-key rotation needs a migration path for existing `SecretString` values.
-- Raw PromQL is not namespace-rewritten by KubeOsprey. Multi-tenant Prometheus isolation must be provided by the metrics architecture or a restricted query model.
-- Passkey ceremonies, Cluster Agent sessions, and other in-memory state need shared storage before a multi-replica deployment is considered fully supported.
+- Cluster Agent 当前使用注册的 Kubernetes 凭据转发请求，不会在 Kubernetes API 层模拟 KubeOsprey 用户身份；
+- kubectl 和 Node Terminal 需要更强的 Break-glass 控制和更小权限的身份；
+- 加密密钥轮换需要兼容已有 `SecretString` 的迁移流程；
+- KubeOsprey 不会对原始 PromQL 做 namespace 改写，多租户隔离应由指标架构或受限查询模型提供；
+- Passkey、Cluster Agent 会话和其他进程内状态在正式支持多副本前需要共享存储。

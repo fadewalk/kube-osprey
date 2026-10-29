@@ -2,24 +2,24 @@
 outline: deep
 ---
 
-# Plugin Configuration
+# 插件配置
 
-Use `definePlugin()` in `plugin.config.tsx` to configure routes, menus, resource extensions, themes, a settings page, and internationalization.
+在 `plugin.config.tsx` 中通过 `definePlugin()` 声明插件的路由、菜单、资源扩展、主题、配置页和国际化配置。
 
-All configuration fields are optional. `routes`, `menus`, `resources`, and `themes` default to empty arrays.
+所有配置项均可省略，`routes`、`menus`、`resources` 和 `themes` 默认为空数组。
 
-| Field | Purpose |
-| ----- | ------- |
-| [`routes`](#routes) | Register plugin pages and routes |
-| [`menus`](#menus) | Register sidebar menus and groups |
-| [`resources`](#resource-extensions) | Add list columns or detail tabs, or replace custom resource pages |
-| [`themes`](#themes) | Provide color themes |
-| [`settings`](#settings-page) | Provide an administrator settings page |
-| [`i18n`](#internationalization) | Configure internationalization |
+| 配置项 | 用途 |
+| ------ | ---- |
+| [`routes`](#路由) | 注册插件页面和路由 |
+| [`menus`](#菜单) | 注册侧边栏菜单和分组 |
+| [`resources`](#资源扩展) | 添加列表列、详情 Tab 或接管 CRD 页面 |
+| [`themes`](#主题) | 提供配色主题 |
+| [`settings`](#配置页) | 提供管理员配置页 |
+| [`i18n`](#国际化) | 配置国际化 |
 
-## Routes
+## 路由
 
-Register a plugin home page and a detail page with namespace and name parameters:
+注册插件首页和带命名空间、名称参数的详情页：
 
 ```tsx
 import { lazy } from 'react'
@@ -49,23 +49,23 @@ export default definePlugin({
 })
 ```
 
-- `id`: A route ID unique within the plugin. It must start with a letter or digit and may contain letters, digits, underscores, and hyphens.
-- `path`: A path relative to `/plugins/<plugin ID>`. It cannot start with `/` or contain `\`, `.` segments, or `..` segments. An empty string is the plugin home page. Named parameters (`:name`), optional parameters (`:name?`), and a trailing `*` are supported.
-- `title`: An optional page title that supports localized labels.
-- `element`: Required. Any React node; each route renders a complete page.
+- `id`：路由 ID，插件内唯一。必须由字母或数字开头，可含字母、数字、下划线、连字符。
+- `path`：相对 `/plugins/<插件 ID>` 的路径，不能以 `/` 开头，也不能包含 `\` 或 `.`、`..` 段；空字符串是插件首页，支持命名参数（`:name`）、可选参数（`:name?`）和尾部 `*`。
+- `title`：可选页面标题，支持本地化标签。
+- `element`：必填，任意 React 节点，每个路由渲染一个完整页面。
 
-Paths with the same structure but different parameter names, such as `deployments/:namespace/:name` and `deployments/:ns/:name`, conflict and cannot both be declared.
+参数名不同的同形路径（例如 `deployments/:namespace/:name` 与 `deployments/:ns/:name`）视为冲突，不能同时声明。
 
-| Route path | URL |
-| ---------- | --- |
+| 路由 path | 实际 URL |
+| --------- | -------- |
 | `''` | `/plugins/my-plugin` |
 | `deployments/:namespace/:name` | `/plugins/my-plugin/deployments/default/demo` |
 
-## Menus
+## 菜单
 
-Add a Certificate management group with a Certificate list menu for a plugin whose ID is `my-plugin`:
+为 ID 为 `my-plugin` 的插件添加“证书管理”分组，并在分组下放置 Certificate 列表菜单：
 
-Install the icon library used in this example:
+安装示例使用的图标库：
 
 ```sh
 pnpm add @tabler/icons-react
@@ -95,23 +95,23 @@ export default definePlugin({
 })
 ```
 
-- `id` and `label` are required. IDs must be unique within the plugin and follow the same format as route IDs. Labels support localization.
-- `route` points to a plugin route that can open without required parameters. `resource: { group, resource }` points directly to a custom resource list, which can use a page declared in `resources` without an additional plugin route. These fields are mutually exclusive. A menu with neither field is a group heading.
-- `parent` determines the menu's location:
+- `id`、`label` 必填：ID 在插件内唯一，格式与路由 ID 相同；标签支持本地化。
+- `route` 指向一个无需必填参数即可打开的插件路由；`resource: { group, resource }` 直接指向某个自定义资源的列表页，由 `resources` 中的页面定义接管，无需额外注册路由。两者互斥，都不带的菜单是分组标题。
+- `parent` 决定菜单位置：
 
-| `parent` value | Location |
-| -------------- | -------- |
-| Omitted | Top-level sidebar menu or group |
-| `core:workloads`, etc. | Inside a built-in KubeOsprey group |
-| `my-plugin:tools` | Inside this plugin's group with ID `tools` |
+| `parent` 取值 | 位置 |
+| ------------- | ---- |
+| 省略 | 侧边栏顶级菜单或分组 |
+| `core:workloads` 等 | KubeOsprey 内置分组内 |
+| `my-plugin:tools` | 本插件中 ID 为 `tools` 的分组内 |
 
-Built-in group IDs are `core:application`, `core:workloads`, `core:traffic`, `core:storage`, `core:config`, `core:security`, and `core:other`. Import `coreMenuGroupIds` from `/validation` to access them.
+内置分组 ID 为 `core:application`、`core:workloads`、`core:traffic`、`core:storage`、`core:config`、`core:security`、`core:other`，可从 `/validation` 导入 `coreMenuGroupIds`。
 
-A parent must be a built-in group or a group declared by the same plugin. Cycles are not allowed, and parent groups cannot have `route` or `resource` fields. `order` sets the default position (menu items default to `50`); users' sidebar preferences take precedence.
+菜单父级只能是内置分组或同一插件声明的分组，不允许成环；作为父级的分组菜单自身不能带 `route` 或 `resource`。`order` 设置默认排序（菜单项默认 `50`，用户侧边栏偏好优先）。
 
-`icon` accepts a React element or a built-in icon name. Use libraries such as `@tabler/icons-react` or `lucide-react`, or pass your own component. Install the icon library in your plugin; the icons you use are bundled with it.
+`icon` 接受 React 元素或内置图标名称。可直接使用 `@tabler/icons-react`、`lucide-react` 等图标库，也可以传入自定义组件。图标库由插件自行安装，使用的图标会随插件打包。
 
-Custom components must forward `className` to the icon element and use `currentColor` to inherit the menu color. For example, wrap a third-party icon to adjust its stroke width:
+自定义组件需将 `className` 传给实际的图标元素，并使用 `currentColor` 继承菜单颜色。例如，为第三方图标调整线条粗细：
 
 ```tsx
 import { IconCertificate } from '@tabler/icons-react'
@@ -121,9 +121,9 @@ function CertificateIcon({ className }: { className?: string }) {
 }
 ```
 
-Set `icon: <CertificateIcon />` on the menu to use it. Custom icons load when their menus are displayed and appear in the sidebar, Configure Sidebar, and global search navigation results. Top-level group headings do not display icons.
+在菜单中设置 `icon: <CertificateIcon />` 即可使用。自定义图标在菜单显示时加载，在侧边栏、配置侧边栏和全局搜索的菜单入口中使用相同的图标。顶级分组标题不显示图标。
 
-You can also use any of these built-in names, such as `icon: 'IconShieldCheck'`. If omitted or set to an `Icon...` name outside this list, it defaults to `IconBox`:
+也可以直接填写以下内置图标名称，例如 `icon: 'IconShieldCheck'`。未指定或使用未内置的 `Icon...` 名称时，使用 `IconBox`：
 
 ```text
 IconBox           IconRocket           IconStack2        IconTopologyBus  IconPackage
@@ -133,27 +133,27 @@ IconLock          IconArrowsHorizontal IconUser          IconUsers        IconSh
 IconKey           IconBoxMultiple      IconServer2       IconBell         IconCode
 ```
 
-`definePlugin` infers route ID literal types from inline declarations and checks `menus.route` values. If you extract the route array into a variable, use `as const` to preserve those literal types.
+`definePlugin` 会从内联声明推断路由 ID 的字面量类型，并校验 `menus.route` 的取值；如果把路由数组提取成变量，需要加 `as const` 保留字面量类型。
 
-## Resource Extensions
+## 资源扩展
 
-Use `resources` in `plugin.config.tsx` to add columns to KubeOsprey's resource lists, add tabs to detail pages, or replace complete pages for a CRD. To query or modify resource data, see [Resource Queries and Operations](./resources).
+通过 `plugin.config.tsx` 的 `resources` 配置，为 KubeOsprey 的资源列表添加列、为详情页添加 Tab，或替换某种 CRD 的完整页面。查询和修改资源数据见[资源查询与操作](./resources)。
 
-Each entry has type `PluginResourceView<T>` and identifies a resource by `group` (API group) and `resource` (plural resource name). Use an empty string for the core API group: a Pod is `{ group: '', resource: 'pods' }`, and a StorageClass is `{ group: 'storage.k8s.io', resource: 'storageclasses' }`. API groups are validated for format without restricting suffixes such as `k8s.io`.
+`resources` 中的每一项用 `group`（API 组）和 `resource`（复数资源名）定位一种资源，类型是 `PluginResourceView<T>`。核心 API 组用空字符串，例如 Pod 是 `{ group: '', resource: 'pods' }`，StorageClass 是 `{ group: 'storage.k8s.io', resource: 'storageclasses' }`；API 组按格式校验，不限制 `k8s.io` 这类后缀。
 
-| Field | Type | Purpose |
-| ----- | ---- | ------- |
-| `group`, `resource` | `string` | Required; together they identify a unique resource target |
-| `columns` | `PluginResourceColumn<T>[]` | Append columns to host lists |
-| `tabs` | `PluginResourceTab[]` | Append tabs to host detail pages |
-| `list` | `ReactNode` | Replace the complete custom resource list page |
-| `detail` | `ReactNode` | Replace the complete custom resource detail page |
+| 字段 | 类型 | 作用 |
+| ---- | ---- | ---- |
+| `group`、`resource` | `string` | 必填，共同组成唯一的资源目标 |
+| `columns` | `PluginResourceColumn<T>[]` | 向宿主列表追加列 |
+| `tabs` | `PluginResourceTab[]` | 向宿主详情页追加 Tab |
+| `list` | `ReactNode` | 接管自定义资源的完整列表页 |
+| `detail` | `ReactNode` | 接管自定义资源的完整详情页 |
 
-Provide at least one of these four extensions. A plugin cannot declare the same resource target more than once. KubeOsprey loads plugin modules on demand: when a column is visible, a tab is selected, or a replacement page is opened. `columns` and `tabs` apply to both native resource pages and generic custom resource pages. `list` and `detail` replace only custom resource pages, not native resource pages.
+四种扩展至少提供一种，且同一插件内不能重复声明相同的资源目标。宿主按需加载插件模块：列可见时加载，Tab 被选中时加载，接管页面在访问时加载。`columns`、`tabs` 对原生资源和通用 CR 页面都生效；`list`、`detail` 只接管自定义资源整页，不会替换原生资源页面。
 
-### Adding List Columns
+### 添加列表列
 
-Add a Team column to the Pod list that displays the resource's `team` label:
+给 Pod 列表增加 Team 列，显示资源的 `team` 标签：
 
 ```tsx
 // plugin.config.tsx
@@ -183,24 +183,24 @@ export default definePlugin({
 })
 ```
 
-Import `PluginResourceColumn<T, TValue>` from the SDK's root entry point. `T` is the resource type; `TValue` is the column value type and defaults to `unknown`.
+`PluginResourceColumn<T, TValue>` 从 SDK 根入口导入，`T` 是资源类型，`TValue` 是列值类型（默认 `unknown`）。
 
-| Field | Description |
-| ----- | ----------- |
-| `id`, `header` | Required. IDs must be unique among columns for the resource. Headers support localized labels |
-| `accessorFn` / `accessorKey` | Read the value used for display, sorting, and search. These are mutually exclusive. `accessorKey` supports dotted paths such as `metadata.labels.team` |
-| `cell` | TanStack Table cell renderer. `row.original` is the current resource. Render a separate React component when you need hooks |
-| `size`, `minSize`, `maxSize` | Column width and its limits |
-| `enableSorting`, `sortingFn` | Control sorting. Columns with an accessor are sortable by default. `sortingFn` accepts a TanStack built-in name (`auto`, `text`, `alphanumeric`, `datetime`, etc.) or a custom function |
-| `sortDescFirst`, `sortUndefined`, `invertSorting` | Initial sort direction, placement of missing values (last by default), and inverted sorting |
-| `enableHiding`, `defaultHidden` | Whether the column can be hidden and whether it starts hidden. Existing user preferences take precedence |
-| `order` | Default order among plugin columns, starting at `0`, with ties sorted by ID. All plugin columns appear after host columns |
+| 字段 | 说明 |
+| ---- | ---- |
+| `id`、`header` | 必填；ID 在该资源的列中唯一，标题支持本地化标签 |
+| `accessorFn` / `accessorKey` | 读取用于显示、排序和搜索的值，两者互斥；`accessorKey` 支持 `metadata.labels.team` 这类点路径 |
+| `cell` | TanStack Table 单元格渲染接口，`row.original` 是当前资源；需要 Hook 时渲染独立的 React 组件 |
+| `size`、`minSize`、`maxSize` | 列宽及其范围 |
+| `enableSorting`、`sortingFn` | 控制排序；有 accessor 的列默认参与排序，`sortingFn` 可用 TanStack 内置名称（`auto`、`text`、`alphanumeric`、`datetime` 等）或自定义函数 |
+| `sortDescFirst`、`sortUndefined`、`invertSorting` | 首次排序方向、空值位置（默认排在最后）和反向排序 |
+| `enableHiding`、`defaultHidden` | 是否允许隐藏、是否默认隐藏；已有用户显隐偏好优先 |
+| `order` | 插件列之间的默认顺序，默认 `0`，相同取值按 ID 排序；插件列统一追加在宿主列之后 |
 
-When any plugin column is visible, host list requests retrieve complete resource objects, including when watch is enabled. Cells can read the current row directly without requesting the resource again. Text search matches values from visible columns, including plugin accessor results. Label selectors are still processed by the backend. Accessors should return strings, numbers, or booleans.
+只要存在可见的插件列，宿主列表请求（包括开启 watch 时）就会拉取完整资源对象，因此单元格可以直接读取当前行，不需要再次请求同一资源。文本搜索会匹配当前可见列的取值（含插件列 accessor 的返回值），标签选择器仍由后端处理。accessor 建议返回字符串、数字或布尔值。
 
-### Adding Detail Tabs
+### 添加详情 Tab
 
-Add a Policy tab to Pod detail pages:
+给 Pod 详情页增加“策略”Tab：
 
 ```tsx
 import { lazy } from 'react'
@@ -228,22 +228,22 @@ export default definePlugin({
 })
 ```
 
-Import `PluginResourceTab` from the SDK's root entry point:
+`PluginResourceTab` 从 SDK 根入口导入：
 
-| Field | Description |
-| ----- | ----------- |
-| `id` | Required; unique among tabs for this resource |
-| `label` | Required; a localized label |
-| `element` | Required; any React node |
-| `order` | Optional; defaults to `0`, with ties sorted by ID |
+| 字段 | 说明 |
+| ---- | ---- |
+| `id` | 必填，在该资源的 Tab 中唯一 |
+| `label` | 必填，本地化标签 |
+| `element` | 必填，任意 React 节点 |
+| `order` | 可选，默认 `0`，相同取值按 ID 排序 |
 
-Plugin tabs appear after host tabs. Users' order and visibility preferences take precedence.
+插件 Tab 追加在宿主 Tab 之后，用户排序与显隐偏好优先。
 
-To access the current resource or refresh the page from a column or tab component, see [Reading the Current Resource in an Extension](./resources#reading-the-current-resource-in-an-extension).
+在列或 Tab 组件中读取当前资源和触发刷新，见[读取扩展中的当前资源](./resources#读取扩展中的当前资源)。
 
-### Replacing CRD List and Detail Pages
+### 接管 CRD 列表和详情
 
-`list` and `detail` accept React nodes. If you provide only one, the other page uses KubeOsprey's generic view. You do not need plugin routes, and menus can point directly to the CRD:
+`list`、`detail` 接收实际的 React 节点。只提供其中一项时，另一页仍使用 KubeOsprey 的通用视图。无需声明插件路由，菜单也可以直接指向该 CRD：
 
 ```tsx
 // plugin.config.tsx
@@ -273,25 +273,25 @@ export default definePlugin({
 })
 ```
 
-Replacement pages fetch their data through resource hooks. Detail pages use `useParams()` to read `name` and `namespace`. Menus, the CRD browser, and page links use the same CRD URLs; see [Opening Resource Pages](./navigation#opening-resource-pages). Reuse [UI Components](./ui) for tables, detail layouts, and YAML editing.
+接管页面自行通过资源 Hook 请求数据，详情页用 `useParams()` 读取 `name` 和 `namespace`。菜单、CRD 浏览器和页面内链接使用同一套 CRD URL，见[打开资源页面](./navigation#打开资源页面)。表格、详情页和 YAML 编辑器可以复用 [UI 组件](./ui)。
 
-If multiple active plugins replace the same page type for the same resource, the first match in the active plugin list takes effect. KubeOsprey falls back to its generic view when a plugin is disabled, uninstalled, incompatible, or fails to load.
+多个活动插件接管同一资源的同一种页面时，只有活动插件列表中的第一个匹配项生效。插件被禁用、卸载、不兼容或模块加载失败时，KubeOsprey 回退到通用视图。
 
-### Extension IDs and Deep Links
+### 扩展的标识与深链
 
-KubeOsprey prefixes extension IDs with the plugin ID, for example `plugin:my-plugin:column:team` and `plugin:my-plugin:tab:policy`. These IDs do not include a version, so plugin upgrades preserve user preferences. Use `?tab=plugin:my-plugin:tab:policy` to select a tab directly. If that tab does not exist on the page, KubeOsprey selects the first visible tab.
+宿主会给扩展 ID 加插件前缀，例如 `plugin:my-plugin:column:team`、`plugin:my-plugin:tab:policy`。这些 ID 不含版本号，因此升级插件不会丢失用户偏好；详情页可以用 `?tab=plugin:my-plugin:tab:policy` 直接选中该 Tab，值在页面上不存在时回退到第一个可见 Tab。
 
-For example, open the Pod named `demo` in the `default` namespace and select the Policy tab provided by `my-plugin`:
+例如，打开 `default` 命名空间中名为 `demo` 的 Pod，并选中 `my-plugin` 提供的“策略”Tab：
 
 ```text
 /pods/default/demo?tab=plugin:my-plugin:tab:policy
 ```
 
-Column and tab extensions apply to pages that use the host's resource table and detail components. A plugin's own `ResourceTable` and `ResourceDetailShell` do not automatically include other plugins' extensions. A plugin column or tab loading or rendering error affects only that extension's area.
+列和 Tab 扩展作用于使用宿主资源表格与详情页组件的页面；插件自己渲染的 `ResourceTable`、`ResourceDetailShell` 不会自动插入其他插件的内容。插件列或 Tab 的加载、渲染错误只影响对应的扩展区域。
 
-## Themes
+## 主题
 
-Plugins can provide color themes. A theme is a stylesheet that overrides KubeOsprey's CSS variables, so one file can change the colors of pages, YAML editors, and terminals.
+插件可以提供配色主题。一个主题就是一份样式表，用来覆盖 KubeOsprey 的 CSS 变量，因此一份文件就能同时改变所有页面、YAML 编辑器和终端的配色。
 
 ```tsx
 import { definePlugin } from '@kite-dev/plugin-sdk'
@@ -310,15 +310,15 @@ export default definePlugin({
 })
 ```
 
-| Field | Description |
-| ----- | ----------- |
-| `id` | Theme ID, unique within the plugin. Use lowercase letters, digits, and hyphens, starting and ending with a letter or digit |
-| `label` | Optional name shown in the theme selector; defaults to the ID and supports localized labels |
-| `styles` | One or more stylesheet paths, included in the plugin package |
+| 字段    | 说明                                                                                       |
+| ------- | ------------------------------------------------------------------------------------------ |
+| `id`    | 主题 ID，插件内唯一。只能使用小写字母、数字和连字符，并且以字母或数字开头和结尾。           |
+| `label` | 可选，主题选择器中显示的名称，省略时使用 ID；支持本地化标签。                              |
+| `styles` | 一份或多份样式表路径，必须打包进插件包。                                                  |
 
-Place stylesheets in `public/`; the build copies them unchanged into the package. Use the corresponding relative paths in `styles`. Theme plugins do not need routes, menus, or resources. If all three are absent, KubeOsprey loads only the stylesheets, without loading the plugin's JavaScript.
+样式表建议放在 `public/` 下，构建时会原样复制进归档，`styles` 中填写同样的相对路径。主题插件不需要声明路由、菜单或资源；三者都不声明时插件的 JavaScript 不会被加载，只会使用样式表。
 
-Themes from enabled plugins appear under **Color Theme** in the user menu, grouped by plugin name. KubeOsprey loads a stylesheet only when its theme is selected, so it can target `:root` and `.dark` directly:
+已启用插件提供的主题会出现在用户菜单的 **Color Theme** 中，按插件名分组。只有选中该主题时 KubeOsprey 才加载对应样式表，因此样式表可以直接写 `:root` 和 `.dark`：
 
 ```css
 /* public/themes/nord.css */
@@ -335,7 +335,7 @@ Themes from enabled plugins appear under **Color Theme** in the user menu, group
 }
 ```
 
-You can override any variable defined in `ui/src/styles/themes/default.css`. Unspecified variables retain their defaults. While a theme is active, KubeOsprey adds `color-<plugin ID>-<theme ID>` to the root element; use that class when you need to limit selector scope. Relative `url()` values resolve to files in the plugin package, so bundled images and fonts can be referenced normally:
+`ui/src/styles/themes/default.css` 中定义的变量都可以覆盖，未覆盖的沿用默认值。主题生效期间 KubeOsprey 还会在根节点加上 `color-<插件 ID>-<主题 ID>` 类，需要限定作用域时可以只用这个类。样式表中的相对 `url()` 会解析到插件包内的文件，随插件分发的图片和字体都可以正常引用：
 
 ```css
 body::before {
@@ -347,11 +347,11 @@ body::before {
 }
 ```
 
-Themes with background images usually need translucent surfaces (`--background`, `--card`, `--popover`, and `--sidebar`); otherwise, opaque surfaces will cover the image.
+带背景图的主题通常还需要把承载面改成半透明（`--background`、`--card`、`--popover`、`--sidebar`），否则内容区会被不透明的色块盖住。
 
-## Settings Page
+## 配置页
 
-Declare a settings page to add a **Configure** button to the plugin's row under **Plugin management → Installed plugins**. The button opens a dialog rendered by the plugin:
+插件可以声明一个配置页，让管理员在 **插件管理 → 已安装插件** 的该插件行里看到 **配置** 按钮，点开是一个由插件自己渲染的弹窗：
 
 ```tsx
 import { lazy } from 'react'
@@ -370,9 +370,9 @@ export default definePlugin({
 })
 ```
 
-`label` is optional; the dialog title defaults to the plugin's name. `element` accepts any React node and should be imported with `React.lazy` in `plugin.config.tsx`. Plugins without `settings` do not show this button.
+`label` 可选，省略时用插件名作为弹窗标题；`element` 是任意 React 节点，`plugin.config.tsx` 里要用 `React.lazy` 引入。没有声明 `settings` 的插件不会显示这个按钮。
 
-Settings are stored in KubeOsprey's backend database. The plugin defines their structure and reads and writes them through `usePluginSettings()`:
+配置本身存在 KubeOsprey 的后端数据库里，字段结构完全由插件决定，通过 `usePluginSettings()` 读写：
 
 ```tsx
 import { useState } from 'react'
@@ -409,11 +409,11 @@ export default function Settings() {
 }
 ```
 
-Settings are shared across the KubeOsprey instance: an administrator configures them once for all users. All signed-in users can read them, but only administrators can write them. KubeOsprey shows a confirmation after a successful save. Each JSON submission is limited to 16 KiB. Before configuration, `settings` is an empty object, so the plugin should handle unset values. Uninstalling the plugin also removes its settings.
+配置是实例级的：管理员配置一次，所有用户共享；读取对所有登录用户开放，写入只有管理员可以。保存成功后宿主会给出统一提示。单次提交的 JSON 不超过 16 KiB，未配置过时 `settings` 是空对象，插件应当处理"尚未配置"的情况。卸载插件时会连带删除它的配置。
 
-## Internationalization
+## 国际化
 
-The optional `i18n` field requires English translations. Other languages can be incomplete or omitted; missing text falls back to English. Name the `resources` returned by `createPluginI18n()` as `translations` and pass them into the configuration:
+`i18n` 可选。使用时需提供英文翻译，其他语言可以不完整或省略，缺失的文案回退到英文。将 `createPluginI18n()` 返回的 `resources` 命名为 `translations`，再传入配置：
 
 ```tsx
 import { definePlugin } from '@kite-dev/plugin-sdk'
@@ -425,4 +425,4 @@ export default definePlugin({
 })
 ```
 
-Use `label()` from the same module for menu labels, route titles, and tab labels. Page components use `useTranslation()` so their text updates when KubeOsprey's language changes. See the [Internationalization guide](../i18n) for organizing translation files and complete examples.
+声明菜单、路由或 Tab 标签时使用同一模块的 `label()`；页面组件通过 `useTranslation()` 读取文案，随 KubeOsprey 的语言切换更新。翻译文件的组织方式和完整示例见[国际化指南](../i18n)。

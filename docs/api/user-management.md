@@ -1,19 +1,19 @@
-# User Management
+# 用户管理
 
-User management APIs are under `/api/v1/admin/users/`.
+用户管理接口位于 `/api/v1/admin/users/`。
 
-These endpoints require an authenticated admin user, or an API key with the `admin` role, unless noted otherwise.
+除特别说明外，这些接口要求调用方已经是管理员用户，或者使用一个拥有 `admin` 角色的 API 密钥。
 
-## Bootstrap the first super user
+## 初始化第一个超级管理员
 
-This route is intended for first-time setup and is available before admin authentication is established.
+这个接口用于首次初始化，在还没有建立管理员认证之前即可调用。
 
 ```http
 POST /api/v1/admin/users/create_super_user
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -23,15 +23,15 @@ Request body:
 }
 ```
 
-It only succeeds when the system has no users yet.
+它只会在系统里还没有任何用户时成功。
 
-## List users
+## 获取用户列表
 
 ```http
 GET /api/v1/admin/users/
 ```
 
-Supported query parameters:
+支持的查询参数：
 
 - `page`
 - `size`
@@ -40,7 +40,7 @@ Supported query parameters:
 - `sortBy`
 - `sortOrder`
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -48,7 +48,7 @@ curl \
   "https://kube-osprey.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -74,14 +74,14 @@ Response example:
 }
 ```
 
-## Create a password user
+## 创建密码用户
 
 ```http
 POST /api/v1/admin/users/
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -91,9 +91,9 @@ Request body:
 }
 ```
 
-The created user is returned with `mustChangePassword: true`: the account is flagged for a forced password change and the user must set a new password at first login before other APIs become available.
+新创建的密码用户会被自动标记为首次登录需修改密码（`mustChangePassword`）：在完成修改密码前，除改密相关接口外的其他接口返回 `403 password_change_required`。密码本身受[密码策略](/config/user-management#密码策略)约束。
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -104,14 +104,14 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/users/
 ```
 
-## Update a user
+## 更新用户
 
 ```http
 PUT /api/v1/admin/users/:id
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -120,7 +120,7 @@ Request body:
 }
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -131,13 +131,13 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
-## Delete a user
+## 删除用户
 
 ```http
 DELETE /api/v1/admin/users/:id
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -146,7 +146,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -154,14 +154,14 @@ Response example:
 }
 ```
 
-## Reset a user's password
+## 重置用户密码
 
 ```http
 POST /api/v1/admin/users/:id/reset_password
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -169,16 +169,16 @@ Request body:
 }
 ```
 
-The new password must satisfy the configured password policy. After a successful reset, the user is flagged for a forced password change again and must set a new password at the next login.
+重置密码后，该用户同样会被标记为首次登录需修改密码：完成修改前，除改密相关接口外的其他接口返回 `403 password_change_required`。
 
-## Enable or disable a user
+## 启用或禁用用户
 
 ```http
 POST /api/v1/admin/users/:id/enable
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -186,7 +186,7 @@ Request body:
 }
 ```
 
-Response example:
+响应示例：
 
 ```json
 {

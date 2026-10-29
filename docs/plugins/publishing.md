@@ -2,44 +2,44 @@
 outline: deep
 ---
 
-# Publishing Plugins
+# 发布插件
 
-Plugins are packaged as `.tar.gz` archives. Distribute them directly or host your own catalog — these are the recommended ways to make plugins available to KubeOsprey users. You can also contribute a plugin to the upstream [kite-plugins](https://github.com/kite-org/kite-plugins) repository, which maintains the official catalog of the Kite plugin ecosystem that KubeOsprey is compatible with.
+插件打包为 `.tar.gz` 安装包，支持直接分发或自建 catalog。对 KubeOsprey 用户，这是推荐的分发方式。KubeOsprey 兼容上游 Kite 插件生态，也可以按上游流程把插件提交到由 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) 维护的官方目录，供包括 KubeOsprey 在内的下游发行版使用。
 
-## Version Rules
+## 版本规则
 
-- Use a **semantic version without a `v` prefix**, such as `0.1.3`.
-- **Package contents for the same ID and version are immutable.** KubeOsprey stores assets by their SHA-256 digest. Any content change, even a single string, requires a version increment; otherwise, KubeOsprey rejects the installation.
-- `engines.kite` specifies the KubeOsprey versions the plugin supports. Only stable releases (`X.Y.Z` or `vX.Y.Z`) enforce this range during installation and when displaying the catalog. Development, prerelease, and other non-release builds skip KubeOsprey version matching. All builds still check SDK compatibility.
+- 版本号是**不带 `v` 前缀**的语义化版本（如 `0.1.3`）。
+- **同一 ID + 版本对应不可变的包内容**。KubeOsprey 按内容 SHA-256 存储资产，任何内容变更——哪怕只改了一个字符串——都必须递增版本号，否则 KubeOsprey 拒绝安装。
+- `engines.kite` 决定插件可安装的 KubeOsprey 版本范围。仅正式版本（`X.Y.Z` 或 `vX.Y.Z`）在安装和目录展示时校验该范围；开发、预发布等非正式构建跳过 KubeOsprey 版本匹配。所有构建仍会校验 SDK 兼容性。
 
 ## README
 
-The plugin's root `README.md` is copied into `dist/` and included in the archive. When distributed through a catalog, KubeOsprey can preview this README. Use full repository URLs for links to files that are not included in the package.
+插件根目录的 `README.md` 会自动复制进 `dist/` 并包含在归档中。catalog 分发时，KubeOsprey 的插件目录可以在线预览这份 README。README 中指向未随包分发文件的链接请使用完整的仓库 URL。
 
-## Private Distribution
+## 私有分发
 
-### Direct Installation
+### 直接安装
 
-Upload the `.tar.gz` archive through **Plugin management → Install from file**. This works for internal use and small groups. The archive limit is 50 MiB.
+在 **插件管理 → 从文件安装** 上传 `.tar.gz`。适合内部使用和小范围共享。归档上限 50 MiB。
 
-### Host a Static Catalog
+### 自建静态 catalog
 
-Generate static files for a plugin catalog:
+为插件目录生成可托管的静态文件：
 
 ```sh
 pnpm run catalog --base-url https://plugins.example.com/
 ```
 
-Output:
+产出：
 
 ```text
 dist/catalog/
-├── catalog.json          # Catalog index: metadata, versions, download URLs, SHA-256
-├── packages/             # Plugin archives
-└── readmes/              # README preview files
+├── catalog.json          # 目录索引：元数据、版本、下载 URL、SHA-256
+├── packages/             # 各插件归档
+└── readmes/              # README 预览文件
 ```
 
-Upload `dist/catalog/` to any HTTP(S) static host, then enter the `catalog.json` URL under **Settings → General → Plugin catalog** in KubeOsprey. To host archives separately from the catalog:
+把 `dist/catalog/` 上传到任意 HTTP(S) 静态主机，然后在 KubeOsprey **设置 → 通用 → 插件目录** 中填入 `catalog.json` 地址。归档与 catalog 分开托管时：
 
 ```sh
 pnpm run catalog \
@@ -47,19 +47,19 @@ pnpm run catalog \
   --package-base-url https://downloads.example.com/plugins/
 ```
 
-Upload `packages/` first, then publish `catalog.json` and `readmes/`.
+先上传 `packages/`，再发布 `catalog.json` 和 `readmes/`。
 
-## Contribute to the Upstream Kite Catalog
+## 提交到上游官方目录
 
-Submitting a completed plugin to [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins) is the contribution flow of the upstream Kite plugin ecosystem. Once a contribution is reviewed and merged upstream, the plugin becomes available in the catalog that KubeOsprey uses by default. For internal or self-managed plugins, prefer [Private Distribution](#private-distribution) instead.
+以下属于上游 Kite 插件生态的贡献流程：将开发完成的插件提交到 [kite-org/kite-plugins](https://github.com/kite-org/kite-plugins)，审核合并后发布到官方目录。不想走上游流程的团队，可继续使用上文的自建 catalog（`catalog.json` 格式不变）或直接分发安装包。
 
-1. Fork and clone the repository.
-2. Place the plugin source in `plugins/<plugin ID>/`, with the directory name matching `name` in `package.json`. Include a `README.md` describing the plugin's features and usage. Do not commit `dist/` or installation archives.
-3. Run `pnpm install` at the repository root, then submit a PR with the plugin source and updated `pnpm-lock.yaml`.
+1. Fork 并 clone 仓库。
+2. 将插件源码放入 `plugins/<插件 ID>/`，目录名与 `package.json` 中的 `name` 一致。附上介绍插件功能和使用方法的 `README.md`，不要提交 `dist/` 或安装包。
+3. 在仓库根目录运行 `pnpm install`，将插件源码和更新后的 `pnpm-lock.yaml` 一起提交 PR。
 
-After the PR is merged into `main`, the publishing workflow builds unpublished plugin versions and updates these catalogs:
+PR 合并到 `main` 后，发布流程会自动构建尚未发布的插件版本并更新以下目录：
 
-| Catalog | URL |
-| ------- | --- |
-| GitHub Pages | `https://kite-org.github.io/kite-plugins/catalog.json` |
-| EdgeOne | `https://plugins.kitehq.dev/catalog.json` (KubeOsprey's default catalog, maintained by the upstream ecosystem) |
+| 目录         | 地址                                                       |
+| ------------ | ---------------------------------------------------------- |
+| GitHub Pages | `https://kite-org.github.io/kite-plugins/catalog.json`     |
+| EdgeOne      | `https://plugins.kitehq.dev/catalog.json`（KubeOsprey 默认目录） |

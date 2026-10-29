@@ -2,11 +2,11 @@
 outline: deep
 ---
 
-# Host State and Interaction
+# 宿主状态与交互
 
-Use `@kite-dev/plugin-sdk/hooks` to access KubeOsprey's current cluster, namespace, user, and theme, or control host features such as favorites and the terminal. These React hooks keep plugins in sync with KubeOsprey without maintaining a separate copy of its state.
+从 `@kite-dev/plugin-sdk/hooks` 读取 KubeOsprey 当前集群、命名空间、用户和主题，或控制收藏、终端等宿主功能。这些 React Hook 让插件与宿主保持同步，不需要自己维护一份状态。
 
-## Current Cluster and Namespace
+## 当前集群与命名空间
 
 ```tsx
 import { useCluster, useNamespace } from '@kite-dev/plugin-sdk/hooks'
@@ -17,50 +17,50 @@ export function CurrentScope() {
 
   return (
     <p>
-      {currentCluster ?? 'No cluster selected'} / {namespace === '_all' ? 'All namespaces' : namespace}
+      {currentCluster ?? '未选择集群'} / {namespace === '_all' ? '全部命名空间' : namespace}
     </p>
   )
 }
 ```
 
-| Hook | Result / action |
-| ---- | --------------- |
-| `useCluster()` | `{ currentCluster, setCurrentCluster }`; `currentCluster` is `null` when no cluster is selected |
-| `useClusters(options?)` | Query result for accessible clusters. Enabled by default; use `{ enabled }` to disable it |
-| `useNamespace()` | `{ namespace, setNamespace }`, the plugin's namespace context |
+| Hook | 结果 / 动作 |
+| ---- | ----------- |
+| `useCluster()` | `{ currentCluster, setCurrentCluster }`，未选择集群时 `currentCluster` 为 `null` |
+| `useClusters(options?)` | 可访问集群的查询结果，默认启用，可用 `{ enabled }` 关闭 |
+| `useNamespace()` | `{ namespace, setNamespace }`，即插件的命名空间上下文 |
 
-`ClusterInfo` contains only `name`, `isDefault`, and optional `version` and `error` fields. It does not include cluster credentials. KubeOsprey manages authentication.
+`ClusterInfo` 只含 `name`、`isDefault` 和可选的 `version`、`error`，不包含集群凭据。认证始终由 KubeOsprey 管理。
 
-## User and Plugin Settings
+## 用户与插件配置
 
-| Hook | Result / action |
-| ---- | --------------- |
-| `useAuth()` | `{ user, isLoading, capabilities }`, where `capabilities` is `{ aiEnabled, kubectlEnabled }`. Check administrator access with `user?.isAdmin()` |
-| `usePluginSettings<T>()` | Current plugin settings: `{ settings, isLoading, isSaving, error, save }`. See the [settings page example](./plugin-config#settings-page) |
+| Hook | 结果 / 动作 |
+| ---- | ----------- |
+| `useAuth()` | `{ user, isLoading, capabilities }`；`capabilities` 为 `{ aiEnabled, kubectlEnabled }`，是否为管理员用 `user?.isAdmin()` 判断 |
+| `usePluginSettings<T>()` | 当前插件的配置：`{ settings, isLoading, isSaving, error, save }`，配置页示例见[插件配置](./plugin-config#配置页) |
 
-`usePluginSettings` reads and writes instance-wide plugin settings stored on the server. The plugin defines their structure. Only administrators can write through `save()`; other users can only read. Before configuration, `settings` is `{}`.
+`usePluginSettings` 读写的是插件在服务端保存的实例级配置，字段结构由插件自己决定，只有管理员能通过 `save()` 写入，普通用户只能读取。未配置过时 `settings` 为 `{}`。
 
-## Appearance and Page Information
+## 外观与页面信息
 
-| Hook | Result / action |
-| ---- | --------------- |
+| Hook | 结果 / 动作 |
+| ---- | ----------- |
 | `useTheme()` | `{ theme, actualTheme, setTheme }` |
-| `usePageTitle(title)` | Sets the page title |
-| `useIsMobile()` | Whether the mobile layout is active |
-| `useVersionInfo()` | KubeOsprey version information (`UseQueryResult<VersionInfo, Error>`) |
+| `usePageTitle(title)` | 设置页面标题 |
+| `useIsMobile()` | 是否移动端布局 |
+| `useVersionInfo()` | KubeOsprey 版本信息（`UseQueryResult<VersionInfo, Error>`） |
 
-## Favorites and Terminal
+## 收藏与终端
 
-| Hook | Result / action |
-| ---- | --------------- |
+| Hook | 结果 / 动作 |
+| ---- | ----------- |
 | `useFavorites()` | `{ favorites, addToFavorites, removeFromFavorites, isFavorite, toggleFavorite, refreshFavorites }` |
 | `useTerminal()` | `{ isOpen, isMinimized, openTerminal, closeTerminal, minimizeTerminal, toggleTerminal }` |
 
-`useTerminal` controls the global kubectl terminal panel. To embed a Pod exec session, use the [Terminal component](./ui#terminal).
+`useTerminal` 控制全局 kubectl 终端面板。嵌入 Pod exec 会话时，使用 [Terminal 组件](./ui#terminal)。
 
-## Host Version
+## 宿主版本
 
-`useHostInfo()` synchronously returns `{ kiteVersion, sdkVersion }`, where `sdkVersion` is the SDK version installed in the host. Check these versions before enabling features that require a newer host.
+`useHostInfo()` 同步返回 `{ kiteVersion, sdkVersion }`，其中 `sdkVersion` 是宿主安装的 SDK 版本。插件可以据此决定是否启用需要新版宿主的功能。
 
 ```tsx
 import { useHostInfo } from '@kite-dev/plugin-sdk/hooks'
@@ -71,8 +71,8 @@ export function HostVersion() {
 }
 ```
 
-Version information is available when the plugin renders; the hook does not send a request. Use semantic version comparisons instead of comparing version strings alphabetically.
+版本信息在插件渲染时即可读取，调用该 Hook 不会发起请求。版本应按语义化版本规则比较，不能直接比较字符串大小。
 
-## Repeating Callbacks
+## 定时回调
 
-`useInterval(callback, delay)` runs a callback at an interval in milliseconds. To refresh a resource query periodically, use the query hook's `refreshInterval` option.
+`useInterval(callback, delay)` 按毫秒间隔执行回调。资源查询需要定时刷新时，直接使用查询 Hook 的 `refreshInterval` 选项即可。

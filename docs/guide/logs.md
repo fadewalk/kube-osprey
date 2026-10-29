@@ -1,35 +1,35 @@
-# Logs
+# 日志
 
-You can easily view the logs of your pods in KubeOsprey. The log view provides features like filtering, highlighting, and automatic scrolling.
+您可以在 KubeOsprey 中轻松查看 Pod 的日志。日志视图提供了过滤、高亮和自动滚动等功能。
 
 ![Log](/screenshots/log.png)
 
 ::: tip
-Ensure that the user has `pods/log` permission, otherwise the log feature will not be available.
+需确保访问的用户拥有 `pods/log` 权限，否则将无法使用日志功能。
 
-Refer to the [RBAC Configuration Guide](../config/rbac-config) section for more information.
+参考 [RBAC 配置指南](../config/rbac-config) 部分, 以获取更多信息。
 :::
 
-## Features
+## 功能
 
-### Fullscreen Display
+### 全屏展示
 
-Click the fullscreen button in the upper right corner of the log view to switch the log view to fullscreen mode, which is convenient for viewing a large amount of log information.
+点击日志视图右上角的全屏按钮，可以将日志视图切换到全屏模式，便于查看大量日志信息。
 
-The shortcut `Ctrl + Enter` (Windows/Linux) or `Cmd + Enter` (macOS) can also switch between fullscreen/non-fullscreen mode.
+快捷键 `Ctrl + Enter` (Windows/Linux) 或 `Cmd + Enter` (macOS) 也可以切换全屏/非全屏模式。
 
-### Filter Logs
+### 过滤日志
 
-After entering a keyword, the log view will automatically filter out the log lines containing the keyword. At the same time, the keyword is highlighted for quick positioning.
+输入关键字后，日志视图会自动过滤出包含该关键字的日志行。同时以高亮显示关键字，便于快速定位。
 
-You can also use the shortcut `Ctrl + F` (Windows/Linux) or `Cmd + F` (macOS) to open the filter input box.
+也可输入快捷键 `Ctrl + F` (Windows/Linux) 或 `Cmd + F` (macOS) 来打开过滤输入框。
 
-### Auto Scroll
+### 自动滚动
 
-By default, the log view automatically scrolls to the latest log line, ensuring that you can view the latest logs in real time.
+默认情况下日志视图会自动滚动到最新的日志行，确保您可以实时查看最新日志。
 
-When you are viewing the logs, auto-scrolling will be paused until you scroll to the bottom of the logs.
+当你在查看日志时，自动滚动会暂停，直到你滚动到日志的底部。
 
-### For more features, please refer to the following settings
+### 更多功能可参考如下设置
 
 ![Log Features](/screenshots/log-setting.png)

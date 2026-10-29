@@ -1,54 +1,52 @@
-# Frequently Asked Questions (FAQ)
+# 常见问题 (FAQ)
 
-## Data Sharing
+## 数据共享
 
-KubeOsprey does not collect any analytics or telemetry data. The optional
-usage reporting that existed in upstream Kite has been removed from this
-fork — no installation statistics or usage data ever leave your cluster.
+KubeOsprey 不收集任何分析或遥测数据。上游 Kite 中可选的使用统计已在本 fork 中移除——不会向集群外发送任何安装统计或使用数据。
 
-## Permission Issues
+## 权限问题
 
-If you encounter an error message like the following when accessing resources:
+如果在访问资源时，遇到如下错误提示，
 
 ```txt
-User admin does not have permission to get configmaps in namespace kube-osprey in cluster in-cluster
+用户 admin 没有权限在集群 in-cluster 的命名空间 kube-osprey 中执行 获取 configmaps
 ```
 
-This means that user `admin` does not have permission to access `configmaps` resources in the `kube-osprey` namespace.
+表示用户 `admin` 没有权限访问 `kube-osprey` 命名空间中的 `configmaps` 资源。
 
-You need to refer to the [RBAC Configuration Guide](./config/rbac-config) to configure user permissions.
+你需要参考 [RBAC 配置指南](./config/rbac-config) 来配置用户的权限。
 
-## Managed Kubernetes Cluster Connection Issues
+## 托管 Kubernetes 集群连接问题
 
-If you're using a managed Kubernetes cluster (AKS, EKS, GKE, etc.) and encounter authentication errors when adding the cluster to KubeOsprey, this is usually because the default kubeconfig uses `exec` plugins that require CLI tools (like `kubelogin`, `aws`, or `gcloud`).
+如果您使用托管 Kubernetes 集群（AKS、EKS、GKE 等）并在将集群添加到 KubeOsprey 时遇到身份验证错误，这通常是因为默认的 kubeconfig 使用了需要 CLI 工具（如 `kubelogin`、`aws` 或 `gcloud`）的 `exec` 插件。
 
-KubeOsprey runs as a server-side application and cannot execute these client-side authentication tools. Instead, you should use Service Account token-based authentication.
+KubeOsprey 作为服务端应用运行，无法执行这些客户端身份验证工具。相反，您应该使用基于 Service Account token 的身份验证。
 
-Please refer to the [Managed Kubernetes Cluster Configuration Guide](./config/managed-k8s-auth) for detailed instructions on creating and using Service Account tokens for authentication.
+请参考[托管 Kubernetes 集群配置指南](./config/managed-k8s-auth)，了解如何创建和使用 Service Account token 进行身份验证的详细说明。
 
-## Persistence Issues
+## 持久化相关
 
-KubeOsprey supports the use of SQLite, MySQL, or PostgreSQL as databases.
+KubeOsprey 支持使用 SQLite、MySQL 或 PostgreSQL 作为数据库。
 
-You can configure the database connection string using the `DB_DSN` environment variable, and specify the type of database using `DB_TYPE` (default is `sqlite`).
+你可以通过环境变量 `DB_DSN` 来配置数据库连接字符串，`DB_TYPE` 来指定数据库类型（默认为 `sqlite`）。
 
-- If SQLite is used, data is stored within the container. This means that if the container is deleted, the data will be lost. To persistently store data, you need to mount a persistent volume at the `/data` path. You can set the environment variable `DB_DSN=/data/db.sqlite`. (Note: `/data` isn’t the default path. You can choose any other path as needed, but make sure the path specified in `DB_DSN` matches the mounted path.)
+- 如果使用 SQLite，默认情况下数据将存储在容器内，这意味着如果容器被删除，数据也会丢失。为了持久化数据，你需要将一个持久化卷挂载到 `/data` 路径，并设置环境变量 `DB_DSN=/data/db.sqlite`。（注意：`/data` 并非默认路径，你可以根据需要选择其他路径，但必须确保 `DB_DSN` 中的路径与挂载路径一致。）
+- 如果使用 MySQL 或 PostgreSQL，你需要提供相应的连接字符串，例如 `DB_DSN=user:password@tcp(host:port)/dbname`。
 
-- If MySQL or PostgreSQL is used, you need to provide the appropriate connection string, such as `DB_DSN=user:password@tcp(host:port)/dbname`.
+建议通过 Helm Chart 进行安装，这样你可以更方便地配置持久化存储和数据库连接。
 
-It’s recommended to install KubeOsprey using a Helm Chart. This makes it easier to configure persistent storage and database connections.
+## SQLite 使用 hostPath 存储问题
 
-## SQLite with hostPath Storage
-
-If you're using SQLite as the database and encountering an "out of memory" error when using `hostPath` for persistent storage:
+如果您使用 SQLite 作为数据库，并在使用 `hostPath` 进行持久化存储时遇到"out of memory"错误：
 
 ```txt
 panic: failed to connect database: unable to open database file: out of memory (14)
 ```
 
-This issue is related to the pure Go SQLite driver used by KubeOsprey (to avoid CGO dependencies). The driver has limitations when accessing database files on certain storage backends.
+此问题与 KubeOsprey 使用的纯 Go SQLite 驱动有关（为避免 CGO 依赖）。该驱动在访问某些存储后端上的数据
+库文件时存在限制。
 
-**Solution**: Add SQLite connection options to improve compatibility with hostPath storage. In your Helm values, set:
+**解决方案**：添加 SQLite 连接选项以提高与 hostPath 存储的兼容性。在 Helm values 中设置：
 
 ```yaml
 db:
@@ -56,19 +54,19 @@ db:
     options: "_journal_mode=WAL&_busy_timeout=5000"
 ```
 
-These options enable Write-Ahead Logging (WAL) mode and increase the busy timeout, which resolves most hostPath compatibility issues.
+这些选项启用预写日志（WAL）模式并增加忙碌超时时间，可以解决大多数 hostPath 兼容性问题。
 
-**Recommended for Production**: For production deployments requiring persistent storage, use MySQL or PostgreSQL instead of SQLite. These databases are better suited for containerized environments and persistent storage scenarios.
+**生产环境推荐**：对于需要持久化存储的生产环境部署，建议使用 MySQL 或 PostgreSQL 代替 SQLite。这些数据库更适合容器化环境和持久化存储场景。
 
-For more details, see the upstream Kite issue ([kite-org/kite#204](https://github.com/kite-org/kite/issues/204)).
+更多详情请参见 [上游 Kite 的 issue（kite-org/kite#204）](https://github.com/kite-org/kite/issues/204)。
 
-## How to Change Font
+## 如何更改字体
 
-By default, KubeOsprey provides three fonts: system default, `Maple Mono`, and `JetBrains Mono`.
+KubeOsprey 默认提供三种字体：系统默认、`Maple Mono` 和 `JetBrains Mono`。
 
-If you want to use a different font, you need to build the project yourself.
+如果您想使用其他字体，则需要自己构建项目。
 
-Build KubeOsprey with make and change the font in `./ui/src/index.css`:
+用 make 构建 KubeOsprey，并在 `./ui/src/index.css` 中更改字体
 
 ```css
 @font-face {
@@ -88,22 +86,22 @@ body {
 }
 ```
 
-## How Can I Contribute to KubeOsprey?
+## 我如何为 KubeOsprey 做出贡献？
 
-We welcome contributions! You can:
+我们欢迎贡献！您可以：
 
-- Report bugs and feature requests on [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues)
-- Submit pull requests
-- Improve documentation
-- Share feedback and use cases
+- 在 [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 上报告错误和功能请求
+- 提交拉取请求
+- 改进文档
+- 分享反馈和使用案例
 
-## Where Can I Get Help?
+## 我在哪里可以获得帮助？
 
-You can get support through:
+您可以通过以下方式获得支持：
 
-- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) for bug reports and feature requests
-- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) for questions and community support
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 用于提交错误报告和功能请求
+- [GitHub Issues](https://github.com/fadewalk/kube-osprey/issues) 用于提问和社区支持
 
 ---
 
-**Didn't find what you're looking for?** Feel free to [open an issue](https://github.com/fadewalk/kube-osprey/issues) on GitHub.
+**没有找到您要找的内容？** 欢迎在 GitHub 上[提交问题](https://github.com/fadewalk/kube-osprey/issues/new)。

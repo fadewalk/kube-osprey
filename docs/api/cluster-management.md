@@ -1,16 +1,16 @@
-# Cluster Management
+# 集群管理
 
-Cluster management APIs are under `/api/v1/admin/clusters/`.
+集群管理接口位于 `/api/v1/admin/clusters/`。
 
-These endpoints require an authenticated admin user, or an API key with the `admin` role.
+这些接口要求调用方已经是管理员用户，或者使用一个拥有 `admin` 角色的 API 密钥。
 
-## List clusters
+## 获取集群列表
 
 ```http
 GET /api/v1/admin/clusters/
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -18,7 +18,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
-Response example:
+响应示例：
 
 ```json
 [
@@ -36,14 +36,14 @@ Response example:
 ]
 ```
 
-## Create a cluster
+## 创建集群
 
 ```http
 POST /api/v1/admin/clusters/
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -56,7 +56,7 @@ Request body:
 }
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -74,7 +74,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -83,14 +83,14 @@ Response example:
 }
 ```
 
-## Update a cluster
+## 更新集群
 
 ```http
 PUT /api/v1/admin/clusters/:id
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -101,7 +101,7 @@ Request body:
 }
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -115,7 +115,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -123,18 +123,18 @@ Response example:
 }
 ```
 
-Notes:
+说明：
 
-- `config` is optional on update. If omitted, the existing kubeconfig is kept.
-- `name` can be changed by passing a new non-empty value.
+- 更新时 `config` 是可选的，不传就会保留现有 kubeconfig。
+- 如果传了新的非空 `name`，集群名称会被更新。
 
-## Delete a cluster
+## 删除集群
 
 ```http
 DELETE /api/v1/admin/clusters/:id
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -143,7 +143,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -151,20 +151,20 @@ Response example:
 }
 ```
 
-Note: the default cluster cannot be deleted.
+说明：默认集群不能被删除。
 
-## Import clusters from kubeconfig
+## 从 kubeconfig 导入集群
 
-This bootstrap endpoint is available at:
+这个初始化接口位于：
 
 ```http
 POST /api/v1/admin/clusters/import
 Content-Type: application/json
 ```
 
-It is intended for the initial setup flow and only works when no clusters exist yet.
+它主要用于首次初始化，并且只会在系统里还没有任何集群时生效。
 
-Request body:
+请求体：
 
 ```json
 {
@@ -173,7 +173,7 @@ Request body:
 }
 ```
 
-In-cluster import example:
+使用 in-cluster 导入时：
 
 ```json
 {

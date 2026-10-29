@@ -1,40 +1,40 @@
-# Resources
+# 资源操作
 
-KubeOsprey exposes generic CRUD-style APIs for built-in Kubernetes resources under `/api/v1/<resource>`.
+KubeOsprey 在 `/api/v1/<resource>` 下为内置 Kubernetes 资源提供通用的 CRUD 风格接口。
 
-## Prerequisites
+## 调用前提
 
-Resource endpoints require:
+资源接口需要：
 
-- an authenticated user or API key
-- a target cluster, usually passed through `x-cluster-name`
+- 一个已经认证的用户或 API 密钥
+- 一个目标集群，通常通过 `x-cluster-name` 传入
 
-Example:
+示例：
 
 ```bash
 -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
 -H "x-cluster-name: demo-cluster"
 ```
 
-## Path patterns
+## 路径规则
 
-Built-in resources use one of these two patterns:
+内置资源会使用下面两种路径形式：
 
-- namespaced resources: `/api/v1/<resource>/<namespace>`
-- cluster-scoped resources: `/api/v1/<resource>/_all`
+- namespace 级资源：`/api/v1/<resource>/<namespace>`
+- 集群级资源：`/api/v1/<resource>/_all`
 
-Examples:
+示例：
 
-- ConfigMap: `/api/v1/configmaps/default`
-- Deployment: `/api/v1/deployments/default`
-- Namespace: `/api/v1/namespaces/_all`
-- Node: `/api/v1/nodes/_all`
+- ConfigMap：`/api/v1/configmaps/default`
+- Deployment：`/api/v1/deployments/default`
+- Namespace：`/api/v1/namespaces/_all`
+- Node：`/api/v1/nodes/_all`
 
-## Supported operations
+## 支持的操作
 
-For built-in resources, KubeOsprey exposes these generic routes:
+对于内置资源，KubeOsprey 暴露了这些通用路由：
 
-### Namespaced resources
+### namespace 级资源
 
 ```text
 GET    /api/v1/<resource>/<namespace>
@@ -45,7 +45,7 @@ PATCH  /api/v1/<resource>/<namespace>/<name>
 DELETE /api/v1/<resource>/<namespace>/<name>
 ```
 
-### Cluster-scoped resources
+### 集群级资源
 
 ```text
 GET    /api/v1/<resource>/_all
@@ -56,9 +56,9 @@ PATCH  /api/v1/<resource>/_all/<name>
 DELETE /api/v1/<resource>/_all/<name>
 ```
 
-## Create example
+## Create 示例
 
-This example creates a ConfigMap in the `default` namespace.
+下面的例子会在 `default` namespace 创建一个 ConfigMap。
 
 ```bash
 curl \
@@ -81,11 +81,11 @@ curl \
   https://kube-osprey.example.com/api/v1/configmaps/default
 ```
 
-## Update example
+## Update 示例
 
-`PUT` is a full update. Include `metadata.resourceVersion` from the current object, otherwise Kubernetes will reject the request.
+`PUT` 是完整更新，不是局部更新。请求体里需要带上当前对象的 `metadata.resourceVersion`，否则 Kubernetes 会拒绝这次更新。
 
-This example replaces the ConfigMap content.
+下面的例子会整体更新这个 ConfigMap。
 
 ```bash
 curl \
@@ -109,15 +109,15 @@ curl \
   https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
-## Patch example
+## Patch 示例
 
-`PATCH` accepts raw patch bodies. Supported patch types are:
+`PATCH` 接收原始 patch 内容。当前支持的 patch 类型有：
 
-- default: strategic merge patch
-- `?patchType=merge`: JSON merge patch
-- `?patchType=json`: JSON patch
+- 默认：strategic merge patch
+- `?patchType=merge`：JSON merge patch
+- `?patchType=json`：JSON patch
 
-This example uses JSON merge patch to update one field without sending the full object.
+下面的例子使用 JSON merge patch，只更新一个字段，不发送整个对象。
 
 ```bash
 curl \
@@ -133,7 +133,7 @@ curl \
   "https://kube-osprey.example.com/api/v1/configmaps/default/example-config?patchType=merge"
 ```
 
-To restart a Deployment with `PATCH`, update an annotation under `spec.template.metadata.annotations`. This changes the Pod template and triggers a new rollout.
+如果要通过 `PATCH` 重启一个 Deployment，可以更新 `spec.template.metadata.annotations` 下的一个时间戳字段。这样会修改 Pod template，从而触发一次新的 rollout。
 
 ```bash
 curl \
@@ -155,9 +155,9 @@ curl \
   "https://kube-osprey.example.com/api/v1/deployments/default/example-app?patchType=merge"
 ```
 
-## Delete example
+## Delete 示例
 
-This example deletes the ConfigMap.
+下面的例子会删除这个 ConfigMap。
 
 ```bash
 curl \
@@ -167,13 +167,13 @@ curl \
   https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
 
-Optional delete query parameters:
+可选删除参数：
 
-- `force=true`: delete with zero grace period
-- `wait=false`: return immediately instead of waiting for deletion
-- `cascade=false`: orphan dependents instead of foreground deletion
+- `force=true`：使用 0 秒 grace period 强制删除
+- `wait=false`：立即返回，不等待删除完成
+- `cascade=false`：孤儿化依赖对象，而不是前台级联删除
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -183,11 +183,11 @@ curl \
   "https://kube-osprey.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
 ```
 
-## Cluster-scoped example
+## 集群级资源示例
 
-Cluster-scoped resources use `/_all` in the path.
+集群级资源路径里使用 `/_all`。
 
-This example patches a Namespace label:
+下面的例子会给一个 Namespace 打标签：
 
 ```bash
 curl \
@@ -205,17 +205,17 @@ curl \
   https://kube-osprey.example.com/api/v1/namespaces/_all/demo
 ```
 
-## Custom resources
+## 自定义资源
 
-Custom resources use `/:crd/...` routes, where `:crd` is the CRD name such as `rollouts.argoproj.io`.
+自定义资源使用 `/:crd/...` 形式的路由，其中 `:crd` 是 CRD 名称，例如 `rollouts.argoproj.io`。
 
-Examples:
+示例：
 
-- namespaced custom resource get: `/api/v1/rollouts.argoproj.io/default/example`
-- cluster-scoped custom resource get: `/api/v1/<crd>/_all/example`
+- namespace 级自定义资源查询：`/api/v1/rollouts.argoproj.io/default/example`
+- 集群级自定义资源查询：`/api/v1/<crd>/_all/example`
 
-As of the current server routes:
+按当前服务端已注册的路由来看：
 
-- custom resources expose list and get routes
-- custom resources expose update and delete routes
-- custom resource create and patch are not documented here because the generic built-in resource routes are the stable CRUD surface currently registered for normal resource operations
+- 自定义资源支持 list 和 get
+- 自定义资源支持 update 和 delete
+- 这里没有把自定义资源的 create 和 patch 作为当前稳定文档面来写，当前通用的 create / update / patch / delete 示例以已注册的内置资源路由为准

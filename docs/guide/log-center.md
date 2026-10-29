@@ -1,19 +1,19 @@
-# Log Center
+# 日志中心
 
-The Log Center aggregates logs from many pods into a single streaming view. While the per-pod [Logs](./logs) page answers "what is this pod printing?", the Log Center answers "what are all the pods of this app printing?".
+日志中心把多个 Pod 的日志聚合到一个实时滚动视图中。单 Pod 的[日志](./logs)页面回答的是"这个 Pod 在打印什么"，日志中心回答的是"这个应用的全部 Pod 在打印什么"。
 
-![Log Center streaming logs from every pod in a namespace](/screenshots/log-center.png)
+![日志中心聚合展示命名空间内所有 Pod 的日志](/screenshots/log-center.png)
 
-## How it works
+## 使用方式
 
-1. Pick a **namespace** and enter a **label selector** (for example `app=nginx`).
-2. KubeOsprey watches the pods matching the selector and streams their logs into one combined view.
-3. The namespace and selector are kept in the URL, so a filtered view can be bookmarked or shared with a teammate.
+1. 选择一个**命名空间**，输入**标签选择器**（例如 `app=nginx`）。
+2. KubeOsprey 监听匹配选择器的 Pod，把它们的日志汇聚到同一视图。
+3. 命名空间和选择器会保留在 URL 中，过滤后的视图可以直接收藏或分享给同事。
 
 ::: tip
-Ensure that the user has `pods/log` permission for the target namespace, otherwise log streaming will not be available. See the [RBAC Configuration Guide](../config/rbac-config).
+请确保用户对目标命名空间拥有 `pods/log` 权限，否则无法查看日志。参见 [RBAC 配置指南](../config/rbac-config)。
 :::
 
-::: tip Related reading
-For a single pod — including previous container logs, download, and fullscreen mode — use the [Logs](./logs) view on the pod detail page.
+::: tip 延伸阅读
+查看单个 Pod（包括前一次容器日志、下载、全屏模式）请使用 Pod 详情页的[日志](./logs)视图。
 :::

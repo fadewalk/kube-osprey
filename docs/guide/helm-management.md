@@ -1,44 +1,44 @@
-# Helm Management
+# Helm 管理
 
-KubeOsprey provides basic Helm management in the dashboard, covering chart discovery, release installation, upgrade, rollback, and uninstall.
+KubeOsprey 在 Dashboard 中提供基础 Helm 管理能力，包括 Chart 发现、Release 安装、升级、回滚和卸载。
 
 ## App Catalog
 
-Open **App Catalog** from the sidebar to browse Helm charts.
+从侧边栏打开 **App Catalog** 可以浏览 Helm Charts。
 
-KubeOsprey supports two chart sources:
+KubeOsprey 支持两类 Chart 来源：
 
-- **Artifact Hub**: search public Helm charts.
-- **Repositories**: browse Helm repositories managed in KubeOsprey.
+- **Artifact Hub**：搜索公开 Helm Charts。
+- **Repositories**：浏览在 KubeOsprey 中托管的 Helm Repositories。
 
 ::: tip
-When using the Artifact Hub source, KubeOsprey may request Artifact Hub to fetch chart lists and chart details.
+使用 Artifact Hub 来源时，KubeOsprey 可能会请求 Artifact Hub 来获取 Chart 列表和详情。
 :::
 
 ::: warning
-KubeOsprey only displays chart information and is not responsible for the chart content. Review chart details, templates, and values carefully before installing or upgrading.
+KubeOsprey 只是展示 Chart 信息，不对其中的内容负责。安装或升级前，请仔细审查 Chart 详情、templates 和 values。
 :::
 
-Users with the **admin** role can add or remove Helm repositories. Both classic (`https://`) and OCI (`oci://`) repositories are supported; an OCI URL must point at a single chart path without a tag or digest (for example `oci://registry.example.com/charts/app`), and its semver registry tags become the chart's versions. Removing a repository only removes it from KubeOsprey and does not uninstall existing releases.
+拥有 **admin** 角色的用户可以添加或删除 Helm Repository。支持传统仓库（`https://`）和 OCI 仓库（`oci://`）；OCI URL 需指向单个 Chart 路径，且不能带 tag 或 digest（例如 `oci://registry.example.com/charts/app`），其 semver 格式的 registry tag 会作为该 Chart 的版本列表。删除 Repository 只会从 KubeOsprey 移除这个来源，不会卸载已有 Release。
 
-OCI registries use HTTPS by default. For an HTTP-only registry, enable **Use HTTP (unencrypted)** when adding the repository; keep the URL in `oci://` form. KubeOsprey saves this setting for browsing, installation, upgrades, and automatic upgrades. When enabled, credentials and chart data are sent without encryption.
+OCI Registry 默认使用 HTTPS。如果 Registry 仅提供 HTTP，请在添加仓库时开启 **使用 HTTP（不加密）**，URL 仍使用 `oci://` 格式。KubeOsprey 会保存此设置，并用于浏览、安装、升级和自动升级。开启后，凭据和 Chart 数据将以明文传输。
 
-Open a chart to view its README, values, templates, and versions. If the chart package is available, you can install it directly from KubeOsprey.
+进入 Chart 详情后，可以查看 README、values、templates 和版本。如果 Chart package 可用，可以直接从 KubeOsprey 安装。
 
 ## Helm Releases
 
-Open **Helm Release** from the sidebar to view installed releases.
+从侧边栏打开 **Helm Release** 可以查看已安装的 Releases。
 
-The release detail page shows release status, chart version, values, resources, history, logs, and rendered manifests.
+Release 详情页会展示状态、Chart 版本、values、资源、历史记录、日志和渲染后的 manifests。
 
-KubeOsprey supports dry-run previews before install and upgrade. You can upgrade a release from the detail page, roll back from the history tab, or delete a release to uninstall it from the cluster.
+安装和升级前支持 dry-run 预览。你可以在详情页升级 Release，在历史记录中回滚，也可以删除 Release 来从集群中卸载。
 
-## Permissions
+## 权限
 
-Repository management requires the **admin** role. Release operations are controlled by KubeOsprey RBAC through the `helmrelease` resource (`get`, `create`, `update`, `delete`).
+Repository 管理需要 **admin** 角色。Release 操作通过 KubeOsprey RBAC 的 `helmrelease` 资源控制（`get`、`create`、`update`、`delete`）。
 
 ::: warning
-Grant `helmrelease` permissions carefully. Helm actions are executed by KubeOsprey with the cluster credentials configured in KubeOsprey, so users with `helmrelease` `create`, `update`, or `delete` permissions may create, update, or delete chart-rendered resources even if their own Kubernetes RBAC permissions would not allow those direct operations.
+请谨慎授予 `helmrelease` 权限。Helm 操作会使用 KubeOsprey 中配置的集群凭据执行，因此拥有 `helmrelease` 的 `create`、`update` 或 `delete` 权限的用户，可能可以创建、更新或删除 Chart 渲染出的资源，即使该用户自己的 Kubernetes RBAC 权限不允许直接执行这些操作。
 
-The cluster credentials configured in KubeOsprey also need enough Kubernetes permissions for the resources rendered by the chart.
+KubeOsprey 中配置的集群凭据也需要具备操作 Chart 渲染资源的 Kubernetes 权限。
 :::

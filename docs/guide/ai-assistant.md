@@ -1,77 +1,80 @@
-# AI Assistant
+# AI 助手
 
-KubeOsprey includes a built-in AI assistant for Kubernetes operations. It can explain cluster state, inspect resources, read logs, query Prometheus metrics, and help with common changes without leaving the current workspace.
+KubeOsprey 内置了面向 Kubernetes 运维场景的 AI 助手。它可以在当前工作空间内帮助你理解集群状态、检查资源、查看日志、查询 Prometheus 指标，以及辅助完成常见变更操作。
 
-![AI Assistant](../screenshots/ai-chat.png)
+![AI](/screenshots/ai-chat.png)
 
-## Enable AI
 
-1. Open `Settings`.
-2. Go to `General`.
-3. Turn on `AI Agent`.
-4. Choose a provider:
+## 启用 AI
+
+1. 打开 `Settings`。
+2. 进入 `General`。
+3. 打开 `AI Agent` 开关。
+4. 选择 Provider：
    - `OpenAI Compatible`
    - `Anthropic Compatible`
-5. Fill in `Model` and `API Key`.
-6. Optionally set `Base URL` and `Max Tokens`.
-7. Save the settings.
+5. 填写 `Model` 和 `API Key`。
+6. 按需填写 `Base URL` 和 `Max Tokens`。
+7. 保存设置。
 
-If you use a self-hosted or proxy-compatible endpoint, set the `Base URL` to your API endpoint.
+如果你使用自建网关或兼容接口，也可以通过 `Base URL` 指向自己的 API 地址。
 
-## Open The Assistant
+## 打开助手
 
-After AI is enabled, a floating AI button appears in the lower-right corner of the workspace. Click it to open the chat panel.
+启用 AI 后，工作区右下角会出现一个浮动的 AI 按钮。点击后即可打开聊天面板。
 
-From the chat panel, you can:
+在聊天面板中，你可以：
 
-- start a new chat
-- review chat history
-- open the conversation in a separate tab for more space
+- 发起新会话
+- 查看聊天历史
+- 在独立标签页中打开会话，获得更大的操作空间
 
-## What The Assistant Can Do
+## 可以做什么
 
-The assistant is designed for day-to-day Kubernetes work inside KubeOsprey. Common use cases include:
+这个助手主要面向日常 Kubernetes 操作。常见用法包括：
 
-- explain the current page, resource, or namespace you are viewing
-- get a resource in YAML form
-- list resources in the current namespace or across the cluster
-- read pod logs for troubleshooting
-- summarize overall cluster status
-- query Prometheus metrics when Prometheus is configured
-- create, update, patch, or delete Kubernetes resources after confirmation
+- 解释当前页面、当前资源或当前命名空间的状态
+- 读取某个资源的 YAML 内容
+- 在当前命名空间或整个集群范围内列出资源
+- 读取 Pod 日志用于排障
+- 汇总当前集群的整体状态
+- 在已配置 Prometheus 的情况下查询监控指标
+- 在确认后创建、更新、补丁修改或删除 Kubernetes 资源
 
-KubeOsprey passes the current page context to the assistant, so it can use the current cluster, namespace, and resource page as the default scope when appropriate.
+KubeOsprey 会把当前页面上下文传给 AI，因此它会优先结合当前选中的集群、命名空间和资源页面来理解你的问题。
 
-## Confirmation And Structured Input
+## 确认与结构化输入
 
-For write operations, KubeOsprey does not immediately execute the change. The assistant first prepares the action, then asks for confirmation in the chat UI. For stronger governance, AI write operations can also go through the Change Plan approval flow: enable `aiChangePlanMode` under `Settings → General` (see [Change Plans](./change-plans)).
+对于写操作，KubeOsprey 不会直接执行。助手会先生成待执行动作，再在聊天界面中请求你确认。
 
-When required details are missing, the assistant can also ask for:
+AI 的写操作也可以走变更计划（Change Plan）审批流：在 `Settings → General` 中开启 `aiChangePlanMode` 后，助手产生的变更会先生成变更计划，经审批后再执行。详见 [变更计划](/guide/change-plans)。
 
-- a short choice list
-- a small structured form
+如果执行某个操作还缺少必要信息，助手也可以直接在聊天界面里请求：
 
-This keeps the workflow inside the chat panel instead of requiring free-form back-and-forth for simple inputs.
+- 一个简短的选项选择
+- 一个小型结构化表单
 
-![AI](../screenshots/ai-form.png)
+这样就不需要为了简单输入再进行多轮自由文本确认。
 
-## Permissions And Safety
+![AI](/screenshots/ai-form.png)
 
-The AI assistant works within KubeOsprey's existing access model.
+## 权限与边界
 
-- It only operates on the currently selected cluster.
-- It respects the current user's RBAC permissions.
-- `describe_resource` is authorized by the user's `get` permission on the target resource. Its output may also include Events and related resource summaries fetched by the Kubernetes describer; KubeOsprey does not perform separate RBAC checks for those included details. This is the intended authorization boundary for describe operations.
-- If the user cannot read logs, exec into pods, or modify a resource, the assistant cannot bypass that restriction.
-- Prometheus queries are only available when Prometheus is configured for the current cluster.
+AI 助手遵循 KubeOsprey 现有的权限模型。
 
-![AI](../screenshots/ai-permission.png)
+- 只会在当前选中的集群内执行操作
+- 会遵循当前用户的 RBAC 权限
+- `describe_resource` 以当前用户对目标资源的 `get` 权限作为授权依据。其输出可能同时包含 Kubernetes describer 查询到的 Events 和关联资源摘要，KubeOsprey 不会再对这些附带信息执行独立的 RBAC 检查；这是 describe 操作的既定授权边界
+- 如果当前用户没有日志、执行命令或资源修改权限，AI 也无法绕过这些限制
+- 只有当前集群配置了 Prometheus，AI 才能查询 Prometheus 指标
 
-For related setup details, see:
+![AI](/screenshots/ai-permission.png)
 
-- [RBAC Configuration](../config/rbac-config)
-- [Prometheus Setup](../config/prometheus-setup)
+相关配置可以参考：
+
+- [RBAC 配置](../config/rbac-config)
+- [Prometheus 设置](../config/prometheus-setup)
 
 ::: tip
-AI can make mistakes. Review generated actions carefully before confirming them.
+AI 可能会出错，确认执行前请仔细检查生成的操作内容。
 :::

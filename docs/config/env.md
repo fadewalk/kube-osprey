@@ -1,74 +1,50 @@
-# Environment Variables
+# 环境变量
 
-KubeOsprey supports several environment variables by default to change the default values of some configuration items.
+KubeOsprey 默认支持一些环境变量，来改变一些配置项的默认值。
 
-::: tip Renamed from `KITE_*`
-Environment variables were renamed from the `KITE_` prefix to `KUBE_OSPREY_` (for example `KITE_ENCRYPT_KEY` → `KUBE_OSPREY_ENCRYPT_KEY`). The old names keep working but log a deprecation warning; update your deployment at your convenience.
+::: tip 由 `KITE_*` 更名而来
+环境变量前缀已由 `KITE_` 更名为 `KUBE_OSPREY_`（例如 `KITE_ENCRYPT_KEY` → `KUBE_OSPREY_ENCRYPT_KEY`）。旧名称仍然有效，但会打印弃用告警；请在方便时更新部署配置。
 :::
 
-## Server
+- **PLUGIN_DIR**：已安装插件的文件目录，默认是相对于 KubeOsprey 工作目录的 `data/plugins`（官方容器镜像中为 `/app/data/plugins`）。Helm Chart 将其设为 `/data/plugins`，可复用 SQLite 的存储卷。目录与持久化配置见[插件存储](./chart-values#插件存储)。
 
-- **PORT**: Port on which KubeOsprey runs, default value is `8080`.
+- **KUBE_OSPREY_CONFIG_FILE**：配置文件路径。该功能仅适用于 KubeOsprey `v0.10.0` 及以上版本。设置后，KubeOsprey 从该文件加载集群、OAuth、LDAP、RBAC 和超级用户设置。详见[配置文件](/config/config-file)。
+- **PLUGIN_DEV_URL**：开发插件的 manifest 地址，例如 `http://localhost:5174/plugin.json`。浏览器直接加载该地址，同 ID 时优先使用开发插件，不修改安装记录。不设置时仅加载已安装插件。Helm 部署可通过 `extraEnvs` 配置，详见[插件调试](/plugins/debugging)。
+- **KUBE_OSPREY_USERNAME**：兼容旧配置的超级用户名环境变量。仅在未设置 `KUBE_OSPREY_CONFIG_FILE` 时，用于环境变量到数据库配置的迁移。
+- **KUBE_OSPREY_PASSWORD**：兼容旧配置的超级用户密码环境变量。仅在未设置 `KUBE_OSPREY_CONFIG_FILE` 时，用于环境变量到数据库配置的迁移。
+- **KUBECONFIG**：兼容旧配置的 kubeconfig 环境变量。仅在未设置 `KUBE_OSPREY_CONFIG_FILE` 时读取并导入集群配置。
+- **ANONYMOUS_USER_ENABLED**：启用匿名用户访问，默认值为 `false`，当启用后所有访问将不再需要身份验证，并且默认拥有最高权限。
 
-- **HOST**: Used for generating OAuth 2.0 authorization callback addresses, default will be obtained from request headers. If you find the result not as expected, you can manually configure this environment variable.
+- **KUBE_OSPREY_BASE**：应用的部署基路径（如 `/kite`），用于在子路径下部署时的静态资源和路由前缀。
+- **NAMESPACE**：Cluster Agent Pod 与终端等辅助 Pod 所在的命名空间，默认值为 `kube-system`。
 
-- **KUBE_OSPREY_BASE**: Base path under which KubeOsprey is served, for example `/kite`. Leading and trailing slashes are normalized automatically.
+- **JWT_SECRET**：用于签名和验证 JWT 的密钥
+- **KUBE_OSPREY_ENCRYPT_KEY**：用于加密敏感数据的密钥，例如 OAuth client secret、kubeconfig 和 Cluster Agent 私钥。生产环境必须显式配置；恢复已有数据库时必须保持该密钥不变。
+- **KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS**：仅用于本地开发，设置为 `true` 后允许使用公开的开发环境加密密钥回退值。生产环境禁止设置。
 
-- **TRUSTED_PROXIES**: Comma-separated list of reverse proxy, ingress, or load balancer IPs/CIDRs that KubeOsprey should trust when reading `X-Forwarded-For` / `X-Real-IP` to determine the client IP. By default, KubeOsprey trusts local/private network ranges (`127.0.0.0/8`, `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `::1`, `fc00::/7`) so common ingress deployments can report real client IPs. Set a narrower value such as `TRUSTED_PROXIES=10.42.0.0/16,192.168.1.10` for production, or `TRUSTED_PROXIES=none` to ignore all client-supplied forwarding headers.
+- **HOST**: 用户 OAuth 2.0 授权回调地址生成，默认会从请求头获取，如果您发现结果不及预期可以手动配置此环境变量。
 
-- **CORS_ALLOWED_ORIGINS**: Comma-separated list of origins allowed to call the API cross-origin, for example `http://localhost:5173` for the local Vite dev server. Empty by default (no CORS). Intended for development only.
+- **TRUSTED_PROXIES**：以逗号分隔的反向代理、Ingress 或负载均衡器 IP/CIDR 列表；只有这些直连 KubeOsprey 的上一跳才会被信任，KubeOsprey 才会读取其转发的 `X-Forwarded-For` / `X-Real-IP` 来判断客户端 IP。默认信任本地和常见私网网段（`127.0.0.0/8`、`10.0.0.0/8`、`172.16.0.0/12`、`192.168.0.0/16`、`::1`、`fc00::/7`），方便常见 Ingress 部署拿到真实用户 IP。生产环境建议配置为更窄的范围，例如 `TRUSTED_PROXIES=10.42.0.0/16,192.168.1.10`；如需忽略所有客户端转发头，可设置 `TRUSTED_PROXIES=none`。
 
-- **DISABLE_GZIP**: Disable gzip response compression, default value is `true` (compression disabled). Set to `false` to enable gzip.
+- **DB_TYPE**：数据库类型，取值为 `sqlite`、`mysql` 或 `postgres`，默认值为 `sqlite`。
+- **DB_DSN**：数据库连接串。SQLite 模式下为数据库文件路径，默认值为 `dev.db`；MySQL/PostgreSQL 模式下为完整的 DSN。
+- **DISABLE_CACHE**：设置为 `true` 时禁用 Kubernetes 资源的客户端缓存（informer），所有读取直接访问 API Server。默认启用缓存。
 
-- **DISABLE_VERSION_CHECK**: Set to `true` to disable the new-version check, default value is `false`.
+- **KUBE_OSPREY_CACHE_SYNC_TIMEOUT**：启动时等待 Kubernetes 资源缓存同步完成的超时时间（秒），默认值为 `60`。大型或远程集群可适当调大。
+- **KUBE_OSPREY_KUBE_API_QPS**：Kubernetes API 客户端的 QPS 限制，默认值为 `50`。
+- **KUBE_OSPREY_KUBE_API_BURST**：Kubernetes API 客户端的突发请求上限，默认值为 `100`。
 
-## Security
+- **DISABLE_GZIP**：是否禁用响应的 GZIP 压缩，默认值为 `true`；设置为 `false` 时启用压缩。
+- **DISABLE_VERSION_CHECK**：设置为 `true` 时关闭版本更新检查，默认值为 `false`。
+- **CORS_ALLOWED_ORIGINS**：以逗号分隔的允许跨域来源列表，默认为空（不开启 CORS）。仅在需要让其他站点的前端直接调用 API 时配置。
 
-- **JWT_SECRET**: Secret key used for signing and verifying JWT
-- **KUBE_OSPREY_ENCRYPT_KEY**: Secret key used for encrypting sensitive data, such as OAuth client secrets, kubeconfig, and Cluster Agent private keys. It must be non-empty, at least 32 characters long, and must not equal the built-in development default — otherwise KubeOsprey refuses to start. It must be explicitly configured for production and must remain stable while restoring an existing database.
-- **KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS**: Set to `true` only for local development to allow the public development encryption-key fallback. Do not set this in production.
-- **ANONYMOUS_USER_ENABLED**: Enable anonymous user access, default value is `false`. When enabled, all access will no longer require authentication and will have the highest permissions by default.
+- **KUBECTL_TERMINAL_IMAGE**: 用于 kubectl 终端的 Docker 镜像，默认值为 `zzde/kubectl:latest`。
 
-## Database
+- **NODE_TERMINAL_IMAGE**: 用于生成 Node Terminal Agent 的 Docker 镜像，默认值为 `busybox:latest`。
 
-- **DB_TYPE**: Database type, one of `sqlite`, `mysql`, `postgres`. Default value is `sqlite`. Invalid values cause startup failure.
+- **CLUSTER_AGENT_IMAGE**: 为 Cluster Agent 类型集群生成 Cluster Agent 部署清单时使用的 Docker 镜像，默认值为 `ghcr.io/kite-org/kite:latest`。
 
-- **DB_DSN**: Database connection string. The default value `dev.db` is a SQLite file relative to KubeOsprey's working directory. Required for `mysql`/`postgres`.
+- **PORT**：KubeOsprey 运行的端口，默认值为 `8080`。
 
-## Images and Terminals
-
-- **NODE_TERMINAL_IMAGE**: Docker image used for generating Node Terminal Agent, default value is `busybox:latest`.
-
-- **KUBECTL_TERMINAL_IMAGE**: Docker image used for the kubectl terminal, default value is `zzde/kubectl:latest`.
-
-- **CLUSTER_AGENT_IMAGE**: Docker image used when generating the Cluster Agent manifest for Cluster Agent clusters, default value is `ghcr.io/kite-org/kite:latest`.
-
-- **NAMESPACE**: Namespace where terminal and agent pods are created, default value is `kube-system`.
-
-## Kubernetes Client
-
-- **KUBE_OSPREY_CACHE_SYNC_TIMEOUT**: Timeout in seconds for the initial informer cache sync when connecting to a cluster, default value is `60`. Increase it for large or remote clusters.
-
-- **KUBE_OSPREY_KUBE_API_QPS**: Kubernetes API client QPS limit, default value is `50`.
-
-- **KUBE_OSPREY_KUBE_API_BURST**: Kubernetes API client burst limit, default value is `100`.
-
-- **DISABLE_CACHE**: Set to `true` to disable the built-in client-side cache and read directly from the Kubernetes API. Useful for troubleshooting; increase `KUBE_OSPREY_CACHE_SYNC_TIMEOUT` instead when cache sync times out.
-
-## Plugins
-
-- **PLUGIN_DIR**: Directory for installed plugin files. Defaults to `data/plugins`, relative to KubeOsprey's working directory (`/app/data/plugins` in the official container image). The Helm Chart sets it to `/data/plugins` to share SQLite's volume. See [Plugin Storage](./chart-values#plugin-storage) for directory and persistence configuration.
-
-- **PLUGIN_DEV_URL**: Development plugin manifest URL, for example `http://localhost:5174/plugin.json`. The browser loads it directly; it overrides an installed plugin with the same ID without changing installation records. Leave unset to use installed plugins only. Helm deployments can set it through `extraEnvs`. See [Plugin Debugging](/plugins/debugging) for details.
-
-## MCP
-
-- **KUBE_OSPREY_MCP_ENABLED**: Bootstrap default for the built-in MCP server (`POST /api/v1/mcp`). Defaults to `false`. This value seeds the general setting on first run; administrators can toggle MCP later in Settings → General.
-- **KUBE_OSPREY_MCP_RATE_LIMIT_PER_MINUTE**: Per-user MCP tool call budget per minute. Defaults to `60`.
-
-## Bootstrap and Legacy
-
-- **KUBE_OSPREY_CONFIG_FILE**: Path to the configuration file. Available in KubeOsprey `v0.10.0` and later. When set, KubeOsprey loads cluster, OAuth, LDAP, RBAC, and super user settings from this file. See [Configuration File](/config/config-file) for details.
-- **KUBE_OSPREY_USERNAME**: Legacy environment variable for the initial administrator username. It is only used for env-to-DB migration when `KUBE_OSPREY_CONFIG_FILE` is not set.
-- **KUBE_OSPREY_PASSWORD**: Legacy environment variable for the initial administrator password. It is only used for env-to-DB migration when `KUBE_OSPREY_CONFIG_FILE` is not set.
-- **KUBECONFIG**: Legacy kubeconfig environment variable used to import clusters when `KUBE_OSPREY_CONFIG_FILE` is not set.
+- **KUBE_OSPREY_MCP_ENABLED**：内置 MCP 服务（`POST /api/v1/mcp`）的初始默认值，默认为 `false`。该值仅在首次运行时写入通用设置，之后管理员可在 设置 → 通用 中调整。
+- **KUBE_OSPREY_MCP_RATE_LIMIT_PER_MINUTE**：MCP 工具调用每用户每分钟的限流次数，默认值为 `60`。

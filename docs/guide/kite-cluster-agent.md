@@ -5,6 +5,6 @@ head:
       content: '0; url=./cluster-agent'
 ---
 
-# Moved
+# 页面已迁移
 
-The KubeOsprey Cluster Agent guide moved to [cluster-agent](./cluster-agent).
+KubeOsprey Cluster Agent 指南已迁移到 [cluster-agent](./cluster-agent)。

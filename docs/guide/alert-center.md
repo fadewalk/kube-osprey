@@ -1,35 +1,35 @@
-# Alert Center
+# 告警中心
 
-The Alert Center gives you a unified view of the alerts fired by [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) in each cluster, together with silence management, directly inside KubeOsprey.
+告警中心将每个集群中 [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) 触发的告警汇聚到统一视图，并支持在 KubeOsprey 内直接管理静默规则。
 
-![Alert Center](/screenshots/alert-center.png)
+![告警中心](/screenshots/alert-center.png)
 
-## Prerequisites
+## 前置条件
 
-- Prometheus monitoring must be configured for the cluster. See the [Prometheus Setup Guide](../config/prometheus-setup).
-- An Alertmanager endpoint must be reachable for the cluster. KubeOsprey auto-discovers an Alertmanager service in the cluster when one runs with the standard `kube-prometheus-stack` labels; you can also set the URL explicitly in the cluster settings.
+- 该集群已配置 Prometheus 监控，参见 [Prometheus 设置指南](../config/prometheus-setup)。
+- 集群内存在可访问的 Alertmanager 端点。KubeOsprey 会自动发现以 `kube-prometheus-stack` 标准标签部署的 Alertmanager 服务；也可以在集群设置中显式填写地址。
 
-## What you can do
+## 功能
 
-- **View alerts** with their labels, annotations, severity, and firing duration.
-- **Create silences** for an alert to stop notifications for a period of time.
-- **List and expire silences** when an outage window is over.
-- **Check Alertmanager status** to confirm the integration is healthy.
+- **查看告警**：展示标签、注解、严重级别与触发时长。
+- **创建静默**：对某条告警设置静默，在指定时间段内停止通知。
+- **管理静默**：查看静默列表，维护窗口结束后手动过期静默。
+- **查看 Alertmanager 状态**：确认集成是否健康。
 
-Access follows the cluster's RBAC: a user who cannot access the cluster cannot see its alerts.
+访问遵循集群级 RBAC：无集群访问权限的用户看不到对应告警。
 
 ## API
 
-The Alert Center is backed by the following cluster-scoped endpoints:
+告警中心由以下集群级接口支撑：
 
-| Method   | Path                                    | Purpose               |
-| -------- | --------------------------------------- | --------------------- |
-| `GET`    | `/api/v1/alertmanager/alerts`           | List active alerts    |
-| `GET`    | `/api/v1/alertmanager/silences`         | List silences         |
-| `POST`   | `/api/v1/alertmanager/silences`         | Create a silence      |
-| `DELETE` | `/api/v1/alertmanager/silences/:silenceId` | Expire a silence   |
-| `GET`    | `/api/v1/alertmanager/status`           | Alertmanager status   |
+| 方法     | 路径                                    | 用途             |
+| -------- | --------------------------------------- | ---------------- |
+| `GET`    | `/api/v1/alertmanager/alerts`           | 查看活跃告警     |
+| `GET`    | `/api/v1/alertmanager/silences`         | 查看静默列表     |
+| `POST`   | `/api/v1/alertmanager/silences`         | 创建静默         |
+| `DELETE` | `/api/v1/alertmanager/silences/:silenceId` | 过期静默     |
+| `GET`    | `/api/v1/alertmanager/status`           | Alertmanager 状态 |
 
-::: tip Related reading
-Pair the Alert Center with [Health Diagnostics](./health-diagnostics) for a complete picture: diagnostics tells you what is degrading inside the cluster, alerts tell you what your monitoring already noticed.
+::: tip 延伸阅读
+告警中心与[健康诊断](./health-diagnostics)搭配使用效果最好：诊断告诉你集群内部什么在劣化，告警告诉你监控系统已经发现了什么。
 :::

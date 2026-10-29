@@ -1,31 +1,31 @@
-# Health Diagnostics
+# 健康诊断
 
-Health Diagnostics runs a set of built-in checks against a cluster and turns the results into a single health score with actionable findings. It answers the question "is this cluster healthy right now?" without writing your own queries.
+健康诊断对集群运行一组内置检查，把结果汇总为一个健康评分和可操作的风险项列表，回答"这个集群现在健康吗"，而不需要自己手写查询。
 
-![Health Diagnostics](/screenshots/health-diagnostics.png)
+![健康诊断](/screenshots/health-diagnostics.png)
 
-## What the report contains
+## 报告内容
 
-- **Health score** — an overall 0–100 score derived from the check results.
-- **Findings** — grouped into four categories, each with a severity (`critical`, `warning`, `info`), an occurrence count, and a sample:
-  - `nodes` — NotReady nodes, resource pressure, and similar node-level issues.
-  - `workloads` — failing or restarted pods, unavailable replicas.
-  - `storage` — PVC binding and capacity problems.
-  - `platform` — control plane and add-on health.
-- **Control plane components** — ready/total counts for API server, scheduler, controller manager, and etcd.
-- **Top consumers** — nodes and pods with the highest CPU and memory usage. This section is only shown when [Prometheus](../config/prometheus-setup) is enabled for the cluster.
+- **健康评分**：由检查结果推导出的 0–100 总分。
+- **风险项**：按四个类别分组，每项带严重级别（`critical`、`warning`、`info`）、发生次数与样例：
+  - `nodes` — NotReady 节点、资源压力等节点层问题。
+  - `workloads` — 异常或频繁重启的 Pod、不可用副本。
+  - `storage` — PVC 绑定与容量问题。
+  - `platform` — 控制面与平台组件健康。
+- **控制面组件**：API Server、Scheduler、Controller Manager、etcd 的 ready/total 状态。
+- **资源消耗 Top 榜**：CPU 与内存用量最高的节点和 Pod。该部分仅在集群启用 [Prometheus](../config/prometheus-setup) 时展示。
 
-## Multi-cluster overview
+## 多集群总览
 
-The overview page aggregates the health of all clusters you can access, so you can spot the unhealthy cluster in a fleet at a glance.
+总览页聚合你可访问的全部集群的健康状况，一眼定位集群中出问题的那一个。
 
 ## API
 
-| Method | Path                            | Purpose                          |
-| ------ | ------------------------------- | -------------------------------- |
-| `GET`  | `/api/v1/health-report`         | Health report for one cluster    |
-| `GET`  | `/api/v1/clusters/overview`     | Aggregated multi-cluster overview |
+| 方法  | 路径                            | 用途                       |
+| ----- | ------------------------------- | -------------------------- |
+| `GET` | `/api/v1/health-report`         | 单集群健康报告             |
+| `GET` | `/api/v1/clusters/overview`     | 多集群聚合总览             |
 
 ::: tip
-Health checks are computed on request, not stored — every page load reflects the current state of the cluster.
+健康检查在每次请求时实时计算、不落库——页面加载看到的就是集群当前状态。
 :::

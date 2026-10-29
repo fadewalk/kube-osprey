@@ -1,99 +1,89 @@
 # Chart Values
 
-This document describes all available configuration options for the KubeOsprey Helm Chart.
+本文档描述了 KubeOsprey Helm Chart 的所有可用配置选项。
 
-## Basic Configuration
+## 基础配置
 
-| Parameter          | Description                                                | Default                 |
-| ------------------ | ---------------------------------------------------------- | ----------------------- |
-| `replicaCount`     | Number of replicas                                         | `1`                     |
-| `image.repository` | Container image repository                                 | `ghcr.io/fadewalk/kube-osprey` |
-| `image.pullPolicy` | Image pull policy                                          | `IfNotPresent`          |
-| `image.tag`        | Image tag. If set, will override the chart's `appVersion`. | `""`                    |
-| `imagePullSecrets` | Image pull secrets for private repositories                | `[]`                    |
-| `nameOverride`     | Override chart name                                        | `""`                    |
-| `fullnameOverride` | Override full name                                         | `""`                    |
-| `debug`            | Enable debug mode                                          | `false`                 |
-| `basePath`         | Base path where KubeOsprey is served. See notes below.           | `""`                    |
-| `deploymentStrategy.type` | Deployment update strategy. Keep `Recreate` for SQLite on a `ReadWriteOnce` volume, so two Pods never mount the same volume during upgrades | `Recreate` |
+| 参数               | 描述                                               | 默认值                  |
+| ------------------ | -------------------------------------------------- | ----------------------- |
+| `replicaCount`     | 副本数量                                           | `1`                     |
+| `image.repository` | 容器镜像仓库                                       | `ghcr.io/fadewalk/kube-osprey` |
+| `image.pullPolicy` | 镜像拉取策略                                       | `IfNotPresent`          |
+| `image.tag`        | 镜像标签。如果设置，将覆盖 chart 的 `appVersion`。 | `""`                    |
+| `imagePullSecrets` | 私有镜像仓库的拉取密钥                             | `[]`                    |
+| `nameOverride`     | 覆盖 chart 名称                                    | `""`                    |
+| `fullnameOverride` | 覆盖完整名称                                       | `""`                    |
+| `debug`            | 启用调试模式                                       | `false`                 |
+| `basePath`         | 应用的基础路径，详见安装文档中的说明。             | `""`                    |
+| `deploymentStrategy.type` | 部署策略类型。SQLite 配合 ReadWriteOnce 存储时必须使用 `Recreate`，避免升级时同一个卷被两个 Pod 同时挂载 | `Recreate` |
 
-## Authentication & Security
+## 认证与安全
 
-| Parameter              | Description                                                                              | Default                                              |
-| ---------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `anonymousUserEnabled` | Enable anonymous user access with full admin privileges. Use with caution in production. | `false`                                              |
-| `jwtSecret`            | Secret key for signing JWT tokens. Auto-generated on first boot if empty.                | `""`                                                 |
-| `encryptKey`           | Secret key used for encrypting sensitive data. Leave empty to generate a key for a new chart Secret or use `secret.existingSecret`. Keep it stable when restoring an existing database. | `""` |
-| `host`                 | Hostname for the application                                                             | `""`                                                 |
+| 参数                   | 描述                                                       | 默认值                                               |
+| ---------------------- | ---------------------------------------------------------- | ---------------------------------------------------- |
+| `anonymousUserEnabled` | 启用匿名用户访问，拥有完全管理员权限。生产环境请谨慎使用。 | `false`                                              |
+| `jwtSecret`            | 用于签名 JWT 令牌的密钥。为空时首次启动自动生成。使用 `secret.existingSecret` 时被忽略。 | `""`                                                 |
+| `encryptKey`           | 用于加密敏感数据的密钥。留空时为新建的 Chart Secret 生成随机值，或使用 `secret.existingSecret`。恢复已有数据库时必须保持不变。 | `""` |
+| `host`                 | 应用程序的主机名                                           | `""`                                                 |
 
-### Secret Configuration
+### Secret 配置
 
-| Parameter                | Description                                                                        | Default |
-| ------------------------ | ---------------------------------------------------------------------------------- | ------- |
-| `secret.create`          | Create a Kubernetes Secret from chart values (`jwtSecret`, `encryptKey`, `db.*`)   | `true`  |
-| `secret.existingSecret`  | Reference an existing Secret instead of creating one. Ignored when `create: true`. | `""`    |
+默认情况下，Chart 会根据 `jwtSecret`、`encryptKey`、`db.type`、`db.dsn` 生成一个 Kubernetes Secret。
 
-When `secret.existingSecret` is set, the referenced Secret must contain all required keys:
+| 参数                    | 描述                                                       | 默认值   |
+| ----------------------- | ---------------------------------------------------------- | -------- |
+| `secret.create`         | 是否由 Chart 创建 Secret                                   | `true`   |
+| `secret.existingSecret` | 使用已有 Secret 的名称。设置后忽略 `jwtSecret`、`encryptKey`、`db.type` 和 `db.dsn` | `""` |
+
+已有 Secret 必须包含以下键：
 
 - `JWT_SECRET`
 - `KUBE_OSPREY_ENCRYPT_KEY`
-- `DB_TYPE` — supported values: `sqlite`, `postgres`, `mysql` (defaults to `sqlite` if not set)
-- `DB_DSN` — not required for `sqlite`
+- `DB_TYPE`（取值 `sqlite`、`postgres`、`mysql`；未设置时默认 `sqlite`）
+- `DB_DSN`（SQLite 时可不填）
 
-With an existing Secret, the `jwtSecret`, `encryptKey`, `db.type`, and `db.dsn` chart values are ignored. See [Production Security Hardening](./security-hardening) for key handling guidance.
+## 数据库配置
 
-## Database Configuration
+| 参数      | 描述                                                             | 默认值   |
+| --------- | ---------------------------------------------------------------- | -------- |
+| `db.type` | 数据库类型：`sqlite`、`postgres`、`mysql`                        | `sqlite` |
+| `db.dsn`  | MySQL/Postgres 的完整 DSN 字符串。当类型为 mysql/postgres 时必需 | `""`     |
 
-| Parameter | Description                                                              | Default  |
-| --------- | ------------------------------------------------------------------------ | -------- |
-| `db.type` | Database type: `sqlite`, `postgres`, `mysql`                             | `sqlite` |
-| `db.dsn`  | Full DSN string for MySQL/Postgres. Required when type is mysql/postgres | `""`     |
+### SQLite 配置
 
-### SQLite Configuration
+| 参数                                      | 描述                                  | 默认值              |
+| ----------------------------------------- | ------------------------------------- | ------------------- |
+| `db.sqlite.persistence.pvc.enabled`       | 是否创建 PVC 来存储 sqlite 数据库文件 | `false`             |
+| `db.sqlite.persistence.pvc.existingClaim` | 使用现有的 PVC                        | `""`                |
+| `db.sqlite.persistence.pvc.storageClass`  | PVC 的 StorageClass（可选）           | `""`                |
+| `db.sqlite.persistence.pvc.accessModes`   | PVC 的访问模式                        | `["ReadWriteOnce"]` |
+| `db.sqlite.persistence.pvc.size`          | PVC 请求的存储大小                    | `1Gi`               |
+| `db.sqlite.persistence.hostPath.enabled`  | 是否使用 hostPath 存储                | `false`             |
+| `db.sqlite.persistence.hostPath.path`     | hostPath 路径                         | `/path/to/host/dir` |
+| `db.sqlite.persistence.hostPath.type`     | hostPath 类型                         | `DirectoryOrCreate` |
+| `db.sqlite.persistence.mountPath`         | 容器内的挂载路径                      | `/data`             |
+| `db.sqlite.persistence.filename`          | 挂载路径内的 sqlite 文件名            | `kube-osprey.db`           |
 
-| Parameter                                 | Description                                               | Default             |
-| ----------------------------------------- | --------------------------------------------------------- | ------------------- |
-| `db.sqlite.persistence.pvc.enabled`       | Whether to create a PVC to store the sqlite database file | `false`             |
-| `db.sqlite.persistence.pvc.existingClaim` | Use existing PVC                                          | `""`                |
-| `db.sqlite.persistence.pvc.storageClass`  | StorageClass for PVC (optional)                           | `""`                |
-| `db.sqlite.persistence.pvc.accessModes`   | Access modes for PVC                                      | `["ReadWriteOnce"]` |
-| `db.sqlite.persistence.pvc.size`          | Requested storage size for PVC                            | `1Gi`               |
-| `db.sqlite.persistence.hostPath.enabled`  | Whether to use hostPath storage                           | `false`             |
-| `db.sqlite.persistence.hostPath.path`     | hostPath path                                             | `/path/to/host/dir` |
-| `db.sqlite.persistence.hostPath.type`     | hostPath type                                             | `DirectoryOrCreate` |
-| `db.sqlite.persistence.mountPath`         | Mount path inside container                               | `/data`             |
-| `db.sqlite.persistence.filename`          | SQLite filename inside mountPath                          | `kube-osprey.db`           |
-| `db.sqlite.options`                       | Additional SQLite connection options, e.g. `_journal_mode=WAL&_busy_timeout=5000` | `""`        |
+## 插件存储
 
-## MCP Server
+适用于 KubeOsprey `v0.16.0` 及以上版本。插件目录默认为 `/data/plugins`，可复用 SQLite 挂载在 `/data` 的存储卷。默认不启用持久化。
 
-Available in KubeOsprey `v0.17.0` and later. These values seed the runtime settings on first run; enablement can also be changed later by administrators in **Settings → General**.
-
-| Parameter                 | Description                                                 | Default |
-| ------------------------- | ----------------------------------------------------------- | ------- |
-| `mcp.enabled`             | Bootstrap default for the built-in MCP server (`POST /api/v1/mcp`) | `false` |
-| `mcp.rateLimitPerMinute`  | Per-user MCP tool call budget per minute                    | `60`    |
-
-## Plugin Storage
-
-Available in KubeOsprey `v0.16.0` and later. The default plugin directory is `/data/plugins`, which shares SQLite's `/data` volume. Persistence is disabled by default.
-
-| Parameter | Description | Default |
-| --------- | ----------- | ------- |
-| `plugins.directory` | Plugin directory inside the container; sets `PLUGIN_DIR` | `/data/plugins` |
-| `plugins.persistence.enabled` | Mount a separate PVC for plugin files | `false` |
-| `plugins.persistence.existingClaim` | Use an existing PVC instead of creating one | `""` |
-| `plugins.persistence.storageClass` | StorageClass for the new PVC; empty uses the cluster default | `""` |
-| `plugins.persistence.accessModes` | Access modes for the new PVC | `["ReadWriteOnce"]` |
-| `plugins.persistence.size` | Storage requested for the new PVC | `1Gi` |
+| 参数 | 描述 | 默认值 |
+| ---- | ---- | ------ |
+| `plugins.directory` | 容器内的插件目录，对应 `PLUGIN_DIR` | `/data/plugins` |
+| `plugins.persistence.enabled` | 为插件文件挂载独立的 PVC | `false` |
+| `plugins.persistence.existingClaim` | 使用已有 PVC，不创建新 PVC | `""` |
+| `plugins.persistence.storageClass` | 新 PVC 的 StorageClass，留空使用集群默认值 | `""` |
+| `plugins.persistence.accessModes` | 新 PVC 的访问模式 | `["ReadWriteOnce"]` |
+| `plugins.persistence.size` | 新 PVC 请求的存储大小 | `1Gi` |
 
 ::: warning
-If the plugin directory is not on persistent storage, recreating the Pod loses plugin files. Plugins installed from the official catalog are downloaded again, requiring access to the download source. Manually uploaded plugins must be uploaded again.
+插件目录未使用持久化存储时，Pod 重建会丢失插件文件。从官方插件目录安装的插件会重新下载，需要能够访问下载源；手动上传的插件需要重新上传。
 
-Automatic downloads rely on installation records in the database. Persist the SQLite database or use an external database as well.
+自动下载依赖数据库中的安装记录，因此还需持久化 SQLite 数据库或使用外部数据库。
 :::
 
-With SQLite, enable database persistence and leave `plugins.persistence.enabled` set to `false`. The database and plugins share one PVC:
+使用 SQLite 时，开启数据库持久化，并保持 `plugins.persistence.enabled: false`，数据库和插件即可共用一个 PVC：
 
 ```yaml
 deploymentStrategy:
@@ -106,9 +96,9 @@ db:
         enabled: true
 ```
 
-If you change `db.sqlite.persistence.mountPath`, also set `plugins.directory` to a subdirectory of that path to keep sharing the volume.
+如果修改了 `db.sqlite.persistence.mountPath`，也需要将 `plugins.directory` 设为该路径下的子目录，才能继续复用存储卷。
 
-With MySQL or PostgreSQL, enable a separate plugin PVC:
+使用 MySQL 或 PostgreSQL 时，单独开启插件持久化：
 
 ```yaml
 deploymentStrategy:
@@ -121,51 +111,49 @@ plugins:
     size: 1Gi
 ```
 
-Set `plugins.persistence.existingClaim` to reuse a PVC in KubeOsprey's namespace. With `ReadWriteOnce` storage, use `Recreate` for a single replica to avoid volume attachment conflicts during upgrades.
+如需使用已有 PVC，将 `plugins.persistence.existingClaim` 设为 KubeOsprey 所在命名空间中的 PVC 名称。单副本使用 `ReadWriteOnce` 存储时，将部署策略设为 `Recreate`，避免升级时卷挂载冲突。
 
-## Environment Variables
+## MCP 服务
 
-| Parameter   | Description                              | Default |
-| ----------- | ---------------------------------------- | ------- |
-| `extraEnvs` | List of additional environment variables | `[]`    |
+| 参数                     | 描述                                                                                              | 默认值 |
+| ------------------------ | ------------------------------------------------------------------------------------------------- | ------ |
+| `mcp.enabled`            | 内置 MCP 服务（`POST /api/v1/mcp`）的初始默认值。首次运行写入通用设置，之后可在管理界面调整       | `false` |
+| `mcp.rateLimitPerMinute` | MCP 工具调用每用户每分钟的限流次数                                                               | `60`   |
 
-## Application Configuration
+## 配置文件
 
-KubeOsprey supports loading cluster, OAuth/LDAP, and RBAC configuration from a YAML config file. When enabled, managed sections become read-only in the UI.
+通过 Helm 值管理配置文件时，Chart 将其挂载到容器的 `/etc/kite/config.yaml`（对应 `KUBE_OSPREY_CONFIG_FILE` 环境变量），相关配置部分在 UI 中变为只读。
 
-Available in KubeOsprey `v0.10.0` and later.
+| 参数                    | 描述                                                         | 默认值 |
+| ----------------------- | ------------------------------------------------------------ | ------ |
+| `config.enabled`        | 是否启用配置文件管理                                         | `false` |
+| `config.existingSecret` | 包含 `config.yaml` 键的已有 Secret 名称，设置后忽略内联配置  | `""`   |
 
-See [Configuration File](./config-file) for the full config file format, usage examples, and reference.
+配置文件的完整格式与两种提供方式（已有 Secret / 内联）见[配置文件](./config-file)。
 
-| Parameter                 | Description                                                                      | Default |
-| ------------------------- | -------------------------------------------------------------------------------- | ------- |
-| `config.enabled`          | Enable configuration file mode                                                   | `false` |
-| `config.existingSecret`   | Name of an existing Secret containing a `config.yaml` key. Recommended approach. | `""`    |
-| `config.superUser`        | Inline super user configuration (created on first startup only)                  | `{}`    |
-| `config.clusters`         | Inline cluster configurations (when no existingSecret)                           | `[]`    |
-| `config.oauth`            | Inline OAuth provider configurations                                             | `[]`    |
-| `config.ldap`             | Inline LDAP configuration                                                        | `{}`    |
-| `config.ai`               | Inline AI assistant configuration                                                | `{}`    |
-| `config.rbac.roles`       | Inline RBAC role definitions                                                     | `[]`    |
-| `config.rbac.roleMapping` | Inline RBAC role mappings                                                        | `[]`    |
+## 环境变量
 
-## Service Account Configuration
+| 参数        | 描述               | 默认值 |
+| ----------- | ------------------ | ------ |
+| `extraEnvs` | 额外的环境变量列表 | `[]`   |
 
-| Parameter                    | Description                                         | Default |
-| ---------------------------- | --------------------------------------------------- | ------- |
-| `serviceAccount.create`      | Whether to create a service account                 | `true`  |
-| `serviceAccount.automount`   | Automatically mount service account API credentials | `true`  |
-| `serviceAccount.annotations` | Annotations for service account                     | `{}`    |
-| `serviceAccount.name`        | Name of service account to use                      | `""`    |
+## 服务账户配置
 
-## RBAC Configuration
+| 参数                         | 描述                        | 默认值 |
+| ---------------------------- | --------------------------- | ------ |
+| `serviceAccount.create`      | 是否创建服务账户            | `true` |
+| `serviceAccount.automount`   | 自动挂载服务账户的 API 凭据 | `true` |
+| `serviceAccount.annotations` | 服务账户的注解              | `{}`   |
+| `serviceAccount.name`        | 使用的服务账户名称          | `""`   |
 
-| Parameter     | Description                      | Default           |
-| ------------- | -------------------------------- | ----------------- |
-| `rbac.create` | Whether to create RBAC resources | `true`            |
-| `rbac.rules`  | List of RBAC rules               | See example below |
+## RBAC 配置
 
-### RBAC Rules Example
+| 参数          | 描述               | 默认值     |
+| ------------- | ------------------ | ---------- |
+| `rbac.create` | 是否创建 RBAC 资源 | `true`     |
+| `rbac.rules`  | RBAC 规则列表      | 见下方示例 |
+
+### RBAC 规则示例
 
 ```yaml
 rbac:
@@ -177,33 +165,33 @@ rbac:
       verbs: ["*"]
 ```
 
-## Pod Configuration
+## Pod 配置
 
-| Parameter            | Description                    | Default |
-| -------------------- | ------------------------------ | ------- |
-| `podAnnotations`     | Kubernetes annotations for Pod | `{}`    |
-| `podLabels`          | Kubernetes labels for Pod      | `{}`    |
-| `podSecurityContext` | Pod security context           | `{}`    |
-| `securityContext`    | Container security context     | `{}`    |
+| 参数                 | 描述                   | 默认值 |
+| -------------------- | ---------------------- | ------ |
+| `podAnnotations`     | Pod 的 Kubernetes 注解 | `{}`   |
+| `podLabels`          | Pod 的 Kubernetes 标签 | `{}`   |
+| `podSecurityContext` | Pod 安全上下文         | `{}`   |
+| `securityContext`    | 容器安全上下文         | `{}`   |
 
-## Service Configuration
+## 服务配置
 
-| Parameter      | Description  | Default     |
-| -------------- | ------------ | ----------- |
-| `service.type` | Service type | `ClusterIP` |
-| `service.port` | Service port | `8080`      |
+| 参数           | 描述     | 默认值      |
+| -------------- | -------- | ----------- |
+| `service.type` | 服务类型 | `ClusterIP` |
+| `service.port` | 服务端口 | `8080`      |
 
-## Ingress Configuration
+## Ingress 配置
 
-| Parameter             | Description                | Default           |
-| --------------------- | -------------------------- | ----------------- |
-| `ingress.enabled`     | Whether to enable Ingress  | `false`           |
-| `ingress.className`   | Ingress class name         | `"nginx"`         |
-| `ingress.annotations` | Ingress annotations        | `{}`              |
-| `ingress.hosts`       | Ingress host configuration | See example below |
-| `ingress.tls`         | TLS configuration          | `[]`              |
+| 参数                  | 描述             | 默认值     |
+| --------------------- | ---------------- | ---------- |
+| `ingress.enabled`     | 是否启用 Ingress | `false`    |
+| `ingress.className`   | Ingress 类名     | `"nginx"`  |
+| `ingress.annotations` | Ingress 注解     | `{}`       |
+| `ingress.hosts`       | Ingress 主机配置 | 见下方示例 |
+| `ingress.tls`         | TLS 配置         | `[]`       |
 
-### Ingress Host Configuration Example
+### Ingress 主机配置示例
 
 ```yaml
 ingress:
@@ -214,28 +202,13 @@ ingress:
           pathType: ImplementationSpecific
 ```
 
-## Gateway API Configuration
+## 资源限制
 
-Requires Gateway API CRDs to be installed in the cluster. Enables exposing KubeOsprey through a `Gateway` and `HTTPRoute` instead of an Ingress.
+| 参数        | 描述               | 默认值 |
+| ----------- | ------------------ | ------ |
+| `resources` | 容器资源限制和请求 | `{}`   |
 
-| Parameter                | Description                                                              | Default           |
-| ------------------------ | ------------------------------------------------------------------------ | ----------------- |
-| `gateway.enabled`        | Whether to create Gateway API resources                                  | `false`           |
-| `gateway.className`      | Existing `GatewayClass` name (e.g. `istio`, `cilium`, `envoy-gateway`)   | `""`              |
-| `gateway.create`         | Create a new `Gateway` (`true`) or reference an existing one (`false`)   | `false`           |
-| `gateway.name`           | Name of the `Gateway` (created or referenced)                            | `""`              |
-| `gateway.namespace`      | Namespace of the existing `Gateway`; defaults to the release namespace   | `""`              |
-| `gateway.annotations`    | Annotations for the created `Gateway`                                    | `{}`              |
-| `gateway.listeners`      | Listener configuration for the created `Gateway`                         | See `values.yaml` |
-| `gateway.httpRoutes`     | `HTTPRoute` configuration (supports multiple routes)                     | See `values.yaml` |
-
-## Resource Limits
-
-| Parameter   | Description                            | Default |
-| ----------- | -------------------------------------- | ------- |
-| `resources` | Container resource limits and requests | `{}` (no default requests or limits are set) |
-
-### Resource Limits Example
+### 资源限制示例
 
 ```yaml
 resources:
@@ -247,14 +220,14 @@ resources:
     memory: 128Mi
 ```
 
-## Health Checks
+## 健康检查
 
-| Parameter        | Description                   | Default           |
-| ---------------- | ----------------------------- | ----------------- |
-| `livenessProbe`  | Liveness probe configuration  | See example below |
-| `readinessProbe` | Readiness probe configuration | See example below |
+| 参数             | 描述         | 默认值     |
+| ---------------- | ------------ | ---------- |
+| `livenessProbe`  | 存活探针配置 | 见下方示例 |
+| `readinessProbe` | 就绪探针配置 | 见下方示例 |
 
-### Health Check Example
+### 健康检查示例
 
 ```yaml
 livenessProbe:
@@ -273,17 +246,17 @@ readinessProbe:
   failureThreshold: 6
 ```
 
-## Storage Configuration
+## 存储配置
 
-| Parameter      | Description                            | Default |
-| -------------- | -------------------------------------- | ------- |
-| `volumes`      | Additional volume configurations       | `[]`    |
-| `volumeMounts` | Additional volume mount configurations | `[]`    |
+| 参数           | 描述             | 默认值 |
+| -------------- | ---------------- | ------ |
+| `volumes`      | 额外的卷配置     | `[]`   |
+| `volumeMounts` | 额外的卷挂载配置 | `[]`   |
 
-## Scheduling Configuration
+## 调度配置
 
-| Parameter      | Description               | Default |
-| -------------- | ------------------------- | ------- |
-| `nodeSelector` | Node selector             | `{}`    |
-| `tolerations`  | Tolerations configuration | `[]`    |
-| `affinity`     | Affinity configuration    | `{}`    |
+| 参数           | 描述       | 默认值 |
+| -------------- | ---------- | ------ |
+| `nodeSelector` | 节点选择器 | `{}`   |
+| `tolerations`  | 容忍度配置 | `[]`   |
+| `affinity`     | 亲和性配置 | `{}`   |

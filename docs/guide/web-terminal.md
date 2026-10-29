@@ -1,14 +1,14 @@
-# Web Terminal
+# Web 终端
 
-KubeOsprey provides an integrated web terminal that allows you to execute commands directly within your pods and nodes through your browser, eliminating the need for local command-line tools.
+KubeOsprey 提供了集成的 Web 终端，让您可以直接通过浏览器在 Pod 和节点中执行命令，无需使用本地命令行工具。
 
 ![Web Terminal](/screenshots/terminal.png)
 
 ::: tip
 
-Ensure that the user has `pods/exec` permission, otherwise the web terminal will not be able to connect to the pod.
+确保访问的用户拥有 `pods/exec` 权限，否则将无法使用 Web 终端链接 Pod。
 
-Ensure that the user has `nodes/exec` permission, otherwise the web terminal will not be able to connect to the node.
+确保访问的用户拥有 `nodes/exec` 权限，否则将无法使用 Web 终端链接 Node。
 
-Refer to the [RBAC Configuration Guide](../config/rbac-config) section for more information.
+参考 [RBAC 配置指南](../config/rbac-config) 部分, 以获取更多信息。
 :::

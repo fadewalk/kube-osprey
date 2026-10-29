@@ -2,13 +2,13 @@
 outline: deep
 ---
 
-# UI Components
+# UI 组件
 
-Import components from `@kite-dev/plugin-sdk/ui` to reuse KubeOsprey's resource tables, detail layouts, YAML editor, and basic controls. Components handle display and interaction; fetch data through [Resource Queries and Operations](./resources). You can also combine those APIs with your own layouts.
+从 `@kite-dev/plugin-sdk/ui` 导入组件，复用 KubeOsprey 的资源表格、详情页、YAML 编辑器和基础控件。组件负责展示与交互，资源数据通过[资源查询与操作](./resources)获取；也可以用这些接口搭配自己的布局。
 
 ## ResourceTable
 
-Build resource list pages with search, sorting, client-side pagination, and column visibility controls. Pass in query results and column definitions:
+用于构建资源列表页，内置搜索、排序、客户端分页和列显隐。传入查询结果和列定义即可：
 
 ```tsx
 import { useNamespace } from '@kite-dev/plugin-sdk/hooks'
@@ -56,21 +56,21 @@ export default function DeploymentsPage() {
 }
 ```
 
-| Prop | Description |
-| ---- | ----------- |
-| `id`, `resourceName`, `data`, `columns` | Required. `id` identifies the table within the plugin, `resourceName` is its display name, and the caller provides data through resource hooks |
-| `isLoading`, `error`, `onRefresh` | Loading state, error state, and refresh callback |
-| `searchQueryFilter(item, query)` | Custom search matching; defaults to searching values in currently visible columns |
-| `extraToolbars`, `emptyState`, `onCreateClick` | Additional toolbar content, empty state, and create-button callback |
-| `defaultHiddenColumns` | Column IDs hidden by default |
-| `namespace` | `{ value, onChange }`; shows a namespace selector when provided |
-| `refreshInterval`, `onRefreshIntervalChange` | Shows a polling interval selector when both are provided. Pass the same interval to the resource hook to control polling |
+| 属性 | 说明 |
+| ---- | ---- |
+| `id`、`resourceName`、`data`、`columns` | 必填；`id` 是插件内唯一的表格标识，`resourceName` 是显示名，数据由调用方通过资源 Hook 提供 |
+| `isLoading`、`error`、`onRefresh` | 加载与错误状态、刷新回调 |
+| `searchQueryFilter(item, query)` | 自定义搜索匹配；不传时按当前可见列的取值搜索 |
+| `extraToolbars`、`emptyState`、`onCreateClick` | 额外工具栏、空状态、创建按钮回调 |
+| `defaultHiddenColumns` | 默认隐藏的列 ID |
+| `namespace` | `{ value, onChange }`，传入后显示命名空间选择器 |
+| `refreshInterval`、`onRefreshIntervalChange` | 同时传入才显示轮询间隔选择器；把同一间隔传给资源 Hook 即可控制轮询 |
 
-The table also provides row counts and refresh controls. Search and filter state is stored per cluster and table in `sessionStorage`; column visibility is stored in `localStorage`.
+表格还提供行数统计和刷新控制。搜索与筛选状态按集群 + 表格保存在 `sessionStorage`，列可见性保存在 `localStorage`。
 
 ## ResourceDetailShell
 
-Build resource detail pages with a header, loading and error states, refresh controls, and optional resource actions. Use `tabs` to arrange overview, YAML, and other content:
+用于构建资源详情页，提供页头、加载与错误状态、刷新和可选的资源操作。通过 `tabs` 自己组织概览、YAML 等内容：
 
 ```tsx
 import { useParams, usePluginNavigate } from '@kite-dev/plugin-sdk/navigation'
@@ -137,40 +137,40 @@ export default function DeploymentPage() {
 }
 ```
 
-| Prop | Description |
-| ---- | ----------- |
-| `resource`, `resourceLabel`, `name`, `data`, `isLoading`, `error`, `onRefresh`, `tabs` | Required. `resource` is the resource reference; `data` is the resource object |
-| `namespace` | Namespace for namespaced resources |
-| `tabs` | Defines all tabs. Each entry is `{ value, label, content }`, displayed in array order, with a `value` unique to the page. The shell does not automatically add overview or YAML tabs |
-| `content` | A React node or a callback receiving `{ resource, refreshKey, onRefresh }`. The type of `resource` is inferred from `data`. Use `refreshKey` as a child component's `key` to reset it on manual refresh |
-| `showDelete`, `showClone` | Show delete and clone actions; both are disabled by default |
-| `showDescribe` | Show the Describe action; enabled by default |
-| `onDeleted` | Callback after successful deletion |
-| `headerActions`, `titleIcon`, `loadingMessage` | Custom header actions, title icon, and loading text |
+| 属性 | 说明 |
+| ---- | ---- |
+| `resource`、`resourceLabel`、`name`、`data`、`isLoading`、`error`、`onRefresh`、`tabs` | 必填；`resource` 是资源引用，`data` 才是资源对象 |
+| `namespace` | 命名空间级资源的命名空间 |
+| `tabs` | 唯一的 Tab 定义入口，每项为 `{ value, label, content }`，按数组顺序展示，`value` 在页面内唯一；Shell 不会自动添加概览或 YAML Tab |
+| `content` | React 节点，或接收 `{ resource, refreshKey, onRefresh }` 的回调；`resource` 的类型从 `data` 推导，需要随手动刷新重置子组件时可把 `refreshKey` 作为它的 `key` |
+| `showDelete`、`showClone` | 默认关闭，开启后显示删除 / 克隆操作 |
+| `showDescribe` | Describe 操作，默认开启 |
+| `onDeleted` | 删除成功后的回调 |
+| `headerActions`、`titleIcon`、`loadingMessage` | 自定义页头操作、标题图标和加载文案 |
 
-Users can change tab order and visibility through KubeOsprey's tab controls.
+用户可通过 KubeOsprey 的 Tab 控件调整插件 Tab 的顺序和可见性。
 
 ## ResourceOverview
 
-Display metadata and custom fields (`fields`) in an information card.
+在信息卡片中展示元数据和自定义字段（`fields`）。
 
-`children` appears below the information card in the main column, making it suitable for resource-specific content such as a Pod list. Events, related resources, labels, and annotations appear in the sidebar. Omitting `relatedResources` uses the built-in relationship query. Pass `relatedResources={null}` or custom content to skip it.
+`children` 位于主栏信息卡片下方，适合放 Pod 列表等资源专属内容；事件、相关资源、标签和注解位于侧栏。不传 `relatedResources` 时使用内置关系查询，传 `relatedResources={null}`（或自定义内容）可以跳过它。
 
 ## ResourceYaml
 
-`ResourceYaml<T>` accepts a resource object as `value` and manages YAML editing, validation, saving, and cancellation. Embed it in a detail page or use it independently.
+`ResourceYaml<T>` 接收资源对象 `value`，管理 YAML 编辑、校验、保存和取消，可嵌入详情页或单独使用。
 
-| Prop | Description |
-| ---- | ----------- |
-| `value` | Resource object to display or edit |
-| `onSave` | Receives the parsed object and returns a Promise. A failed save displays an error and preserves the draft. Omit it for read-only display |
-| `title`, `actions` | Customize the header |
-| `className` | Style the container |
-| `fillHeight` | Fill the tab's available height |
+| 属性 | 说明 |
+| ---- | ---- |
+| `value` | 要展示或编辑的资源对象 |
+| `onSave` | 接收解析后的对象并返回 Promise；保存失败时显示错误并保留草稿，不传时只读 |
+| `title`、`actions` | 定制页头 |
+| `className` | 设置容器样式 |
+| `fillHeight` | 填满 Tab 的可用高度 |
 
 ## ResourceEvents
 
-A standalone event table accepting `resource`, `name`, and an optional `namespace`:
+独立事件表，接收 `resource`、`name` 和可选的 `namespace`：
 
 ```tsx
 import { ResourceEvents } from '@kite-dev/plugin-sdk/ui'
@@ -184,7 +184,7 @@ import { ResourceEvents } from '@kite-dev/plugin-sdk/ui'
 
 ## ResourceHistoryTable
 
-Displays KubeOsprey's operation history, including YAML diffs and rollback actions. Supports built-in and custom resources. Pass `currentResource` to compare a historical record with the current object.
+展示 KubeOsprey 的操作历史，包含 YAML 差异比较和回滚操作，支持内置资源和自定义资源。传入 `currentResource` 可将历史记录与当前对象比较。
 
 ```tsx
 import { ResourceHistoryTable } from '@kite-dev/plugin-sdk/ui'
@@ -198,7 +198,7 @@ import { ResourceHistoryTable } from '@kite-dev/plugin-sdk/ui'
 
 ## RelatedResourcesTable
 
-Displays related resources with links to their detail pages. Accepts `resource`, `name`, and optional `namespace`, and supports the same built-in resources as `useRelatedResources`. Query and render custom resource relationships yourself.
+展示关联资源及详情页链接，接收 `resource`、`name` 和可选的 `namespace`。支持范围与 `useRelatedResources` 一致，仅覆盖支持关系查询的内置资源；自定义资源的关系需要自行查询和展示。
 
 ```tsx
 import { RelatedResourcesTable } from '@kite-dev/plugin-sdk/ui'
@@ -212,7 +212,7 @@ import { RelatedResourcesTable } from '@kite-dev/plugin-sdk/ui'
 
 ## LogViewer
 
-Embeds KubeOsprey's Pod log viewer with container selection, search, streaming controls, and download. Queries use the current cluster and require the user's `pods/log` permission for the namespace.
+嵌入 KubeOsprey 的 Pod 日志查看器，支持容器选择、搜索、流式日志控制和下载。使用当前集群，并检查用户在目标命名空间的 `pods/log` 权限。
 
 ```tsx
 import { LogViewer } from '@kite-dev/plugin-sdk/ui'
@@ -227,11 +227,11 @@ import { LogViewer } from '@kite-dev/plugin-sdk/ui'
 />
 ```
 
-`namespace` is required. Use `podName` for a single Pod, or `pods` / `labelSelector` for workload logs. Pass the Pod's container definitions to populate the selector. `onClose` adds a close action. The viewer loads when rendered.
+`namespace` 必填。单 Pod 使用 `podName`，工作负载日志可传 `pods` 或 `labelSelector`；容器列表来自 Pod 的定义。`onClose` 提供关闭操作。查看器在渲染时按需加载。
 
 ## Terminal
 
-Embeds KubeOsprey's terminal for a Pod, node, or kubectl session. Pod exec uses the current cluster and requires `pods/exec` permission for the namespace.
+嵌入 KubeOsprey 的 Pod、节点或 kubectl 终端。Pod exec 使用当前集群，并检查目标命名空间的 `pods/exec` 权限。
 
 ```tsx
 import { Terminal } from '@kite-dev/plugin-sdk/ui'
@@ -245,26 +245,26 @@ import { Terminal } from '@kite-dev/plugin-sdk/ui'
 />
 ```
 
-`type` defaults to `pod`. Provide `namespace`, `podName`, and the Pod's container definitions for a Pod session, `nodeName` for `node`, or set `type="kubectl"` for kubectl. Use `pods` to allow Pod selection. `containers`, `initContainers`, `ephemeralContainers`, and `selectedContainerName` control container selection; `attachContainerName` attaches to a running container process instead of starting a shell. `embedded` hides the toolbar and fills the parent, which must have an explicit height. Mount the terminal only while it is in use, and unmount it when closing the view.
+`type` 默认为 `pod`，需传 `namespace`、`podName` 和 Pod 的容器定义；`node` 需传 `nodeName`，kubectl 会话设置 `type="kubectl"`。`pods` 用于提供 Pod 选择列表，`containers`、`initContainers`、`ephemeralContainers`、`selectedContainerName` 用于容器选择。`attachContainerName` 用于附加到容器现有进程，而非新建 shell。`embedded` 隐藏工具栏并填满父容器，需要给父容器指定高度。仅在使用终端时挂载组件，关闭视图时卸载。
 
-## Toast Notifications
+## Toast 通知
 
-`toast` displays notifications in KubeOsprey's existing notification area; plugins do not need a separate provider.
+`toast` 使用 KubeOsprey 现有通知区域，插件无需额外挂载通知容器。
 
 ```ts
 import { toast } from '@kite-dev/plugin-sdk/ui'
 
-const id = toast.loading('Saving…')
-toast.success('Saved', { id, description: 'The configuration is up to date.' })
-toast.error('Save failed', { description: 'Check your permissions.' })
+const id = toast.loading('保存中…')
+toast.success('已保存', { id, description: '配置已更新。' })
+toast.error('保存失败', { description: '请检查操作权限。' })
 toast.dismiss(id)
 ```
 
-Use `toast(message, options?)`, `toast.success`, `toast.error`, `toast.info`, `toast.warning`, or `toast.loading`. Options include `id`, `description`, `duration` in milliseconds, `dismissible`, `closeButton`, and `action: { label, onClick }`. Messages and labels accept React nodes and can use your plugin's translations. `toast.dismiss(id)` closes one notification; omitting the ID closes all notifications.
+支持 `toast(message, options?)`、`toast.success`、`toast.error`、`toast.info`、`toast.warning`、`toast.loading`。选项包括 `id`、`description`、以毫秒为单位的 `duration`、`dismissible`、`closeButton` 和 `action: { label, onClick }`。消息和标签支持 React 节点，可使用插件自身的翻译。`toast.dismiss(id)` 关闭指定通知，省略 ID 则关闭全部通知。
 
 ## WorkloadPodsCard
 
-Display KubeOsprey's compact Pod card, including status, ready container count, restarts, node, IP, and age. Clicking a Pod name opens the host's Pod detail dialog.
+展示宿主的紧凑 Pod 卡片，包含状态、就绪容器数、重启次数、节点、IP 和运行时间。点击 Pod 名称可打开宿主的 Pod 详情弹窗。
 
 ```tsx
 import { WorkloadPodsCard } from '@kite-dev/plugin-sdk/ui'
@@ -273,16 +273,16 @@ import { WorkloadPodsCard } from '@kite-dev/plugin-sdk/ui'
   title="Pods"
   pods={pods}
   isLoading={isLoading}
-  loadingText="Loading Pods…"
-  emptyText="No Pods"
-  ageLabel="Age"
+  loadingText="正在加载 Pod…"
+  emptyText="暂无 Pod"
+  ageLabel="运行时间"
 />
 ```
 
-`title`, `pods`, `isLoading`, `loadingText`, `emptyText`, and `ageLabel` are all required. `pods` accepts Kubernetes `Pod[]`. The component displays the data you provide; fetch it through resource hooks. Text props accept `ReactNode`, so you can use your plugin's translations.
+`title`、`pods`、`isLoading`、`loadingText`、`emptyText`、`ageLabel` 都是必填属性，`pods` 接收 Kubernetes `Pod[]`。组件只展示传入的数据，数据需要自己通过资源 Hook 获取；这些文案都接收 `ReactNode`，可以使用插件自己的翻译。
 
-## Basic Controls
+## 基础控件
 
-- Basic components: `Button`, `Badge`, `Input`, `Label`, and the `Card`, `Dialog`, `Select`, and `Tabs` component families.
-- `NamespaceSelector`: supports `value`, `onChange`, `showAll`, `multiple`, `disabled`, `triggerClassName`, and `modal`.
-- `YamlEditor`: supports `value`, `onChange` (receives `string | undefined`), `disabled`, and `height`.
+- 基础组件：`Button`、`Badge`、`Input`、`Label`、`Card` 系列、`Dialog` 系列、`Select` 系列、`Tabs` 系列。
+- `NamespaceSelector`：支持 `value`、`onChange`、`showAll`、`multiple`、`disabled`、`triggerClassName`、`modal`。
+- `YamlEditor`：`value`、`onChange`（接收 `string | undefined`）、`disabled`、`height`。

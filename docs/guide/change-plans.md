@@ -1,41 +1,41 @@
-# Change Plans
+# 变更计划
 
-Change Plans add an approval gate in front of sensitive operations. Instead of applying a change immediately, KubeOsprey records it as a plan with explicit steps; an approver reviews and approves it; only then is the change executed, and every applied plan can be rolled back.
+变更计划（Change Plan）为敏感操作增加审批闸门：变更不再立即执行，而是先记录为带明确步骤的计划，由审批人审核通过后才执行，且每个已执行的计划都支持回滚。
 
-![Change Plans](/screenshots/change-plans.png)
+![变更计划](/screenshots/change-plans.png)
 
-## When plans are created
+## 计划何时产生
 
-Two switches in **Settings → General** control which operations are gated:
+**Settings → General** 中的两个开关控制哪些操作需要走计划：
 
-- **AI change plan mode (`aiChangePlanMode`)** — when enabled, write operations requested through the [AI Assistant](./ai-assistant) do not run directly. The assistant records the intended steps as a plan and hands it to a human for approval.
-- **Webhook change plan mode (`webhookChangePlanMode`)** — when enabled, Helm upgrades submitted through the CI webhook endpoint (`POST /api/v1/webhooks/helm-upgrade`) are held as pending plans instead of executing immediately. This turns your CI/CD pipeline into a review-before-deploy flow.
-- The webhook payload accepts an optional `chartVersion`: the upgrade then pulls that version from the release's repository catalog instead of keeping the current chart. `chartUrl`, when provided, takes precedence; without either, the upgrade re-uses the currently deployed chart with the submitted values.
+- **AI 变更计划模式（`aiChangePlanMode`）**：启用后，通过 [AI 助手](./ai-assistant)发起的写操作不再直接执行。助手把意图操作记录为计划，交由人工审批。
+- **Webhook 变更计划模式（`webhookChangePlanMode`）**：启用后，通过 CI webhook 接口（`POST /api/v1/webhooks/helm-upgrade`）提交的 Helm 升级会挂起为待审批计划而非立即执行，把 CI/CD 流水线变成"先审批、后部署"的流程。
+- Webhook 负载支持可选的 `chartVersion`：升级时从 Release 所属仓库目录中拉取该版本，而不是沿用当前 Chart。若同时提供 `chartUrl` 则以 `chartUrl` 为准；两者都缺省时，使用当前已部署的 Chart 配合提交的 values 升级。
 
-## Plan lifecycle
+## 计划生命周期
 
 ```
 created → pending → approved → applying → applied
                   ↘ rejected        ↘ failed
-pending → expired (approval not given before the deadline)
+pending → expired（超时未审批）
 ```
 
-- A plan contains one or more **steps**, each describing one operation together with its dry-run result, so the approver sees what would happen before approving.
-- **Approval requires a separate permission** — the person who created the plan cannot approve it themselves.
-- Pending plans expire if no decision is made in time.
-- Applied plans support **rollback** (see [Resource History](./resource-history) for the underlying revision trail).
+- 一个计划包含一个或多个**步骤**，每个步骤描述一次操作及其 dry-run 结果，审批人批准前就能看到会发生什么。
+- **审批需要独立权限**——计划的创建者不能审批自己的计划。
+- 待审批计划超时未处理会自动过期。
+- 已执行的计划支持**回滚**（底层修订记录见[资源历史](./resource-history)）。
 
-## Notifications
+## 通知
 
-KubeOsprey can push plan events (`plan_pending`, `plan_applied`, `plan_failed`) to DingTalk, WeCom, Feishu, Slack, or a generic webhook. See [Notification Channels](../config/notification-channels).
+KubeOsprey 可以把计划事件（`plan_pending`、`plan_applied`、`plan_failed`）推送到钉钉、企业微信、飞书、Slack 或通用 webhook。参见[通知渠道](../config/notification-channels)。
 
 ## API
 
-| Method | Path                                    | Purpose                          |
-| ------ | --------------------------------------- | -------------------------------- |
-| `GET`  | `/api/v1/change-plans`                  | List plans                       |
-| `GET`  | `/api/v1/change-plans/:id`              | Plan detail with steps           |
-| `GET`  | `/api/v1/change-plans/pending-count`    | Badge count of pending plans     |
-| `POST` | `/api/v1/change-plans/:id/approve`      | Approve a pending plan           |
-| `POST` | `/api/v1/change-plans/:id/reject`       | Reject a pending plan            |
-| `POST` | `/api/v1/change-plans/:id/rollback`     | Roll back an applied plan        |
+| 方法   | 路径                                    | 用途                     |
+| ------ | --------------------------------------- | ------------------------ |
+| `GET`  | `/api/v1/change-plans`                  | 计划列表                 |
+| `GET`  | `/api/v1/change-plans/:id`              | 计划详情（含步骤）       |
+| `GET`  | `/api/v1/change-plans/pending-count`    | 待审批数量（角标）       |
+| `POST` | `/api/v1/change-plans/:id/approve`      | 审批通过                 |
+| `POST` | `/api/v1/change-plans/:id/reject`       | 拒绝                     |
+| `POST` | `/api/v1/change-plans/:id/rollback`     | 回滚已执行的计划         |

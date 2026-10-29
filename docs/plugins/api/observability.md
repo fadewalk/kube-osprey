@@ -2,13 +2,13 @@
 outline: deep
 ---
 
-# Metrics and Logs
+# 指标与日志
 
-Use `@kite-dev/plugin-sdk/observability` to query the cluster overview, resource usage, and Pod metrics, or subscribe to Pod log streams. Plugins build the charts and log interfaces; KubeOsprey provides data using the current user's access to the current cluster.
+从 `@kite-dev/plugin-sdk/observability` 查询集群概览、资源用量和 Pod 指标，或订阅 Pod 日志流。插件负责组织图表和日志界面，KubeOsprey 提供数据和当前集群的访问权限。
 
-## Querying Metrics
+## 查询指标
 
-For example, display the number of running Pods in the current cluster:
+例如显示当前集群中运行的 Pod 数量：
 
 ```tsx
 import { useOverview } from '@kite-dev/plugin-sdk/observability'
@@ -16,23 +16,23 @@ import { useOverview } from '@kite-dev/plugin-sdk/observability'
 export function RunningPods() {
   const query = useOverview()
 
-  if (query.isLoading) return <p>Loading…</p>
+  if (query.isLoading) return <p>加载中…</p>
   if (query.error) return <p role="alert">{query.error.message}</p>
-  return <p>Running Pods: {query.data?.runningPods ?? 0}</p>
+  return <p>运行中的 Pod：{query.data?.runningPods ?? 0}</p>
 }
 ```
 
-| Hook | Purpose | Options |
-| ---- | ------- | ------- |
-| `useOverview(options?)` | Resource counts and CPU and memory allocation for the cluster; returns `OverviewData` | `{ staleTime? }` |
-| `useResourceUsageHistory(duration, options?)` | CPU, memory, network, and disk usage history; returns `ResourceUsageHistory` | `{ staleTime?, instance?, enabled? }` |
-| `usePodMetrics(namespace, podName, duration, options?)` | Pod or container metrics history; returns `PodMetricsHistory` | `{ staleTime?, container?, refreshInterval?, labelSelector? }` |
+| Hook | 用途 | 选项 |
+| ---- | ---- | ---- |
+| `useOverview(options?)` | 集群资源数量和 CPU、内存分配概览，返回 `OverviewData` | `{ staleTime? }` |
+| `useResourceUsageHistory(duration, options?)` | CPU、内存、网络和磁盘用量历史，返回 `ResourceUsageHistory` | `{ staleTime?, instance?, enabled? }` |
+| `usePodMetrics(namespace, podName, duration, options?)` | Pod 或容器的指标历史，返回 `PodMetricsHistory` | `{ staleTime?, container?, refreshInterval?, labelSelector? }` |
 
-These hooks return TanStack Query results. Read the values listed above through `data`, and handle loading and errors through `isLoading` and `error`. Queries use the current cluster, with separate caches for each cluster.
+这些 Hook 返回 TanStack Query 的查询结果，通过 `data` 读取上表中的数据，通过 `isLoading` 和 `error` 处理加载与错误状态。查询使用当前集群，缓存按集群隔离。
 
-## PromQL Queries
+## PromQL 查询
 
-Use arbitrary PromQL against the current cluster's configured Prometheus, including metrics from GPU exporters, cost tools, and service meshes.
+在当前集群配置的 Prometheus 上执行任意 PromQL，可查询 GPU exporter、成本工具和服务网格等指标。
 
 ```tsx
 import { usePrometheusQuery } from '@kite-dev/plugin-sdk/observability'
@@ -42,21 +42,21 @@ export function GPUUsage() {
     refreshInterval: 30000,
   })
 
-  if (query.isLoading) return <p>Loading…</p>
+  if (query.isLoading) return <p>加载中…</p>
   if (query.error) return <p role="alert">{query.error.message}</p>
   if (query.data?.resultType !== 'vector') return null
   return <pre>{JSON.stringify(query.data.result, null, 2)}</pre>
 }
 ```
 
-| API | Options | Result |
-| --- | ------- | ------ |
+| API | 选项 | 返回值 |
+| --- | ---- | ------ |
 | `queryPrometheus(query, options?)` | `{ cluster?, time? }` | `Promise<PrometheusResult>` |
 | `queryPrometheusRange(query, options)` | `{ cluster?, start, end, step }` | `Promise<PrometheusResult>` |
-| `usePrometheusQuery(query, options?)` | Instant query options, plus query controls | `UseQueryResult<PrometheusResult, Error>` |
-| `usePrometheusRangeQuery(query, options)` | Range query options, plus query controls | `UseQueryResult<PrometheusResult, Error>` |
+| `usePrometheusQuery(query, options?)` | 即时查询选项，加上查询控制选项 | `UseQueryResult<PrometheusResult, Error>` |
+| `usePrometheusRangeQuery(query, options)` | 区间查询选项，加上查询控制选项 | `UseQueryResult<PrometheusResult, Error>` |
 
-Query controls are `enabled`, `staleTime`, and `refreshInterval` (milliseconds). Hooks keep separate caches for each cluster and query. Times (`time`, `start`, `end`) are integer Unix timestamps in seconds; `step` is an integer from 1 to 86,400 seconds. Instant queries default to the current time. A range query retrieves a series of samples:
+查询控制选项为 `enabled`、`staleTime` 和 `refreshInterval`（毫秒）。缓存按集群和查询条件隔离。`time`、`start`、`end` 为整数 Unix 时间戳，单位为秒；`step` 为 1～86,400 的整数，单位也是秒。即时查询默认使用当前时间，区间查询用于获取一段时间的采样序列：
 
 ```ts
 import { queryPrometheusRange } from '@kite-dev/plugin-sdk/observability'
@@ -68,9 +68,9 @@ const data = await queryPrometheusRange(
 )
 ```
 
-`PrometheusResult` contains `resultType`, `result`, and optional `warnings`. Narrow by `resultType` (`vector`, `matrix`, `scalar`, or `string`) before reading `result`. Numeric samples are `[timestamp, value]` pairs, where `value` is a string; vector and matrix results also support native histograms.
+`PrometheusResult` 包含 `resultType`、`result` 和可选的 `warnings`。先按 `resultType`（`vector`、`matrix`、`scalar` 或 `string`）区分结果，再读取 `result`。数值采样格式为 `[timestamp, value]`，其中 `value` 是字符串；vector 和 matrix 结果也支持原生直方图。
 
-Arbitrary PromQL can read across namespaces. A matching KubeOsprey role must grant `get` on `prometheus` for the target cluster, with `namespaces: ["*"]` and no namespace exclusions. Namespace-scoped grants do not qualify. For example:
+任意 PromQL 可以跨命名空间读取数据，因此必须有同一个 KubeOsprey 角色允许目标集群的 `prometheus/get`，且 `namespaces` 包含 `"*"`、没有命名空间排除规则。仅有某个命名空间的权限不能执行通用查询。例如：
 
 ```json
 {
@@ -81,11 +81,11 @@ Arbitrary PromQL can read across namespaces. A matching KubeOsprey role must gra
 }
 ```
 
-KubeOsprey returns 403 without this permission and 503 when Prometheus is unavailable. Queries time out after 30 seconds; increase `step` for ranges exceeding 11,000 intervals per series. Authentication stays with KubeOsprey; no Prometheus credentials are sent to the plugin.
+无权限时返回 403，集群未配置可用 Prometheus 时返回 503。查询超时为 30 秒；每条序列超过 11,000 个采样间隔时需增大 `step`。认证由 KubeOsprey 处理，插件不会收到 Prometheus 凭据。
 
-## Subscribing to Pod Logs
+## 订阅 Pod 日志
 
-`useLogsWebSocket(namespace, podName, options?)` connects to a Pod log stream in the current cluster. Receive lines through `onNewLog` and control how many to keep. This example retains up to 1,000 lines:
+`useLogsWebSocket(namespace, podName, options?)` 连接当前集群的 Pod 日志流。用 `onNewLog` 接收日志行，并自行控制保留数量；下面的示例最多保留 1,000 行：
 
 ```tsx
 import { useState } from 'react'
@@ -109,4 +109,4 @@ export function PodLogs() {
 }
 ```
 
-Options include `enabled`, `container`, `tailLines`, `timestamps`, `previous`, `sinceSeconds`, and `labelSelector`, plus the `onNewLog` and `onClear` callbacks. The result is `{ isLoading, error, isConnected, downloadSpeed, refetch, stopStreaming, clearLogs }`.
+日志选项包括 `enabled`、`container`、`tailLines`、`timestamps`、`previous`、`sinceSeconds`、`labelSelector`，以及 `onNewLog`、`onClear` 回调；返回值是 `{ isLoading, error, isConnected, downloadSpeed, refetch, stopStreaming, clearLogs }`。

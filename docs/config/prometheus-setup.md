@@ -1,84 +1,84 @@
-# Prometheus Setup Guide
+# Prometheus 设置指南
 
-This guide explains how to configure KubeOsprey's monitoring integration with Prometheus to achieve real-time metrics and monitoring functionality.
+本指南介绍如何配置 KubeOsprey 与 Prometheus 的监控集成，以实现实时指标和监控功能。
 
-## Overview
+## 概述
 
-KubeOsprey's integration with Prometheus provides:
+KubeOsprey 与 Prometheus 集成提供：
 
-- Real-time cluster resource metrics
-- Historical data visualization
-- Pod and container resource usage tracking
-- Node performance monitoring
+- 实时集群资源指标
+- 历史数据可视化
+- Pod 和容器资源使用跟踪
+- 节点性能监控
 
-## Prerequisites
+## 前提条件
 
-- A running Kubernetes cluster
-- `kubectl` configured with cluster access permissions
-- Cluster administrator privileges (for Prometheus installation)
+- 一个运行中的 Kubernetes 集群
+- 配置了集群访问权限的 `kubectl`
+- 集群管理员权限（用于安装 Prometheus）
 
-## Prometheus Installation Options
+## Prometheus 安装选项
 
-### Option 1: Using kube-prometheus-stack (Recommended)
+### 选项 1：使用 kube-prometheus-stack（推荐）
 
-The [kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart provides a complete monitoring solution including Prometheus, Alertmanager, and Grafana.
+[kube-prometheus-stack](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack) Helm chart 提供了完整的监控解决方案，包括 Prometheus、Alertmanager 和 Grafana。
 
 ```bash
-# Add Prometheus community Helm repository
+# 添加 Prometheus 社区 Helm 仓库
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
 
-# Install kube-prometheus-stack
+# 安装 kube-prometheus-stack
 helm install prometheus prometheus-community/kube-prometheus-stack \
   --namespace monitoring \
   --create-namespace
 ```
 
-### Option 2: Manual Prometheus Installation
+### 选项 2：手动安装 Prometheus
 
-For more control over the installation, you can manually install Prometheus components:
+如需对安装有更多控制，您可以手动安装 Prometheus 组件：
 
-1. **[Prometheus Server](https://prometheus.io/docs/prometheus/latest/installation/)** - Collects and stores metrics
-2. **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)** - Provides Kubernetes object metrics
-3. **[metrics-server](https://github.com/kubernetes-sigs/metrics-server)** - Provides container resource metrics
-4. **Node Exporter** - Collects host system metrics
+1. **[Prometheus 服务器](https://prometheus.io/docs/prometheus/latest/installation/)** - 收集并存储指标
+2. **[kube-state-metrics](https://github.com/kubernetes/kube-state-metrics)** - 提供 Kubernetes 对象指标
+3. **[metrics-server](https://github.com/kubernetes-sigs/metrics-server)** - 提供容器资源指标
+4. **Node Exporter** - 收集主机系统指标
 
-Follow the official documentation for each component for detailed installation instructions.
+按照每个组件的官方文档获取详细的安装说明。
 
-## Connecting KubeOsprey to Prometheus
+## 连接 KubeOsprey 到 Prometheus
 
-Users with the **admin** role can access the settings entry in the upper right corner of the page to enter the cluster management interface.
+拥有 **admin** 角色的用户，可在页面右上角进入设置入口，进入集群管理界面。
 
-Select the cluster that needs to be configured and fill in the Prometheus address.
+选中需要配置的集群，填写 Prometheus 地址。
 
-## Troubleshooting
+## 故障排除
 
-### Common Issues
+### 常见问题
 
-1. **No metrics displayed**:
+1. **未显示指标**：
 
-   - Verify Prometheus URL is correct
-   - Check Prometheus server is running
-   - Ensure Prometheus can scrape metrics from targets
+   - 验证 Prometheus URL 是否正确
+   - 检查 Prometheus 服务器是否运行
+   - 确保 Prometheus 可以从目标抓取指标
 
-2. **Incomplete metrics**:
+2. **指标不完整**：
 
-   - Ensure kube-state-metrics is running
-   - Check Prometheus configuration includes all necessary scrape jobs
-   - Verify target pods/nodes are labeled correctly for Prometheus discovery
+   - 确保 kube-state-metrics 正在运行
+   - 检查 Prometheus 配置是否包含所有必要的抓取任务
+   - 验证目标 Pod/节点是否正确标记以供 Prometheus 发现
 
-3. **Authentication errors**:
-   - If Prometheus requires authentication, ensure credentials are provided
-   - Check for TLS configuration if HTTPS is used
+3. **认证错误**：
+   - 如果 Prometheus 需要认证，确保提供了凭据
+   - 如果使用 HTTPS，检查 TLS 配置
 
-### Verifying Prometheus Configuration
+### 验证 Prometheus 配置
 
-To check if Prometheus is correctly scraping targets:
+要检查 Prometheus 是否正确抓取目标：
 
 ```bash
-# Port-forward to Prometheus UI
+# 端口转发到 Prometheus UI
 kubectl port-forward -n monitoring svc/prometheus-server 9090:9090
 
-# Then open in your browser:
+# 然后在浏览器中打开：
 # http://localhost:9090/targets
 ```

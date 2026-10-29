@@ -14,19 +14,16 @@ import {
   IconTerminal2,
   IconWorld,
 } from "@tabler/icons-vue";
-import { useData } from "vitepress";
+import { useData, withBase } from "vitepress";
 import { computed } from "vue";
-import auditScreenshot from "../../../screenshots/audit.webp";
-import detailScreenshot from "../../../screenshots/detail.webp";
-import helmScreenshot from "../../../screenshots/helm.webp";
 import GitHubStarCount from "./GitHubStarCount.vue";
 
 const content = {
   en: {
-    homeHref: "/",
-    docsHref: "/guide/",
-    pluginsHref: "/plugins/",
-    installHref: "/guide/installation",
+    homeHref: "/en/",
+    docsHref: "/en/guide/",
+    pluginsHref: "/en/plugins/",
+    installHref: "/en/guide/installation",
     homeLabel: "KubeOsprey home",
     navigationLabel: "Primary navigation",
     skipLabel: "Skip to content",
@@ -106,7 +103,7 @@ const content = {
         title: "The full story behind every resource.",
         description:
           "Inspect status, configuration, events, conditions, and related workloads in one place. Move from a symptom to the context you need without jumping between tools.",
-        image: detailScreenshot,
+        image: "/screenshots/detail.webp",
         imageAlt:
           "Kite Kubernetes resource detail page showing workload status, pods, events, related resources, labels, and configuration",
         imageWidth: 3118,
@@ -119,7 +116,7 @@ const content = {
         title: "Manage Helm without leaving the workspace.",
         description:
           "Browse charts, manage repositories, and install, upgrade, or review releases alongside the Kubernetes resources they create.",
-        image: helmScreenshot,
+        image: "/screenshots/helm.webp",
         imageAlt:
           "Kite Helm release page showing deployment status, related resources, release history, and configuration",
         imageWidth: 3118,
@@ -132,7 +129,7 @@ const content = {
         title: "Every sensitive action, accounted for.",
         description:
           "Keep access governed with role-based permissions and a clear audit trail of user activity and resource changes across your clusters.",
-        image: auditScreenshot,
+        image: "/screenshots/audit.webp",
         imageAlt:
           "Kite audit log showing operators, Kubernetes resource changes, clusters, status, and reviewable diffs",
         imageWidth: 3118,
@@ -142,10 +139,10 @@ const content = {
     ],
   },
   zh: {
-    homeHref: "/zh/",
-    docsHref: "/zh/guide/",
-    pluginsHref: "/zh/plugins/",
-    installHref: "/zh/guide/installation",
+    homeHref: "/",
+    docsHref: "/guide/",
+    pluginsHref: "/plugins/",
+    installHref: "/guide/installation",
     homeLabel: "KubeOsprey 首页",
     navigationLabel: "主导航",
     skipLabel: "跳至主要内容",
@@ -224,7 +221,7 @@ const content = {
         title: "看清每一个资源的完整上下文。",
         description:
           "在同一处查看状态、配置、事件、条件和相关工作负载，从异常现象直接抵达排障所需的信息。",
-        image: detailScreenshot,
+        image: "/screenshots/detail.webp",
         imageAlt: "KubeOsprey Kubernetes 资源详情页展示状态、Pod、事件、关联资源、标签和配置",
         imageWidth: 3118,
         imageHeight: 2250,
@@ -236,7 +233,7 @@ const content = {
         title: "无需离开工作空间即可管理 Helm。",
         description:
           "浏览 Chart、管理仓库，并在其创建的 Kubernetes 资源旁完成 Release 的安装、升级与检查。",
-        image: helmScreenshot,
+        image: "/screenshots/helm.webp",
         imageAlt: "KubeOsprey Helm Release 页面展示部署状态、关联资源、发布历史和配置",
         imageWidth: 3118,
         imageHeight: 2250,
@@ -248,7 +245,7 @@ const content = {
         title: "每一次敏感操作都有据可查。",
         description:
           "通过基于角色的权限和清晰的审计记录，管理用户访问与跨集群资源变更。",
-        image: auditScreenshot,
+        image: "/screenshots/audit.webp",
         imageAlt: "KubeOsprey 审计日志展示操作用户、Kubernetes 资源变更、集群、状态和差异",
         imageWidth: 3118,
         imageHeight: 2250,
@@ -420,7 +417,7 @@ const copy = computed(() =>
 
         <div class="product-detail__media">
           <img
-            :src="detail.image"
+            :src="withBase(detail.image)"
             :alt="detail.imageAlt"
             :width="detail.imageWidth"
             :height="detail.imageHeight"

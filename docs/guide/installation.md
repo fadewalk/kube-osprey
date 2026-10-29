@@ -1,92 +1,88 @@
-# Installation Guide
+# 安装指南
 
-This guide provides detailed instructions for installing KubeOsprey in a Kubernetes environment.
+本指南详细介绍如何在 Kubernetes 环境下安装 KubeOsprey。
 
-## Prerequisites
+## 前提条件
 
-- `kubectl` with cluster administrator privileges
-- Helm v4, or Helm v3.8+ for OCI chart installation
-- MySQL/PostgreSQL database, or local storage for sqlite
+- 拥有集群管理员权限的 `kubectl`
+- Helm v4，或支持 OCI chart 的 Helm v3.8+
+- MySQL/PostgreSQL 数据库，或本地存储用于 sqlite
 
-## Installation Methods
+## 安装方式
 
-### Method 1: Helm Chart (Recommended)
+### 方式一：Helm Chart（推荐）
 
-Using Helm provides flexibility for configuration and upgrades:
-
-Install from OCI registry:
+使用 Helm 可灵活配置和升级 KubeOsprey：
 
 ```bash
 helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace
 ```
 
-Installing under the release name `kube-osprey` names every deployed resource `kube-osprey`.
-
-Or pin a chart version for reproducible installs:
+或锁定 Chart 版本以保证安装可复现：
 
 ```bash
 helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey --version <chart-version> -n kube-osprey-system --create-namespace
 ```
 
-#### Custom Installation
+#### 自定义安装
 
-You can adjust installation parameters by customizing the values file:
+可通过自定义 values 文件调整安装参数：
 
-For complete configuration, refer to [Chart Values](../config/chart-values).
+完整配置参考 [Chart Values](../config/chart-values)。
 
-Install with custom values:
+使用自定义值安装：
 
 ```bash
 helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system -f values.yaml
 ```
 
-### Method 2: YAML Manifest
+### 方式二：YAML 清单
 
-For quick deployment, you can directly apply the official installation YAML:
+如需快速部署，可直接应用官方安装 YAML：
 
 ::: warning
-This method is not suitable for production environments, as it does not include any configuration related to persistence. You need to manually mount the persistence volume and set the environment variable `DB_DSN=/data/db.sqlite` to ensure that data is not lost. Alternatively, you can use an external database.
+此方法不适合生产环境，因为他没有配置任何持久化相关内容，你需要手动挂载持久化卷并设置环境变量 `DB_DSN=/data/db.sqlite` 来确保数据不会丢失。或者也可以使用外部数据库。
 
-see [Persistence Issues](../faq#persistence-issues) for more details.
+参考 [持久化相关](../faq#持久化相关) 获取更多详情。
 :::
 
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/fadewalk/kube-osprey/main/deploy/install.yaml
 ```
 
-This method will install KubeOsprey with default configuration. For advanced customization, it's recommended to use the Helm Chart.
+此方法将使用默认配置安装 KubeOsprey。如需高级定制，建议使用 Helm Chart。
 
-## Accessing KubeOsprey
+## 访问 KubeOsprey
 
-### Port Forwarding (Testing Environment)
+### 端口转发（测试环境）
 
-During testing, you can quickly access KubeOsprey through port forwarding:
+测试期间可通过端口转发快速访问 KubeOsprey：
 
 ```bash
 kubectl port-forward -n kube-osprey-system svc/kube-osprey 8080:8080
 ```
 
-### LoadBalancer Service
+### LoadBalancer 服务
 
-If the cluster supports LoadBalancer, you can directly expose the KubeOsprey service:
+如集群支持 LoadBalancer，可直接暴露 KubeOsprey 服务：
 
 ```bash
 kubectl patch svc kube-osprey -n kube-osprey-system -p '{"spec": {"type": "LoadBalancer"}}'
 ```
 
-Get the assigned IP:
+获取分配的 IP：
 
 ```bash
 kubectl get svc kube-osprey -n kube-osprey-system
 ```
 
-### Ingress (Recommended for Production)
+### Ingress（生产环境推荐）
 
-For production environments, it's recommended to expose KubeOsprey through an Ingress controller with TLS enabled:
+生产环境建议通过 Ingress 控制器并启用 TLS 暴露 KubeOsprey：
 
 ::: warning
-KubeOsprey's log and web terminal features require websocket support.
-Some Ingress controllers may require additional configuration to handle websockets correctly.
+KubeOsprey 的日志和 Web 终端功能需支持 websocket。
+部分 Ingress 控制器可能需额外配置以正确处理 websocket。
 :::
 
 ```yaml
@@ -114,27 +110,27 @@ spec:
       secretName: kube-osprey-tls
 ```
 
-## Serving under a subpath (basePath)
+## 在子路径下部署（basePath）
 
-If you want to serve KubeOsprey under a subpath (for example `https://example.com/kube-osprey`), use the Helm chart `basePath` value.
+如果您希望将 KubeOsprey 部署在一个子路径下，例如 `https://example.com/kube-osprey`，可以使用 Helm Chart 的 `basePath` 值来配置。
 
-How to set it:
+如何设置：
 
-- In `values.yaml`:
+- 在 `values.yaml` 中：
 
 ```yaml
 basePath: "/kube-osprey"
 ```
 
-- Or with Helm CLI:
+- 或使用 Helm CLI：
 
 ```fish
 helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace --set basePath="/kube-osprey"
 ```
 
-Important notes:
+说明：
 
-- Ingress configuration: make sure your Ingress `paths` match the subpath and use a matching pathType (e.g., `Prefix`). Example:
+- Ingress 配置：确保 Ingress 的 `paths` 与子路径一致，并使用合适的 `pathType`（例如 `Prefix`）。示例：
 
 ```yaml
 ingress:
@@ -146,52 +142,41 @@ ingress:
           pathType: Prefix
 ```
 
-- OAuth / redirects: if you enable OAuth (or any external redirect flows), update the redirect URLs in your OAuth provider to include the base path, e.g. `https://kube-osprey.example.com/kube-osprey/oauth/callback`.
-- Environment overrides: if you provide environment variables via `extraEnvs` or an existing secret, ensure `KUBE_OSPREY_BASE` is set consistently with the `basePath` value (otherwise behavior may differ).
+- OAuth / 重定向：如果启用了 OAuth 或其他外部重定向，请在 OAuth 提供方中将重定向 URL 更新为包含子路径，例如 `https://kube-osprey.example.com/kube-osprey/oauth/callback`。
 
-## Verifying Installation
+## 验证安装
 
-After installation, you can access the dashboard to verify that KubeOsprey is deployed successfully. The expected interface is as follows:
+安装完成后，可访问仪表盘验证 KubeOsprey 是否部署成功。预期界面如下：
 
 ::: tip
-If you need to configure KubeOsprey through environment variables, please refer to [Environment Variables](../config/env).
+如需通过环境变量配置 KubeOsprey，请参考 [环境变量](../config/env)。
 :::
 
-![setup](../screenshots/setup.png)
+![setup](/screenshots/setup.png)
 
-![setup](../screenshots/setup2.png)
+![setup](/screenshots/setup2.png)
 
-You can complete cluster setup according to the page prompts.
+可根据页面提示完成集群设置。
 
-### Quick Setup with In-Cluster Mode
+## 卸载 KubeOsprey
 
-For the simplest setup, select **`in-cluster`** as the cluster type. This option automatically uses the service account credentials that KubeOsprey is running with inside the cluster, requiring no additional configuration:
-
-- **No kubeconfig needed**: KubeOsprey will use its own service account to access the Kubernetes API
-- **Automatic authentication**: Works out of the box with the default RBAC permissions
-- **Ideal for single-cluster deployments**: Perfect when KubeOsprey is managing the same cluster it's running in
-
-This is the recommended option for getting started quickly, especially in development or when KubeOsprey only needs to manage its own cluster.
-
-## Uninstalling KubeOsprey
-
-### Helm Uninstall
+### Helm 卸载
 
 ```bash
 helm uninstall kube-osprey -n kube-osprey-system
 ```
 
-### YAML Uninstall
+### YAML 卸载
 
 ```bash
 kubectl delete -f https://raw.githubusercontent.com/fadewalk/kube-osprey/main/deploy/install.yaml
 ```
 
-## Next Steps
+## 后续步骤
 
-After KubeOsprey installation is complete, you can continue with:
+KubeOsprey 安装完成后，您可以继续：
 
-- [Adding Users](../config/user-management)
-- [Configuring RBAC](../config/rbac-config)
-- [Configuring OAuth Authentication](../config/oauth-setup)
-- [Setting up Prometheus Monitoring](../config/prometheus-setup)
+- [添加用户](../config/user-management)
+- [配置 RBAC](../config/rbac-config)
+- [配置 OAuth 认证](../config/oauth-setup)
+- [设置 Prometheus 监控](../config/prometheus-setup)

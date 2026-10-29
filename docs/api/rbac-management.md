@@ -1,16 +1,16 @@
-# RBAC Management
+# RBAC 管理
 
-RBAC management APIs are under `/api/v1/admin/roles/`.
+RBAC 管理接口位于 `/api/v1/admin/roles/`。
 
-These endpoints require an authenticated admin user, or an API key with the `admin` role.
+这些接口要求调用方已经是管理员用户，或者使用一个拥有 `admin` 角色的 API 密钥。
 
-## List roles
+## 获取角色列表
 
 ```http
 GET /api/v1/admin/roles/
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -18,7 +18,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -38,20 +38,20 @@ Response example:
 }
 ```
 
-## Get a single role
+## 获取单个角色
 
 ```http
 GET /api/v1/admin/roles/:id
 ```
 
-## Create a role
+## 创建角色
 
 ```http
 POST /api/v1/admin/roles/
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -64,7 +64,7 @@ Request body:
 }
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -82,22 +82,22 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
-## Update a role
+## 更新角色
 
 ```http
 PUT /api/v1/admin/roles/:id
 Content-Type: application/json
 ```
 
-Request body uses the same fields as create.
+请求体字段与创建角色时一致。
 
-## Delete a role
+## 删除角色
 
 ```http
 DELETE /api/v1/admin/roles/:id
 ```
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -106,7 +106,7 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/roles/3
 ```
 
-Response example:
+响应示例：
 
 ```json
 {
@@ -114,14 +114,14 @@ Response example:
 }
 ```
 
-## Assign a role
+## 分配角色
 
 ```http
 POST /api/v1/admin/roles/:id/assign
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -131,14 +131,14 @@ Request body:
 }
 ```
 
-Supported `subjectType` values in the current server implementation:
+`expiresAt` 为可选字段，RFC3339 格式，用于设置授权的过期时间；省略或传 `null` 表示永不过期。过期后授权立即失效（无需重新同步权限）；对同一主体重复调用时，会更新已有授权的过期时间。
+
+当前服务端实现支持的 `subjectType`：
 
 - `user`
 - `group`
 
-`expiresAt` is optional and takes an RFC 3339 timestamp. An expired assignment stops granting the role immediately on the next permission check. Assigning the same subject again updates the assignment, so you can extend or clear the expiry this way. See [Role Assignment Expiry](/config/rbac-config#role-assignment-expiry) for the UI flow.
-
-Example:
+示例：
 
 ```bash
 curl \
@@ -149,13 +149,13 @@ curl \
   https://kube-osprey.example.com/api/v1/admin/roles/3/assign
 ```
 
-## Unassign a role
+## 移除角色分配
 
 ```http
 DELETE /api/v1/admin/roles/:id/assign?subjectType=user&subject=alice
 ```
 
-Example:
+示例：
 
 ```bash
 curl \

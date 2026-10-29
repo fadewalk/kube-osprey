@@ -1,14 +1,12 @@
-# Monitoring
+# 监控
 
-KubeOsprey provides comprehensive monitoring capabilities for your Kubernetes clusters through integration with Prometheus and built-in visualization tools.
+KubeOsprey 通过与 Prometheus 集成和内置的可视化工具，为您的 Kubernetes 集群提供全面的监控功能。
 
 ![Monitoring](/screenshots/monitor.png)
 
-To learn how to configure Prometheus monitoring, please refer to the [Prometheus Setup Guide](../config/prometheus-setup).
+如何配置 Prometheus 监控，请参阅 [Prometheus 设置指南](../config/prometheus-setup)。
 
-## See Also
+## 另请参阅
 
-In addition to Prometheus metrics, KubeOsprey provides two related views:
-
-- [Alert Center](./alert-center) — view AlertManager alerts and manage silences.
-- [Health Diagnostics](./health-diagnostics) — cluster health score and risk findings.
+- [告警中心](/guide/alert-center)：查看 AlertManager 告警，并进行告警静默管理。
+- [健康诊断](/guide/health-diagnostics)：获取集群健康评分与风险项概览。

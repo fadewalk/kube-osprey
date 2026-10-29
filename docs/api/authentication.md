@@ -1,17 +1,17 @@
-# Authentication
+# 认证
 
-KubeOsprey supports interactive login through OAuth, password users, LDAP, MFA, and passkeys, plus programmatic access through API keys. API keys authenticate as special users and follow the same RBAC model as interactive users.
+KubeOsprey 支持通过 OAuth、密码用户、LDAP、MFA 和 Passkey 进行页面登录，也支持通过 API 密钥进行程序化访问。API 密钥会以一个特殊用户身份完成认证，并沿用与页面登录用户相同的 RBAC 模型。
 
-## Interactive login
+## 页面登录
 
-Password login uses:
+密码登录接口：
 
 ```http
 POST /api/auth/login/password
 Content-Type: application/json
 ```
 
-Request body:
+请求体：
 
 ```json
 {
@@ -21,13 +21,15 @@ Request body:
 }
 ```
 
-`mfa_code` is required only when MFA is enabled for the password user.
+只有当该密码用户已启用 MFA 时，才需要传 `mfa_code`。
 
-LDAP login uses the same request body at `POST /api/auth/login/ldap`.
+LDAP 登录使用相同请求体，接口为 `POST /api/auth/login/ldap`。
+
+OAuth 登录使用浏览器跳转流程：`GET /api/auth/login` 按名称跳转到对应的身份提供商，授权完成后回调 `GET /api/auth/callback` 换取会话。Passkey 与 MFA 的管理接口见下文。
 
 ## MFA
 
-MFA is available for password users. Users manage MFA from account settings, or through these authenticated endpoints:
+MFA 适用于密码用户。用户可以在账号设置中管理 MFA，也可以使用以下已认证接口：
 
 ```http
 POST /api/users/me/mfa/setup
@@ -35,7 +37,7 @@ POST /api/users/me/mfa/enable
 POST /api/users/me/mfa/disable
 ```
 
-Setup requires the current password:
+初始化 MFA 需要当前密码：
 
 ```json
 {
@@ -43,7 +45,7 @@ Setup requires the current password:
 }
 ```
 
-The setup response includes `secret`, `otpauth_url`, and `qr_code`. Enable or disable MFA by submitting a TOTP code:
+初始化响应包含 `secret`、`otpauth_url` 和 `qr_code`。启用或停用 MFA 时提交 TOTP 验证码：
 
 ```json
 {
@@ -51,11 +53,11 @@ The setup response includes `secret`, `otpauth_url`, and `qr_code`. Enable or di
 }
 ```
 
-## Passkey login
+## Passkey 登录
 
-Passkeys are available for password users. Users can register and delete passkeys from account settings.
+Passkey 适用于密码用户。用户可以在账号设置中注册和删除 Passkey。
 
-Current-user passkey endpoints:
+当前用户 Passkey 接口：
 
 ```http
 GET /api/users/me/passkeys
@@ -64,7 +66,7 @@ POST /api/users/me/passkeys/finish
 DELETE /api/users/me/passkeys/:id
 ```
 
-Registration starts with the passkey name and current password. If the user has MFA enabled, `mfa_code` is also required:
+注册 Passkey 时需要传名称和当前密码。如果该用户已启用 MFA，还需要传 `mfa_code`：
 
 ```json
 {
@@ -74,25 +76,25 @@ Registration starts with the passkey name and current password. If the user has 
 }
 ```
 
-Passkey sign-in uses the WebAuthn begin/finish flow:
+Passkey 登录使用 WebAuthn begin/finish 流程：
 
 ```http
 POST /api/auth/passkey/login/begin
 POST /api/auth/passkey/login/finish
 ```
 
-## Authentication settings
+## 认证设置
 
-Admins can enable or disable password login, MFA, and passkey login in **Settings -> Authentication**.
+管理员可以在 **设置 -> 认证** 中启用或停用密码登录、MFA 和 Passkey 登录。
 
-The same settings are available through:
+同样的设置也可以通过以下接口管理：
 
 ```http
 GET /api/v1/admin/general-setting/
 PUT /api/v1/admin/general-setting/
 ```
 
-Relevant request fields:
+相关请求字段：
 
 ```json
 {
@@ -102,46 +104,46 @@ Relevant request fields:
 }
 ```
 
-## Login attempt blocking
+## 登录尝试封禁
 
-Credential-based logins are temporarily blocked by client IP after repeated invalid password or MFA attempts. KubeOsprey allows up to 10 failures within 1 minute; the next failure blocks further credential login attempts from that client IP for 5 minutes.
+基于账号密码的登录会在连续失败时按客户端 IP 临时封禁。KubeOsprey 允许 1 分钟内最多 10 次错误密码或 MFA 验证失败；第 11 次失败会封禁该客户端 IP 的账号密码登录 5 分钟。
 
-When KubeOsprey runs behind an ingress or load balancer, the client IP used by this limiter depends on `TRUSTED_PROXIES`. See [Environment Variables](/config/env#environment-variables) for how to configure trusted proxy ranges.
+当 KubeOsprey 运行在 Ingress 或负载均衡器后面时，封禁使用的客户端 IP 取决于 `TRUSTED_PROXIES` 配置。详见[环境变量](/config/env)。
 
-## API key format
+## API 密钥格式
 
-The full API key format is:
+完整 API 密钥格式如下：
 
 ```text
 kubeosprey<ID>-<SECRET>
 ```
 
-Use the full value directly in the `Authorization` header. Do not prepend `Bearer`.
+使用时直接把完整值放进 `Authorization` 请求头，不要加 `Bearer`。
 
-Keys issued before the `kubeosprey` prefix was introduced (`kite<ID>-<SECRET>`) keep working; re-issuing a key in **Settings -> API Keys** migrates it to the new prefix.
+在引入 `kubeosprey` 前缀之前签发的密钥（`kite<ID>-<SECRET>`）仍然有效；在 **设置 -> API 密钥** 中重新签发即可迁移到新前缀。
 
 ```http
 Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-## Where to configure it
+## 在哪里配置
 
-Users with the `admin` role can create API keys in **Settings -> API Keys**.
+拥有 `admin` 角色的用户可以在 **设置 -> API 密钥** 中创建 API 密钥。
 
-After creating a key, copy the full value and use it as the `Authorization` header for API requests.
+创建后，复制完整密钥值，并把它作为 API 请求里的 `Authorization` 请求头使用。
 
-## Permissions
+## 权限说明
 
-API keys use the same RBAC model as regular users.
+API 密钥与普通用户共用同一套 RBAC 权限模型。
 
-- Creating an API key does not automatically grant any resource permissions.
-- Resource access under `/api/v1/...` is still checked by RBAC.
-- Admin APIs under `/api/v1/admin/...` require the caller to have the `admin` role.
-- Cluster resource APIs usually also require `x-cluster-name`.
+- 创建 API 密钥本身不会自动获得任何资源权限。
+- `/api/v1/...` 下的资源访问仍然会经过 RBAC 校验。
+- `/api/v1/admin/...` 下的管理接口要求调用方拥有 `admin` 角色。
+- 集群资源接口通常还需要传 `x-cluster-name`。
 
-## Authenticate requests
+## 认证请求
 
-Example:
+示例：
 
 ```bash
 curl \
@@ -150,6 +152,6 @@ curl \
   https://kube-osprey.example.com/api/v1/pods/default
 ```
 
-Notes:
+说明：
 
-- Resource endpoints under `/api/v1/...` usually also require `x-cluster-name`.
+- `/api/v1/...` 下的资源接口通常还需要传 `x-cluster-name`。

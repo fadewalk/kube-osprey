@@ -4,18 +4,18 @@ outline: deep
 
 # Kube Proxy
 
-KubeOsprey has a built-in kubectl Proxy feature that allows you to access Pods or Services directly through KubeOsprey without running `kubectl port-forward` locally.
+KubeOsprey 内置了 kubectl Proxy 功能，让您可以直接通过 KubeOsprey 访问 Pods 或 Services，无需在本地运行 `kubectl port-forward`。
 
-## How to Use
+## 如何使用
 
-1.  Navigate to the details page of the Pod or Service you want to access.
-2.  In the `Ports` section, click to access directly.
+1.  导航到您想要访问的 Pod 或 Service 详情页。
+2.  在 `端口` 部分，直接点击即可访问。
 
-![Kube Proxy](../screenshots/kube-proxy1.png)
+![Kube Proxy](/screenshots/kube-proxy1.png)
 
-![Kube Proxy](../screenshots/kube-proxy2.png)
+![Kube Proxy](/screenshots/kube-proxy2.png)
 
-## Notes
+## 注意事项
 
-1. If the Pod or Service you need to access is a front-end service, you may not be able to access it properly.
-2. Only HTTP services are supported for proxying.
+1. 如果需要访问的 Pod 或 Service 是前端服务，则可能无法正常访问。
+2. 只支持代理 HTTP 服务。

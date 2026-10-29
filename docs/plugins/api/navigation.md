@@ -2,13 +2,13 @@
 outline: deep
 ---
 
-# Page Navigation
+# 页面跳转
 
-Import link components and routing utilities from `@kite-dev/plugin-sdk/navigation` to navigate between plugin pages, open custom resource pages, or read URL parameters. Declare sidebar menus and routes in [Plugin Configuration](./plugin-config).
+从 `@kite-dev/plugin-sdk/navigation` 导入链接组件和路由工具，用于在插件页面之间跳转、打开 CRD 页面或读取 URL 参数。侧边栏菜单和路由的声明见[插件配置](./plugin-config)。
 
-## Opening Plugin Pages
+## 打开插件页面
 
-Use `PluginLink` to render links and `usePluginNavigate()` to navigate from event handlers. The `deployment` and `deployments` values below are route IDs declared in `plugin.config.tsx`:
+用 `PluginLink` 渲染链接，用 `usePluginNavigate()` 在事件回调中跳转。下面的 `deployment` 和 `deployments` 对应 `plugin.config.tsx` 中声明的路由 ID：
 
 ```tsx
 import { PluginLink, usePluginNavigate } from '@kite-dev/plugin-sdk/navigation'
@@ -20,42 +20,42 @@ export function DeploymentActions() {
   return (
     <>
       <PluginLink route="deployment" params={{ namespace: 'default', name: 'demo' }}>
-        Open details
+        打开详情
       </PluginLink>
-      <Button onClick={() => navigate('deployments')}>All Deployments</Button>
+      <Button onClick={() => navigate('deployments')}>全部 Deployments</Button>
     </>
   )
 }
 ```
 
-- `PluginLink` accepts standard React Router Link props except `to`, plus `route`, `params`, `search`, and `hash`. Parameters are encoded automatically, and paths include the plugin prefix.
-- `usePluginNavigate()` returns `navigate(routeId, params?, options?)`. `options` extends React Router's `NavigateOptions` with `search` and `hash`.
-- `usePlugin()` returns `{ pluginId, routes }` for the current plugin. Use it with `resolvePluginRoute(context, routeId, params?)` to construct a URL.
+- `PluginLink`：接受常规 React Router Link 属性（除 `to`），外加 `route`、`params`、`search`、`hash`。参数自动编码并加上插件前缀。
+- `usePluginNavigate()`：返回 `navigate(routeId, params?, options?)`，`options` 是 React Router 的 `NavigateOptions` 加上 `search`、`hash`。
+- `usePlugin()` 返回当前插件的 `{ pluginId, routes }`，可配合 `resolvePluginRoute(context, routeId, params?)` 手工拼 URL。
 
-## Opening Resource Pages
+## 打开资源页面
 
-Import `ResourceLink` and `resolveResourcePath` from `/navigation` to open KubeOsprey's custom resource pages without declaring plugin routes:
+`ResourceLink` 和 `resolveResourcePath` 从 `/navigation` 导入，用于跳转 KubeOsprey 的自定义资源页面，不依赖插件路由：
 
 ```tsx
 import { ResourceLink } from '@kite-dev/plugin-sdk/navigation'
 
 const gateways = { group: 'gateway.networking.k8s.io', resource: 'gateways' }
 
-<ResourceLink resource={gateways}>All Gateways</ResourceLink>
+<ResourceLink resource={gateways}>全部 Gateways</ResourceLink>
 <ResourceLink resource={gateways} name="demo" namespace="default">
   demo
 </ResourceLink>
 ```
 
-`ResourceLink` accepts `resource: PluginResourceTarget`, optional `name` and `namespace`, and standard React Router Link props except `to`. Omit `name` to open the list, or provide it to open a detail page. Include `namespace` for namespaced objects. URLs remain unchanged when a plugin provides the page:
+`ResourceLink` 接受 `resource: PluginResourceTarget`、可选的 `name` / `namespace`，以及常规 React Router Link 属性（除 `to`）。不传 `name` 打开列表，传 `name` 打开详情，命名空间级对象同时传 `namespace`。插件接管页面后 URL 保持不变：
 
-| Page | URL |
+| 页面 | URL |
 | ---- | --- |
-| List | `/crds/gateways.gateway.networking.k8s.io` |
-| Namespaced detail | `/crds/gateways.gateway.networking.k8s.io/default/demo` |
-| Cluster-scoped detail | `/crds/clusterissuers.cert-manager.io/demo` |
+| 列表 | `/crds/gateways.gateway.networking.k8s.io` |
+| 命名空间级详情 | `/crds/gateways.gateway.networking.k8s.io/default/demo` |
+| 集群级详情 | `/crds/clusterissuers.cert-manager.io/demo` |
 
-`resolveResourcePath(target, item?)` returns the same paths, with `item` shaped as `{ name, namespace? }`. Parameters are encoded automatically, and KubeOsprey's Router handles the deployment base path. Use React Router's `useNavigate()` in an event handler:
+`resolveResourcePath(target, item?)` 返回同样的路径，`item` 为 `{ name, namespace? }`。参数自动编码，部署基路径由 KubeOsprey 的 Router 处理。事件回调中可以配合 React Router 的 `useNavigate()` 跳转：
 
 ```tsx
 import { resolveResourcePath } from '@kite-dev/plugin-sdk/navigation'
@@ -65,9 +65,9 @@ const navigate = useNavigate()
 const returnToList = () => navigate(resolveResourcePath(gateways))
 ```
 
-## Reading Route Parameters
+## 读取路由参数
 
-`useParams` reads path parameters, `useSearchParams` reads and writes query parameters, and `useLocation` reads the current URL information. They work as they do in React Router. For example, read the name, namespace, and selected tab on a resource detail page:
+`useParams` 读取路径参数，`useSearchParams` 读写查询参数，`useLocation` 读取当前 URL 信息，用法与 React Router 相同。例如在资源详情页读取名称、命名空间和当前 Tab：
 
 ```tsx
 import { useParams, useSearchParams } from '@kite-dev/plugin-sdk/navigation'
@@ -77,4 +77,4 @@ const [searchParams] = useSearchParams()
 const tab = searchParams.get('tab')
 ```
 
-The module also exports React Router's `Outlet` component for nested route layouts.
+需要嵌套路由布局时，同一模块还提供 React Router 的 `Outlet` 组件。

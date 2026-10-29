@@ -1,76 +1,76 @@
-# RBAC Configuration Guide
+# RBAC 配置指南
 
-This guide explains how to configure Role-Based Access Control (RBAC) in KubeOsprey to efficiently manage user permissions and resource access.
+本指南介绍如何在 KubeOsprey 中配置基于角色的访问控制（RBAC），以高效管理用户权限和资源访问。
 
-## Overview
+## 概述
 
-KubeOsprey's RBAC system supports:
+KubeOsprey 的 RBAC 系统支持：
 
-- Defining custom roles with specific permissions
-- Assigning roles to users or OAuth groups
-- Flexible access control at cluster, namespace, and resource levels
-- Specifying allowed operations (verbs) for each role
+- 定义具备特定权限的自定义角色
+- 将角色分配给用户或 OAuth 组
+- 在集群、命名空间和资源级别灵活控制访问
+- 为每个角色指定允许的操作（动词）
 
-## Configuration
+## 配置
 
-Users with the **admin** role can access the settings entry in the upper right corner of the page.
+拥有 **admin** 角色的用户可在页面右上角进入设置入口。
 
-The system provides two default roles that cannot be edited or deleted:
+系统默认提供两类不可编辑和删除的角色：
 
-- **admin**: Has full permissions to manage all resources
-- **viewer**: Has permissions to view all resources and logs
+- **admin**：拥有管理所有资源的全部权限
+- **viewer**：拥有查看所有资源和日志的权限
 
-![RBAC Settings](../screenshots/rbac.png)
+![RBAC 设置](/screenshots/rbac.png)
 
-Each role can specify the following fields:
+每个角色可指定以下字段：
 
-| Field         | Description                    | Example                                                    |
-| ------------- | ------------------------------ | ---------------------------------------------------------- |
-| `name`        | Role identifier                | `admin`, `viewer`                                          |
-| `description` | Brief description (optional)   | `Administrator role with full access`                      |
-| `clusters`    | Applicable clusters            | `!prod`, `dev` means can access dev but not prod           |
-| `resources`   | Accessible resources           | `pods`, `deployments` for specific resources               |
-| `namespaces`  | Applicable namespaces          | `!kube-system`, `*` means can access all namespaces except `kube-system` |
-| `verbs`       | Allowed operations             | `get` for read-only operations                             |
+| 字段          | 描述             | 示例                                                          |
+| ------------- | ---------------- | ------------------------------------------------------------- |
+| `name`        | 角色标识符       | `admin`、`viewer`                                             |
+| `description` | 简要描述（可选） | `具有完全访问权限的管理员角色`                                |
+| `clusters`    | 适用集群         | `!prod`、`dev` 表示可访问 dev 但不可访问 prod                 |
+| `resources`   | 可访问资源       | `pods`、`deployments` 表示特定资源                            |
+| `namespaces`  | 适用命名空间     | `!kube-system`、`*` 表示可访问除 `kube-system` 外所有命名空间 |
+| `verbs`       | 允许操作         | `get` 表示只读操作                                            |
 
-### Supported Operation Verbs
+### 支持的操作动词
 
-- Common resources: `get`, `create`, `update`, `delete`
-- Pod-specific: `exec`, `log` (for pod terminal and log access)
-- Node-specific: `exec` (for node terminal access)
-- Wildcard: `*` (all operations)
+- 通用资源：`get`、`create`、`update`、`delete`
+- Pod 专用：`exec`、`log`（用于 Pod 终端和日志访问）
+- 节点专用：`exec`（用于节点终端访问）
+- 通配符：`*`（所有操作）
 
-### Mapping Roles to OAuth Groups
+### 映射角色到 OAuth 组
 
-You can assign roles to specific OAuth groups, so that all users in the group automatically inherit the corresponding permissions.
+可为特定 OAuth 组分配角色，使组内所有用户自动继承相应权限。
 
-Note: Some OAuth groups may not be able to return user group and permission information. It is recommended to use the [DEX](https://github.com/dexidp/dex) project as a relay. Please ensure that the OAuth scope includes `groups` or `roles`.
+注意：部分 OAuth 组可能无法返回用户的组和权限信息，建议使用 [DEX](https://github.com/dexidp/dex) 项目作为中转。请确保 OAuth 的 scope 包含 `groups` 或 `roles`。
 
-You can configure or cancel group mapping in Role Actions.
+在 Role Actions 中可配置或取消组映射。
 
-![RBAC Group Mapping](../screenshots/assign-role.png)
+![RBAC 组映射](/screenshots/assign-role.png)
 
-### Mapping Roles to Users
+### 映射角色到用户
 
-You can assign roles to specified users to give them corresponding permissions.
+可为指定用户分配角色，使其获得相应权限。
 
-![RBAC User Mapping](../screenshots/assign-role2.png)
+![RBAC 用户映射](/screenshots/assign-role2.png)
 
-### Role Assignment Expiry
+### 角色授权过期时间
 
-When assigning a role (from **Settings → RBAC**), administrators can set an optional expiry time for the assignment. After the expiry time passes, the assignment stops granting the role immediately on the next permission check — no re-sync or manual cleanup is required.
+在用户或组映射上可以设置过期时间（`expiresAt`）。到期后授权立即失效，无需等待或重新触发权限同步。
 
-Re-assigning the same user or group updates the assignment, so you can extend or clear the expiry this way.
+适合为临时支持、值班或外部协作者发放有时限的权限：到期后无需手动回收。
 
-The underlying API is `POST /api/v1/admin/roles/:id/assign`; its request body accepts an optional `expiresAt` (RFC 3339 timestamp). See [RBAC Management API](../api/rbac-management#assign-a-role).
+对应的 API 为 `POST /api/v1/admin/roles/:id/assign`，请求体中可选传入 `expiresAt`（RFC3339 格式，如 `2026-12-31T23:59:59Z`）；不传或传 `null` 表示永不过期。同一个主体重复调用该接口时，服务端会更新已有授权的过期时间。参见 [RBAC 管理 API](../api/rbac-management)。
 
-## Example Scenarios
+## 示例场景
 
-### Scenario 1: Testing Environment
+### 场景 1：测试环境
 
-Can access resources in all test, beta namespaces, but prohibits updates and deletions.
+可访问所有 test、beta 命名空间的资源，但禁止更新和删除。
 
-Configuration example:
+配置示例：
 
 ```
 clusters: *
@@ -79,11 +79,11 @@ namespaces: test, beta
 verbs: !delete, !update, *
 ```
 
-### Scenario 2: Cluster Administrator
+### 场景 2：集群管理员
 
-Assign full operation permissions to the `test-cluster` cluster administrator.
+为 `test-cluster` 集群管理员分配全部操作权限。
 
-Configuration example:
+配置示例：
 
 ```
 clusters: test-cluster
@@ -92,21 +92,21 @@ namespaces: *
 verbs: *
 ```
 
-### Scenario 3: Setting Default Roles for All OAuth Users
+### 场景 3：为所有 OAuth 用户设置默认角色
 
-When your OAuth provider is trustworthy, such as a company's internal OA system.
-You can select a role and set the username to `*` to assign that role. See the example:
+当你的 OAuth 供应商是可以信任的，例如公司内部 OA 系统。
+你可以选中某个角色，将 username 设置为 `*` 赋予该角色。参考示例
 
-![alt text](../screenshots/assign-role3.png)
+![alt text](/screenshots/assign-role3.png)
 
-## Best Practices
+## 最佳实践
 
-1. **Principle of Least Privilege**: Only assign necessary permissions to roles
-2. **Prioritize Namespace Roles**: Try to restrict access to specific namespaces
-3. **Avoid Wildcard Users**: In production environments, explicitly specify users and avoid using `"*"`
-4. **Regular Auditing**: Regularly check and optimize role mappings
-5. **Test Access**: Verify permission effects promptly after changes
+1. **最小权限原则**：仅为角色分配必要权限
+2. **优先使用命名空间角色**：尽量将访问限制在特定命名空间
+3. **避免通配符用户**：生产环境中应明确指定用户，避免使用 `"*"`
+4. **定期审计**：定期检查和优化角色映射
+5. **测试访问**：更改后及时验证权限效果
 
-## Common Questions
+## 常见问题
 
-- The `Describe` action only checks the current user's `get` permission on the target resource. The Kubernetes describer runs queries using the cluster credentials configured in KubeOsprey, and its output may include Events and related resource summaries. KubeOsprey does not perform separate RBAC checks for this additional information.
+- `Describe` 操作只检查当前用户对目标资源的 `get` 权限。Kubernetes describer 使用 KubeOsprey 中配置的集群凭据执行查询，其输出可能包含 Events 和关联资源摘要，KubeOsprey 不会再对这些附带信息执行独立的 RBAC 检查。

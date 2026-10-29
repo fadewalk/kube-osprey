@@ -2,40 +2,40 @@
 outline: deep
 ---
 
-# Debugging
+# 调试
 
-The plugin development server watches source files, rebuilds changes, and serves static files. Pages run inside KubeOsprey, using its actual components, current user, cluster, and API permissions.
+插件开发服务负责监听源码、重新构建并提供静态文件。页面运行在 KubeOsprey 内，复用真实的组件、当前用户、集群和 API 权限。
 
-## Start the Development Server
+## 启动开发服务
 
-Run this in the plugin directory:
+在插件目录运行：
 
 ```sh
 pnpm dev
 ```
 
-After the first build, the terminal prints:
+首次构建完成后，终端输出：
 
 ```text
 Plugin URL: http://localhost:5174/plugin.json
 ```
 
-In the `kite-plugins` workspace, build the SDK before starting a plugin:
+在 `kite-plugins` workspace 中，先构建 SDK，再启动对应插件：
 
 ```sh
 pnpm --filter @kite-dev/plugin-sdk run build
 pnpm --filter cert-manager dev
 ```
 
-## Configure KubeOsprey
+## 配置 KubeOsprey
 
-Pass the development URL to KubeOsprey as an environment variable:
+将开发地址作为环境变量传给 KubeOsprey：
 
 ```sh
 PLUGIN_DEV_URL=http://localhost:5174/plugin.json ./kube-osprey
 ```
 
-For Helm deployments, use the existing `extraEnvs` option:
+使用 Helm 部署时，通过已有的 `extraEnvs` 配置：
 
 ```yaml
 extraEnvs:
@@ -43,29 +43,29 @@ extraEnvs:
     value: http://localhost:5174/plugin.json
 ```
 
-The URL must be accessible from your browser. `localhost` means the machine running the browser, not the KubeOsprey container. For remote development, forward the port to the browser's machine. You can also choose the listening address and port:
+开发地址必须能被浏览器访问；`localhost` 指浏览器所在的机器，而不是 KubeOsprey 容器。远程开发可以通过端口转发将服务映射到浏览器所在的机器。也可以指定监听地址和端口：
 
 ```sh
 pnpm dev --host 0.0.0.0 --port 5174
 ```
 
-Then update the hostname in the configuration to a development machine address your browser can reach. When KubeOsprey uses HTTPS, use a development URL that the browser allows. Remote HTTP services may be blocked as mixed content; configure HTTPS for the development server when needed.
+此时将配置中的主机名改成浏览器能够访问的开发机地址。HTTPS KubeOsprey 页面应配合浏览器允许访问的开发地址，远程 HTTP 服务可能被浏览器拦截为混合内容；需要时为开发服务配置 HTTPS。
 
-## Edit and Refresh
+## 修改与刷新
 
-1. Edit pages, styles, translations, or `plugin.config.tsx`.
-2. Wait for the terminal to report a successful rebuild.
-3. Refresh KubeOsprey to load the updated plugin.
+1. 修改页面、样式、翻译或 `plugin.config.tsx`。
+2. 等待终端提示重新构建完成。
+3. 刷新 KubeOsprey 页面，加载最新的插件。
 
-Menus, routes, custom resource pages, list columns, and detail tabs use the existing plugin loading mechanism. Development plugins do not need installation and are not stored in the database. If an installed plugin has the same ID, the current KubeOsprey instance uses the development plugin instead. This setting applies to users of that KubeOsprey instance.
+菜单、路由、资源页面接管以及列表列、详情 Tab 扩展均通过现有插件机制加载。开发插件无需安装，也不写入数据库；如果存在相同 ID 的已安装插件，当前实例优先使用开发插件。此配置作用于访问该 KubeOsprey 实例的用户。
 
-You do not need to increment versions during development. Restart `pnpm dev` after changing the plugin ID, version, or Vite configuration. Restart KubeOsprey after changing `PLUGIN_DEV_URL`; ordinary source changes only require a browser refresh. Remove the environment variable and restart KubeOsprey to return to installed plugins.
+开发期间无需递增版本号。修改插件 ID、版本或 Vite 配置后，重启 `pnpm dev`。修改 `PLUGIN_DEV_URL` 后需要重启 KubeOsprey；平时修改插件源码只需刷新浏览器。移除环境变量并重启 KubeOsprey 后，恢复加载已安装插件。
 
-## Troubleshooting
+## 排查问题
 
-- **Development URL fails to load:** open the URL printed in the terminal in your browser. Check that the server is running, the address and port are reachable, and the browser console has no loading errors.
-- **Changes do not appear:** confirm the build succeeded, then refresh the entire KubeOsprey page. Switching menus does not reload modules that have already executed.
-- **Build fails:** read the error in the development server's terminal. The watcher resumes building when you fix the source.
-- **Plugin module or component fails:** check the browser console and page error messages. KubeOsprey's plugin error isolation still applies.
+- 开发地址请求失败：在浏览器中打开终端输出的开发地址，确认服务正在运行、地址和端口可达，并检查浏览器控制台中的加载错误。
+- 改动没有生效：先确认构建成功，再刷新整个 KubeOsprey 页面。仅切换菜单不会重新加载已经执行的模块。
+- 构建失败：查看开发服务终端中的错误。修正源码后监听器会继续构建。
+- 插件模块或组件异常：查看浏览器控制台和页面错误提示；插件仍使用 KubeOsprey 的错误隔离机制。
 
-When ready to distribute the plugin, run `pnpm build` and `pnpm pack` to produce a release build and installation archive.
+准备分发时运行 `pnpm build` 和 `pnpm pack`，生成正式构建和安装包。

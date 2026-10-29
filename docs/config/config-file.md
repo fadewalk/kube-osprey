@@ -1,20 +1,20 @@
-# Configuration File
+# 配置文件
 
-KubeOsprey supports loading cluster, OAuth/LDAP, AI, and RBAC configuration from a YAML file. When a section is configured this way, it becomes **read-only** in the UI — users can view the settings but cannot modify them through the dashboard.
+KubeOsprey 支持通过 YAML 配置文件来管理集群、OAuth/LDAP、AI 和 RBAC 配置。通过配置文件管理的部分在 UI 中将变为**只读**——用户可以查看配置但无法通过界面修改。
 
-This is useful for GitOps workflows where configuration is version-controlled and applied via Helm.
+这对于 GitOps 工作流非常有用，配置可以版本控制并通过 Helm 部署。
 
-> Available in KubeOsprey `v0.10.0` and later.
+> 该功能仅适用于 KubeOsprey `v0.10.0` 及以上版本。
 
-## How It Works
+## 工作原理
 
-1. KubeOsprey reads a YAML config file from the path specified by the `KUBE_OSPREY_CONFIG_FILE` environment variable.
-2. On every startup, the config is applied to the database, overwriting existing values for managed sections.
-3. Sensitive values in the config file support `${ENV_VAR}` placeholder expansion from environment variables.
-4. The UI automatically detects managed sections and displays them as read-only with an informational banner.
-5. Write API endpoints for managed sections return `403 Forbidden`.
+1. KubeOsprey 从 `KUBE_OSPREY_CONFIG_FILE` 环境变量指定的路径读取 YAML 配置文件。
+2. 每次启动时，配置都会应用到数据库，覆盖已管理部分的现有值。
+3. 配置文件中的敏感值支持 `${ENV_VAR}` 占位符，从环境变量中展开。
+4. UI 自动检测已管理的部分，以只读模式显示并附带提示横幅。
+5. 已管理部分的写入 API 返回 `403 Forbidden`。
 
-## Config File Format
+## 配置文件格式
 
 ```yaml
 superUser:
@@ -23,7 +23,7 @@ superUser:
 
 clusters:
   - name: production
-    description: "Production cluster"
+    description: "生产集群"
     config: |
       apiVersion: v1
       kind: Config
@@ -81,19 +81,19 @@ ai:
 rbac:
   roles:
     - name: admin
-      description: "Administrator role with full access"
+      description: "管理员，完全访问权限"
       clusters: ["*"]
       namespaces: ["*"]
       resources: ["*"]
       verbs: ["*"]
     - name: viewer
-      description: "Read-only access"
+      description: "只读访问"
       clusters: ["*"]
       namespaces: ["*"]
       resources: ["*"]
       verbs: ["get", "log"]
     - name: dev-team
-      description: "Development team access"
+      description: "开发团队权限"
       clusters: ["dev-*", "staging-*"]
       namespaces: ["*"]
       resources: ["*"]
@@ -108,19 +108,19 @@ rbac:
       oidcGroups: ["developers"]
 ```
 
-You only need to include the sections you want to manage. For example, if you only want to manage clusters via config file, just include the `clusters` section — OAuth, LDAP, AI, and RBAC will remain editable through the UI.
+你只需包含想要管理的部分。例如，如果只想通过配置文件管理集群，只需包含 `clusters` 部分——OAuth、LDAP、AI 和 RBAC 仍然可以通过 UI 编辑。
 
-## Using with Helm
+## 通过 Helm 使用
 
-There are two approaches to provide the config file via Helm.
+有两种方式通过 Helm 提供配置文件。
 
-### Approach 1: Existing Secret (Recommended)
+### 方式一：使用已有的 Secret（推荐）
 
-Create and manage your own Kubernetes Secret containing the config file. This is the recommended approach for production since it keeps sensitive values (kubeconfigs, OAuth secrets, LDAP passwords) in a proper Secret.
+创建并管理你自己的 Kubernetes Secret。这是生产环境推荐的方式，因为可以妥善保管敏感值（kubeconfig、OAuth 密钥、LDAP 密码）。
 
-**Step 1:** Create your `config.yaml` file locally.
+**步骤 1：** 在本地创建 `config.yaml` 文件。
 
-**Step 2:** Create the Kubernetes Secret:
+**步骤 2：** 创建 Kubernetes Secret：
 
 ```bash
 kubectl create secret generic kube-osprey-config \
@@ -128,7 +128,7 @@ kubectl create secret generic kube-osprey-config \
   -n <namespace>
 ```
 
-**Step 3:** Reference it in your Helm values:
+**步骤 3：** 在 Helm values 中引用：
 
 ```yaml
 config:
@@ -137,12 +137,12 @@ config:
 ```
 
 ::: tip
-You can manage the Secret with tools like [External Secrets Operator](https://external-secrets.io/), [Sealed Secrets](https://sealed-secrets.netlify.app/), or any GitOps-compatible secret management solution.
+你可以使用 [External Secrets Operator](https://external-secrets.io/)、[Sealed Secrets](https://sealed-secrets.netlify.app/) 或任何 GitOps 兼容的密钥管理方案来管理该 Secret。
 :::
 
-### Approach 2: Inline Configuration
+### 方式二：内联配置
 
-Define the configuration directly in Helm values. A Secret is automatically generated. Suitable for simple setups or development environments.
+直接在 Helm values 中定义配置，会自动生成 Secret。适合简单场景或开发环境。
 
 ```yaml
 config:
@@ -173,12 +173,12 @@ config:
         users: ["*"]
 ```
 
-#### Using Environment Variable Placeholders
+#### 使用环境变量占位符
 
-For sensitive values in inline configuration, use `${ENV_VAR}` placeholders. These are expanded from environment variables at startup. Combine with `extraEnvs` to inject secrets from Kubernetes Secrets:
+对于内联配置中的敏感值，可以使用 `${ENV_VAR}` 占位符，启动时会从环境变量中展开。配合 `extraEnvs` 从 Kubernetes Secret 注入：
 
 ```yaml
-# Reference external secrets as environment variables
+# 从外部 Secret 引用环境变量
 extraEnvs:
   - name: PROD_KUBECONFIG
     valueFrom:
@@ -196,7 +196,7 @@ extraEnvs:
         name: my-ldap-secrets
         key: bind-password
 
-# Use placeholders in config
+# 在配置中使用占位符
 config:
   enabled: true
   clusters:
@@ -221,104 +221,104 @@ config:
     groupBaseDn: "ou=groups,dc=example,dc=com"
 ```
 
-## Config Values Reference
+## 配置值参考
 
-### Super User Configuration
+### 超级用户配置
 
-| Field      | Type   | Description                           | Required |
-| ---------- | ------ | ------------------------------------- | -------- |
-| `username` | string | Super user username                   | Yes      |
-| `password` | string | Super user password                   | Yes      |
+| 字段       | 类型   | 描述           | 必填 |
+| ---------- | ------ | -------------- | ---- |
+| `username` | string | 超级用户用户名 | 是   |
+| `password` | string | 超级用户密码   | 是   |
 
-The super user is created on first startup if it doesn't exist. On subsequent startups, the password is updated to match the config file.
+超级用户仅在首次启动且数据库中没有该用户时创建。后续启动会更新该用户的密码（如果配置文件中的密码发生了变化）。
 
-### Cluster Configuration
+### 集群配置
 
-| Field           | Type    | Description                     | Required |
-| --------------- | ------- | ------------------------------- | -------- |
-| `name`          | string  | Unique cluster name             | Yes      |
-| `description`   | string  | Cluster description             | No       |
-| `config`        | string  | Kubeconfig YAML content         | No *     |
-| `prometheusURL` | string  | Prometheus endpoint URL         | No       |
-| `inCluster`     | boolean | Use in-cluster service account  | No       |
-| `default`       | boolean | Set as default cluster          | No       |
+| 字段            | 类型    | 描述                    | 必填   |
+| --------------- | ------- | ----------------------- | ------ |
+| `name`          | string  | 唯一集群名称            | 是     |
+| `description`   | string  | 集群描述                | 否     |
+| `config`        | string  | Kubeconfig YAML 内容    | 否 *   |
+| `prometheusURL` | string  | Prometheus 端点 URL     | 否     |
+| `inCluster`     | boolean | 使用集群内服务账号      | 否     |
+| `default`       | boolean | 设为默认集群            | 否     |
 
-\* Either `config` or `inCluster: true` must be provided.
+\* 必须提供 `config` 或 `inCluster: true`。
 
-### OAuth Provider Configuration
+### OAuth 提供者配置
 
-| Field           | Type    | Description                                 | Required |
-| --------------- | ------- | ------------------------------------------- | -------- |
-| `name`          | string  | Provider name (e.g., "google", "github")    | Yes      |
-| `clientId`      | string  | OAuth client ID                             | Yes      |
-| `clientSecret`  | string  | OAuth client secret                         | Yes      |
-| `issuer`        | string  | OIDC issuer URL (enables auto-discovery)    | No       |
-| `authUrl`       | string  | Authorization endpoint (if no issuer)       | No       |
-| `tokenUrl`      | string  | Token endpoint (if no issuer)               | No       |
-| `userInfoUrl`   | string  | User info endpoint (if no issuer)           | No       |
-| `scopes`        | string  | Comma-separated scopes                      | No       |
-| `usernameClaim` | string  | JWT claim for username                      | No       |
-| `groupsClaim`   | string  | JWT claim for groups                        | No       |
-| `allowedGroups` | string  | Comma-separated list of allowed groups      | No       |
-| `enabled`       | boolean | Enable this provider                        | No       |
+| 字段            | 类型    | 描述                                    | 必填 |
+| --------------- | ------- | --------------------------------------- | ---- |
+| `name`          | string  | 提供者名称（如 "google"、"github"）     | 是   |
+| `clientId`      | string  | OAuth Client ID                         | 是   |
+| `clientSecret`  | string  | OAuth Client Secret                     | 是   |
+| `issuer`        | string  | OIDC Issuer URL（启用自动发现）         | 否   |
+| `authUrl`       | string  | 授权端点（无 issuer 时）                | 否   |
+| `tokenUrl`      | string  | Token 端点（无 issuer 时）              | 否   |
+| `userInfoUrl`   | string  | 用户信息端点（无 issuer 时）            | 否   |
+| `scopes`        | string  | 逗号分隔的 scopes                       | 否   |
+| `usernameClaim` | string  | 用于用户名的 JWT claim                  | 否   |
+| `groupsClaim`   | string  | 用于组的 JWT claim                      | 否   |
+| `allowedGroups` | string  | 逗号分隔的允许组列表                    | 否   |
+| `enabled`       | boolean | 启用此提供者                            | 否   |
 
-### LDAP Configuration
+### LDAP 配置
 
-| Field                  | Type    | Description                          | Default        |
-| ---------------------- | ------- | ------------------------------------ | -------------- |
-| `enabled`              | boolean | Enable LDAP authentication           | `false`        |
-| `serverUrl`            | string  | LDAP server URL                      |                |
-| `useStartTLS`          | boolean | Use StartTLS for `ldap://`           | `false`        |
-| `bindDn`               | string  | Service account DN                   |                |
-| `bindPassword`         | string  | Service account password             |                |
-| `userBaseDn`           | string  | Base DN for user searches            |                |
-| `userFilter`           | string  | User search filter                   | `(uid=%s)`     |
-| `usernameAttribute`    | string  | Username attribute                   | `uid`          |
-| `displayNameAttribute` | string  | Display name attribute               | `cn`           |
-| `groupBaseDn`          | string  | Base DN for group searches           |                |
-| `groupFilter`          | string  | Group membership filter              | `(member=%s)`  |
-| `groupNameAttribute`   | string  | Group name attribute                 | `cn`           |
+| 字段                   | 类型    | 描述                | 默认值         |
+| ---------------------- | ------- | ------------------- | -------------- |
+| `enabled`              | boolean | 启用 LDAP 认证      | `false`        |
+| `serverUrl`            | string  | LDAP 服务器 URL     |                |
+| `useStartTLS`          | boolean | 对 `ldap://` 使用 StartTLS | `false` |
+| `bindDn`               | string  | 服务账号 DN         |                |
+| `bindPassword`         | string  | 服务账号密码        |                |
+| `userBaseDn`           | string  | 用户搜索 Base DN    |                |
+| `userFilter`           | string  | 用户搜索过滤器      | `(uid=%s)`     |
+| `usernameAttribute`    | string  | 用户名属性          | `uid`          |
+| `displayNameAttribute` | string  | 显示名属性          | `cn`           |
+| `groupBaseDn`          | string  | 组搜索 Base DN      |                |
+| `groupFilter`          | string  | 组成员过滤器        | `(member=%s)`  |
+| `groupNameAttribute`   | string  | 组名属性            | `cn`           |
 
-### AI Configuration
+### AI 配置
 
-| Field       | Type    | Description                                      | Default                         |
-| ----------- | ------- | ------------------------------------------------ | ------------------------------- |
-| `enabled`   | boolean | Enable the AI assistant                          | `false`                         |
-| `provider`  | string  | `openai` or `anthropic`                           | `openai`                        |
-| `model`     | string  | Model name                                       | `gpt-4o-mini` / `claude-sonnet-5-5` |
-| `apiKey`    | string  | API key; required when enabled; supports `${ENV_VAR}` |                              |
-| `baseUrl`   | string  | Custom API endpoint                              | Provider's default endpoint     |
-| `maxTokens` | integer | Maximum output tokens                            | `16384`                         |
+| 字段        | 类型    | 描述                                            | 默认值                            |
+| ----------- | ------- | ----------------------------------------------- | --------------------------------- |
+| `enabled`   | boolean | 启用 AI 助手                                    | `false`                           |
+| `provider`  | string  | `openai` 或 `anthropic`                          | `openai`                          |
+| `model`     | string  | 模型名称                                        | `gpt-4o-mini` / `claude-sonnet-5-5` |
+| `apiKey`    | string  | API Key；启用时必填，支持 `${ENV_VAR}` 占位符     |                                   |
+| `baseUrl`   | string  | 自定义 API 地址                                 | 提供者的默认地址                  |
+| `maxTokens` | integer | 最大输出 Token 数                               | `16384`                           |
 
-The default model follows the selected provider. The `ai` section manages all AI fields; omitted fields use their defaults or empty values. API keys are stored encrypted in the database.
+默认模型随提供者变化。`ai` 部分管理全部 AI 字段，省略的字段使用默认值或空值。API Key 在数据库中加密存储。
 
-AI settings follow the existing config file reload mechanism and become read-only in the UI. Other general settings remain editable. In inline Helm values, configure these fields under `config.ai`.
+AI 设置沿用现有配置文件的自动重载机制，并在 UI 中变为只读。其他通用设置仍可编辑。使用 Helm 内联配置时，将这些字段放在 `config.ai` 下。
 
-### RBAC Configuration
+### RBAC 配置
 
-#### Role
+#### 角色
 
-| Field         | Type     | Description                              | Required |
-| ------------- | -------- | ---------------------------------------- | -------- |
-| `name`        | string   | Role name                                | Yes      |
-| `description` | string   | Role description                         | No       |
-| `clusters`    | string[] | Cluster patterns (`*`, `prod-*`, `!dev`) | Yes      |
-| `namespaces`  | string[] | Namespace patterns                       | Yes      |
-| `resources`   | string[] | Resource types (`pods`, `*`, etc.)       | Yes      |
-| `verbs`       | string[] | Allowed verbs (`get`, `create`, `*`)     | Yes      |
+| 字段          | 类型     | 描述                                     | 必填 |
+| ------------- | -------- | ---------------------------------------- | ---- |
+| `name`        | string   | 角色名称                                 | 是   |
+| `description` | string   | 角色描述                                 | 否   |
+| `clusters`    | string[] | 集群匹配模式（`*`、`prod-*`、`!dev`）   | 是   |
+| `namespaces`  | string[] | 命名空间匹配模式                         | 是   |
+| `resources`   | string[] | 资源类型（`pods`、`*` 等）               | 是   |
+| `verbs`       | string[] | 允许的操作（`get`、`create`、`*`）       | 是   |
 
-#### Role Mapping
+#### 角色映射
 
-| Field        | Type     | Description                     | Required |
-| ------------ | -------- | ------------------------------- | -------- |
-| `name`       | string   | Role name to map to             | Yes      |
-| `users`      | string[] | Usernames (`*` for all users)   | No       |
-| `oidcGroups` | string[] | OIDC/LDAP group names           | No       |
+| 字段         | 类型     | 描述                          | 必填 |
+| ------------ | -------- | ----------------------------- | ---- |
+| `name`       | string   | 要映射的角色名称              | 是   |
+| `users`      | string[] | 用户名（`*` 表示所有用户）    | 否   |
+| `oidcGroups` | string[] | OIDC/LDAP 组名                | 否   |
 
-## Behavior Notes
+## 行为说明
 
-- **Startup override**: Config is re-applied on every startup. Changes made to managed sections through the database will be overwritten.
-- **Super user**: Created on first startup if it doesn't exist. On subsequent startups, the password is updated to match the config file.
-- **Setup wizard skip**: When clusters are configured via config file, the initialization wizard is automatically skipped.
-- **Partial management**: You can manage some sections via config file and leave others for UI management. Only sections present in the config file become read-only.
-- **System roles**: The default `admin` and `viewer` system roles are updated (not duplicated) when defined in the RBAC config.
+- **启动覆盖**：每次启动时都会重新应用配置。通过数据库对已管理部分的修改会被覆盖。
+- **超级用户**：首次启动时如果该用户不存在则创建。后续启动会同步更新密码。
+- **跳过初始化向导**：当集群通过配置文件配置时，初始化向导会自动跳过。
+- **部分管理**：你可以通过配置文件管理某些部分，其余部分留给 UI 管理。只有配置文件中存在的部分才会变为只读。
+- **系统角色**：在 RBAC 配置中定义默认的 `admin` 和 `viewer` 系统角色时，会更新现有角色（不会重复创建）。
