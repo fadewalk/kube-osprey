@@ -36,11 +36,8 @@ func TestLoadRepositoryArchiveFromRepository(t *testing.T) {
 }
 
 func TestLoadArchiveFromOCIRepository(t *testing.T) {
-	// TODO(swatch): point at oci://ghcr.io/fadewalk/charts/kube-osprey and
-	// assert name "kube-osprey" once the first renamed chart release exists;
-	// that package is only created by the release workflow on the next tag.
-	loadedChart, err := LoadArchive("oci://ghcr.io/kite-org/charts/kite", nil)
+	loadedChart, err := LoadArchive("oci://ghcr.io/fadewalk/charts/kube-osprey", nil)
 	require.NoError(t, err)
-	require.Equal(t, "kite", loadedChart.Metadata.Name)
+	require.Equal(t, "kube-osprey", loadedChart.Metadata.Name)
 	require.NotEmpty(t, loadedChart.Metadata.Version)
 }
