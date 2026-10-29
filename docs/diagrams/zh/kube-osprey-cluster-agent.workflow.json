@@ -1,0 +1,278 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "cluster-agent 注册与反向隧道",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "kube-osprey-cluster-agent.html",
+    "views": [
+      {
+        "id": "happy-path",
+        "label": "接入主路径",
+        "focus": [
+          "admin",
+          "manifest",
+          "deploy",
+          "register",
+          "verify",
+          "wsconn",
+          "clientset",
+          "kubeapi"
+        ],
+        "note": "从管理员添加集群到经隧道读写 K8s API。"
+      },
+      {
+        "id": "security-gate",
+        "label": "安全与重试",
+        "focus": [
+          "verify",
+          "rejected",
+          "deploy"
+        ],
+        "note": "Token 校验失败时的处理与重试。"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "ops",
+      "label": "运维管理员"
+    },
+    {
+      "id": "server",
+      "label": "KubeOsprey 服务端"
+    },
+    {
+      "id": "cluster",
+      "label": "目标集群"
+    },
+    {
+      "id": "failure",
+      "label": "异常处理",
+      "variant": "exception"
+    }
+  ],
+  "phases": [
+    {
+      "id": "prep",
+      "label": "接入准备",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "enroll",
+      "label": "注册与校验",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "tunnel",
+      "label": "隧道与访问",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "groups": [
+    {
+      "id": "agent-lifecycle",
+      "label": "Agent 生命周期",
+      "lane": "cluster",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "dashed"
+    },
+    {
+      "id": "tunnel-setup",
+      "label": "隧道建立",
+      "lane": "server",
+      "fromCol": 4,
+      "toCol": 5,
+      "variant": "security"
+    }
+  ],
+  "mainPath": [
+    "admin",
+    "manifest",
+    "deploy",
+    "register",
+    "verify",
+    "wsconn",
+    "clientset",
+    "kubeapi"
+  ],
+  "nodes": [
+    {
+      "id": "admin",
+      "lane": "ops",
+      "col": 0,
+      "type": "external",
+      "label": "管理员",
+      "sublabel": "添加 Agent 模式集群",
+      "width": 132
+    },
+    {
+      "id": "manifest",
+      "lane": "server",
+      "col": 1,
+      "type": "backend",
+      "label": "生成接入清单",
+      "sublabel": "manifest.go · 权限档案",
+      "tag": "readOnly / operator / custom",
+      "width": 132
+    },
+    {
+      "id": "deploy",
+      "lane": "cluster",
+      "col": 2,
+      "type": "cloud",
+      "label": "部署 cluster-agent",
+      "sublabel": "同一二进制子命令",
+      "width": 132
+    },
+    {
+      "id": "register",
+      "lane": "cluster",
+      "col": 3,
+      "type": "messagebus",
+      "label": "注册请求",
+      "sublabel": "NaCl-box 加密集群凭据",
+      "width": 132
+    },
+    {
+      "id": "verify",
+      "lane": "server",
+      "col": 3,
+      "type": "security",
+      "label": "校验注册 Token",
+      "sublabel": "ClusterAgentTokenHash",
+      "width": 132
+    },
+    {
+      "id": "wsconn",
+      "lane": "server",
+      "col": 4,
+      "type": "messagebus",
+      "label": "反向隧道建立",
+      "sublabel": "remotedialer WebSocket",
+      "width": 132
+    },
+    {
+      "id": "clientset",
+      "lane": "server",
+      "col": 5,
+      "type": "backend",
+      "label": "ClientSet 就绪",
+      "sublabel": "ClusterManager · RESTConfig",
+      "width": 132
+    },
+    {
+      "id": "kubeapi",
+      "lane": "cluster",
+      "col": 5,
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "经隧道拨号访问",
+      "width": 132
+    },
+    {
+      "id": "rejected",
+      "lane": "failure",
+      "col": 4,
+      "type": "security",
+      "label": "注册失败",
+      "sublabel": "Token 不匹配 / 清单过期",
+      "width": 132
+    }
+  ],
+  "edges": [
+    {
+      "id": "admin-manifest",
+      "from": "admin",
+      "to": "manifest",
+      "label": "添加集群"
+    },
+    {
+      "id": "manifest-deploy",
+      "from": "manifest",
+      "to": "deploy",
+      "label": "Deployment YAML"
+    },
+    {
+      "id": "deploy-register",
+      "from": "deploy",
+      "to": "register",
+      "label": "启动后注册"
+    },
+    {
+      "id": "register-verify",
+      "from": "register",
+      "to": "verify",
+      "label": "加密凭据",
+      "variant": "security"
+    },
+    {
+      "id": "verify-wsconn",
+      "from": "verify",
+      "to": "wsconn",
+      "label": "校验通过"
+    },
+    {
+      "id": "verify-rejected",
+      "from": "verify",
+      "to": "rejected",
+      "label": "校验失败",
+      "variant": "security",
+      "role": "error"
+    },
+    {
+      "id": "rejected-deploy",
+      "from": "rejected",
+      "to": "deploy",
+      "label": "修正后重试",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "wsconn-clientset",
+      "from": "wsconn",
+      "to": "clientset",
+      "label": "隧道拨号器"
+    },
+    {
+      "id": "clientset-kubeapi",
+      "from": "clientset",
+      "to": "kubeapi",
+      "label": "读写 K8s API",
+      "variant": "emphasis"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "接入模式",
+      "items": [
+        "直连 / kubeconfig / agent 三模式",
+        "Agent 适合网络隔离场景"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "安全机制",
+      "items": [
+        "注册凭据 NaCl 加密，仅存哈希",
+        "权限档案默认最小化"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "运行时",
+      "items": [
+        "WebSocket 长连接自动重连",
+        "按集群 ID 经隧道拨号"
+      ]
+    }
+  ]
+}

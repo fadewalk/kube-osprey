@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "Cluster Client Sync Lifecycle",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      660
+    ],
+    "output": "kube-osprey-cluster-sync.html",
+    "views": [
+      {
+        "id": "main-sync",
+        "label": "Main sync flow",
+        "focus": [
+          "disabled",
+          "syncing",
+          "mode",
+          "ready"
+        ],
+        "note": "From cluster onboarding to a ready client."
+      },
+      {
+        "id": "rebuild",
+        "label": "Rebuild and recovery",
+        "focus": [
+          "ready",
+          "syncing",
+          "degraded"
+        ],
+        "note": "Rebuild on config change and retry on failure."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "Main sync flow"
+    },
+    {
+      "id": "exceptions",
+      "label": "Recovery"
+    },
+    {
+      "id": "terminal",
+      "label": "Terminal"
+    }
+  ],
+  "states": [
+    {
+      "id": "disabled",
+      "type": "start",
+      "label": "Not onboarded",
+      "sublabel": "No record / disabled",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "Entry"
+    },
+    {
+      "id": "syncing",
+      "type": "active",
+      "label": "Build ClientSet",
+      "sublabel": "buildClientSet",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "syncClusters"
+    },
+    {
+      "id": "mode",
+      "type": "decision",
+      "label": "Pick access mode",
+      "sublabel": "Credential source",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "Three modes"
+    },
+    {
+      "id": "ready",
+      "type": "success",
+      "label": "Client ready",
+      "sublabel": "K8s + Prometheus",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "ClientSet"
+    },
+    {
+      "id": "degraded",
+      "type": "failure",
+      "label": "Build failed",
+      "sublabel": "Invalid / unreachable",
+      "lane": "exceptions",
+      "col": 0,
+      "tag": "Recoverable"
+    },
+    {
+      "id": "removed",
+      "type": "neutral",
+      "label": "Client removed",
+      "sublabel": "Cluster record deleted",
+      "lane": "terminal",
+      "col": 2,
+      "tag": "Terminal"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "enable-sync",
+      "from": "disabled",
+      "to": "syncing",
+      "route": "straight"
+    },
+    {
+      "id": "sync-mode",
+      "from": "syncing",
+      "to": "mode",
+      "route": "straight"
+    },
+    {
+      "id": "mode-ready",
+      "from": "mode",
+      "to": "ready",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "id": "ready-resync",
+      "from": "ready",
+      "to": "syncing",
+      "label": "Rebuild on change",
+      "variant": "dashed",
+      "route": "top-channel"
+    },
+    {
+      "id": "sync-failed",
+      "from": "syncing",
+      "to": "degraded",
+      "label": "Build failed",
+      "variant": "security",
+      "labelDy": 10
+    },
+    {
+      "id": "degraded-retry",
+      "from": "degraded",
+      "to": "syncing",
+      "label": "Retry",
+      "variant": "emphasis",
+      "channelX": 285,
+      "toSide": "bottom"
+    },
+    {
+      "id": "ready-removed",
+      "from": "ready",
+      "to": "removed",
+      "label": "Cluster deleted / disabled",
+      "route": "bottom-channel"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Triggers",
+      "items": [
+        "Reconciles all clusters every minute",
+        "TriggerClusterSync runs a sync immediately"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Three access modes",
+      "items": [
+        "in-cluster / encrypted kubeconfig / agent tunnel",
+        "Prometheus URL auto-discovery"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Failure and terminal state",
+      "items": [
+        "A failed build degrades and retries next round",
+        "The client is removed when the cluster is deleted"
+      ]
+    }
+  ]
+}

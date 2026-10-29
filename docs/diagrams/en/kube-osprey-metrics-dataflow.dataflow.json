@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Monitoring Metrics Data Flow",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      520
+    ],
+    "output": "kube-osprey-metrics-dataflow.html",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "Main metrics path",
+        "focus": [
+          "prom",
+          "roundtripper",
+          "promclient",
+          "handler",
+          "charts"
+        ],
+        "note": "The main path from Prometheus to the frontend charts."
+      },
+      {
+        "id": "transport",
+        "label": "Transport routing",
+        "focus": [
+          "prom",
+          "roundtripper",
+          "promclient"
+        ],
+        "note": "Direct / K8s API proxy / agent tunnel routes."
+      },
+      {
+        "id": "fallback",
+        "label": "Fallback path",
+        "focus": [
+          "metricsserver",
+          "handler"
+        ],
+        "note": "Pod metrics fall back to metrics-server."
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "Cluster sources"
+    },
+    {
+      "label": "Transport routing"
+    },
+    {
+      "label": "KubeOsprey query layer"
+    },
+    {
+      "label": "API endpoints"
+    },
+    {
+      "label": "Frontend"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "prom",
+      "type": "cloud",
+      "label": "Prometheus",
+      "sublabel": "Auto-discovery",
+      "stage": 0,
+      "row": 0,
+      "tag": "PromQL"
+    },
+    {
+      "id": "metricsserver",
+      "type": "cloud",
+      "label": "metrics-server",
+      "sublabel": "Pod metrics fallback",
+      "stage": 0,
+      "row": 2
+    },
+    {
+      "id": "roundtripper",
+      "type": "backend",
+      "label": "RoundTripper",
+      "sublabel": "Direct / proxy / tunnel",
+      "stage": 1,
+      "row": 1,
+      "tag": "Per cluster mode"
+    },
+    {
+      "id": "promclient",
+      "type": "backend",
+      "label": "pkg/prometheus",
+      "sublabel": "Query · QueryRange",
+      "stage": 2,
+      "row": 1
+    },
+    {
+      "id": "handler",
+      "type": "backend",
+      "label": "pkg/metrics",
+      "sublabel": "/api/v1/prometheus/*",
+      "stage": 3,
+      "row": 1
+    },
+    {
+      "id": "charts",
+      "type": "frontend",
+      "label": "Resource charts",
+      "sublabel": "Pod / workload usage",
+      "stage": 4,
+      "row": 0
+    },
+    {
+      "id": "prompage",
+      "type": "frontend",
+      "label": "Prometheus page",
+      "sublabel": "PromQL queries",
+      "stage": 4,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "prom-transport",
+      "from": "prom",
+      "to": "roundtripper",
+      "label": "Metric series",
+      "classification": "PromQL response",
+      "variant": "emphasis"
+    },
+    {
+      "id": "transport-client",
+      "from": "roundtripper",
+      "to": "promclient",
+      "label": "Pass-through",
+      "classification": "HTTP"
+    },
+    {
+      "id": "client-handler",
+      "from": "promclient",
+      "to": "handler",
+      "label": "Query results",
+      "classification": "JSON series",
+      "variant": "emphasis",
+      "labelDy": -22
+    },
+    {
+      "id": "server-fallback",
+      "from": "metricsserver",
+      "to": "handler",
+      "label": "Pod metrics fallback",
+      "classification": "metrics API",
+      "variant": "dashed",
+      "route": "bottom-channel"
+    },
+    {
+      "id": "handler-charts",
+      "from": "handler",
+      "to": "charts",
+      "label": "Usage history",
+      "classification": "Read-only",
+      "variant": "emphasis"
+    },
+    {
+      "id": "handler-prompage",
+      "from": "handler",
+      "to": "prompage",
+      "label": "Custom queries",
+      "classification": "RBAC-filtered"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Transport routing",
+      "items": [
+        "In-cluster URLs go through the K8s API proxy",
+        "Agent mode dials the tunnel; others connect directly"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Query capabilities",
+      "items": [
+        "Query / QueryRange for instant and range queries",
+        "Resource usage history aggregation"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Fallback",
+      "items": [
+        "Live Pod metrics can fall back to metrics-server"
+      ]
+    }
+  ]
+}

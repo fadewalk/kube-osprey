@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "监控指标数据流",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      520
+    ],
+    "output": "kube-osprey-metrics-dataflow.html",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "指标主链路",
+        "focus": [
+          "prom",
+          "roundtripper",
+          "promclient",
+          "handler",
+          "charts"
+        ],
+        "note": "从 Prometheus 到前端图表的指标主链路。"
+      },
+      {
+        "id": "transport",
+        "label": "传输路由",
+        "focus": [
+          "prom",
+          "roundtripper",
+          "promclient"
+        ],
+        "note": "直连 / K8s API proxy / agent 隧道三种路由。"
+      },
+      {
+        "id": "fallback",
+        "label": "兜底链路",
+        "focus": [
+          "metricsserver",
+          "handler"
+        ],
+        "note": "Pod 指标回退 metrics-server。"
+      }
+    ]
+  },
+  "stages": [
+    {
+      "label": "集群数据源"
+    },
+    {
+      "label": "传输路由"
+    },
+    {
+      "label": "KubeOsprey 查询层"
+    },
+    {
+      "label": "API 端点"
+    },
+    {
+      "label": "前端消费"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "prom",
+      "type": "cloud",
+      "label": "Prometheus",
+      "sublabel": "自动发现",
+      "stage": 0,
+      "row": 0,
+      "tag": "PromQL"
+    },
+    {
+      "id": "metricsserver",
+      "type": "cloud",
+      "label": "metrics-server",
+      "sublabel": "Pod 指标兜底",
+      "stage": 0,
+      "row": 2
+    },
+    {
+      "id": "roundtripper",
+      "type": "backend",
+      "label": "RoundTripper 路由",
+      "sublabel": "直连 / proxy / 隧道",
+      "stage": 1,
+      "row": 1,
+      "tag": "按集群模式"
+    },
+    {
+      "id": "promclient",
+      "type": "backend",
+      "label": "pkg/prometheus",
+      "sublabel": "Query · QueryRange",
+      "stage": 2,
+      "row": 1
+    },
+    {
+      "id": "handler",
+      "type": "backend",
+      "label": "pkg/metrics 端点",
+      "sublabel": "/api/v1/prometheus/*",
+      "stage": 3,
+      "row": 1
+    },
+    {
+      "id": "charts",
+      "type": "frontend",
+      "label": "资源详情图表",
+      "sublabel": "Pod / 负载用量",
+      "stage": 4,
+      "row": 0
+    },
+    {
+      "id": "prompage",
+      "type": "frontend",
+      "label": "Prometheus 页面",
+      "sublabel": "PromQL 查询",
+      "stage": 4,
+      "row": 2
+    }
+  ],
+  "flows": [
+    {
+      "id": "prom-transport",
+      "from": "prom",
+      "to": "roundtripper",
+      "label": "指标序列",
+      "classification": "PromQL 响应",
+      "variant": "emphasis"
+    },
+    {
+      "id": "transport-client",
+      "from": "roundtripper",
+      "to": "promclient",
+      "label": "透传",
+      "classification": "HTTP"
+    },
+    {
+      "id": "client-handler",
+      "from": "promclient",
+      "to": "handler",
+      "label": "查询结果",
+      "classification": "JSON 序列",
+      "variant": "emphasis",
+      "labelDy": -22
+    },
+    {
+      "id": "server-fallback",
+      "from": "metricsserver",
+      "to": "handler",
+      "label": "Pod 指标兜底",
+      "classification": "metrics API",
+      "variant": "dashed",
+      "route": "bottom-channel"
+    },
+    {
+      "id": "handler-charts",
+      "from": "handler",
+      "to": "charts",
+      "label": "用量历史",
+      "classification": "只读",
+      "variant": "emphasis"
+    },
+    {
+      "id": "handler-prompage",
+      "from": "handler",
+      "to": "prompage",
+      "label": "自定义查询",
+      "classification": "RBAC 过滤后"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "传输路由",
+      "items": [
+        "集群内 URL 经 K8s API proxy 转发",
+        "agent 模式走隧道拨号，其余直连"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "查询能力",
+      "items": [
+        "Query / QueryRange 即时与区间查询",
+        "资源用量历史聚合"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "兜底",
+      "items": [
+        "Pod 实时指标可回退 metrics-server"
+      ]
+    }
+  ]
+}

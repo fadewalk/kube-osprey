@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "AI 会话与工具调用",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1080,
+      560
+    ],
+    "output": "kube-osprey-ai-toolcall.html",
+    "views": [
+      {
+        "id": "agent-loop",
+        "label": "Agent 循环",
+        "focus": [
+          "user",
+          "chat",
+          "llm",
+          "agent"
+        ],
+        "note": "SSE 对话与 LLM 工具调用循环。"
+      },
+      {
+        "id": "authorization",
+        "label": "授权与确认",
+        "focus": [
+          "agent",
+          "authz",
+          "chat"
+        ],
+        "note": "工具授权映射用户 RBAC，变更操作需确认。"
+      },
+      {
+        "id": "execution",
+        "label": "工具执行",
+        "focus": [
+          "agent",
+          "exec",
+          "kube"
+        ],
+        "note": "经集群 ClientSet 执行并脱敏返回。"
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "用户",
+      "sublabel": "运维提问"
+    },
+    {
+      "id": "chat",
+      "type": "frontend",
+      "label": "AI 对话框",
+      "sublabel": "ai-chat 组件"
+    },
+    {
+      "id": "llm",
+      "type": "external",
+      "label": "LLM 提供方",
+      "sublabel": "Anthropic / OpenAI"
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Agent 循环",
+      "sublabel": "pkg/ai"
+    },
+    {
+      "id": "authz",
+      "type": "security",
+      "label": "工具授权",
+      "sublabel": "AuthorizeToolForUser"
+    },
+    {
+      "id": "exec",
+      "type": "backend",
+      "label": "工具执行",
+      "sublabel": "ClientSet"
+    },
+    {
+      "id": "kube",
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "目标集群"
+    }
+  ],
+  "messages": [
+    {
+      "id": "ask",
+      "from": "user",
+      "to": "chat",
+      "y": 165,
+      "label": "描述运维意图"
+    },
+    {
+      "id": "sse-open",
+      "from": "chat",
+      "to": "agent",
+      "y": 193,
+      "label": "POST /api/v1/ai/chat（SSE）",
+      "variant": "emphasis",
+      "note": "中断后续接：POST /api/v1/ai/continue"
+    },
+    {
+      "id": "llm-call",
+      "from": "agent",
+      "to": "llm",
+      "y": 221,
+      "label": "上下文 + 工具定义"
+    },
+    {
+      "id": "tool-call",
+      "from": "llm",
+      "to": "agent",
+      "y": 249,
+      "label": "工具调用（get/list/exec/mutate）",
+      "variant": "return"
+    },
+    {
+      "id": "authorize",
+      "from": "agent",
+      "to": "authz",
+      "y": 277,
+      "label": "AuthorizeToolForUser",
+      "variant": "security",
+      "note": "映射到当前用户自身的 KubeOsprey RBAC 权限"
+    },
+    {
+      "id": "authz-result",
+      "from": "authz",
+      "to": "agent",
+      "y": 305,
+      "label": "允许 / 拒绝",
+      "variant": "return"
+    },
+    {
+      "id": "confirm-card",
+      "from": "agent",
+      "to": "chat",
+      "y": 333,
+      "label": "变更类工具下发确认卡片",
+      "variant": "dashed",
+      "note": "request_choice / request_form 交互"
+    },
+    {
+      "id": "user-confirm",
+      "from": "chat",
+      "to": "agent",
+      "y": 361,
+      "label": "用户确认后继续",
+      "variant": "security"
+    },
+    {
+      "id": "execute",
+      "from": "agent",
+      "to": "exec",
+      "y": 389,
+      "label": "执行工具",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kube-call",
+      "from": "exec",
+      "to": "kube",
+      "y": 417,
+      "label": "K8sClient 调用"
+    },
+    {
+      "id": "kube-result",
+      "from": "kube",
+      "to": "exec",
+      "y": 445,
+      "label": "结果 · 敏感字段脱敏",
+      "variant": "return"
+    },
+    {
+      "id": "stream-reply",
+      "from": "agent",
+      "to": "chat",
+      "y": 475,
+      "label": "SSE 流式回答 + ResourceHistory",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "user",
+      "from": 160,
+      "to": 480,
+      "type": "external"
+    },
+    {
+      "participant": "chat",
+      "from": 163,
+      "to": 480,
+      "type": "frontend"
+    },
+    {
+      "participant": "llm",
+      "from": 219,
+      "to": 255,
+      "type": "external"
+    },
+    {
+      "participant": "agent",
+      "from": 191,
+      "to": 480,
+      "type": "backend"
+    },
+    {
+      "participant": "authz",
+      "from": 275,
+      "to": 311,
+      "type": "security"
+    },
+    {
+      "participant": "exec",
+      "from": 387,
+      "to": 451,
+      "type": "backend"
+    },
+    {
+      "participant": "kube",
+      "from": 415,
+      "to": 451,
+      "type": "cloud"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "会话通道",
+      "items": [
+        "POST /api/v1/ai/chat 建立 SSE 流",
+        "中断后经 /api/v1/ai/continue 续接"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "权限与确认",
+      "items": [
+        "工具授权映射用户自身 RBAC 权限",
+        "变更类工具强制人工确认"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "执行与留痕",
+      "items": [
+        "执行经集群 ClientSet 访问 K8s",
+        "结果脱敏并写入 ResourceHistory"
+      ]
+    }
+  ]
+}

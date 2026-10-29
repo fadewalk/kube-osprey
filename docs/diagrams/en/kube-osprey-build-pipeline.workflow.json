@@ -1,0 +1,255 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "KubeOsprey Build and Delivery Pipeline",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "kube-osprey-build-pipeline.html",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "One build",
+        "focus": [
+          "ui-source",
+          "pnpm-build",
+          "static-dir",
+          "go-embed",
+          "go-build",
+          "binary",
+          "helm"
+        ],
+        "note": "The full path from source to a single binary to Helm delivery."
+      },
+      {
+        "id": "dev-loop",
+        "label": "Local development",
+        "focus": [
+          "binary",
+          "dev-mode",
+          "ui-source"
+        ],
+        "note": "How make dev wires the frontend and backend together."
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "Frontend ui/"
+    },
+    {
+      "id": "go",
+      "label": "Go backend"
+    },
+    {
+      "id": "ship",
+      "label": "Delivery"
+    }
+  ],
+  "phases": [
+    {
+      "id": "fe",
+      "label": "Frontend build",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "embed",
+      "label": "Embed and compile",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "ship-phase",
+      "label": "Run and deliver",
+      "fromCol": 4,
+      "toCol": 5
+    }
+  ],
+  "groups": [
+    {
+      "id": "fe-build",
+      "label": "Vite build",
+      "lane": "ui",
+      "fromCol": 0,
+      "toCol": 2,
+      "variant": "dashed"
+    },
+    {
+      "id": "go-compile",
+      "label": "Embed and compile",
+      "lane": "go",
+      "fromCol": 2,
+      "toCol": 4,
+      "variant": "emphasis"
+    }
+  ],
+  "mainPath": [
+    "ui-source",
+    "pnpm-build",
+    "static-dir",
+    "go-embed",
+    "go-build",
+    "binary",
+    "helm"
+  ],
+  "nodes": [
+    {
+      "id": "ui-source",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "ui/src source",
+      "sublabel": "React · TypeScript",
+      "width": 132
+    },
+    {
+      "id": "pnpm-build",
+      "lane": "ui",
+      "col": 1,
+      "type": "backend",
+      "label": "pnpm build",
+      "sublabel": "Vite · outDir ../static",
+      "width": 132
+    },
+    {
+      "id": "static-dir",
+      "lane": "ui",
+      "col": 2,
+      "type": "database",
+      "label": "static/ output",
+      "sublabel": "Build output directory",
+      "width": 132
+    },
+    {
+      "id": "go-embed",
+      "lane": "go",
+      "col": 2,
+      "type": "backend",
+      "label": "//go:embed static",
+      "sublabel": "static.go",
+      "width": 132
+    },
+    {
+      "id": "go-build",
+      "lane": "go",
+      "col": 3,
+      "type": "backend",
+      "label": "go build",
+      "sublabel": "CGO_ENABLED=0 · -trimpath",
+      "tag": "Version ldflags",
+      "width": 132
+    },
+    {
+      "id": "binary",
+      "lane": "go",
+      "col": 4,
+      "type": "backend",
+      "label": "kube-osprey binary",
+      "sublabel": "cluster-agent subcommand",
+      "width": 132
+    },
+    {
+      "id": "helm",
+      "lane": "ship",
+      "col": 5,
+      "type": "cloud",
+      "label": "Helm delivery",
+      "sublabel": "charts/kube-osprey",
+      "width": 132
+    },
+    {
+      "id": "dev-mode",
+      "lane": "ship",
+      "col": 4,
+      "type": "messagebus",
+      "label": "make dev",
+      "sublabel": "Backend -v=5 + Vite HMR",
+      "width": 132
+    }
+  ],
+  "edges": [
+    {
+      "id": "source-build",
+      "from": "ui-source",
+      "to": "pnpm-build",
+      "label": "Build"
+    },
+    {
+      "id": "build-static",
+      "from": "pnpm-build",
+      "to": "static-dir",
+      "label": "Emit output"
+    },
+    {
+      "id": "static-embed",
+      "from": "static-dir",
+      "to": "go-embed",
+      "label": "Embed"
+    },
+    {
+      "id": "embed-compile",
+      "from": "go-embed",
+      "to": "go-build",
+      "label": "Bundled at compile time"
+    },
+    {
+      "id": "compile-binary",
+      "from": "go-build",
+      "to": "binary",
+      "label": "Produce"
+    },
+    {
+      "id": "binary-helm",
+      "from": "binary",
+      "to": "helm",
+      "label": "Image + charts/kube-osprey",
+      "variant": "emphasis"
+    },
+    {
+      "id": "binary-dev",
+      "from": "binary",
+      "to": "dev-mode",
+      "label": "Run locally",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "dev-proxy",
+      "from": "dev-mode",
+      "to": "ui-source",
+      "label": "Vite proxies /api",
+      "variant": "dashed",
+      "role": "return",
+      "route": "return-left"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "One build",
+      "items": [
+        "make build = frontend build + Go compile",
+        "Frontend output is embedded via go:embed"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Local development",
+      "items": [
+        "make dev runs ./kube-osprey -v=5 in the background",
+        "Vite dev server proxies /api with hot reload"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Version and delivery",
+      "items": [
+        "Version injected via ldflags into pkg/version",
+        "Image ghcr.io/fadewalk/kube-osprey"
+      ]
+    }
+  ]
+}

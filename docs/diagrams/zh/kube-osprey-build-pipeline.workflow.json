@@ -1,0 +1,255 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "KubeOsprey 构建与交付流水线",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "kube-osprey-build-pipeline.html",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "一次构建",
+        "focus": [
+          "ui-source",
+          "pnpm-build",
+          "static-dir",
+          "go-embed",
+          "go-build",
+          "binary",
+          "helm"
+        ],
+        "note": "从源码到单二进制再到 Helm 交付的完整路径。"
+      },
+      {
+        "id": "dev-loop",
+        "label": "本地开发",
+        "focus": [
+          "binary",
+          "dev-mode",
+          "ui-source"
+        ],
+        "note": "make dev 的前后端联动方式。"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "ui",
+      "label": "前端 ui/"
+    },
+    {
+      "id": "go",
+      "label": "Go 后端"
+    },
+    {
+      "id": "ship",
+      "label": "交付"
+    }
+  ],
+  "phases": [
+    {
+      "id": "fe",
+      "label": "前端构建",
+      "fromCol": 0,
+      "toCol": 1
+    },
+    {
+      "id": "embed",
+      "label": "嵌入编译",
+      "fromCol": 2,
+      "toCol": 3,
+      "variant": "emphasis"
+    },
+    {
+      "id": "ship-phase",
+      "label": "运行与交付",
+      "fromCol": 4,
+      "toCol": 5
+    }
+  ],
+  "groups": [
+    {
+      "id": "fe-build",
+      "label": "Vite 构建",
+      "lane": "ui",
+      "fromCol": 0,
+      "toCol": 2,
+      "variant": "dashed"
+    },
+    {
+      "id": "go-compile",
+      "label": "嵌入与编译",
+      "lane": "go",
+      "fromCol": 2,
+      "toCol": 4,
+      "variant": "emphasis"
+    }
+  ],
+  "mainPath": [
+    "ui-source",
+    "pnpm-build",
+    "static-dir",
+    "go-embed",
+    "go-build",
+    "binary",
+    "helm"
+  ],
+  "nodes": [
+    {
+      "id": "ui-source",
+      "lane": "ui",
+      "col": 0,
+      "type": "frontend",
+      "label": "ui/src 源码",
+      "sublabel": "React · TypeScript",
+      "width": 132
+    },
+    {
+      "id": "pnpm-build",
+      "lane": "ui",
+      "col": 1,
+      "type": "backend",
+      "label": "pnpm build",
+      "sublabel": "Vite · outDir ../static",
+      "width": 132
+    },
+    {
+      "id": "static-dir",
+      "lane": "ui",
+      "col": 2,
+      "type": "database",
+      "label": "static/ 产物",
+      "sublabel": "构建输出目录",
+      "width": 132
+    },
+    {
+      "id": "go-embed",
+      "lane": "go",
+      "col": 2,
+      "type": "backend",
+      "label": "//go:embed static",
+      "sublabel": "static.go",
+      "width": 132
+    },
+    {
+      "id": "go-build",
+      "lane": "go",
+      "col": 3,
+      "type": "backend",
+      "label": "go build",
+      "sublabel": "CGO_ENABLED=0 · -trimpath",
+      "tag": "版本 ldflags",
+      "width": 132
+    },
+    {
+      "id": "binary",
+      "lane": "go",
+      "col": 4,
+      "type": "backend",
+      "label": "kube-osprey 单二进制",
+      "sublabel": "含 cluster-agent 子命令",
+      "width": 132
+    },
+    {
+      "id": "helm",
+      "lane": "ship",
+      "col": 5,
+      "type": "cloud",
+      "label": "Helm 交付",
+      "sublabel": "charts/kube-osprey 部署",
+      "width": 132
+    },
+    {
+      "id": "dev-mode",
+      "lane": "ship",
+      "col": 4,
+      "type": "messagebus",
+      "label": "make dev",
+      "sublabel": "后端 -v=5 + Vite 热更新",
+      "width": 132
+    }
+  ],
+  "edges": [
+    {
+      "id": "source-build",
+      "from": "ui-source",
+      "to": "pnpm-build",
+      "label": "构建"
+    },
+    {
+      "id": "build-static",
+      "from": "pnpm-build",
+      "to": "static-dir",
+      "label": "产物输出"
+    },
+    {
+      "id": "static-embed",
+      "from": "static-dir",
+      "to": "go-embed",
+      "label": "嵌入"
+    },
+    {
+      "id": "embed-compile",
+      "from": "go-embed",
+      "to": "go-build",
+      "label": "编译期打包"
+    },
+    {
+      "id": "compile-binary",
+      "from": "go-build",
+      "to": "binary",
+      "label": "产出"
+    },
+    {
+      "id": "binary-helm",
+      "from": "binary",
+      "to": "helm",
+      "label": "镜像 + charts/kube-osprey",
+      "variant": "emphasis"
+    },
+    {
+      "id": "binary-dev",
+      "from": "binary",
+      "to": "dev-mode",
+      "label": "本地运行",
+      "variant": "dashed",
+      "role": "branch"
+    },
+    {
+      "id": "dev-proxy",
+      "from": "dev-mode",
+      "to": "ui-source",
+      "label": "Vite 代理 /api",
+      "variant": "dashed",
+      "role": "return",
+      "route": "return-left"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "一次构建",
+      "items": [
+        "make build = 前端构建 + Go 编译",
+        "前端产物经 go:embed 打进二进制"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "本地开发",
+      "items": [
+        "make dev 后台起 ./kube-osprey -v=5",
+        "Vite dev server 代理 /api 并热更新"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "版本与交付",
+      "items": [
+        "版本信息经 ldflags 注入 pkg/version",
+        "镜像 ghcr.io/fadewalk/kube-osprey"
+      ]
+    }
+  ]
+}

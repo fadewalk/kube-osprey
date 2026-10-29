@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "KubeOsprey 系统总体架构",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "output": "kube-osprey-architecture.html",
+    "views": [
+      {
+        "id": "request-path",
+        "label": "请求主路径",
+        "focus": [
+          "user",
+          "spa",
+          "gin",
+          "auth",
+          "rbac",
+          "resources",
+          "clustermgr",
+          "kubeapi"
+        ],
+        "note": "从浏览器到 Kubernetes API 的完整调用链。"
+      },
+      {
+        "id": "cluster-access",
+        "label": "多集群接入",
+        "focus": [
+          "clustermgr",
+          "kubeapi",
+          "agent",
+          "prom"
+        ],
+        "note": "三种集群接入模式与指标采集。"
+      },
+      {
+        "id": "ai-and-store",
+        "label": "AI 与存储",
+        "focus": [
+          "gin",
+          "ai",
+          "db",
+          "clustermgr"
+        ],
+        "note": "AI 会话、工具调用与持久化存储。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "用户",
+      "sublabel": "浏览器",
+      "pos": [
+        40,
+        340
+      ],
+      "size": [
+        120,
+        60
+      ]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "ui/src · 内嵌 static/",
+      "pos": [
+        215,
+        340
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "gin",
+      "type": "backend",
+      "label": "Gin HTTP 服务",
+      "sublabel": "routes.go · 中间件链",
+      "tag": "单二进制 :8080",
+      "pos": [
+        415,
+        336
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "pkg/auth",
+      "sublabel": "JWT · OAuth · LDAP · Passkey",
+      "pos": [
+        385,
+        160
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "rbac",
+      "type": "security",
+      "label": "pkg/rbac",
+      "sublabel": "KubeOsprey 自有角色模型",
+      "pos": [
+        640,
+        160
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "resources",
+      "type": "backend",
+      "label": "pkg/resources",
+      "sublabel": "约 80 种资源 API",
+      "pos": [
+        655,
+        340
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "clustermgr",
+      "type": "backend",
+      "label": "ClusterManager",
+      "sublabel": "pkg/cluster · ClientSet",
+      "pos": [
+        890,
+        336
+      ],
+      "size": [
+        170,
+        72
+      ]
+    },
+    {
+      "id": "kubeapi",
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "目标集群",
+      "pos": [
+        1100,
+        220
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "cluster-agent",
+      "sublabel": "同二进制子命令",
+      "pos": [
+        1100,
+        440
+      ],
+      "size": [
+        150,
+        72
+      ]
+    },
+    {
+      "id": "prom",
+      "type": "cloud",
+      "label": "Prometheus",
+      "sublabel": "指标 · 自动发现",
+      "pos": [
+        890,
+        560
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "ai",
+      "type": "backend",
+      "label": "AI 助手",
+      "sublabel": "pkg/ai · SSE 工具调用",
+      "pos": [
+        655,
+        560
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "GORM 存储",
+      "sublabel": "SQLite / MySQL / Postgres",
+      "pos": [
+        415,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "KubeOsprey 单二进制（Go）",
+      "wraps": [
+        "gin",
+        "auth",
+        "rbac",
+        "resources",
+        "ai",
+        "db",
+        "clustermgr"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "目标 Kubernetes 集群",
+      "wraps": [
+        "kubeapi",
+        "agent",
+        "prom"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-spa",
+      "from": "user",
+      "to": "spa",
+      "label": "HTTPS"
+    },
+    {
+      "id": "spa-gin",
+      "from": "spa",
+      "to": "gin",
+      "label": "REST · WebSocket · SSE",
+      "labelDy": 58
+    },
+    {
+      "id": "gin-auth",
+      "from": "gin",
+      "to": "auth",
+      "label": "RequireAuth",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-rbac",
+      "from": "auth",
+      "to": "rbac",
+      "label": "加载用户与角色"
+    },
+    {
+      "id": "rbac-res",
+      "from": "rbac",
+      "to": "resources",
+      "label": "RBACMiddleware 放行",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "res-cm",
+      "from": "resources",
+      "to": "clustermgr",
+      "label": "获取 ClientSet"
+    },
+    {
+      "id": "cm-kube",
+      "from": "clustermgr",
+      "to": "kubeapi",
+      "label": "in-cluster / kubeconfig 直连",
+      "variant": "emphasis"
+    },
+    {
+      "id": "agent-cm",
+      "from": "agent",
+      "to": "clustermgr",
+      "label": "注册 + WebSocket 隧道"
+    },
+    {
+      "id": "agent-kube",
+      "from": "agent",
+      "to": "kubeapi",
+      "label": "本地转发",
+      "variant": "dashed"
+    },
+    {
+      "id": "cm-prom",
+      "from": "clustermgr",
+      "to": "prom",
+      "label": "指标查询",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "gin-ai",
+      "from": "gin",
+      "to": "ai",
+      "label": "AI 会话（SSE）"
+    },
+    {
+      "id": "ai-cm",
+      "from": "ai",
+      "to": "clustermgr",
+      "label": "工具调用"
+    },
+    {
+      "id": "gin-db",
+      "from": "gin",
+      "to": "db",
+      "label": "GORM 读写",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "请求主路径",
+      "items": [
+        "SPA 经中间件链访问资源 API",
+        "JWT cookie 或 API Key 认证",
+        "KubeOsprey RBAC 放行，非 K8s RBAC"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "多集群接入",
+      "items": [
+        "每集群独立 K8s 与指标客户端",
+        "直连 · kubeconfig · agent 三模式",
+        "集群配置每分钟热同步"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "AI 与安全",
+      "items": [
+        "AI 工具复用用户 RBAC 权限",
+        "变更操作强制人工确认",
+        "敏感配置 AES-GCM 落盘加密"
+      ]
+    }
+  ]
+}

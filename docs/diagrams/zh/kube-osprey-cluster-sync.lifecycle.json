@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "集群客户端同步生命周期",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      660
+    ],
+    "output": "kube-osprey-cluster-sync.html",
+    "views": [
+      {
+        "id": "main-sync",
+        "label": "同步主流程",
+        "focus": [
+          "disabled",
+          "syncing",
+          "mode",
+          "ready"
+        ],
+        "note": "从集群接入到客户端就绪的主流程。"
+      },
+      {
+        "id": "rebuild",
+        "label": "重建与恢复",
+        "focus": [
+          "ready",
+          "syncing",
+          "degraded"
+        ],
+        "note": "配置变更重建与失败重试。"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "同步主流程"
+    },
+    {
+      "id": "exceptions",
+      "label": "异常恢复"
+    },
+    {
+      "id": "terminal",
+      "label": "终态"
+    }
+  ],
+  "states": [
+    {
+      "id": "disabled",
+      "type": "start",
+      "label": "集群未接入",
+      "sublabel": "无记录 / 已禁用",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "入口"
+    },
+    {
+      "id": "syncing",
+      "type": "active",
+      "label": "构建 ClientSet",
+      "sublabel": "buildClientSet",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "syncClusters"
+    },
+    {
+      "id": "mode",
+      "type": "decision",
+      "label": "选择接入模式",
+      "sublabel": "凭据来源",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "三种模式"
+    },
+    {
+      "id": "ready",
+      "type": "success",
+      "label": "客户端就绪",
+      "sublabel": "K8s + Prometheus",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "ClientSet"
+    },
+    {
+      "id": "degraded",
+      "type": "failure",
+      "label": "构建失败",
+      "sublabel": "凭据无效 / 不可达",
+      "lane": "exceptions",
+      "col": 0,
+      "tag": "可恢复"
+    },
+    {
+      "id": "removed",
+      "type": "neutral",
+      "label": "客户端移除",
+      "sublabel": "集群记录已删除",
+      "lane": "terminal",
+      "col": 2,
+      "tag": "终态"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "enable-sync",
+      "from": "disabled",
+      "to": "syncing",
+      "route": "straight"
+    },
+    {
+      "id": "sync-mode",
+      "from": "syncing",
+      "to": "mode",
+      "route": "straight"
+    },
+    {
+      "id": "mode-ready",
+      "from": "mode",
+      "to": "ready",
+      "variant": "emphasis",
+      "route": "straight"
+    },
+    {
+      "id": "ready-resync",
+      "from": "ready",
+      "to": "syncing",
+      "label": "变更触发重建",
+      "variant": "dashed",
+      "route": "top-channel"
+    },
+    {
+      "id": "sync-failed",
+      "from": "syncing",
+      "to": "degraded",
+      "label": "构建失败",
+      "variant": "security",
+      "labelDy": 10
+    },
+    {
+      "id": "degraded-retry",
+      "from": "degraded",
+      "to": "syncing",
+      "label": "下轮重试",
+      "variant": "emphasis",
+      "channelX": 285,
+      "toSide": "bottom"
+    },
+    {
+      "id": "ready-removed",
+      "from": "ready",
+      "to": "removed",
+      "label": "集群删除 / 禁用",
+      "route": "bottom-channel"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "触发方式",
+      "items": [
+        "每分钟定时 reconcile 全部集群",
+        "TriggerClusterSync 立即触发"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "三种接入模式",
+      "items": [
+        "in-cluster / 加密 kubeconfig / agent 隧道",
+        "Prometheus URL 自动发现"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "失败与终态",
+      "items": [
+        "构建失败进入降态，下轮重试",
+        "集群删除后客户端随之移除"
+      ]
+    }
+  ]
+}

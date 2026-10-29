@@ -1,0 +1,365 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "KubeOsprey System Architecture",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "output": "kube-osprey-architecture.html",
+    "views": [
+      {
+        "id": "request-path",
+        "label": "Request path",
+        "focus": [
+          "user",
+          "spa",
+          "gin",
+          "auth",
+          "rbac",
+          "resources",
+          "clustermgr",
+          "kubeapi"
+        ],
+        "note": "The full call chain from the browser to the Kubernetes API."
+      },
+      {
+        "id": "cluster-access",
+        "label": "Multi-cluster access",
+        "focus": [
+          "clustermgr",
+          "kubeapi",
+          "agent",
+          "prom"
+        ],
+        "note": "Three cluster access modes and metrics collection."
+      },
+      {
+        "id": "ai-and-store",
+        "label": "AI and storage",
+        "focus": [
+          "gin",
+          "ai",
+          "db",
+          "clustermgr"
+        ],
+        "note": "AI sessions, tool calls and persistent storage."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "User",
+      "sublabel": "Browser",
+      "pos": [
+        40,
+        340
+      ],
+      "size": [
+        120,
+        60
+      ]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "ui/src · embedded static/",
+      "pos": [
+        215,
+        340
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "gin",
+      "type": "backend",
+      "label": "Gin HTTP server",
+      "sublabel": "routes.go · middleware chain",
+      "tag": "Single binary :8080",
+      "pos": [
+        415,
+        336
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "pkg/auth",
+      "sublabel": "JWT · OAuth · LDAP · Passkey",
+      "pos": [
+        385,
+        160
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "rbac",
+      "type": "security",
+      "label": "pkg/rbac",
+      "sublabel": "KubeOsprey role model",
+      "pos": [
+        640,
+        160
+      ],
+      "size": [
+        160,
+        68
+      ]
+    },
+    {
+      "id": "resources",
+      "type": "backend",
+      "label": "pkg/resources",
+      "sublabel": "~80 resource APIs",
+      "pos": [
+        655,
+        340
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "clustermgr",
+      "type": "backend",
+      "label": "ClusterManager",
+      "sublabel": "pkg/cluster · ClientSet",
+      "pos": [
+        890,
+        336
+      ],
+      "size": [
+        170,
+        72
+      ]
+    },
+    {
+      "id": "kubeapi",
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "Target cluster",
+      "pos": [
+        1100,
+        220
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "cluster-agent",
+      "sublabel": "Subcommand, same binary",
+      "pos": [
+        1100,
+        440
+      ],
+      "size": [
+        150,
+        72
+      ]
+    },
+    {
+      "id": "prom",
+      "type": "cloud",
+      "label": "Prometheus",
+      "sublabel": "Metrics · auto-discovery",
+      "pos": [
+        890,
+        560
+      ],
+      "size": [
+        150,
+        60
+      ]
+    },
+    {
+      "id": "ai",
+      "type": "backend",
+      "label": "AI assistant",
+      "sublabel": "pkg/ai · SSE tool calls",
+      "pos": [
+        655,
+        560
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "GORM store",
+      "sublabel": "SQLite / MySQL / Postgres",
+      "pos": [
+        415,
+        560
+      ],
+      "size": [
+        160,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "KubeOsprey single binary (Go)",
+      "wraps": [
+        "gin",
+        "auth",
+        "rbac",
+        "resources",
+        "ai",
+        "db",
+        "clustermgr"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Target Kubernetes cluster",
+      "wraps": [
+        "kubeapi",
+        "agent",
+        "prom"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-spa",
+      "from": "user",
+      "to": "spa",
+      "label": "HTTPS"
+    },
+    {
+      "id": "spa-gin",
+      "from": "spa",
+      "to": "gin",
+      "label": "REST · WebSocket · SSE",
+      "labelDy": 58
+    },
+    {
+      "id": "gin-auth",
+      "from": "gin",
+      "to": "auth",
+      "label": "RequireAuth",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-rbac",
+      "from": "auth",
+      "to": "rbac",
+      "label": "Load roles"
+    },
+    {
+      "id": "rbac-res",
+      "from": "rbac",
+      "to": "resources",
+      "label": "RBACMiddleware allows",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "res-cm",
+      "from": "resources",
+      "to": "clustermgr",
+      "label": "Get ClientSet"
+    },
+    {
+      "id": "cm-kube",
+      "from": "clustermgr",
+      "to": "kubeapi",
+      "label": "in-cluster / kubeconfig direct",
+      "variant": "emphasis"
+    },
+    {
+      "id": "agent-cm",
+      "from": "agent",
+      "to": "clustermgr",
+      "label": "Register + WebSocket tunnel"
+    },
+    {
+      "id": "agent-kube",
+      "from": "agent",
+      "to": "kubeapi",
+      "label": "Local forwarding",
+      "variant": "dashed"
+    },
+    {
+      "id": "cm-prom",
+      "from": "clustermgr",
+      "to": "prom",
+      "label": "Metrics queries",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "gin-ai",
+      "from": "gin",
+      "to": "ai",
+      "label": "AI session (SSE)"
+    },
+    {
+      "id": "ai-cm",
+      "from": "ai",
+      "to": "clustermgr",
+      "label": "Tool calls"
+    },
+    {
+      "id": "gin-db",
+      "from": "gin",
+      "to": "db",
+      "label": "GORM read/write",
+      "labelDy": 24
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Request path",
+      "items": [
+        "SPA reaches resource APIs via the middleware chain",
+        "JWT cookie or API key authentication",
+        "KubeOsprey RBAC decides, not K8s RBAC"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Multi-cluster access",
+      "items": [
+        "Per-cluster K8s and metrics clients",
+        "Direct · kubeconfig · agent modes",
+        "Cluster config hot-synced every minute"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "AI and security",
+      "items": [
+        "AI tools reuse the user's own RBAC",
+        "Mutations require human confirmation",
+        "Sensitive config encrypted at rest (AES-GCM)"
+      ]
+    }
+  ]
+}

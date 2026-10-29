@@ -1,0 +1,258 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "资源 API 请求生命周期",
+    "locale": "zh-CN",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1080,
+      580
+    ],
+    "output": "kube-osprey-request-sequence.html",
+    "views": [
+      {
+        "id": "auth-chain",
+        "label": "认证与鉴权",
+        "focus": [
+          "spa",
+          "auth",
+          "store",
+          "rbac"
+        ],
+        "note": "从 cookie 到 Kite 角色校验的中间件链。"
+      },
+      {
+        "id": "data-plane",
+        "label": "数据读取",
+        "focus": [
+          "rbac",
+          "handler",
+          "cache",
+          "kube"
+        ],
+        "note": "Informer 缓存优先，未命中回源 Kubernetes API。"
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "React SPA",
+      "sublabel": "api-client"
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "RequireAuth",
+      "sublabel": "pkg/auth"
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "GORM",
+      "sublabel": "用户 · 角色"
+    },
+    {
+      "id": "rbac",
+      "type": "security",
+      "label": "RBAC 中间件",
+      "sublabel": "pkg/rbac"
+    },
+    {
+      "id": "handler",
+      "type": "backend",
+      "label": "资源处理器",
+      "sublabel": "pkg/resources"
+    },
+    {
+      "id": "cache",
+      "type": "database",
+      "label": "Informer 缓存",
+      "sublabel": "K8sClient"
+    },
+    {
+      "id": "kube",
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "目标集群"
+    }
+  ],
+  "messages": [
+    {
+      "id": "list-request",
+      "from": "spa",
+      "to": "auth",
+      "y": 165,
+      "label": "GET /api/v1/pods?namespace=_all",
+      "variant": "emphasis",
+      "note": "凭证：auth_token cookie 或 Authorization: kite-<id>-<key>"
+    },
+    {
+      "id": "load-user",
+      "from": "auth",
+      "to": "store",
+      "y": 193,
+      "label": "GetUserByIDCached"
+    },
+    {
+      "id": "user-roles",
+      "from": "store",
+      "to": "auth",
+      "y": 223,
+      "label": "用户 + 角色绑定",
+      "variant": "return"
+    },
+    {
+      "id": "rbac-check",
+      "from": "auth",
+      "to": "rbac",
+      "y": 255,
+      "label": "鉴权：list pods · ns=_all",
+      "variant": "security",
+      "note": "Kite 自有角色模型；跨命名空间 _all 由处理器过滤结果"
+    },
+    {
+      "id": "pass-through",
+      "from": "rbac",
+      "to": "handler",
+      "y": 283,
+      "label": "放行"
+    },
+    {
+      "id": "list-cache",
+      "from": "handler",
+      "to": "cache",
+      "y": 315,
+      "label": "List Pods（读缓存）",
+      "variant": "emphasis"
+    },
+    {
+      "id": "fallback-kube",
+      "from": "cache",
+      "to": "kube",
+      "y": 348,
+      "label": "未命中回源 / Watch 同步",
+      "variant": "dashed"
+    },
+    {
+      "id": "kube-data",
+      "from": "kube",
+      "to": "cache",
+      "y": 380,
+      "label": "资源数据",
+      "variant": "return"
+    },
+    {
+      "id": "cache-hit",
+      "from": "cache",
+      "to": "handler",
+      "y": 410,
+      "label": "Pod 列表",
+      "variant": "return"
+    },
+    {
+      "id": "response",
+      "from": "handler",
+      "to": "spa",
+      "y": 439,
+      "label": "200 JSON",
+      "variant": "return"
+    },
+    {
+      "id": "silent-refresh",
+      "from": "spa",
+      "to": "auth",
+      "y": 468,
+      "label": "401 时静默 POST /api/auth/refresh",
+      "variant": "security"
+    },
+    {
+      "id": "new-token",
+      "from": "auth",
+      "to": "spa",
+      "y": 497,
+      "label": "新 JWT cookie（48h）",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "spa",
+      "from": 160,
+      "to": 504,
+      "type": "frontend"
+    },
+    {
+      "participant": "auth",
+      "from": 165,
+      "to": 232,
+      "type": "security"
+    },
+    {
+      "participant": "store",
+      "from": 191,
+      "to": 228,
+      "type": "database"
+    },
+    {
+      "participant": "rbac",
+      "from": 253,
+      "to": 290,
+      "type": "security"
+    },
+    {
+      "participant": "handler",
+      "from": 281,
+      "to": 447,
+      "type": "backend"
+    },
+    {
+      "participant": "cache",
+      "from": 313,
+      "to": 416,
+      "type": "database"
+    },
+    {
+      "participant": "kube",
+      "from": 346,
+      "to": 386,
+      "type": "cloud"
+    },
+    {
+      "participant": "auth",
+      "from": 466,
+      "to": 504,
+      "type": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "认证与会话",
+      "items": [
+        "JWT cookie / API Key / 匿名凭证",
+        "401 时前端静默刷新并重试"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "鉴权",
+      "items": [
+        "Kite 角色存于自身数据库",
+        "HTTP 方法映射资源动词校验",
+        "_all 结果由处理器过滤"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "数据读取",
+      "items": [
+        "Informer 缓存优先可关闭",
+        "未命中回源 Kubernetes API"
+      ]
+    }
+  ]
+}

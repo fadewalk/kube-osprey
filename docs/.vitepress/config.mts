@@ -125,6 +125,7 @@ export default defineConfig({
           items: [
             { text: "What is KubeOsprey?", link: "/guide/" },
             { text: "Getting Started", link: "/guide/installation" },
+            { text: "Architecture", link: "/guide/architecture" },
           ],
         },
         {
@@ -198,6 +199,7 @@ export default defineConfig({
           items: [
             { text: "什么是 KubeOsprey?", link: "/zh/guide/" },
             { text: "开始", link: "/zh/guide/installation" },
+            { text: "架构", link: "/zh/guide/architecture" },
           ],
         },
         {

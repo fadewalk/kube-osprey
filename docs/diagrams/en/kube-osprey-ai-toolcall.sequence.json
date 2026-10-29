@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "AI Session and Tool Calls",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1080,
+      560
+    ],
+    "output": "kube-osprey-ai-toolcall.html",
+    "views": [
+      {
+        "id": "agent-loop",
+        "label": "Agent loop",
+        "focus": [
+          "user",
+          "chat",
+          "llm",
+          "agent"
+        ],
+        "note": "The SSE conversation and the LLM tool-call loop."
+      },
+      {
+        "id": "authorization",
+        "label": "Authorization and confirmation",
+        "focus": [
+          "agent",
+          "authz",
+          "chat"
+        ],
+        "note": "Tool authorization maps to the user's RBAC; mutations need confirmation."
+      },
+      {
+        "id": "execution",
+        "label": "Tool execution",
+        "focus": [
+          "agent",
+          "exec",
+          "kube"
+        ],
+        "note": "Runs through the cluster ClientSet and redacts the result."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "User",
+      "sublabel": "Ops question"
+    },
+    {
+      "id": "chat",
+      "type": "frontend",
+      "label": "AI chat",
+      "sublabel": "ai-chat component"
+    },
+    {
+      "id": "llm",
+      "type": "external",
+      "label": "LLM provider",
+      "sublabel": "Anthropic / OpenAI"
+    },
+    {
+      "id": "agent",
+      "type": "backend",
+      "label": "Agent loop",
+      "sublabel": "pkg/ai"
+    },
+    {
+      "id": "authz",
+      "type": "security",
+      "label": "Authorization",
+      "sublabel": "AuthorizeToolForUser"
+    },
+    {
+      "id": "exec",
+      "type": "backend",
+      "label": "Tool execution",
+      "sublabel": "ClientSet"
+    },
+    {
+      "id": "kube",
+      "type": "cloud",
+      "label": "Kubernetes API",
+      "sublabel": "Target cluster"
+    }
+  ],
+  "messages": [
+    {
+      "id": "ask",
+      "from": "user",
+      "to": "chat",
+      "y": 165,
+      "label": "Describe the ops intent"
+    },
+    {
+      "id": "sse-open",
+      "from": "chat",
+      "to": "agent",
+      "y": 193,
+      "label": "POST /api/v1/ai/chat (SSE)",
+      "variant": "emphasis",
+      "note": "Resume after interrupt: POST /api/v1/ai/continue"
+    },
+    {
+      "id": "llm-call",
+      "from": "agent",
+      "to": "llm",
+      "y": 221,
+      "label": "Context + tool definitions"
+    },
+    {
+      "id": "tool-call",
+      "from": "llm",
+      "to": "agent",
+      "y": 249,
+      "label": "Tool call (get/list/exec/mutate)",
+      "variant": "return"
+    },
+    {
+      "id": "authorize",
+      "from": "agent",
+      "to": "authz",
+      "y": 277,
+      "label": "AuthorizeToolForUser",
+      "variant": "security",
+      "note": "Maps to the current user's own KubeOsprey RBAC permissions"
+    },
+    {
+      "id": "authz-result",
+      "from": "authz",
+      "to": "agent",
+      "y": 305,
+      "label": "Allow / deny",
+      "variant": "return"
+    },
+    {
+      "id": "confirm-card",
+      "from": "agent",
+      "to": "chat",
+      "y": 333,
+      "label": "Confirmation card for mutating tools",
+      "variant": "dashed",
+      "note": "request_choice / request_form interaction"
+    },
+    {
+      "id": "user-confirm",
+      "from": "chat",
+      "to": "agent",
+      "y": 361,
+      "label": "Continue after user confirms",
+      "variant": "security"
+    },
+    {
+      "id": "execute",
+      "from": "agent",
+      "to": "exec",
+      "y": 389,
+      "label": "Execute tool",
+      "variant": "emphasis"
+    },
+    {
+      "id": "kube-call",
+      "from": "exec",
+      "to": "kube",
+      "y": 417,
+      "label": "K8sClient call"
+    },
+    {
+      "id": "kube-result",
+      "from": "kube",
+      "to": "exec",
+      "y": 445,
+      "label": "Result · sensitive fields redacted",
+      "variant": "return"
+    },
+    {
+      "id": "stream-reply",
+      "from": "agent",
+      "to": "chat",
+      "y": 475,
+      "label": "SSE streamed reply + ResourceHistory",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "user",
+      "from": 160,
+      "to": 480,
+      "type": "external"
+    },
+    {
+      "participant": "chat",
+      "from": 163,
+      "to": 480,
+      "type": "frontend"
+    },
+    {
+      "participant": "llm",
+      "from": 219,
+      "to": 255,
+      "type": "external"
+    },
+    {
+      "participant": "agent",
+      "from": 191,
+      "to": 480,
+      "type": "backend"
+    },
+    {
+      "participant": "authz",
+      "from": 275,
+      "to": 311,
+      "type": "security"
+    },
+    {
+      "participant": "exec",
+      "from": 387,
+      "to": 451,
+      "type": "backend"
+    },
+    {
+      "participant": "kube",
+      "from": 415,
+      "to": 451,
+      "type": "cloud"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Session channel",
+      "items": [
+        "POST /api/v1/ai/chat opens an SSE stream",
+        "Resume via /api/v1/ai/continue after an interrupt"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Permissions and confirmation",
+      "items": [
+        "Tool authorization maps to the user's own RBAC",
+        "Mutating tools require human confirmation"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Execution and audit trail",
+      "items": [
+        "Executes against K8s through the cluster ClientSet",
+        "Result is redacted and written to ResourceHistory"
+      ]
+    }
+  ]
+}
