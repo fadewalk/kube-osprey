@@ -48,13 +48,13 @@ jobs:
     timeout-minutes: 60
 
     env:
-      E2E_KIND_NAME: kite-e2e
-      E2E_KUBECONFIG: ${{ github.workspace }}/kite-e2e.kubeconfig
+      E2E_KIND_NAME: kube-osprey-e2e
+      E2E_KUBECONFIG: ${{ github.workspace }}/kube-osprey-e2e.kubeconfig
       KIND_LOGS_DIR: ${{ github.workspace }}/kind-logs
       E2E_PORT: "38080"
-      KITE_E2E_LDAP_URL: ldap://127.0.0.1:3389
-      KITE_E2E_OAUTH_ISSUER: http://127.0.0.1:5556
-      KITE_E2E_USE_SYSTEM_CHROME: "true"
+      KUBE_OSPREY_E2E_LDAP_URL: ldap://127.0.0.1:3389
+      KUBE_OSPREY_E2E_OAUTH_ISSUER: http://127.0.0.1:5556
+      KUBE_OSPREY_E2E_USE_SYSTEM_CHROME: "true"
 
     steps:
       - name: Checkout code
@@ -117,8 +117,8 @@ jobs:
       - name: Collect external auth logs
         if: always()
         run: |
-          docker logs kite-e2e-ldap > "${GITHUB_WORKSPACE}/kite-e2e-ldap.log" 2>&1 || true
-          docker logs kite-e2e-dex > "${GITHUB_WORKSPACE}/kite-e2e-dex.log" 2>&1 || true
+          docker logs kube-osprey-e2e-ldap > "${GITHUB_WORKSPACE}/kube-osprey-e2e-ldap.log" 2>&1 || true
+          docker logs kube-osprey-e2e-dex > "${GITHUB_WORKSPACE}/kube-osprey-e2e-dex.log" 2>&1 || true
 
       - name: Upload E2E artifacts
         if: always()
@@ -129,5 +129,5 @@ jobs:
             e2e/playwright-report
             e2e/test-results
             ${{ env.KIND_LOGS_DIR }}
-            ${{ github.workspace }}/kite-e2e-ldap.log
-            ${{ github.workspace }}/kite-e2e-dex.log
+            ${{ github.workspace }}/kube-osprey-e2e-ldap.log
+            ${{ github.workspace }}/kube-osprey-e2e-dex.log

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

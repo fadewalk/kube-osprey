@@ -53,7 +53,7 @@ export function useMonacoBackgroundColor(
     const onStylesheetLoad = (event: Event) => {
       if (
         event.target instanceof HTMLLinkElement &&
-        event.target.hasAttribute('data-kite-plugin-theme')
+        event.target.hasAttribute('data-kube-osprey-plugin-theme')
       ) {
         updateBackground()
       }

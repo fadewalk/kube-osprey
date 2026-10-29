@@ -6,10 +6,10 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/kube"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"

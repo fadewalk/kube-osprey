@@ -4,28 +4,28 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 	"k8s.io/klog/v2"
 )
 
 var (
-	kiteUsername = os.Getenv("KITE_USERNAME")
-	kitePassword = os.Getenv("KITE_PASSWORD")
+	initialAdminUsername = common.Getenv("USERNAME")
+	initialAdminPassword = common.Getenv("PASSWORD")
 )
 
 func loadUser() error {
-	if kiteUsername != "" && kitePassword != "" {
+	if initialAdminUsername != "" && initialAdminPassword != "" {
 		uc, err := model.CountUsers()
 		if err == nil && uc == 0 {
-			klog.Infof("Creating super user %s from environment variables", kiteUsername)
+			klog.Infof("Creating super user %s from environment variables", initialAdminUsername)
 			u := &model.User{
-				Username: kiteUsername,
-				Password: kitePassword,
+				Username: initialAdminUsername,
+				Password: initialAdminPassword,
 			}
 			err := model.AddSuperUser(u)
 			if err == nil {

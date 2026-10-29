@@ -74,6 +74,7 @@ export function PodDetail(props: { namespace: string; name: string }) {
     namespace
   )
   const attachContainerName =
+    pod?.metadata?.annotations?.['kube-osprey.io/debug-container'] ??
     pod?.metadata?.annotations?.['kite.io/debug-container']
 
   useEffect(() => {

@@ -15,7 +15,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/version"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 	"golang.org/x/crypto/nacl/box"
 	"k8s.io/client-go/rest"
 )

@@ -3,8 +3,8 @@ package version
 import (
 	"net/http"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
 )
 
 var (

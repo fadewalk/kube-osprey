@@ -36,7 +36,7 @@ This document describes all available configuration options for the KubeOsprey H
 When `secret.existingSecret` is set, the referenced Secret must contain all required keys:
 
 - `JWT_SECRET`
-- `KITE_ENCRYPT_KEY`
+- `KUBE_OSPREY_ENCRYPT_KEY`
 - `DB_TYPE` — supported values: `sqlite`, `postgres`, `mysql` (defaults to `sqlite` if not set)
 - `DB_DSN` — not required for `sqlite`
 
@@ -62,7 +62,7 @@ With an existing Secret, the `jwtSecret`, `encryptKey`, `db.type`, and `db.dsn` 
 | `db.sqlite.persistence.hostPath.path`     | hostPath path                                             | `/path/to/host/dir` |
 | `db.sqlite.persistence.hostPath.type`     | hostPath type                                             | `DirectoryOrCreate` |
 | `db.sqlite.persistence.mountPath`         | Mount path inside container                               | `/data`             |
-| `db.sqlite.persistence.filename`          | SQLite filename inside mountPath                          | `kite.db`           |
+| `db.sqlite.persistence.filename`          | SQLite filename inside mountPath                          | `kube-osprey.db`           |
 | `db.sqlite.options`                       | Additional SQLite connection options, e.g. `_journal_mode=WAL&_busy_timeout=5000` | `""`        |
 
 ## MCP Server

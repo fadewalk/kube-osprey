@@ -46,7 +46,7 @@ const ColorThemeProviderContext =
   createContext<ColorThemeProviderState>(initialState)
 
 const pluginThemePrefix = 'plugin-'
-const pluginThemeLinkAttribute = 'data-kite-plugin-theme'
+const pluginThemeLinkAttribute = 'data-kube-osprey-plugin-theme'
 
 function isPluginColorTheme(theme: string): theme is PluginColorTheme {
   return theme.startsWith(pluginThemePrefix)

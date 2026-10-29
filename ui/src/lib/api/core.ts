@@ -628,7 +628,7 @@ export const restartWorkload = async (
       template: {
         metadata: {
           annotations: {
-            'kite.kubernetes.io/restartedAt': new Date().toISOString(),
+            'kube-osprey.io/restartedAt': new Date().toISOString(),
           },
         },
       },

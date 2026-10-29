@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"github.com/gorilla/websocket"
-	"github.com/zxh326/kite/pkg/common"
 	"k8s.io/klog/v2"
 )
 

@@ -1,4 +1,4 @@
-module github.com/zxh326/kite
+module github.com/fadewalk/kube-osprey
 
 go 1.27.0
 

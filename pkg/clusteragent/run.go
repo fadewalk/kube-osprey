@@ -19,9 +19,9 @@ import (
 const registrationRefreshInterval = 10 * time.Minute
 
 func Run(ctx context.Context, args []string) error {
-	flags := flag.NewFlagSet("kite cluster-agent", flag.ContinueOnError)
+	flags := flag.NewFlagSet("kube-osprey cluster-agent", flag.ContinueOnError)
 	klog.InitFlags(flags)
-	server := flags.String("server", "", "Kite server URL")
+	server := flags.String("server", "", "KubeOsprey server URL")
 	token := flags.String("token", "", "Cluster Agent token")
 	publicKey := flags.String("public-key", "", "Cluster Agent registration public key")
 	kubeconfig := flags.String("kubeconfig", "", "Path to kubeconfig file")

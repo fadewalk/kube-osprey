@@ -11,7 +11,7 @@ import (
 	"time"
 
 	semver "github.com/blang/semver/v4"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 const (
@@ -89,7 +89,7 @@ func latestArtifactHubChartPackage(ctx context.Context, repositoryName, chartNam
 	if err != nil {
 		return ChartPackage{}, err
 	}
-	req.Header.Set("User-Agent", "kite")
+	req.Header.Set("User-Agent", "kube-osprey")
 
 	client := http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)

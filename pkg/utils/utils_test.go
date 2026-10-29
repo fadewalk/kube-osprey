@@ -4,35 +4,35 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"k8s.io/apimachinery/pkg/util/validation"
 )
 
-func TestInjectKiteBase(t *testing.T) {
-	html := `<html><head><link rel="modulepreload" href="__KITE_BASE__/assets/index.js"><script type="module" src="__KITE_BASE__/assets/main.js"></script></head></html>`
+func TestInjectBase(t *testing.T) {
+	html := `<html><head><link rel="modulepreload" href="__KUBE_OSPREY_BASE__/assets/index.js"><script type="module" src="__KUBE_OSPREY_BASE__/assets/main.js"></script></head></html>`
 
 	t.Run("subpath", func(t *testing.T) {
-		got := InjectKiteBase(html, "/kite")
+		got := InjectBase(html, "/kube-osprey")
 
-		if strings.Contains(got, "__KITE_BASE__") {
+		if strings.Contains(got, "__KUBE_OSPREY_BASE__") {
 			t.Fatalf("placeholder should be replaced: %s", got)
 		}
 		if strings.Contains(got, "<base ") {
 			t.Fatalf("base tag should not be injected anymore: %s", got)
 		}
-		if !strings.Contains(got, `href="/kite/assets/index.js"`) {
+		if !strings.Contains(got, `href="/kube-osprey/assets/index.js"`) {
 			t.Fatalf("expected asset href to include subpath: %s", got)
 		}
-		if !strings.Contains(got, `src="/kite/assets/main.js"`) {
+		if !strings.Contains(got, `src="/kube-osprey/assets/main.js"`) {
 			t.Fatalf("expected asset src to include subpath: %s", got)
 		}
-		if !strings.Contains(got, `<script>window.__dynamic_base__="/kite";</script>`) {
+		if !strings.Contains(got, `<script>window.__dynamic_base__="/kube-osprey";</script>`) {
 			t.Fatalf("expected runtime base script: %s", got)
 		}
 	})
 
 	t.Run("root", func(t *testing.T) {
-		got := InjectKiteBase(html, "")
+		got := InjectBase(html, "")
 
 		if !strings.Contains(got, `href="/assets/index.js"`) {
 			t.Fatalf("expected root asset href: %s", got)
@@ -46,7 +46,7 @@ func TestInjectKiteBase(t *testing.T) {
 	})
 
 	t.Run("escapes html attribute injection", func(t *testing.T) {
-		got := InjectKiteBase(html, `/ki"te`)
+		got := InjectBase(html, `/ki"te`)
 
 		if strings.Contains(got, `href="/ki"te/assets/index.js"`) {
 			t.Fatalf("expected asset href to be escaped: %s", got)
@@ -68,7 +68,7 @@ func TestGetImageRegistryAndRepo(t *testing.T) {
 	}{
 		{"nginx", "", "library/nginx"},
 		{"nginx:latest", "", "library/nginx"},
-		{"zzde/kite:latest", "", "zzde/kite"},
+		{"zzde/kube-osprey:latest", "", "zzde/kube-osprey"},
 		{"docker.io/library/nginx", "docker.io", "library/nginx"},
 		{"docker.io/library/nginx:latest", "docker.io", "library/nginx"},
 		{"gcr.io/my-project/my-image", "gcr.io", "my-project/my-image"},
@@ -115,7 +115,7 @@ func TestToEnvName(t *testing.T) {
 	}{
 		{name: "hyphen and dot", in: "a-b.c", want: "A_B_C"},
 		{name: "slash", in: "kube/system", want: "KUBE_SYSTEM"},
-		{name: "mixed case", in: "KiteBase", want: "KITEBASE"},
+		{name: "mixed case", in: "OspreyBase", want: "OSPREYBASE"},
 	}
 
 	for _, tc := range testCases {

@@ -3,8 +3,8 @@ package helmutil
 import (
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/stretchr/testify/require"
-	"github.com/zxh326/kite/pkg/model"
 	"helm.sh/helm/v4/pkg/getter"
 	repo "helm.sh/helm/v4/pkg/repo/v1"
 )
@@ -36,6 +36,9 @@ func TestLoadRepositoryArchiveFromRepository(t *testing.T) {
 }
 
 func TestLoadArchiveFromOCIRepository(t *testing.T) {
+	// TODO(swatch): point at oci://ghcr.io/fadewalk/charts/kube-osprey and
+	// assert name "kube-osprey" once the first renamed chart release exists;
+	// that package is only created by the release workflow on the next tag.
 	loadedChart, err := LoadArchive("oci://ghcr.io/kite-org/charts/kite", nil)
 	require.NoError(t, err)
 	require.Equal(t, "kite", loadedChart.Metadata.Name)

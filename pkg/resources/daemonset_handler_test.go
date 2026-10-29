@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"

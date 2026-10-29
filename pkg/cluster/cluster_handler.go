@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/clusteragent"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/clusteragent"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
 	"gorm.io/gorm"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -390,7 +390,7 @@ func (cm *ClusterManager) GetClusterAgentManifest(c *gin.Context) {
 	}
 	manifest := clusteragent.GenerateManifestWithPermission(serverURL, token, publicKey, image, permission, customRole)
 	c.Header("Cache-Control", "no-store")
-	c.Header("Content-Disposition", `attachment; filename="kite-cluster-agent.yaml"`)
+	c.Header("Content-Disposition", `attachment; filename="kube-osprey-cluster-agent.yaml"`)
 	c.Data(http.StatusOK, "text/yaml; charset=utf-8", []byte(manifest))
 }
 

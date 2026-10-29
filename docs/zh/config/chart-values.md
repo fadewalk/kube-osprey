@@ -38,7 +38,7 @@
 已有 Secret 必须包含以下键：
 
 - `JWT_SECRET`
-- `KITE_ENCRYPT_KEY`
+- `KUBE_OSPREY_ENCRYPT_KEY`
 - `DB_TYPE`（取值 `sqlite`、`postgres`、`mysql`；未设置时默认 `sqlite`）
 - `DB_DSN`（SQLite 时可不填）
 
@@ -62,7 +62,7 @@
 | `db.sqlite.persistence.hostPath.path`     | hostPath 路径                         | `/path/to/host/dir` |
 | `db.sqlite.persistence.hostPath.type`     | hostPath 类型                         | `DirectoryOrCreate` |
 | `db.sqlite.persistence.mountPath`         | 容器内的挂载路径                      | `/data`             |
-| `db.sqlite.persistence.filename`          | 挂载路径内的 sqlite 文件名            | `kite.db`           |
+| `db.sqlite.persistence.filename`          | 挂载路径内的 sqlite 文件名            | `kube-osprey.db`           |
 
 ## 插件存储
 
@@ -122,7 +122,7 @@ plugins:
 
 ## 配置文件
 
-通过 Helm 值管理配置文件时，Chart 将其挂载到容器的 `/etc/kite/config.yaml`（对应 `KITE_CONFIG_FILE` 环境变量），相关配置部分在 UI 中变为只读。
+通过 Helm 值管理配置文件时，Chart 将其挂载到容器的 `/etc/kite/config.yaml`（对应 `KUBE_OSPREY_CONFIG_FILE` 环境变量），相关配置部分在 UI 中变为只读。
 
 | 参数                    | 描述                                                         | 默认值 |
 | ----------------------- | ------------------------------------------------------------ | ------ |

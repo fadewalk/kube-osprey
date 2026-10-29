@@ -3,15 +3,15 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "kite.fullname" . }}
+  name: {{ include "kube-osprey.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "kite.labels" . | nindent 4 }}
+    {{- include "kube-osprey.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "kite.selectorLabels" . | nindent 6 }}
+      {{- include "kube-osprey.selectorLabels" . | nindent 6 }}
   {{- with .Values.deploymentStrategy }}
   strategy:
     {{- toYaml . | nindent 4 }}
@@ -23,7 +23,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "kite.labels" . | nindent 8 }}
+        {{- include "kube-osprey.labels" . | nindent 8 }}
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -32,7 +32,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "kite.serviceAccountName" . }}
+      serviceAccountName: {{ include "kube-osprey.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -45,7 +45,7 @@ spec:
           {{- end }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["/app/kite"]
+          command: ["/app/kube-osprey"]
           {{- if .Values.debug }}
           args: ["-v", "1"]
           {{- end }}
@@ -55,7 +55,7 @@ spec:
               protocol: TCP
           envFrom:
             - secretRef:
-                name: {{ include "kite.secret" . }}
+                name: {{ include "kube-osprey.secret" . }}
           env:
             - name: PLUGIN_DIR
               value: {{ $plugins.directory | default "/data/plugins" | quote }}
@@ -74,19 +74,19 @@ spec:
               value: {{ (printf "%s/%s?%s" .Values.db.sqlite.persistence.mountPath .Values.db.sqlite.persistence.filename .Values.db.sqlite.options) }}
             {{- end }}
             {{- if .Values.basePath }}
-            - name: KITE_BASE
+            - name: KUBE_OSPREY_BASE
               value: {{ .Values.basePath }}
             {{- end }}
             {{- if .Values.config.enabled }}
-            - name: KITE_CONFIG_FILE
-              value: /etc/kite/config.yaml
+            - name: KUBE_OSPREY_CONFIG_FILE
+              value: /etc/kube-osprey/config.yaml
             {{- end }}
             {{- if .Values.mcp.enabled }}
-            - name: KITE_MCP_ENABLED
+            - name: KUBE_OSPREY_MCP_ENABLED
               value: "true"
             {{- end }}
             {{- if .Values.mcp.rateLimitPerMinute }}
-            - name: KITE_MCP_RATE_LIMIT_PER_MINUTE
+            - name: KUBE_OSPREY_MCP_RATE_LIMIT_PER_MINUTE
               value: {{ .Values.mcp.rateLimitPerMinute | quote }}
             {{- end }}
           {{- with .Values.extraEnvs }}
@@ -109,32 +109,32 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           {{- if .Values.config.enabled }}
-            - name: kite-config
-              mountPath: /etc/kite
+            - name: kube-osprey-config
+              mountPath: /etc/kube-osprey
               readOnly: true
           {{- end }}
           {{- if and (eq .Values.db.type "sqlite")}}
-            - name: {{ include "kite.fullname" . }}-storage
+            - name: {{ include "kube-osprey.fullname" . }}-storage
               mountPath: {{ .Values.db.sqlite.persistence.mountPath }}
           {{- end }}
           {{- if $persistence.enabled }}
-            - name: {{ include "kite.fullname" . }}-plugins
+            - name: {{ include "kube-osprey.fullname" . }}-plugins
               mountPath: {{ $plugins.directory | default "/data/plugins" | quote }}
           {{- end }}
       volumes:
       {{- if .Values.config.enabled }}
-        - name: kite-config
+        - name: kube-osprey-config
           secret:
-            secretName: {{ .Values.config.existingSecret | default (printf "%s-config" (include "kite.fullname" .)) }}
+            secretName: {{ .Values.config.existingSecret | default (printf "%s-config" (include "kube-osprey.fullname" .)) }}
             items:
               - key: config.yaml
                 path: config.yaml
       {{- end }}
       {{- if eq .Values.db.type "sqlite"}}
-        - name: {{ include "kite.fullname" . }}-storage
+        - name: {{ include "kube-osprey.fullname" . }}-storage
       {{- if .Values.db.sqlite.persistence.pvc.enabled }}
           persistentVolumeClaim:
-            claimName: {{ .Values.db.sqlite.persistence.pvc.existingClaim | default (printf "%s-storage" (include "kite.fullname" .)) }}
+            claimName: {{ .Values.db.sqlite.persistence.pvc.existingClaim | default (printf "%s-storage" (include "kube-osprey.fullname" .)) }}
       {{- else if .Values.db.sqlite.persistence.hostPath.enabled }}
           hostPath:
             path: {{ .Values.db.sqlite.persistence.hostPath.path }}
@@ -144,9 +144,9 @@ spec:
       {{- end }}
       {{- end }}
       {{- if $persistence.enabled }}
-        - name: {{ include "kite.fullname" . }}-plugins
+        - name: {{ include "kube-osprey.fullname" . }}-plugins
           persistentVolumeClaim:
-            claimName: {{ $persistence.existingClaim | default (printf "%s-plugins" (include "kite.fullname" .)) }}
+            claimName: {{ $persistence.existingClaim | default (printf "%s-plugins" (include "kube-osprey.fullname" .)) }}
       {{- end }}
       {{- with .Values.volumes }}
       {{- toYaml . | nindent 8 }}

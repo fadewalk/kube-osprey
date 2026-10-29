@@ -1,7 +1,7 @@
 apiVersion: v2
-name: kite
-description: A Helm chart for Kubernetes
-icon: https://kitehq.dev/logo.svg
+name: kube-osprey
+description: A Helm chart for KubeOsprey, a multi-cluster Kubernetes console
+icon: https://fadewalk.github.io/kube-osprey/logo.svg
 
 # A chart can be either an 'application' or a 'library' chart.
 #

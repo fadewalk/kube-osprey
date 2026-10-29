@@ -44,9 +44,8 @@ docs/.vitepress/dist
 docs/node_modules
 docs/.vitepress/cache
 
-kite
 kube-osprey
-!charts/kite
+!charts/kube-osprey
 
 
 .gocache/

@@ -29,7 +29,7 @@ export interface BootstrapBranding {
 }
 
 export interface BootstrapResponse {
-  kiteVersion: string
+  appVersion: string
   setup: BootstrapSetup
   auth: AuthProviderCatalog
   capabilities: BootstrapCapabilities

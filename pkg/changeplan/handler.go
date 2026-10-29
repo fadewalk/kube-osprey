@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 )
 
 // CanApproveChangePlans reports whether the user holds the change_plans

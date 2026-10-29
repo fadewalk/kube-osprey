@@ -12,7 +12,7 @@ Resource endpoints require:
 Example:
 
 ```bash
--H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+-H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
 -H "x-cluster-name: demo-cluster"
 ```
 
@@ -63,7 +63,7 @@ This example creates a ConfigMap in the `default` namespace.
 ```bash
 curl \
   -X POST \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   -H "Content-Type: application/json" \
   -d '{
@@ -90,7 +90,7 @@ This example replaces the ConfigMap content.
 ```bash
 curl \
   -X PUT \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   -H "Content-Type: application/json" \
   -d '{
@@ -122,7 +122,7 @@ This example uses JSON merge patch to update one field without sending the full 
 ```bash
 curl \
   -X PATCH \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   -H "Content-Type: application/json" \
   -d '{
@@ -138,7 +138,7 @@ To restart a Deployment with `PATCH`, update an annotation under `spec.template.
 ```bash
 curl \
   -X PATCH \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   -H "Content-Type: application/json" \
   -d '{
@@ -146,7 +146,7 @@ curl \
       "template": {
         "metadata": {
           "annotations": {
-            "kite.kubernetes.io/restartedAt": "2026-04-20T12:00:00Z"
+            "kube-osprey.io/restartedAt": "2026-04-20T12:00:00Z"
           }
         }
       }
@@ -162,7 +162,7 @@ This example deletes the ConfigMap.
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   https://kube-osprey.example.com/api/v1/configmaps/default/example-config
 ```
@@ -178,7 +178,7 @@ Example:
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   "https://kube-osprey.example.com/api/v1/deployments/default/example-app?force=true&wait=false"
 ```
@@ -192,7 +192,7 @@ This example patches a Namespace label:
 ```bash
 curl \
   -X PATCH \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   -H "Content-Type: application/json" \
   -d '{

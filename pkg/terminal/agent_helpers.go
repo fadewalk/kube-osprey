@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/utils"
-	"github.com/zxh326/kite/pkg/wsutil"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/middleware"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/middleware"
-	"github.com/zxh326/kite/pkg/utils"
 )
 
 //go:embed static
@@ -50,7 +50,7 @@ func setupStatic(r *gin.Engine) {
 			return
 		}
 
-		htmlContent := utils.InjectKiteBase(string(content), base)
+		htmlContent := utils.InjectBase(string(content), base)
 
 		c.Header("Content-Type", "text/html; charset=utf-8")
 		c.String(http.StatusOK, htmlContent)

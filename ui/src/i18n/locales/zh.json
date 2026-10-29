@@ -611,7 +611,7 @@
     },
     "tabs": {
       "rolloutRevisions": "发布版本历史",
-      "kiteAudit": "KubeOsprey 审计记录"
+      "kubeOspreyAudit": "KubeOsprey 审计记录"
     }
   },
   "daemonsets": {

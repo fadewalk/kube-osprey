@@ -25,9 +25,9 @@ Create a dedicated Service Account for KubeOsprey and use its token for authenti
 KubeOsprey provides a helper script for creation:
 
 ```sh
-wget https://raw.githubusercontent.com/fadewalk/kube-osprey/main/scripts/generate-kite-kubeconfig.sh -O generate-kite-kubeconfig.sh
-chmod +x generate-kite-kubeconfig.sh
-./generate-kite-kubeconfig.sh
+wget https://raw.githubusercontent.com/fadewalk/kube-osprey/main/scripts/generate-kube-osprey-kubeconfig.sh -O generate-kube-osprey-kubeconfig.sh
+chmod +x generate-kube-osprey-kubeconfig.sh
+./generate-kube-osprey-kubeconfig.sh
 ```
 
 #### Steps:
@@ -38,20 +38,20 @@ chmod +x generate-kite-kubeconfig.sh
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kite-admin
+  name: kube-osprey-admin
   namespace: kube-system
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kite-admin
+  name: kube-osprey-admin
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
   - kind: ServiceAccount
-    name: kite-admin
+    name: kube-osprey-admin
     namespace: kube-system
 ```
 
@@ -61,10 +61,10 @@ subjects:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: kite-admin-token
+  name: kube-osprey-admin-token
   namespace: kube-system
   annotations:
-    kubernetes.io/service-account.name: kite-admin
+    kubernetes.io/service-account.name: kube-osprey-admin
 type: kubernetes.io/service-account-token
 ```
 
@@ -72,10 +72,10 @@ type: kubernetes.io/service-account-token
 
 ```bash
 # Get token
-TOKEN=$(kubectl get secret kite-admin-token -n kube-system -o jsonpath='{.data.token}' | base64 -d)
+TOKEN=$(kubectl get secret kube-osprey-admin-token -n kube-system -o jsonpath='{.data.token}' | base64 -d)
 
 # Get CA certificate
-CA_CERT=$(kubectl get secret kite-admin-token -n kube-system -o jsonpath='{.data.ca\.crt}')
+CA_CERT=$(kubectl get secret kube-osprey-admin-token -n kube-system -o jsonpath='{.data.ca\.crt}')
 
 # Get API Server address
 API_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.server}')
@@ -84,22 +84,22 @@ API_SERVER=$(kubectl config view --minify -o jsonpath='{.clusters[0].cluster.ser
 4. Generate kubeconfig:
 
 ```bash
-cat > kite-kubeconfig.yaml <<EOF
+cat > kube-osprey-kubeconfig.yaml <<EOF
 apiVersion: v1
 kind: Config
 clusters:
 - cluster:
     certificate-authority-data: ${CA_CERT}
     server: ${API_SERVER}
-  name: kite-cluster
+  name: kube-osprey-cluster
 contexts:
 - context:
-    cluster: kite-cluster
-    user: kite-admin
-  name: kite-context
-current-context: kite-context
+    cluster: kube-osprey-cluster
+    user: kube-osprey-admin
+  name: kube-osprey-context
+current-context: kube-osprey-context
 users:
-- name: kite-admin
+- name: kube-osprey-admin
   user:
     token: ${TOKEN}
 EOF

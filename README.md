@@ -19,7 +19,7 @@ KubeOsprey is a single-binary Kubernetes workspace for multi-cluster operations,
 <img width="1586" height="1167" alt="image" src="https://github.com/user-attachments/assets/5710204d-5d34-44af-85dc-3b436e205c12" />
 
 > [!NOTE]
-> KubeOsprey is an independently maintained fork of [Kite](https://github.com/kite-org/kite) (Apache-2.0). It pulls useful upstream improvements but is developed separately and does not contribute changes back. Code-level identifiers (the Go module path and `KITE_*` environment variables) intentionally keep their original names so upstream changes keep merging cleanly. KubeOsprey is an independent community project and is not affiliated with or endorsed by the Kubernetes project or the CNCF.
+> KubeOsprey is an independently maintained fork of [Kite](https://github.com/kite-org/kite) (Apache-2.0). It has diverged from upstream and is developed separately; changes are not contributed back. KubeOsprey is an independent community project and is not affiliated with or endorsed by the Kubernetes project or the CNCF.
 
 ## Why KubeOsprey
 
@@ -61,13 +61,12 @@ make build
 
 ### Install a Release
 
-Every tagged release publishes a container image, an OCI Helm chart, and standalone binaries (Linux, macOS, Windows) on the [Releases](https://github.com/fadewalk/kube-osprey/releases) page. The chart keeps the upstream name `kite`, so `KITE_*` environment variables stay compatible with existing deployments; `fullnameOverride` keeps the deployed resources named `kube-osprey`.
+Every tagged release publishes a container image, an OCI Helm chart, and standalone binaries (Linux, macOS, Windows) on the [Releases](https://github.com/fadewalk/kube-osprey/releases) page. Installing under the release name `kube-osprey` names every deployed resource `kube-osprey`.
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite \
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey \
   --namespace kube-osprey-system \
-  --create-namespace \
-  --set fullnameOverride=kube-osprey
+  --create-namespace
 ```
 
 ```bash
@@ -77,7 +76,7 @@ docker run -d --name kube-osprey \
   -p 8080:8080 \
   -v "$(pwd)/data:/data" \
   -e DB_DSN=/data/db.sqlite \
-  -e KITE_ENCRYPT_KEY="$(cat data/encrypt.key)" \
+  -e KUBE_OSPREY_ENCRYPT_KEY="$(cat data/encrypt.key)" \
   ghcr.io/fadewalk/kube-osprey:latest
 ```
 
@@ -91,7 +90,7 @@ docker run -d --name kube-osprey \
 | Installation and exposure              | [Installation](https://fadewalk.github.io/kube-osprey/guide/installation)                                                                           |
 | Users, authentication, and permissions | [User management](https://fadewalk.github.io/kube-osprey/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/config/rbac-config)                    |
 | Monitoring                             | [Prometheus setup](https://fadewalk.github.io/kube-osprey/config/prometheus-setup) · [Alert Center](https://fadewalk.github.io/kube-osprey/guide/alert-center) · [Health diagnostics](https://fadewalk.github.io/kube-osprey/guide/health-diagnostics)                                 |
-| Operations                             | [Helm management](https://fadewalk.github.io/kube-osprey/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/guide/kite-cluster-agent) · [Batch operations](https://fadewalk.github.io/kube-osprey/guide/batch-operations)                                            |
+| Operations                             | [Helm management](https://fadewalk.github.io/kube-osprey/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/guide/cluster-agent) · [Batch operations](https://fadewalk.github.io/kube-osprey/guide/batch-operations)                                            |
 | Change management                      | [Change plans](https://fadewalk.github.io/kube-osprey/guide/change-plans) · [Notification channels](https://fadewalk.github.io/kube-osprey/config/notification-channels)                                                                                              |
 | Scale & search                        | [Resource sync](https://fadewalk.github.io/kube-osprey/guide/resource-sync) · [Global search](https://fadewalk.github.io/kube-osprey/guide/global-search)                                                                                                            |
 | AI                                     | [AI assistant](https://fadewalk.github.io/kube-osprey/guide/ai-assistant) · [MCP server](https://fadewalk.github.io/kube-osprey/guide/mcp-server)                                                                           |

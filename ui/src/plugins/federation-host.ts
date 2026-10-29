@@ -31,6 +31,8 @@ const shared = (version: string, lib: () => Record<string, unknown>) => ({
 })
 
 // Only plugin loading imports this module; the main app starts without federation.
+// 'kite' is the federation host name pinned by @kite-dev/plugin-sdk builds;
+// renaming it breaks third-party plugin bundles.
 export const federationHost = createInstance({
   name: 'kite',
   remotes: [],

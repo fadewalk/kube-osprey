@@ -6,17 +6,17 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
 )
 
-// KiteConfig represents the external configuration file structure.
-type KiteConfig struct {
+// AppConfig represents the external configuration file structure.
+type AppConfig struct {
 	SuperUser *SuperUserConfig `yaml:"superUser"`
 	Clusters  []ClusterConfig  `yaml:"clusters"`
 	OAuth     []OAuthConfig    `yaml:"oauth"`
@@ -117,7 +117,7 @@ func LoadConfigFromFile(path string) {
 	common.SetManagedSections(sections)
 }
 
-func readConfigFile(path string) (*KiteConfig, [sha256.Size]byte, error) {
+func readConfigFile(path string) (*AppConfig, [sha256.Size]byte, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, [sha256.Size]byte{}, fmt.Errorf("failed to read config file %s: %w", path, err)
@@ -127,7 +127,7 @@ func readConfigFile(path string) (*KiteConfig, [sha256.Size]byte, error) {
 	// Expand ${ENV_VAR} placeholders from environment
 	expanded := os.ExpandEnv(string(data))
 
-	var cfg KiteConfig
+	var cfg AppConfig
 	if err := yaml.Unmarshal([]byte(expanded), &cfg); err != nil {
 		return nil, hash, fmt.Errorf("failed to parse config file %s: %w", path, err)
 	}
@@ -135,7 +135,7 @@ func readConfigFile(path string) (*KiteConfig, [sha256.Size]byte, error) {
 	return &cfg, hash, nil
 }
 
-func applyConfig(path string, cfg *KiteConfig) AppliedSections {
+func applyConfig(path string, cfg *AppConfig) AppliedSections {
 	sections := AppliedSections{}
 	klog.Infof("Loading configuration from file: %s", path)
 

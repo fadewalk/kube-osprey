@@ -36,7 +36,7 @@ func TestGenericProviderExchangeCodeForToken(t *testing.T) {
 		if err := r.ParseForm(); err != nil {
 			t.Fatalf("ParseForm() error = %v", err)
 		}
-		if r.Form.Get("client_id") != "client-id" || r.Form.Get("client_secret") != "client-secret" || r.Form.Get("code") != "auth-code" || r.Form.Get("grant_type") != "authorization_code" || r.Form.Get("redirect_uri") != "https://kite.example.com/api/auth/callback" {
+		if r.Form.Get("client_id") != "client-id" || r.Form.Get("client_secret") != "client-secret" || r.Form.Get("code") != "auth-code" || r.Form.Get("grant_type") != "authorization_code" || r.Form.Get("redirect_uri") != "https://kube-osprey.example.com/api/auth/callback" {
 			t.Fatalf("unexpected form values: %v", r.Form)
 		}
 
@@ -54,7 +54,7 @@ func TestGenericProviderExchangeCodeForToken(t *testing.T) {
 		Config: OAuthConfig{
 			ClientID:     "client-id",
 			ClientSecret: "client-secret",
-			RedirectURL:  "https://kite.example.com/api/auth/callback",
+			RedirectURL:  "https://kube-osprey.example.com/api/auth/callback",
 		},
 		TokenURL: server.URL + "/token",
 	}

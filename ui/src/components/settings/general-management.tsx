@@ -743,7 +743,7 @@ export function GeneralManagement() {
                     )}
                   </span>
                   <code className="block break-all font-mono text-muted-foreground">
-                    Authorization: kite&lt;your-api-key&gt;
+                    Authorization: kubeosprey&lt;your-api-key&gt;
                   </code>
                 </div>
                 <p className="text-muted-foreground">

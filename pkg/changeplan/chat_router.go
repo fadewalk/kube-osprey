@@ -7,16 +7,20 @@ import (
 
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/ai"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/ai"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 // ChatClientName marks plans created by the embedded AI assistant. These
 // plans auto-apply on approval: the assistant cannot poll status and apply
 // with a token like MCP agents do, so the human approval itself is the
 // trigger and execution re-checks the creator's RBAC per step.
-const ChatClientName = "kite-chat"
+const ChatClientName = "kube-osprey-chat"
+
+// legacyChatClientName marks plans created before the identifier rename;
+// pending plans stored under it must remain approvable.
+const legacyChatClientName = "kite-chat"
 
 // WebhookClientName marks plans created by CI/CD webhooks. Like chat plans
 // they auto-apply on approval: the human approval is the gate, and the
@@ -60,7 +64,7 @@ func (s *Service) autoApplyChatPlan(plan model.ChangePlan) {
 	if plan.Status != model.ChangePlanApproved {
 		return
 	}
-	if plan.ClientName != ChatClientName && plan.ClientName != WebhookClientName {
+	if plan.ClientName != ChatClientName && plan.ClientName != legacyChatClientName && plan.ClientName != WebhookClientName {
 		return
 	}
 	go func() {

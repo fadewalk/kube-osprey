@@ -15,13 +15,13 @@
 使用 Helm 可灵活配置和升级 KubeOsprey：
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace
 ```
 
 或锁定 Chart 版本以保证安装可复现：
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite --version 0.18.0 -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey --version <chart-version> -n kube-osprey-system --create-namespace
 ```
 
 #### 自定义安装
@@ -33,7 +33,7 @@ helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite --version 0.18.0 -n 
 使用自定义值安装：
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system -f values.yaml --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system -f values.yaml
 ```
 
 ### 方式二：YAML 清单
@@ -125,7 +125,7 @@ basePath: "/kube-osprey"
 - 或使用 Helm CLI：
 
 ```fish
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey --set basePath="/kube-osprey"
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace --set basePath="/kube-osprey"
 ```
 
 说明：

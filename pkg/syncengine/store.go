@@ -11,9 +11,9 @@ import (
 	"gorm.io/gorm/clause"
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 )
 
 // deletedRetention bounds how long soft-deleted rows are kept before the

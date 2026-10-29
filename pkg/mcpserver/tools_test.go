@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 func toolDefByName(t *testing.T, name string) toolDef {
@@ -168,9 +168,9 @@ func TestToolRegistryAllReadOnly(t *testing.T) {
 	}
 }
 
-// TestCheckPermissionEvaluatesKiteRBAC checks the check_permission tool
+// TestCheckPermissionEvaluatesRBAC checks the check_permission tool
 // reports the caller's own access rather than raising a denial.
-func TestCheckPermissionEvaluatesKiteRBAC(t *testing.T) {
+func TestCheckPermissionEvaluatesRBAC(t *testing.T) {
 	def := toolDefByName(t, "check_permission")
 	ctx := context.Background()
 

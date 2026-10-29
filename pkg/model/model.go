@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/common"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

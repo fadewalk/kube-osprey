@@ -14,7 +14,7 @@ GET /api/v1/admin/clusters/
 
 ```bash
 curl \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   https://kube-osprey.example.com/api/v1/admin/clusters/
 ```
 
@@ -61,7 +61,7 @@ Content-Type: application/json
 ```bash
 curl \
   -X POST \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"demo-cluster",
@@ -106,7 +106,7 @@ Content-Type: application/json
 ```bash
 curl \
   -X PUT \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{
     "description":"production cluster",
@@ -139,7 +139,7 @@ DELETE /api/v1/admin/clusters/:id
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   https://kube-osprey.example.com/api/v1/admin/clusters/1
 ```
 

@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 // HandleStatus serves the sync engine's self-observation: one row per

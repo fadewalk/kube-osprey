@@ -17,8 +17,8 @@ import (
 
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 // DefaultWhitelist is the resource plural list synced when the settings do

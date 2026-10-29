@@ -1,7 +1,7 @@
 package helmutil
 
 import (
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"helm.sh/helm/v4/pkg/action"
 	"helm.sh/helm/v4/pkg/kube"
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -62,22 +62,22 @@ func (g *restClientGetter) ToRESTMapper() (meta.RESTMapper, error) {
 func (g *restClientGetter) ToRawKubeConfigLoader() clientcmd.ClientConfig {
 	config := clientcmdapi.Config{
 		Clusters: map[string]*clientcmdapi.Cluster{
-			"kite": {Server: g.config.Host},
+			"kube-osprey": {Server: g.config.Host},
 		},
 		AuthInfos: map[string]*clientcmdapi.AuthInfo{
-			"kite": {},
+			"kube-osprey": {},
 		},
 		Contexts: map[string]*clientcmdapi.Context{
-			"kite": {
-				Cluster:   "kite",
-				AuthInfo:  "kite",
+			"kube-osprey": {
+				Cluster:   "kube-osprey",
+				AuthInfo:  "kube-osprey",
 				Namespace: g.namespace,
 			},
 		},
-		CurrentContext: "kite",
+		CurrentContext: "kube-osprey",
 	}
 	return clientcmd.NewDefaultClientConfig(config, &clientcmd.ConfigOverrides{
-		CurrentContext: "kite",
+		CurrentContext: "kube-osprey",
 		Context: clientcmdapi.Context{
 			Namespace: g.namespace,
 		},

@@ -8,7 +8,7 @@ KubeOsprey 支持通过 YAML 配置文件来管理集群、OAuth/LDAP、AI 和 R
 
 ## 工作原理
 
-1. KubeOsprey 从 `KITE_CONFIG_FILE` 环境变量指定的路径读取 YAML 配置文件。
+1. KubeOsprey 从 `KUBE_OSPREY_CONFIG_FILE` 环境变量指定的路径读取 YAML 配置文件。
 2. 每次启动时，配置都会应用到数据库，覆盖已管理部分的现有值。
 3. 配置文件中的敏感值支持 `${ENV_VAR}` 占位符，从环境变量中展开。
 4. UI 自动检测已管理的部分，以只读模式显示并附带提示横幅。

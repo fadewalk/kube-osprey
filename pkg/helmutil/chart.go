@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	chart "helm.sh/helm/v4/pkg/chart/v2"
 	"helm.sh/helm/v4/pkg/chart/v2/loader"
 	"helm.sh/helm/v4/pkg/getter"
@@ -147,7 +147,7 @@ func newAnonymousAuthorizer() auth.Client {
 		Client: registryHTTPClient,
 		Cache:  auth.NewCache(),
 	}
-	authorizer.SetUserAgent("kite")
+	authorizer.SetUserAgent("kube-osprey")
 	return authorizer
 }
 

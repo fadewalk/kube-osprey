@@ -31,7 +31,7 @@ disclosure window before publishing details.
 
 - Startup fails closed: the server refuses to run with the upstream default
   encryption key or keys shorter than 32 characters
-  (`KITE_ENCRYPT_KEY`, `KITE_ALLOW_INSECURE_DEFAULTS`).
+  (`KUBE_OSPREY_ENCRYPT_KEY`, `KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS`).
 - Sensitive values at rest (kubeconfigs, API keys, MFA secrets, notification
   channel secrets) are AES-GCM encrypted via `model.SecretString`.
 - Cluster-mutating operations can be routed through change plans with human

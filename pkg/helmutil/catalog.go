@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	chart "helm.sh/helm/v4/pkg/chart/v2"
 	"helm.sh/helm/v4/pkg/getter"
 	"helm.sh/helm/v4/pkg/registry"
@@ -31,7 +31,7 @@ func loadClassicRepositoryIndex(repository model.HelmRepository) (*repo.IndexFil
 	if err != nil {
 		return nil, err
 	}
-	cacheDir, err := os.MkdirTemp("", "kite-helm-repo-*")
+	cacheDir, err := os.MkdirTemp("", "kube-osprey-helm-repo-*")
 	if err != nil {
 		return nil, err
 	}

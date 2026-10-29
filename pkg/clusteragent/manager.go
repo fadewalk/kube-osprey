@@ -18,9 +18,9 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/rancher/remotedialer"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"golang.org/x/crypto/hkdf"
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
@@ -29,7 +29,7 @@ import (
 const (
 	clusterAgentTokenSize = 32
 	manifestGrantTimeout  = 10 * time.Minute
-	manifestGrantAAD      = "kite:cluster-agent-manifest-grant:v1"
+	manifestGrantAAD      = "kube-osprey:cluster-agent-manifest-grant:v1"
 )
 
 var ErrInvalidManifestGrant = errors.New("invalid manifest grant")

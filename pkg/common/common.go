@@ -15,10 +15,10 @@ import (
 
 const (
 	JWTExpirationSeconds = 24 * 60 * 60 // 24 hours
-	DefaultJWTSecret     = "kite-default-jwt-secret-key-change-in-production"
+	DefaultJWTSecret     = "kube-osprey-default-jwt-secret-key-change-in-production"
 
-	NodeTerminalPodName    = "kite-node-terminal-agent"
-	KubectlTerminalPodName = "kite-kubectl-agent"
+	NodeTerminalPodName    = "kube-osprey-node-terminal-agent"
+	KubectlTerminalPodName = "kube-osprey-kubectl-agent"
 
 	// DefaultPluginCatalogURL is used when no catalog URL is configured in settings.
 	DefaultPluginCatalogURL = "https://plugins.kitehq.dev/catalog.json"
@@ -39,13 +39,13 @@ var (
 
 	NodeTerminalImage    = "busybox:latest"
 	KubectlTerminalImage = "zzde/kubectl:latest"
-	ClusterAgentImage    = "ghcr.io/kite-org/kite:latest"
+	ClusterAgentImage    = "ghcr.io/fadewalk/kube-osprey:latest"
 	DBType               = "sqlite"
 	DBDSN                = "dev.db"
 	PluginDir            = "data/plugins"
 	PluginDevURL         = ""
 
-	KiteEncryptKey = "kite-default-encryption-key-change-in-production"
+	EncryptKey = "kube-osprey-default-encryption-key-change-in-production"
 
 	AllNamespaces = "_all"
 
@@ -87,7 +87,7 @@ var (
 
 	AgentPodNamespace = "kube-system"
 
-	// ConfigFilePath is the path to the external config file (set via KITE_CONFIG_FILE env)
+	// ConfigFilePath is the path to the external config file (set via KUBE_OSPREY_CONFIG_FILE env)
 	ConfigFilePath = ""
 
 	// ManagedSections tracks which configuration sections are managed by the config file.
@@ -126,15 +126,15 @@ func ValidateWebSocketOrigin(r *http.Request) bool {
 }
 
 func ValidateEncryptionKey() error {
-	key := strings.TrimSpace(KiteEncryptKey)
+	key := strings.TrimSpace(EncryptKey)
 	if key == "" {
-		return fmt.Errorf("KITE_ENCRYPT_KEY must not be empty")
+		return fmt.Errorf("KUBE_OSPREY_ENCRYPT_KEY must not be empty")
 	}
-	if key == "kite-default-encryption-key-change-in-production" && !AllowInsecureDefaults {
-		return fmt.Errorf("KITE_ENCRYPT_KEY must be explicitly configured; set KITE_ALLOW_INSECURE_DEFAULTS=true only for local development")
+	if key == "kube-osprey-default-encryption-key-change-in-production" && !AllowInsecureDefaults {
+		return fmt.Errorf("KUBE_OSPREY_ENCRYPT_KEY must be explicitly configured; set KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true only for local development")
 	}
 	if len(key) < 32 {
-		return fmt.Errorf("KITE_ENCRYPT_KEY must be at least 32 characters")
+		return fmt.Errorf("KUBE_OSPREY_ENCRYPT_KEY must be at least 32 characters")
 	}
 	return nil
 }
@@ -157,15 +157,32 @@ func SetManagedSections(sections map[string]bool) {
 	}
 }
 
+var legacyEnvWarned sync.Map
+
+// Getenv reads KUBE_OSPREY_<name>. The pre-rename KITE_<name> is still honored
+// so existing deployments keep working, with a one-time warning per variable.
+func Getenv(name string) string {
+	if v := os.Getenv("KUBE_OSPREY_" + name); v != "" {
+		return v
+	}
+	v := os.Getenv("KITE_" + name)
+	if v != "" {
+		if _, warned := legacyEnvWarned.LoadOrStore(name, true); !warned {
+			klog.Warningf("KITE_%s is deprecated, set KUBE_OSPREY_%s instead", name, name)
+		}
+	}
+	return v
+}
+
 func loadMCPEnvs() {
-	if v := os.Getenv("KITE_MCP_ENABLED"); v != "" {
+	if v := Getenv("MCP_ENABLED"); v != "" {
 		MCPEnabled = v == "true"
 	}
-	if v := os.Getenv("KITE_MCP_RATE_LIMIT_PER_MINUTE"); v != "" {
+	if v := Getenv("MCP_RATE_LIMIT_PER_MINUTE"); v != "" {
 		if n, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && n > 0 {
 			MCPRateLimitPerMinute = n
 		} else {
-			klog.Warningf("Invalid KITE_MCP_RATE_LIMIT_PER_MINUTE %q, keeping default %d", v, MCPRateLimitPerMinute)
+			klog.Warningf("Invalid KUBE_OSPREY_MCP_RATE_LIMIT_PER_MINUTE %q, keeping default %d", v, MCPRateLimitPerMinute)
 		}
 	}
 }
@@ -210,12 +227,12 @@ func LoadEnvs() {
 		DBType = dbType
 	}
 
-	AllowInsecureDefaults = os.Getenv("KITE_ALLOW_INSECURE_DEFAULTS") == "true"
+	AllowInsecureDefaults = Getenv("ALLOW_INSECURE_DEFAULTS") == "true"
 
-	if key := os.Getenv("KITE_ENCRYPT_KEY"); key != "" {
-		KiteEncryptKey = strings.TrimSpace(key)
+	if key := Getenv("ENCRYPT_KEY"); key != "" {
+		EncryptKey = strings.TrimSpace(key)
 	} else {
-		klog.Warningf("KITE_ENCRYPT_KEY is not set, using default key, this is not secure for production!")
+		klog.Warningf("KUBE_OSPREY_ENCRYPT_KEY is not set, using default key, this is not secure for production!")
 	}
 
 	if v := os.Getenv("ANONYMOUS_USER_ENABLED"); v == "true" {
@@ -233,7 +250,7 @@ func LoadEnvs() {
 		EnableVersionCheck = false
 	}
 
-	if v := os.Getenv("KITE_BASE"); v != "" {
+	if v := Getenv("BASE"); v != "" {
 		if v[0] != '/' {
 			v = "/" + v
 		}
@@ -241,7 +258,7 @@ func LoadEnvs() {
 		klog.Infof("Using base path: %s", Base)
 	}
 
-	if v := os.Getenv("KITE_CONFIG_FILE"); v != "" {
+	if v := Getenv("CONFIG_FILE"); v != "" {
 		ConfigFilePath = v
 	}
 

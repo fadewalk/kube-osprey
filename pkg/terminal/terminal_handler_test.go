@@ -6,13 +6,13 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/kube"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/wsutil"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -84,7 +84,7 @@ func TestTerminalWebSocketsRejectUnauthorizedUsersBeforeClusterAccess(t *testing
 
 func TestTerminalAgentsUseExpectedSecurityConfigurationAndCleanupScope(t *testing.T) { //nolint:gocyclo // security configuration test covers both terminal agent types
 	originalNamespace := common.AgentPodNamespace
-	common.AgentPodNamespace = "kite-system"
+	common.AgentPodNamespace = "kube-osprey-system"
 	t.Cleanup(func() {
 		common.AgentPodNamespace = originalNamespace
 	})

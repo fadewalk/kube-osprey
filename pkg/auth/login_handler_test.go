@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
 )
 
 func TestCredentialLoginLimiterBlocksLoopbackClientIP(t *testing.T) {
@@ -36,10 +36,10 @@ func TestSetCookieSecure(t *testing.T) {
 	})
 
 	t.Run("secure when host is https", func(t *testing.T) {
-		common.Host = "https://kite.example.com"
+		common.Host = "https://kube-osprey.example.com"
 		rec := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(rec)
-		c.Request = httptest.NewRequest(http.MethodGet, "http://kite.local", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "http://kube-osprey.local", nil)
 
 		setCookieSecure(c, "auth_token", "value", 600)
 
@@ -62,7 +62,7 @@ func TestSetCookieSecure(t *testing.T) {
 		common.Host = ""
 		rec := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(rec)
-		req := httptest.NewRequest(http.MethodGet, "http://kite.local", nil)
+		req := httptest.NewRequest(http.MethodGet, "http://kube-osprey.local", nil)
 		req.Header.Set("X-Forwarded-Proto", "https")
 		c.Request = req
 
@@ -77,7 +77,7 @@ func TestSetCookieSecure(t *testing.T) {
 		common.Host = ""
 		rec := httptest.NewRecorder()
 		c, _ := gin.CreateTestContext(rec)
-		c.Request = httptest.NewRequest(http.MethodGet, "http://kite.local", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "http://kube-osprey.local", nil)
 
 		setCookieSecure(c, "auth_token", "value", 600)
 

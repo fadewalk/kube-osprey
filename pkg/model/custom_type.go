@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 )
 
 type SecretString string

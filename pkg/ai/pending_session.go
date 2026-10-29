@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"k8s.io/klog/v2"
 )
 

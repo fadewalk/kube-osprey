@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/zxh326/kite/pkg/version"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 )
 
 const supportedSDKVersions = ">=0.0.6"
@@ -39,7 +39,10 @@ type Manifest struct {
 }
 
 type Requirements struct {
-	Kite string `json:"kite"`
+	// KubeOsprey is the host version range. Kite is the legacy spelling kept
+	// for plugin manifests built against the original upstream SDK.
+	KubeOsprey string `json:"kubeOsprey,omitempty"`
+	Kite       string `json:"kite,omitempty"`
 }
 
 type Theme struct {
@@ -122,18 +125,22 @@ func checkCompatibility(sdkVersion string, r Requirements) error {
 	}
 	sdkRange, _ := semver.NewConstraint(supportedSDKVersions)
 	if !sdkRange.Check(sdk) {
-		return fmt.Errorf("plugin was built with SDK %s; this Kite supports SDK %s", sdkVersion, supportedSDKVersions)
+		return fmt.Errorf("plugin was built with SDK %s; this KubeOsprey supports SDK %s", sdkVersion, supportedSDKVersions)
 	}
-	if r.Kite == "" {
-		return fmt.Errorf("requires.kite is required")
+	hostRangeStr := r.KubeOsprey
+	if hostRangeStr == "" {
+		hostRangeStr = r.Kite
 	}
-	kiteRange, err := semver.NewConstraint(r.Kite)
+	if hostRangeStr == "" {
+		return fmt.Errorf("requires.kubeOsprey is required")
+	}
+	hostRange, err := semver.NewConstraint(hostRangeStr)
 	if err != nil {
-		return fmt.Errorf("invalid requires.kite range")
+		return fmt.Errorf("invalid requires.kubeOsprey range")
 	}
-	kiteVersion, err := semver.StrictNewVersion(strings.TrimPrefix(version.Version, "v"))
-	if err == nil && kiteVersion.Prerelease() == "" && kiteVersion.Metadata() == "" && !kiteRange.Check(kiteVersion) {
-		return fmt.Errorf("plugin requires Kite %s; this Kite is %s", r.Kite, version.Version)
+	hostVersion, err := semver.StrictNewVersion(strings.TrimPrefix(version.Version, "v"))
+	if err == nil && hostVersion.Prerelease() == "" && hostVersion.Metadata() == "" && !hostRange.Check(hostVersion) {
+		return fmt.Errorf("plugin requires KubeOsprey %s; this KubeOsprey is %s", hostRangeStr, version.Version)
 	}
 	return nil
 }

@@ -3,14 +3,16 @@ package helmutil
 import (
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/stretchr/testify/require"
-	"github.com/zxh326/kite/pkg/model"
 )
 
 func TestLoadRepositoryCatalogFromOCIRepository(t *testing.T) {
 	repository := model.HelmRepository{
 		Name: "kite",
-		URL:  "oci://ghcr.io/kite-org/charts/kite",
+		// TODO(swatch): switch to oci://ghcr.io/fadewalk/charts/kube-osprey once
+		// the first renamed chart release exists.
+		URL: "oci://ghcr.io/fadewalk/charts/kite",
 	}
 
 	indexFile, err := LoadRepositoryCatalog(repository)

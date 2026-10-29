@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/utils"
 	"k8s.io/klog/v2"
 )
 

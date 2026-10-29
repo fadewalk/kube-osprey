@@ -69,19 +69,19 @@ jobs:
           context: .
           file: ./Dockerfile.binary
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/kite:demo
+          tags: ghcr.io/${{ github.repository_owner }}/kube-osprey:demo
           labels: runnumber=${{ github.run_id }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
 
-      - name: Restart kite deployment
+      - name: Restart kube-osprey deployment
         env:
-          KITE_HOST: ${{ secrets.KITE_DEMO_HOST }}
-          KITE_AUTH: ${{ secrets.KITE_DEMO_AUTH }}
+          KUBE_OSPREY_HOST: ${{ secrets.KUBE_OSPREY_DEMO_HOST }}
+          KUBE_OSPREY_AUTH: ${{ secrets.KUBE_OSPREY_DEMO_AUTH }}
         run: |
           RESTART_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          curl -X PATCH "$KITE_HOST/api/v1/deployments/kite/kite" \
-            -H "Authorization: $KITE_AUTH" \
+          curl -X PATCH "$KUBE_OSPREY_HOST/api/v1/deployments/kite/kite" \
+            -H "Authorization: $KUBE_OSPREY_AUTH" \
             -H "Content-Type: application/json" \
-            -d "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kite.kubernetes.io/restartedAt\":\"$RESTART_TIME\"}}}}}"
+            -d "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"kube-osprey.io/restartedAt\":\"$RESTART_TIME\"}}}}}"

@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

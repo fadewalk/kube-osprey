@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zxh326/kite/pkg/kube"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

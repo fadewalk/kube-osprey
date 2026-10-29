@@ -8,13 +8,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/auth"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/auth"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/utils"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )

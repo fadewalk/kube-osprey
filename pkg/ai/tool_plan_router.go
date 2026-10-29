@@ -3,8 +3,8 @@ package ai
 import (
 	"context"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	pkgmodel "github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	pkgmodel "github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 // ChangePlanRouter routes an AI mutation into the change plan approval flow

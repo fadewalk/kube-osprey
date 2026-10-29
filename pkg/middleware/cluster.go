@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
 )
 
 const (

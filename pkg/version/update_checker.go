@@ -61,7 +61,7 @@ func checkForUpdate(ctx context.Context, currentVersion string) updateCheckResul
 		return result
 	}
 
-	req.Header.Set("User-Agent", "kite-version-checker/"+currentVersion)
+	req.Header.Set("User-Agent", "kube-osprey-version-checker/"+currentVersion)
 	req.Header.Set("Accept", "application/vnd.github+json")
 
 	resp, err := http.DefaultClient.Do(req)

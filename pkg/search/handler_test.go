@@ -9,11 +9,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/middleware"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/resources"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/middleware"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/resources"
 )
 
 func TestNormalizeSearchQuery(t *testing.T) {

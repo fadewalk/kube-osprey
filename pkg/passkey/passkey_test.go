@@ -5,11 +5,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"github.com/go-webauthn/webauthn/webauthn"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -91,14 +91,14 @@ func TestCredentialPersistenceEnforcesUserBinding(t *testing.T) {
 func TestPasskeySessionIsSingleUse(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	originalHost := common.Host
-	common.Host = "https://kite.example.com"
+	common.Host = "https://kube-osprey.example.com"
 	t.Cleanup(func() {
 		common.Host = originalHost
 	})
 
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
 	saveSession(ctx, session{Ceremony: "registration", Name: "Laptop"})
 
 	cookies := recorder.Result().Cookies()
@@ -118,7 +118,7 @@ func TestPasskeySessionIsSingleUse(t *testing.T) {
 
 	loadRecorder := httptest.NewRecorder()
 	loadContext, _ := gin.CreateTestContext(loadRecorder)
-	loadContext.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
+	loadContext.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
 	loadContext.Request.AddCookie(cookie)
 	loaded, err := loadSession(loadContext, "registration")
 	if err != nil {
@@ -133,7 +133,7 @@ func TestPasskeySessionIsSingleUse(t *testing.T) {
 
 	replayRecorder := httptest.NewRecorder()
 	replayContext, _ := gin.CreateTestContext(replayRecorder)
-	replayContext.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
+	replayContext.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
 	replayContext.Request.AddCookie(cookie)
 	if _, err := loadSession(replayContext, "registration"); err == nil {
 		t.Fatal("loadSession() accepted a replayed session")
@@ -150,7 +150,7 @@ func TestPasskeySessionCannotCrossCeremonies(t *testing.T) {
 
 	recorder := httptest.NewRecorder()
 	ctx, _ := gin.CreateTestContext(recorder)
-	ctx.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
+	ctx.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
 	ctx.Request.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
 	if _, err := loadSession(ctx, "login"); err == nil {
 		t.Fatal("loadSession() accepted a registration session for login")
@@ -170,15 +170,15 @@ func TestWebAuthnForRequestValidatesOrigin(t *testing.T) {
 
 	validRecorder := httptest.NewRecorder()
 	validContext, _ := gin.CreateTestContext(validRecorder)
-	validContext.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
-	validContext.Request.Header.Set("Origin", "https://kite.example.com")
+	validContext.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
+	validContext.Request.Header.Set("Origin", "https://kube-osprey.example.com")
 	if instance, err := webAuthnForRequest(validContext); err != nil || instance == nil {
 		t.Fatalf("webAuthnForRequest() = %v, %v, want configured instance", instance, err)
 	}
 
 	invalidRecorder := httptest.NewRecorder()
 	invalidContext, _ := gin.CreateTestContext(invalidRecorder)
-	invalidContext.Request = httptest.NewRequest(http.MethodPost, "http://kite.example.com/passkeys", nil)
+	invalidContext.Request = httptest.NewRequest(http.MethodPost, "http://kube-osprey.example.com/passkeys", nil)
 	invalidContext.Request.Host = ""
 	if _, err := webAuthnForRequest(invalidContext); err == nil {
 		t.Fatal("webAuthnForRequest() accepted an origin without a relying-party host")
@@ -249,8 +249,8 @@ func TestRequestOrigin(t *testing.T) {
 func setupPasskeyTestDB(t *testing.T) *gorm.DB {
 	t.Helper()
 	originalDB := model.DB
-	originalEncryptKey := common.KiteEncryptKey
-	common.KiteEncryptKey = "passkey-test-encryption-key"
+	originalEncryptKey := common.EncryptKey
+	common.EncryptKey = "passkey-test-encryption-key"
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		t.Fatalf("opening test database: %v", err)
@@ -265,7 +265,7 @@ func setupPasskeyTestDB(t *testing.T) *gorm.DB {
 			_ = sqlDB.Close()
 		}
 		model.DB = originalDB
-		common.KiteEncryptKey = originalEncryptKey
+		common.EncryptKey = originalEncryptKey
 	})
 	return db
 }

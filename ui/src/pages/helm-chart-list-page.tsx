@@ -80,7 +80,7 @@ type HelmChartListSessionState = {
   pagination?: PaginationState
 }
 
-const helmChartListSessionStorageKey = 'kite-helm-chart-list-state'
+const helmChartListSessionStorageKey = 'kube-osprey-helm-chart-list-state'
 const defaultPagination: PaginationState = {
   pageIndex: 0,
   pageSize: 20,

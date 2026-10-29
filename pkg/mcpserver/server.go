@@ -1,6 +1,6 @@
 // Package mcpserver exposes a Streamable HTTP MCP endpoint at /api/v1/mcp so
 // external MCP clients can operate clusters read-only under the caller's
-// existing Kite RBAC. It is disabled unless enabled in the general settings.
+// existing KubeOsprey RBAC. It is disabled unless enabled in the general settings.
 package mcpserver
 
 import (
@@ -8,11 +8,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 	"github.com/gin-gonic/gin"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/version"
 	"k8s.io/klog/v2"
 )
 
@@ -28,8 +28,8 @@ type Handler struct {
 
 func NewHandler(cm *cluster.ClusterManager) *Handler {
 	server := mcp.NewServer(&mcp.Implementation{
-		Name:    "kite",
-		Title:   "Kite Kubernetes Console",
+		Name:    "kube-osprey",
+		Title:   "KubeOsprey Kubernetes Console",
 		Version: version.Version,
 	}, nil)
 	registerTools(server, cm)

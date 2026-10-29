@@ -12,8 +12,8 @@ import (
 	"time"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/version"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 )
 
 type CatalogPlugin struct {

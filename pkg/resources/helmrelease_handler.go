@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/scheduler"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/helmutil"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/scheduler"
 	"gorm.io/gorm"
 	"helm.sh/helm/v4/pkg/action"
 	release "helm.sh/helm/v4/pkg/release/v1"
@@ -127,9 +127,9 @@ func (h *HelmReleaseHandler) runInstall(c *gin.Context, dryRun bool) (rel *relea
 	}
 	description := req.Description
 	if description == "" {
-		description = "Install requested from Kite"
+		description = "Install requested from KubeOsprey"
 		if dryRun {
-			description = "Dry run install requested from Kite"
+			description = "Dry run install requested from KubeOsprey"
 		}
 	}
 
@@ -251,7 +251,7 @@ func (h *HelmReleaseHandler) Delete(c *gin.Context) {
 
 	if err := helmutil.UninstallRelease(cfg, c.Param("name"), helmutil.UninstallReleaseOptions{
 		Timeout:     helmActionTimeout,
-		Description: "Deleted from Kite",
+		Description: "Deleted from KubeOsprey",
 	}); err != nil {
 		runErr = err
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

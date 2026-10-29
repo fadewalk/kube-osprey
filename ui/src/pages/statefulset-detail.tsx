@@ -135,9 +135,8 @@ export function StatefulSetDetail(props: { namespace: string; name: string }) {
       if (!updated.spec.template.metadata.annotations) {
         updated.spec.template.metadata.annotations = {}
       }
-      updated.spec.template.metadata.annotations[
-        'kite.kubernetes.io/restartedAt'
-      ] = new Date().toISOString()
+      updated.spec.template.metadata.annotations['kube-osprey.io/restartedAt'] =
+        new Date().toISOString()
       await updateResource('statefulsets', name, namespace, updated)
       toast.success('StatefulSet restart initiated')
       setIsRestartPopoverOpen(false)

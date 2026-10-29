@@ -40,7 +40,7 @@ KubeOsprey polls every connected cluster once a minute and pushes newly observed
 - **Name** — unique identifier of the channel.
 - **Type** — one of the types above.
 - **Endpoint** — the webhook URL of the receiver.
-- **Secret** — signing secret for DingTalk/Feishu; stored encrypted with `KITE_ENCRYPT_KEY` and never returned by the API.
+- **Secret** — signing secret for DingTalk/Feishu; stored encrypted with `KUBE_OSPREY_ENCRYPT_KEY` and never returned by the API.
 - **Events** — subscribed event kinds.
 - **Enabled** — disabled channels stop receiving deliveries.
 

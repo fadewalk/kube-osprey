@@ -115,13 +115,15 @@ PUT /api/v1/admin/general-setting/
 完整 API 密钥格式如下：
 
 ```text
-kite<ID>-<SECRET>
+kubeosprey<ID>-<SECRET>
 ```
 
 使用时直接把完整值放进 `Authorization` 请求头，不要加 `Bearer`。
 
+在引入 `kubeosprey` 前缀之前签发的密钥（`kite<ID>-<SECRET>`）仍然有效；在 **设置 -> API 密钥** 中重新签发即可迁移到新前缀。
+
 ```http
-Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ## 在哪里配置
@@ -145,7 +147,7 @@ API 密钥与普通用户共用同一套 RBAC 权限模型。
 
 ```bash
 curl \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   https://kube-osprey.example.com/api/v1/pods/default
 ```

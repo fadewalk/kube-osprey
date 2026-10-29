@@ -11,12 +11,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	expirable "github.com/hashicorp/golang-lru/v2/expirable"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 )
 
 const (
@@ -261,7 +261,7 @@ func webAuthnForRequest(c *gin.Context) (*webauthn.WebAuthn, error) {
 		return nil, fmt.Errorf("invalid passkey origin")
 	}
 	return webauthn.New(&webauthn.Config{
-		RPDisplayName: "Kite",
+		RPDisplayName: "KubeOsprey",
 		RPID:          rpID,
 		RPOrigins:     []string{origin},
 		AuthenticatorSelection: protocol.AuthenticatorSelection{

@@ -3,13 +3,13 @@
 set -e
 
 NAMESPACE="${NAMESPACE:-kube-system}"
-SA_NAME="${SA_NAME:-kite-admin}"
+SA_NAME="${SA_NAME:-kube-osprey-admin}"
 SECRET_NAME="${SECRET_NAME:-${SA_NAME}-token}"
-OUTPUT_FILE="${OUTPUT_FILE:-kite-kubeconfig.yaml}"
+OUTPUT_FILE="${OUTPUT_FILE:-kube-osprey-kubeconfig.yaml}"
 
 cleanup() {
     echo "======================================"
-    echo "Kite Resources Cleanup"
+    echo "KubeOsprey Resources Cleanup"
     echo "======================================"
     echo ""
     echo "This will delete the following resources:"
@@ -42,11 +42,11 @@ cleanup() {
 
 create() {
     echo "======================================"
-    echo "Kite Kubeconfig Generator"
+    echo "KubeOsprey Kubeconfig Generator"
     echo "======================================"
     echo ""
     echo "This script creates a Service Account and generates a kubeconfig"
-    echo "that can be used with Kite (no exec plugins required)."
+    echo "that can be used with KubeOsprey (no exec plugins required)."
     echo ""
     echo "Configuration:"
     echo "  Namespace:    $NAMESPACE"
@@ -143,9 +143,9 @@ echo "======================================"
 echo ""
 echo "Kubeconfig has been saved to: $OUTPUT_FILE"
 echo ""
-echo "You can now use this file to add the cluster to Kite:"
+echo "You can now use this file to add the cluster to KubeOsprey:"
 echo "  1. Copy the contents of $OUTPUT_FILE"
-echo "  2. Go to Kite UI -> Settings -> Clusters -> Add Cluster"
+echo "  2. Go to KubeOsprey UI -> Settings -> Clusters -> Add Cluster"
 echo "  3. Paste the kubeconfig content"
 echo ""
 echo "To test the kubeconfig:"
@@ -164,9 +164,9 @@ Commands:
 
 Environment Variables:
   NAMESPACE     Kubernetes namespace (default: kube-system)
-  SA_NAME       Service Account name (default: kite-admin)
-  SECRET_NAME   Secret name (default: kite-admin-token)
-  OUTPUT_FILE   Output kubeconfig file (default: kite-kubeconfig.yaml)
+  SA_NAME       Service Account name (default: kube-osprey-admin)
+  SECRET_NAME   Secret name (default: kube-osprey-admin-token)
+  OUTPUT_FILE   Output kubeconfig file (default: kube-osprey-kubeconfig.yaml)
 
 Examples:
   # Create resources with defaults

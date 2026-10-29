@@ -3,8 +3,8 @@ ARG TARGETARCH
 
 WORKDIR /app
 
-COPY bin/kube-osprey-$TARGETARCH ./kite
+COPY bin/kube-osprey-$TARGETARCH ./kube-osprey
 
 EXPOSE 8080
 
-CMD ["./kite"]
+CMD ["./kube-osprey"]

@@ -40,7 +40,7 @@ KubeOsprey 每分钟轮询一次所有已连接集群，把新出现的 Alertman
 - **名称**：渠道的唯一标识。
 - **类型**：上表类型之一。
 - **Endpoint**：接收端的 webhook 地址。
-- **Secret**：钉钉/飞书的签名密钥；使用 `KITE_ENCRYPT_KEY` 加密存储，API 永远不会返回。
+- **Secret**：钉钉/飞书的签名密钥；使用 `KUBE_OSPREY_ENCRYPT_KEY` 加密存储，API 永远不会返回。
 - **事件**：订阅的事件类型。
 - **启用**：停用的渠道不再接收投递。
 

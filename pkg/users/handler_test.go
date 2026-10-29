@@ -13,10 +13,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -200,9 +200,9 @@ func TestUpdateSidebarPreferenceHonorsGlobalPolicy(t *testing.T) {
 func setupUserHandlerTestDB(t *testing.T) *model.User {
 	t.Helper()
 	originalDB := model.DB
-	originalEncryptKey := common.KiteEncryptKey
+	originalEncryptKey := common.EncryptKey
 	originalJWTSecret := common.JwtSecret
-	common.KiteEncryptKey = "users-handler-test-key"
+	common.EncryptKey = "users-handler-test-key"
 	common.JwtSecret = "users-handler-test-jwt-secret"
 
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
@@ -241,7 +241,7 @@ func setupUserHandlerTestDB(t *testing.T) *model.User {
 			_ = sqlDB.Close()
 		}
 		model.DB = originalDB
-		common.KiteEncryptKey = originalEncryptKey
+		common.EncryptKey = originalEncryptKey
 		common.JwtSecret = originalJWTSecret
 	})
 	return user

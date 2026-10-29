@@ -32,13 +32,13 @@ describe('normalizeBasePath', () => {
   })
 
   it('normalizes a path with and without a leading slash', () => {
-    expect(normalizeBasePath('kite/')).toBe('/kite')
-    expect(normalizeBasePath('/kite/app/')).toBe('/kite/app')
+    expect(normalizeBasePath('kube-osprey/')).toBe('/kube-osprey')
+    expect(normalizeBasePath('/kube-osprey/app/')).toBe('/kube-osprey/app')
   })
 
   it('rejects invalid path segments', () => {
-    expect(() => normalizeBasePath('/kite app')).toThrow(
-      'Invalid KITE_BASE "/kite app"'
+    expect(() => normalizeBasePath('/kube-osprey app')).toThrow(
+      'Invalid KUBE_OSPREY_BASE "/kube-osprey app"'
     )
   })
 })

@@ -160,7 +160,7 @@ export default defineConfig({
             { text: "MCP Server", link: "/guide/mcp-server" },
             { text: "Change Plans", link: "/guide/change-plans" },
             { text: "Web Terminal", link: "/guide/web-terminal" },
-            { text: "KubeOsprey Cluster Agent", link: "/guide/kite-cluster-agent" },
+            { text: "KubeOsprey Cluster Agent", link: "/guide/cluster-agent" },
             { text: "Resource History", link: "/guide/resource-history" },
             { text: "Custom Sidebar", link: "/guide/custom-sidebar" },
             { text: "Kube Proxy", link: "/guide/kube-proxy" },
@@ -236,7 +236,7 @@ export default defineConfig({
             { text: "Web 终端", link: "/zh/guide/web-terminal" },
             {
               text: "KubeOsprey Cluster Agent",
-              link: "/zh/guide/kite-cluster-agent",
+              link: "/zh/guide/cluster-agent",
             },
             { text: "资源历史", link: "/zh/guide/resource-history" },
             { text: "自定义侧边栏", link: "/zh/guide/custom-sidebar" },

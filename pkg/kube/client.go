@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 	"github.com/go-logr/logr"
-	"github.com/zxh326/kite/pkg/version"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
@@ -44,11 +45,11 @@ const (
 )
 
 // cacheSyncTimeout returns the configured cache sync timeout, overridable via
-// the KITE_CACHE_SYNC_TIMEOUT env var (in seconds). The initial LIST for
+// the KUBE_OSPREY_CACHE_SYNC_TIMEOUT env var (in seconds). The initial LIST for
 // informers on large/remote clusters can take a long time, so the default is
 // generous and remains configurable for edge cases.
 func cacheSyncTimeout() time.Duration {
-	if v := os.Getenv("KITE_CACHE_SYNC_TIMEOUT"); v != "" {
+	if v := common.Getenv("CACHE_SYNC_TIMEOUT"); v != "" {
 		if secs, err := strconv.Atoi(v); err == nil && secs > 0 {
 			return time.Duration(secs) * time.Second
 		}
@@ -57,10 +58,10 @@ func cacheSyncTimeout() time.Duration {
 }
 
 // kubeAPIQPS returns the QPS limit for the Kubernetes API client, overridable
-// via the KITE_KUBE_API_QPS env var. Defaults to 50 (client-go default is 5,
+// via the KUBE_OSPREY_KUBE_API_QPS env var. Defaults to 50 (client-go default is 5,
 // which is too low for large/remote clusters during the initial cache sync).
 func kubeAPIQPS() float32 {
-	if v := os.Getenv("KITE_KUBE_API_QPS"); v != "" {
+	if v := common.Getenv("KUBE_API_QPS"); v != "" {
 		if qps, err := strconv.ParseFloat(v, 32); err == nil && qps > 0 {
 			return float32(qps)
 		}
@@ -69,10 +70,10 @@ func kubeAPIQPS() float32 {
 }
 
 // kubeAPIBurst returns the burst limit for the Kubernetes API client,
-// overridable via the KITE_KUBE_API_BURST env var. Defaults to 100 (client-go
+// overridable via the KUBE_OSPREY_KUBE_API_BURST env var. Defaults to 100 (client-go
 // default is 10).
 func kubeAPIBurst() int {
-	if v := os.Getenv("KITE_KUBE_API_BURST"); v != "" {
+	if v := common.Getenv("KUBE_API_BURST"); v != "" {
 		if burst, err := strconv.Atoi(v); err == nil && burst > 0 {
 			return burst
 		}
@@ -150,11 +151,11 @@ type K8sClient struct {
 
 // NewClient creates a K8sClient from a rest.Config
 func NewClient(config *rest.Config) (*K8sClient, error) {
-	config.UserAgent = fmt.Sprintf("kite/%s (%s/%s)", version.Version, goruntime.GOOS, goruntime.GOARCH)
+	config.UserAgent = fmt.Sprintf("kube-osprey/%s (%s/%s)", version.Version, goruntime.GOOS, goruntime.GOARCH)
 
 	// Tune QPS/Burst so the initial cache sync LIST on large/remote clusters is
 	// not throttled by the client-go defaults (QPS=5, Burst=10). Values are
-	// overridable via KITE_KUBE_API_QPS and KITE_KUBE_API_BURST. A value
+	// overridable via KUBE_OSPREY_KUBE_API_QPS and KUBE_OSPREY_KUBE_API_BURST. A value
 	// explicitly set on the rest.Config (e.g. from kubeconfig) is preserved.
 	if config.QPS == 0 {
 		config.QPS = kubeAPIQPS()
@@ -224,7 +225,7 @@ func NewClient(config *rest.Config) (*K8sClient, error) {
 			cancel()
 			return nil, fmt.Errorf("failed to wait for cache sync (timeout: %s); "+
 				"the cluster may be too large or the API server too slow. "+
-				"Consider increasing KITE_CACHE_SYNC_TIMEOUT or setting DISABLE_CACHE=true", cacheSyncTimeout())
+				"Consider increasing KUBE_OSPREY_CACHE_SYNC_TIMEOUT or setting DISABLE_CACHE=true", cacheSyncTimeout())
 		}
 		c = mgr.GetClient()
 	}

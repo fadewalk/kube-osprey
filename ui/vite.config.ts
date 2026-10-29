@@ -7,8 +7,8 @@ import { defineConfig, type Plugin } from 'vite'
 import monacoEditorFeatures from './plugins/vite-plugin-monaco-editor.ts'
 import { normalizeBasePath } from './src/lib/base-path.ts'
 
-const devSubPath = normalizeBasePath(process.env.KITE_BASE)
-const runtimeBasePlaceholder = '__KITE_BASE__'
+const devSubPath = normalizeBasePath(process.env.KUBE_OSPREY_BASE)
+const runtimeBasePlaceholder = '__KUBE_OSPREY_BASE__'
 
 function getDevBase() {
   return devSubPath ? `${devSubPath}/` : '/'
@@ -53,7 +53,7 @@ function runtimeBaseHtmlPlugin(): Plugin {
   let buildOutDir = ''
 
   return {
-    name: 'kite-runtime-base-html',
+    name: 'kube-osprey-runtime-base-html',
     apply: 'build',
     configResolved(config) {
       buildOutDir = path.resolve(config.root, config.build.outDir)
@@ -99,7 +99,7 @@ export default defineConfig(({ command }) => ({
     }),
     runtimeBaseHtmlPlugin(),
   ],
-  envPrefix: ['VITE_', 'KITE_'],
+  envPrefix: ['VITE_', 'KUBE_OSPREY_'],
   build: {
     outDir: '../static',
     emptyOutDir: true,

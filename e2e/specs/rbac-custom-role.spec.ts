@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test'
 
 const baseURL =
-  process.env.KITE_E2E_BASE_URL ||
-  `http://127.0.0.1:${process.env.KITE_E2E_PORT || '38080'}`
+  process.env.KUBE_OSPREY_E2E_BASE_URL ||
+  `http://127.0.0.1:${process.env.KUBE_OSPREY_E2E_PORT || '38080'}`
 
 test('custom role grants namespaces and denies nodes', async ({
   browser,

@@ -3,8 +3,8 @@ package rbac
 import (
 	"testing"
 
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 func TestGetUserRoles(t *testing.T) {

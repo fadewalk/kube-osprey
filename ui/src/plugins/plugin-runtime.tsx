@@ -68,6 +68,8 @@ export function PluginRuntime({ children }: { children: ReactNode }) {
       const plugin = entry.record
       void load(plugin, entry)
         .then((module) => {
+          // i18n namespace and the remote container name are pinned by
+          // @kite-dev/plugin-sdk (i18n.js, vite.js); renaming breaks plugins.
           if (entry.cancelled || !module) return
           if (module.i18n) {
             const namespace = `kite-plugin-${id}`
@@ -201,7 +203,7 @@ async function load(plugin: ActivePlugin, entry: LoadingPlugin) {
           const link = document.createElement('link')
           link.rel = 'stylesheet'
           link.href = new URL(path, base).href
-          link.dataset.kitePlugin = plugin.manifest.id
+          link.dataset.kubeOspreyPlugin = plugin.manifest.id
           link.onload = () => resolve()
           link.onerror = () =>
             reject(new Error(`Could not load plugin stylesheet: ${path}`))

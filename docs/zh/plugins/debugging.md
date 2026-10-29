@@ -32,7 +32,7 @@ pnpm --filter cert-manager dev
 将开发地址作为环境变量传给 KubeOsprey：
 
 ```sh
-PLUGIN_DEV_URL=http://localhost:5174/plugin.json ./kite
+PLUGIN_DEV_URL=http://localhost:5174/plugin.json ./kube-osprey
 ```
 
 使用 Helm 部署时，通过已有的 `extraEnvs` 配置：

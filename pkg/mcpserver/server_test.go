@@ -10,10 +10,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -112,7 +112,7 @@ func TestMCPProtocolHandshakeAndTools(t *testing.T) {
 		"params": map[string]any{
 			"protocolVersion": testProtocolVersion,
 			"capabilities":    map[string]any{},
-			"clientInfo":      map[string]any{"name": "kite-e2e-test", "version": "0.0.1"},
+			"clientInfo":      map[string]any{"name": "kube-osprey-e2e-test", "version": "0.0.1"},
 		},
 	})
 	if status != http.StatusOK {
@@ -122,7 +122,7 @@ func TestMCPProtocolHandshakeAndTools(t *testing.T) {
 		t.Fatalf("initialize returned error: %v", initResp["error"])
 	}
 	serverInfo, _ := initResp["result"].(map[string]any)["serverInfo"].(map[string]any)
-	if serverInfo == nil || serverInfo["name"] != "kite" {
+	if serverInfo == nil || serverInfo["name"] != "kube-osprey" {
 		t.Fatalf("unexpected serverInfo: %v", initResp["result"])
 	}
 	sessionID := header.Get("Mcp-Session-Id")
@@ -226,7 +226,7 @@ func TestMCPDisabledReturnsJSONRPCError(t *testing.T) {
 		"params": map[string]any{
 			"protocolVersion": testProtocolVersion,
 			"capabilities":    map[string]any{},
-			"clientInfo":      map[string]any{"name": "kite-e2e-test", "version": "0.0.1"},
+			"clientInfo":      map[string]any{"name": "kube-osprey-e2e-test", "version": "0.0.1"},
 		},
 	})
 	rpcErr, _ := resp["error"].(map[string]any)
@@ -262,7 +262,7 @@ func TestMCPRateLimitExceeded(t *testing.T) {
 			"params": map[string]any{
 				"protocolVersion": testProtocolVersion,
 				"capabilities":    map[string]any{},
-				"clientInfo":      map[string]any{"name": "kite-e2e-test", "version": "0.0.1"},
+				"clientInfo":      map[string]any{"name": "kube-osprey-e2e-test", "version": "0.0.1"},
 			},
 		})
 		if i == 0 && status != http.StatusOK {
@@ -309,7 +309,7 @@ func TestAllToolsRegisteredOnServer(t *testing.T) {
 		"params": map[string]any{
 			"protocolVersion": testProtocolVersion,
 			"capabilities":    map[string]any{},
-			"clientInfo":      map[string]any{"name": "kite-e2e-test", "version": "0.0.1"},
+			"clientInfo":      map[string]any{"name": "kube-osprey-e2e-test", "version": "0.0.1"},
 		},
 	})
 	if status != http.StatusOK || initResp["error"] != nil {

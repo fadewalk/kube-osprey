@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"gorm.io/gorm"
 )
 
@@ -140,10 +140,10 @@ func TestLowerCaseString_Value(t *testing.T) {
 }
 
 func TestSecretString_ScanAndValue(t *testing.T) {
-	originalKey := common.KiteEncryptKey
-	common.KiteEncryptKey = "test-encryption-key"
+	originalKey := common.EncryptKey
+	common.EncryptKey = "test-encryption-key"
 	t.Cleanup(func() {
-		common.KiteEncryptKey = originalKey
+		common.EncryptKey = originalKey
 	})
 
 	secret := SecretString("super-secret")
@@ -171,7 +171,7 @@ func TestJSONField_MarshalScanAndUnmarshal(t *testing.T) {
 	}
 
 	var field JSONField
-	if err := field.Marshal(payload{Name: "kite", Age: 3}); err != nil {
+	if err := field.Marshal(payload{Name: "osprey", Age: 3}); err != nil {
 		t.Fatalf("Marshal() error = %v", err)
 	}
 	if len(field) == 0 {
@@ -195,8 +195,8 @@ func TestJSONField_MarshalScanAndUnmarshal(t *testing.T) {
 	if err := scanned.Unmarshal(&got); err != nil {
 		t.Fatalf("Unmarshal() error = %v", err)
 	}
-	if got.Name != "kite" || got.Age != 3 {
-		t.Fatalf("Unmarshal() got = %+v, want %+v", got, payload{Name: "kite", Age: 3})
+	if got.Name != "osprey" || got.Age != 3 {
+		t.Fatalf("Unmarshal() got = %+v, want %+v", got, payload{Name: "osprey", Age: 3})
 	}
 }
 

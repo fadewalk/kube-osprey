@@ -9,7 +9,7 @@ KubeOsprey is a Kubernetes control plane. It can create privileged Kubernetes cl
 Before exposing KubeOsprey to users, verify all of the following:
 
 - Use HTTPS for KubeOsprey, OAuth/OIDC callbacks, Cluster Agent connections, and WebSocket traffic.
-- Set `KITE_ENCRYPT_KEY` to a high-entropy value and store it in an external Secret. Never use the public example value from development documentation.
+- Set `KUBE_OSPREY_ENCRYPT_KEY` to a high-entropy value and store it in an external Secret. Never use the public example value from development documentation.
 - Set `JWT_SECRET` explicitly when you need stable sessions across restarts or multiple replicas.
 - Set `ANONYMOUS_USER_ENABLED=false` and verify that anonymous access is disabled.
 - Use a narrow `TRUSTED_PROXIES` list. Do not trust arbitrary client-supplied forwarding headers. Set `TRUSTED_PROXIES=none` to make KubeOsprey ignore all client-supplied forwarding headers.
@@ -21,9 +21,9 @@ Before exposing KubeOsprey to users, verify all of the following:
 
 ## Secrets and encryption
 
-`SecretString` fields in the database include credentials such as kubeconfig data, OAuth and LDAP secrets, Helm repository passwords, API keys, MFA secrets, and Cluster Agent private keys. They are encrypted with `KITE_ENCRYPT_KEY`.
+`SecretString` fields in the database include credentials such as kubeconfig data, OAuth and LDAP secrets, Helm repository passwords, API keys, MFA secrets, and Cluster Agent private keys. They are encrypted with `KUBE_OSPREY_ENCRYPT_KEY`.
 
-User passwords are stored as one-way password hashes; they are not recovered with `KITE_ENCRYPT_KEY`.
+User passwords are stored as one-way password hashes; they are not recovered with `KUBE_OSPREY_ENCRYPT_KEY`.
 
 Use an existing Kubernetes Secret when possible:
 
@@ -33,7 +33,7 @@ secret:
   existingSecret: kube-osprey-secrets
 ```
 
-`KITE_ENCRYPT_KEY` is validated at startup. KubeOsprey refuses to start when the key is empty, shorter than 32 characters, or still set to the built-in development default. The only escape hatch is `KITE_ALLOW_INSECURE_DEFAULTS=true`, which is intended for local development only.
+`KUBE_OSPREY_ENCRYPT_KEY` is validated at startup. KubeOsprey refuses to start when the key is empty, shorter than 32 characters, or still set to the built-in development default. The only escape hatch is `KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true`, which is intended for local development only.
 
 The Secret must contain the keys required by the selected deployment mode. Keep the encryption key stable while restoring an existing database. Rotating it requires a planned migration that can decrypt with the old key and re-encrypt with the new key.
 
@@ -62,7 +62,7 @@ Cluster Agent manifests support permission profiles:
 
 The default profile is `admin` for backward compatibility; prefer `operator` or `readOnly` for production. Note that Secrets are readable under `operator` because the KubeOsprey console and Helm release browsing read Secret-backed data; use `custom` if that is unacceptable.
 
-ClusterRoleBinding `roleRef` is immutable in Kubernetes. When switching an existing Cluster Agent to a different profile, delete the `kite-cluster-agent` ClusterRoleBinding before applying the new manifest.
+ClusterRoleBinding `roleRef` is immutable in Kubernetes. When switching an existing Cluster Agent to a different profile, delete the existing Cluster Agent ClusterRoleBinding before applying the new manifest (named `kube-osprey-cluster-agent`; installs upgraded from a pre-rename release use `kite-cluster-agent`).
 
 ## Terminal and exec capabilities
 
@@ -105,7 +105,7 @@ If the audit policy cannot be read, auditing fails open: mutations keep being re
 - Rotate or revoke the Agent token after suspected exposure.
 - Verify the Agent image and digest before applying the manifest.
 - Inspect the ServiceAccount, ClusterRoleBinding, Secret, and Deployment before applying.
-- When changing the permission profile, delete the existing `kite-cluster-agent` ClusterRoleBinding first (`roleRef` cannot be updated in place).
+- When changing the permission profile, delete the existing ClusterRoleBinding first (`roleRef` cannot be updated in place; named `kube-osprey-cluster-agent`, or `kite-cluster-agent` on installs upgraded from a pre-rename release).
 - Ensure the reverse proxy supports WebSocket upgrade and long-lived connections.
 - For multiple KubeOsprey replicas, validate session routing and shared state before production use.
 
@@ -114,8 +114,8 @@ If the audit policy cannot be read, auditing fails open: mutations keep being re
 Render and lint the Chart:
 
 ```bash
-helm lint charts/kite
-helm template kube-osprey charts/kite --namespace kube-osprey-system
+helm lint charts/kube-osprey
+helm template kube-osprey charts/kube-osprey --namespace kube-osprey-system
 bash scripts/validate-chart.sh
 ```
 

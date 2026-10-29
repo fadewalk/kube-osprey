@@ -16,6 +16,7 @@ KubeOsprey 是面向平台团队的轻量、开源 Kubernetes 工作空间，将
 
 ## 找到对应指南
 
+- **了解各组件如何协作：** [架构](./architecture)
 - **快速找到任意资源：** [全局搜索](./global-search)
 - **了解工作负载及其依赖关系：** [相关资源](./related-resources)
 - **排查正在运行的 Pod：** [日志](./logs)与 [Web 终端](./web-terminal)
@@ -28,7 +29,7 @@ KubeOsprey 是面向平台团队的轻量、开源 Kubernetes 工作空间，将
 - **为敏感变更增加审批闸门：** [变更计划](./change-plans)
 - **审查资源变更：** [资源历史](./resource-history)
 - **使用 AI Agent 辅助排障：** [AI 助手](./ai-assistant)
-- **连接私有或远程集群：** [KubeOsprey Cluster Agent](./kite-cluster-agent)
+- **连接私有或远程集群：** [KubeOsprey Cluster Agent](./cluster-agent)
 
 ## 平台能力概览
 

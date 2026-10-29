@@ -6,9 +6,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/helmutil"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	release "helm.sh/helm/v4/pkg/release/v1"
 )
 
@@ -97,7 +97,7 @@ func (e *helmReleaseAutoUpgradeExecutor) Run(ctx context.Context, task model.Sch
 		Namespace:            payload.Namespace,
 		Timeout:              time.Duration(payload.TimeoutMinutes) * time.Minute,
 		ResetThenReuseValues: true,
-		Description:          "Auto upgrade requested from Kite",
+		Description:          "Auto upgrade requested from KubeOsprey",
 		RollbackOnFailure:    payload.RollbackOnFailure,
 	})
 	if err != nil {

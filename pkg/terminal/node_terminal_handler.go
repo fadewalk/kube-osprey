@@ -8,13 +8,13 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/kube"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/utils"
-	"github.com/zxh326/kite/pkg/wsutil"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -107,7 +107,7 @@ func (h *NodeTerminalHandler) HandleNodeTerminalWebSocket(c *gin.Context) {
 
 func (h *NodeTerminalHandler) createNodeAgent(ctx context.Context, cs *cluster.ClientSet, nodeName, image string) (string, error) {
 	podName := utils.GenerateNodeAgentName(nodeName)
-	// Define the kite node agent pod spec
+	// Define the kube-osprey node agent pod spec
 	pod := &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
@@ -165,7 +165,7 @@ func (h *NodeTerminalHandler) createNodeAgent(ctx context.Context, cs *cluster.C
 	if err := cs.K8sClient.Get(ctx, namespacedName, object); err == nil {
 		if utils.IsPodErrorOrSuccess(object) {
 			if err := cs.K8sClient.Delete(ctx, object); err != nil {
-				return "", fmt.Errorf("failed to delete existing kite node agent pod: %w", err)
+				return "", fmt.Errorf("failed to delete existing kube-osprey node agent pod: %w", err)
 			}
 		} else {
 			return podName, nil
@@ -175,7 +175,7 @@ func (h *NodeTerminalHandler) createNodeAgent(ctx context.Context, cs *cluster.C
 	// Create the pod
 	err := cs.K8sClient.Create(ctx, pod)
 	if err != nil {
-		return "", fmt.Errorf("failed to create kite node agent pod: %w", err)
+		return "", fmt.Errorf("failed to create kube-osprey node agent pod: %w", err)
 	}
 
 	return podName, nil

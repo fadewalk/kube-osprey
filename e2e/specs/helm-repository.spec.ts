@@ -1,5 +1,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
+// Upstream's public HTTP chart repo; the chart values (anonymousUserEnabled)
+// are kite-specific, so this fixture stays until a fork-owned repo replaces it.
 const chartName = "kite";
 const repositoryURL = "https://charts.kitehq.dev";
 const installVersion = "0.10.0";
@@ -246,14 +248,14 @@ async function cleanupRepositoryFromUI(page: Page, repositoryName: string) {
   }
 }
 
-test.describe("helm kite lifecycle", () => {
+test.describe("helm chart repository lifecycle", () => {
   test.setTimeout(8 * 60 * 1000);
 
-  test("manages the kite repository and release lifecycle through the UI", async ({
+  test("manages the chart repository and release lifecycle through the UI", async ({
     page,
   }) => {
     const suffix = Date.now().toString(36);
-    const repositoryName = `e2e-kite-${suffix}`;
+    const repositoryName = `e2e-repo-${suffix}`;
     const releaseName = `e2e-kite-${suffix}`;
     let repositoryDeleted = false;
     let releaseDeleted = false;

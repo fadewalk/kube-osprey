@@ -22,14 +22,14 @@ RUN go mod download
 COPY . .
 
 COPY --from=frontend-builder /app/static ./static
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o kite .
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o kube-osprey .
 
 FROM gcr.io/distroless/static
 
 WORKDIR /app
 
-COPY --from=backend-builder /app/kite .
+COPY --from=backend-builder /app/kube-osprey .
 
 EXPOSE 8080
 
-CMD ["./kite"]
+CMD ["./kube-osprey"]

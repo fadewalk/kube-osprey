@@ -8,7 +8,7 @@ This is useful for GitOps workflows where configuration is version-controlled an
 
 ## How It Works
 
-1. KubeOsprey reads a YAML config file from the path specified by the `KITE_CONFIG_FILE` environment variable.
+1. KubeOsprey reads a YAML config file from the path specified by the `KUBE_OSPREY_CONFIG_FILE` environment variable.
 2. On every startup, the config is applied to the database, overwriting existing values for managed sections.
 3. Sensitive values in the config file support `${ENV_VAR}` placeholder expansion from environment variables.
 4. The UI automatically detects managed sections and displays them as read-only with an informational banner.

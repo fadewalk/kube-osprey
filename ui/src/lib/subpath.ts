@@ -8,7 +8,7 @@ declare global {
 
 export function getSubPath(): string {
   if (import.meta.env.DEV) {
-    return normalizeBasePath(import.meta.env.KITE_BASE)
+    return normalizeBasePath(import.meta.env.KUBE_OSPREY_BASE)
   }
   return normalizeBasePath(window.__dynamic_base__)
 }

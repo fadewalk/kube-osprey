@@ -13,7 +13,7 @@ static
 bin
 # Dockerfile.binary packages the cross-compiled binaries from bin/.
 !bin/kube-osprey-*
-kite
+kube-osprey
 kube-osprey
 ui/dist
 docs/.vitepress/dist

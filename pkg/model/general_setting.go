@@ -6,7 +6,7 @@ import (
 	"errors"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
 )
@@ -15,7 +15,7 @@ const DefaultGeneralAIModel = "gpt-4o-mini"
 const DefaultGeneralAnthropicModel = "claude-sonnet-5-5"
 const DefaultGeneralKubectlImage = "zzde/kubectl:latest"
 const DefaultGeneralNodeTerminalImage = "busybox:latest"
-const DefaultGeneralClusterAgentImage = "ghcr.io/kite-org/kite:latest"
+const DefaultGeneralClusterAgentImage = "ghcr.io/fadewalk/kube-osprey:latest"
 
 const GeneralAIProviderOpenAI = "openai"
 const GeneralAIProviderAnthropic = "anthropic"
@@ -68,7 +68,7 @@ type GeneralSetting struct {
 	KubectlClusterRole    string       `json:"kubectlClusterRole" gorm:"column:kubectl_cluster_role;type:varchar(253)"`
 	NodeTerminalEnabled   bool         `json:"nodeTerminalEnabled" gorm:"column:node_terminal_enabled;type:boolean;not null;default:false"`
 	NodeTerminalImage     string       `json:"nodeTerminalImage" gorm:"column:node_terminal_image;type:varchar(255);not null;default:'busybox:latest'"`
-	ClusterAgentImage     string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/kite-org/kite:latest'"`
+	ClusterAgentImage     string       `json:"clusterAgentImage" gorm:"column:cluster_agent_image;type:varchar(255);not null;default:'ghcr.io/fadewalk/kube-osprey:latest'"`
 	PluginCatalogURL      string       `json:"pluginCatalogUrl" gorm:"column:plugin_catalog_url;type:varchar(2048)"`
 	MCPEnabled            bool         `json:"mcpEnabled" gorm:"column:mcp_enabled;type:boolean;not null;default:false"`
 	MCPRateLimitPerMinute int          `json:"mcpRateLimitPerMinute" gorm:"column:mcp_rate_limit_per_minute;type:integer;not null;default:60"`

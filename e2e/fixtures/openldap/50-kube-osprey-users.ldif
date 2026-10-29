@@ -14,8 +14,8 @@ objectClass: top
 uid: ldap-e2e
 cn: LDAP E2E
 sn: LDAP
-mail: ldap-e2e@kite.test
-userPassword: KiteLDAP!2345
+mail: ldap-e2e@kube-osprey.test
+userPassword: KubeOspreyLDAP!2345
 
 dn: uid=oauth-e2e,ou=users,{{ LDAP_BASE_DN }}
 objectClass: inetOrgPerson
@@ -25,8 +25,8 @@ objectClass: top
 uid: oauth-e2e
 cn: OAuth E2E
 sn: OAuth
-mail: oauth-e2e@kite.test
-userPassword: KiteOAuth!2345
+mail: oauth-e2e@kube-osprey.test
+userPassword: KubeOspreyOAuth!2345
 
 dn: uid=oauth-no-group,ou=users,{{ LDAP_BASE_DN }}
 objectClass: inetOrgPerson
@@ -36,8 +36,8 @@ objectClass: top
 uid: oauth-no-group
 cn: OAuth No Group
 sn: OAuth
-mail: oauth-no-group@kite.test
-userPassword: KiteOAuthNoGroup!2345
+mail: oauth-no-group@kube-osprey.test
+userPassword: KubeOspreyOAuthNoGroup!2345
 
 dn: cn=e2e-viewers,ou=groups,{{ LDAP_BASE_DN }}
 objectClass: groupOfNames

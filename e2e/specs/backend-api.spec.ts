@@ -461,7 +461,7 @@ test('backend APIs work end to end against the real test environment', async ({
     }>(await request.get('/api/v1/admin/apikeys/'), 200)
     const listedAPIKey = apiKeys.apiKeys.find((item) => item.id === apiKeyId)
     expect(listedAPIKey?.username).toBe(apiKeyName)
-    expect(listedAPIKey?.apiKey).toMatch(/^kite\d+-/)
+    expect(listedAPIKey?.apiKey).toMatch(/^kubeosprey\d+-/)
     const apiKeyToken = listedAPIKey!.apiKey
 
     const createdUser = await expectJSON<{
@@ -676,7 +676,7 @@ test('backend APIs work end to end against the real test environment', async ({
         data: {
           apiVersion: 'v1',
           kind: 'Pod',
-          metadata: { name: podName, labels: { 'e2e.kite.io/test': suffix } },
+          metadata: { name: podName, labels: { 'e2e.kube-osprey.io/test': suffix } },
           spec: {
             containers: [
               {
@@ -703,7 +703,7 @@ test('backend APIs work end to end against the real test environment', async ({
           kind: 'Pod',
           metadata: {
             name: deniedPodName,
-            labels: { 'e2e.kite.io/test': suffix },
+            labels: { 'e2e.kube-osprey.io/test': suffix },
           },
           spec: {
             containers: [
@@ -725,7 +725,7 @@ test('backend APIs work end to end against the real test environment', async ({
       kind: 'Deployment',
       metadata: {
         name: deploymentName,
-        labels: { 'e2e.kite.io/test': suffix },
+        labels: { 'e2e.kube-osprey.io/test': suffix },
       },
       spec: {
         replicas: 0,
@@ -764,7 +764,7 @@ test('backend APIs work end to end against the real test environment', async ({
           ...deploymentBody,
           metadata: {
             name: deniedDeploymentName,
-            labels: { 'e2e.kite.io/test': suffix },
+            labels: { 'e2e.kube-osprey.io/test': suffix },
           },
           spec: {
             ...deploymentBody.spec,
@@ -824,25 +824,25 @@ test('backend APIs work end to end against the real test environment', async ({
         annotations?: Record<string, string>
       }
     }>(await request.get(podPath), 200)
-    currentPod.metadata.annotations = { 'e2e.kite.io/updated': 'true' }
+    currentPod.metadata.annotations = { 'e2e.kube-osprey.io/updated': 'true' }
     const updatedPod = await expectJSON<{
       metadata: { annotations: Record<string, string> }
     }>(await request.put(podPath, { data: currentPod }), 200)
-    expect(updatedPod.metadata.annotations['e2e.kite.io/updated']).toBe('true')
+    expect(updatedPod.metadata.annotations['e2e.kube-osprey.io/updated']).toBe('true')
     const patchedPod = await expectJSON<{
       metadata: { labels: Record<string, string> }
     }>(
       await request.patch(`${podPath}?patchType=merge`, {
-        data: { metadata: { labels: { 'e2e.kite.io/patched': 'true' } } },
+        data: { metadata: { labels: { 'e2e.kube-osprey.io/patched': 'true' } } },
       }),
       200
     )
-    expect(patchedPod.metadata.labels['e2e.kite.io/patched']).toBe('true')
+    expect(patchedPod.metadata.labels['e2e.kube-osprey.io/patched']).toBe('true')
     const pods = await expectJSON<{
       items: Array<{ metadata: { name: string } }>
     }>(
       await request.get(
-        `${clusterPath}/pods/default?labelSelector=${encodeURIComponent(`e2e.kite.io/test=${suffix}`)}`
+        `${clusterPath}/pods/default?labelSelector=${encodeURIComponent(`e2e.kube-osprey.io/test=${suffix}`)}`
       ),
       200
     )
@@ -868,29 +868,29 @@ test('backend APIs work end to end against the real test environment', async ({
         annotations?: Record<string, string>
       }
     }>(await request.get(deploymentPath), 200)
-    currentDeployment.metadata.annotations = { 'e2e.kite.io/updated': 'true' }
+    currentDeployment.metadata.annotations = { 'e2e.kube-osprey.io/updated': 'true' }
     const updatedDeployment = await expectJSON<{
       metadata: { annotations: Record<string, string> }
     }>(await request.put(deploymentPath, { data: currentDeployment }), 200)
-    expect(updatedDeployment.metadata.annotations['e2e.kite.io/updated']).toBe(
+    expect(updatedDeployment.metadata.annotations['e2e.kube-osprey.io/updated']).toBe(
       'true'
     )
     const patchedDeployment = await expectJSON<{
       metadata: { labels: Record<string, string> }
     }>(
       await request.patch(`${deploymentPath}?patchType=merge`, {
-        data: { metadata: { labels: { 'e2e.kite.io/patched': 'true' } } },
+        data: { metadata: { labels: { 'e2e.kube-osprey.io/patched': 'true' } } },
       }),
       200
     )
-    expect(patchedDeployment.metadata.labels['e2e.kite.io/patched']).toBe(
+    expect(patchedDeployment.metadata.labels['e2e.kube-osprey.io/patched']).toBe(
       'true'
     )
     const deployments = await expectJSON<{
       items: Array<{ metadata: { name: string } }>
     }>(
       await request.get(
-        `${clusterPath}/deployments/default?labelSelector=${encodeURIComponent(`e2e.kite.io/test=${suffix}`)}`
+        `${clusterPath}/deployments/default?labelSelector=${encodeURIComponent(`e2e.kube-osprey.io/test=${suffix}`)}`
       ),
       200
     )
@@ -998,7 +998,7 @@ test('backend APIs work end to end against the real test environment', async ({
     )
     await expectStatus(
       await anonymousRequest.get('/api/auth/user', {
-        headers: { Authorization: 'kite-invalid' },
+        headers: { Authorization: 'kubeosprey-invalid' },
       }),
       401
     )

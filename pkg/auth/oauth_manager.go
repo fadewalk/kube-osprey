@@ -7,10 +7,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"k8s.io/klog/v2"
 )
 
@@ -88,7 +88,7 @@ func (om *OAuthManager) GenerateJWT(user *model.User, refreshToken string) (stri
 			ExpiresAt: jwt.NewNumericDate(expirationTime),
 			IssuedAt:  jwt.NewNumericDate(now),
 			NotBefore: jwt.NewNumericDate(now),
-			Issuer:    "Kite",
+			Issuer:    "KubeOsprey",
 		},
 	}
 

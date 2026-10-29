@@ -3,7 +3,7 @@ package utils
 import (
 	"strings"
 
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 )
 
 var searchResourceAliases = common.SearchAliases()

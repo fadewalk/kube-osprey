@@ -3,26 +3,26 @@ import { type Browser, type Page, expect, test } from '@playwright/test'
 import { authFile } from '../env'
 
 const baseURL =
-  process.env.KITE_E2E_BASE_URL ||
-  `http://127.0.0.1:${process.env.KITE_E2E_PORT || '38080'}`
-const ldapURL = process.env.KITE_E2E_LDAP_URL
-const oauthIssuer = process.env.KITE_E2E_OAUTH_ISSUER
+  process.env.KUBE_OSPREY_E2E_BASE_URL ||
+  `http://127.0.0.1:${process.env.KUBE_OSPREY_E2E_PORT || '38080'}`
+const ldapURL = process.env.KUBE_OSPREY_E2E_LDAP_URL
+const oauthIssuer = process.env.KUBE_OSPREY_E2E_OAUTH_ISSUER
 
 const ldapUser = {
   username: 'ldap-e2e',
-  password: 'KiteLDAP!2345',
+  password: 'KubeOspreyLDAP!2345',
   provider: 'ldap',
 }
 
 const oauthUser = {
   username: 'oauth-e2e',
-  password: 'KiteOAuth!2345',
+  password: 'KubeOspreyOAuth!2345',
   provider: 'dex',
 }
 
 const oauthUserWithoutGroup = {
   username: 'oauth-no-group',
-  password: 'KiteOAuthNoGroup!2345',
+  password: 'KubeOspreyOAuthNoGroup!2345',
 }
 
 const restrictedOAuthProvider = {
@@ -118,13 +118,13 @@ async function configureLDAPViaUI(page: Page) {
   }
 
   await page.getByLabel('Server URL').fill(ldapURL!)
-  await page.getByLabel('Bind DN').fill('cn=admin,dc=kite,dc=test')
+  await page.getByLabel('Bind DN').fill('cn=admin,dc=kube-osprey,dc=test')
   await page.getByLabel('Bind Password').fill('admin')
-  await page.getByLabel('User Base DN').fill('ou=users,dc=kite,dc=test')
+  await page.getByLabel('User Base DN').fill('ou=users,dc=kube-osprey,dc=test')
   await page.getByLabel('User Filter').fill('(uid=%s)')
   await page.getByLabel('Username Attribute').fill('uid')
   await page.getByLabel('Display Name Attribute').fill('cn')
-  await page.getByLabel('Group Base DN').fill('ou=groups,dc=kite,dc=test')
+  await page.getByLabel('Group Base DN').fill('ou=groups,dc=kube-osprey,dc=test')
   await page.getByLabel('Group Filter').fill('(member=%s)')
   await page.getByLabel('Group Name Attribute').fill('cn')
   await ldapCard.getByRole('button', { name: 'Save' }).click()
@@ -144,8 +144,8 @@ async function configureOAuthViaUI(page: Page) {
   await expect(dialog).toBeVisible()
 
   await dialog.getByLabel('Name *').fill('dex')
-  await dialog.getByLabel('Client ID *').fill('kite-e2e')
-  await dialog.getByLabel('Client Secret *').fill('kite-e2e-secret')
+  await dialog.getByLabel('Client ID *').fill('kube-osprey-e2e')
+  await dialog.getByLabel('Client Secret *').fill('kube-osprey-e2e-secret')
   await dialog.getByLabel('Issuer').fill(oauthIssuer!)
   await dialog
     .getByLabel('Scopes')
@@ -191,8 +191,8 @@ async function configureUsernameClaimOAuthViaUI(page: Page) {
   await expect(dialog).toBeVisible()
 
   await dialog.getByLabel('Name *').fill(usernameClaimOAuthProvider.name)
-  await dialog.getByLabel('Client ID *').fill('kite-e2e')
-  await dialog.getByLabel('Client Secret *').fill('kite-e2e-secret')
+  await dialog.getByLabel('Client ID *').fill('kube-osprey-e2e')
+  await dialog.getByLabel('Client Secret *').fill('kube-osprey-e2e-secret')
   await dialog.getByLabel('Issuer').fill(oauthIssuer!)
   await dialog.getByLabel('Scopes').fill('openid,profile,email,groups')
   await dialog
@@ -240,8 +240,8 @@ async function configureRestrictedOAuthViaUI(page: Page) {
   await expect(dialog).toBeVisible()
 
   await dialog.getByLabel('Name *').fill(restrictedOAuthProvider.name)
-  await dialog.getByLabel('Client ID *').fill('kite-e2e')
-  await dialog.getByLabel('Client Secret *').fill('kite-e2e-secret')
+  await dialog.getByLabel('Client ID *').fill('kube-osprey-e2e')
+  await dialog.getByLabel('Client Secret *').fill('kube-osprey-e2e-secret')
   await dialog.getByLabel('Issuer').fill(oauthIssuer!)
   await dialog.getByLabel('Scopes').fill('openid,profile,email,groups')
   await dialog
@@ -290,8 +290,8 @@ async function configureCustomGroupClaimOAuthViaUI(page: Page) {
   await expect(dialog).toBeVisible()
 
   await dialog.getByLabel('Name *').fill(customGroupClaimOAuthProvider.name)
-  await dialog.getByLabel('Client ID *').fill('kite-e2e')
-  await dialog.getByLabel('Client Secret *').fill('kite-e2e-secret')
+  await dialog.getByLabel('Client ID *').fill('kube-osprey-e2e')
+  await dialog.getByLabel('Client Secret *').fill('kube-osprey-e2e-secret')
   await dialog.getByLabel('Issuer').fill(oauthIssuer!)
   await dialog.getByLabel('Scopes').fill('openid,profile,email,groups')
   await dialog

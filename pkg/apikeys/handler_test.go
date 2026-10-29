@@ -8,11 +8,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/auth"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/auth"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -57,7 +57,7 @@ func TestAPIKeyLifecycleControlsAuthentication(t *testing.T) {
 		t.Fatalf("listed API keys = %#v", listed.APIKeys)
 	}
 	fullKey := string(listed.APIKeys[0].APIKey)
-	wantPrefix := fmt.Sprintf("kite%d-", created.APIKey.ID)
+	wantPrefix := fmt.Sprintf("kubeosprey%d-", created.APIKey.ID)
 	if !strings.HasPrefix(fullKey, wantPrefix) || !strings.HasSuffix(fullKey, string(created.APIKey.APIKey)) {
 		t.Fatalf("listed API key = %q, want prefix %q and created secret", fullKey, wantPrefix)
 	}
@@ -66,7 +66,7 @@ func TestAPIKeyLifecycleControlsAuthentication(t *testing.T) {
 	authRecorder := httptest.NewRecorder()
 	authContext, _ := gin.CreateTestContext(authRecorder)
 	authContext.Request = httptest.NewRequest(http.MethodGet, "/protected", nil)
-	authHandler.RequireAPIKeyAuth(authContext, strings.TrimPrefix(fullKey, "kite"))
+	authHandler.RequireAPIKeyAuth(authContext, strings.TrimPrefix(fullKey, "kubeosprey"))
 	if authContext.IsAborted() {
 		t.Fatalf("created API key was rejected: %s", authRecorder.Body.String())
 	}
@@ -83,7 +83,7 @@ func TestAPIKeyLifecycleControlsAuthentication(t *testing.T) {
 	rejectedRecorder := httptest.NewRecorder()
 	rejectedContext, _ := gin.CreateTestContext(rejectedRecorder)
 	rejectedContext.Request = httptest.NewRequest(http.MethodGet, "/protected", nil)
-	authHandler.RequireAPIKeyAuth(rejectedContext, strings.TrimPrefix(fullKey, "kite"))
+	authHandler.RequireAPIKeyAuth(rejectedContext, strings.TrimPrefix(fullKey, "kubeosprey"))
 	if !rejectedContext.IsAborted() || rejectedRecorder.Code != http.StatusUnauthorized {
 		t.Fatalf("deleted API key authentication status = %d, aborted=%v", rejectedRecorder.Code, rejectedContext.IsAborted())
 	}
@@ -103,8 +103,8 @@ func TestDeleteAPIKeyRejectsInvalidID(t *testing.T) {
 func setupAPIKeyTestDB(t *testing.T) {
 	t.Helper()
 	originalDB := model.DB
-	originalEncryptKey := common.KiteEncryptKey
-	common.KiteEncryptKey = "apikey-handler-test-key"
+	originalEncryptKey := common.EncryptKey
+	common.EncryptKey = "apikey-handler-test-key"
 	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{Logger: logger.Default.LogMode(logger.Silent)})
 	if err != nil {
 		t.Fatalf("opening test database: %v", err)
@@ -120,7 +120,7 @@ func setupAPIKeyTestDB(t *testing.T) {
 			_ = sqlDB.Close()
 		}
 		model.DB = originalDB
-		common.KiteEncryptKey = originalEncryptKey
+		common.EncryptKey = originalEncryptKey
 	})
 }
 

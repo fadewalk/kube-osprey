@@ -611,7 +611,7 @@
     },
     "tabs": {
       "rolloutRevisions": "Rollout Revisions",
-      "kiteAudit": "KubeOsprey Audit"
+      "kubeOspreyAudit": "KubeOsprey Audit"
     }
   },
   "daemonsets": {
@@ -1175,7 +1175,7 @@
     "errors": {
       "loadFailed": "Failed to load clusters"
     },
-    "deleteConfirmation": "This action will only remove the current cluster's configuration in kite and will not delete any cluster resources.",
+    "deleteConfirmation": "This action will only remove the current cluster's configuration in KubeOsprey and will not delete any cluster resources.",
     "dialog": {
       "createTitle": "Add Cluster",
       "editTitle": "Edit Cluster",

@@ -26,8 +26,8 @@ export function WorkloadHistoryTabs<T extends WorkloadRevisionResourceType>({
         <TabsTrigger value="revisions">
           {t('workloads.tabs.rolloutRevisions')}
         </TabsTrigger>
-        <TabsTrigger value="kiteAudit">
-          {t('workloads.tabs.kiteAudit')}
+        <TabsTrigger value="kubeOspreyAudit">
+          {t('workloads.tabs.kubeOspreyAudit')}
         </TabsTrigger>
       </TabsList>
 
@@ -40,7 +40,7 @@ export function WorkloadHistoryTabs<T extends WorkloadRevisionResourceType>({
         />
       </TabsContent>
 
-      <TabsContent value="kiteAudit">
+      <TabsContent value="kubeOspreyAudit">
         <ResourceHistoryTable
           resourceType={resourceType}
           name={name}

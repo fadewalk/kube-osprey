@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	expirable "github.com/hashicorp/golang-lru/v2/expirable"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/utils"
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
 )
@@ -57,7 +57,7 @@ func (u *User) Key() string {
 }
 
 func (u *User) GetAPIKey() string {
-	return fmt.Sprintf("kite%d-%s", u.ID, string(u.APIKey))
+	return fmt.Sprintf("kubeosprey%d-%s", u.ID, string(u.APIKey))
 }
 
 func AddUser(user *User) error {

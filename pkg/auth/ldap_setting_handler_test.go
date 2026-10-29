@@ -3,7 +3,7 @@ package auth
 import (
 	"testing"
 
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 func TestLDAPSettingResponse(t *testing.T) {

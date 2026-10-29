@@ -32,11 +32,11 @@ afterEach(() => {
 })
 
 describe('getSubPath', () => {
-  it('reads the dev base path from KITE_BASE', () => {
+  it('reads the dev base path from KUBE_OSPREY_BASE', () => {
     vi.stubEnv('DEV', true)
-    vi.stubEnv('KITE_BASE', 'kite/')
+    vi.stubEnv('KUBE_OSPREY_BASE', 'kube-osprey/')
 
-    expect(getSubPath()).toBe('/kite')
+    expect(getSubPath()).toBe('/kube-osprey')
   })
 
   it('reads the runtime base path in production', () => {
@@ -50,10 +50,10 @@ describe('getSubPath', () => {
 describe('withSubPath', () => {
   it('prefixes paths when a subpath exists', () => {
     vi.stubEnv('DEV', false)
-    window.__dynamic_base__ = '/kite'
+    window.__dynamic_base__ = '/kube-osprey'
 
-    expect(withSubPath('api/v1')).toBe('/kite/api/v1')
-    expect(withSubPath('/api/v1')).toBe('/kite/api/v1')
+    expect(withSubPath('api/v1')).toBe('/kube-osprey/api/v1')
+    expect(withSubPath('/api/v1')).toBe('/kube-osprey/api/v1')
   })
 
   it('returns the original path when no subpath is configured', () => {
@@ -67,10 +67,10 @@ describe('getWebSocketUrl', () => {
   it('builds a dev websocket URL with the current subpath', () => {
     vi.stubEnv('DEV', false)
     vi.stubEnv('NODE_ENV', 'development')
-    window.__dynamic_base__ = '/kite'
+    window.__dynamic_base__ = '/kube-osprey'
 
     expect(getWebSocketUrl('ws/logs')).toBe(
-      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//localhost:8080/kite/ws/logs`
+      `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//localhost:8080/kube-osprey/ws/logs`
     )
   })
 })

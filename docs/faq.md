@@ -11,10 +11,10 @@ fork — no installation statistics or usage data ever leave your cluster.
 If you encounter an error message like the following when accessing resources:
 
 ```txt
-User admin does not have permission to get configmaps in namespace kite in cluster in-cluster
+User admin does not have permission to get configmaps in namespace kube-osprey in cluster in-cluster
 ```
 
-This means that user `admin` does not have permission to access `configmaps` resources in the `kite` namespace.
+This means that user `admin` does not have permission to access `configmaps` resources in the `kube-osprey` namespace.
 
 You need to refer to the [RBAC Configuration Guide](./config/rbac-config) to configure user permissions.
 

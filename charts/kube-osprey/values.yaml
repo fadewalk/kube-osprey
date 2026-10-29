@@ -1,4 +1,4 @@
-# Default values for kite.
+# Default values for kube-osprey.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -28,13 +28,13 @@ debug: false
 # External Host for the application
 # Used in generate OAuth redirect URLs
 # Leave empty to obtain from request headers
-# Example: https://kitehq.dev
+# Example: https://kube-osprey.example.com
 host: ""
 
 # Base path for the application
-# If you are serving kite under a subpath, set this value accordingly.
+# If you are serving KubeOsprey under a subpath, set this value accordingly.
 # Remember to also set the ingress path to match.
-# Example: "/kite"
+# Example: "/kube-osprey"
 basePath: ""
 
 # Set to true to enable the anonymous user with full-admin access
@@ -58,7 +58,7 @@ secret:
   # If set, the deployment will use this existing secret name instead of the generated one (ignored when `create: true`).
   # must contain all required keys.
   #  JWT_SECRET
-  #  KITE_ENCRYPT_KEY
+  #  KUBE_OSPREY_ENCRYPT_KEY
   #  DB_TYPE supported values: sqlite, postgres, mysql (defaults to sqlite if not set)
   #  DB_DSN (not required for sqlite)
   # if set, the db.dsn and db.type values from the chart will be ignored.
@@ -100,7 +100,7 @@ db:
       # where to mount inside the container
       mountPath: /data
       # sqlite filename inside the mountPath
-      filename: kite.db
+      filename: kube-osprey.db
     # Additional sqlite database connection options
     # Example: "_journal_mode=WAL&_busy_timeout=5000"
     options: ""
@@ -143,7 +143,7 @@ config:
   # Name of an existing Secret containing a `config.yaml` key.
   # When set, the inline config below is ignored.
   # The user is responsible for creating and managing this Secret.
-  # Example: kubectl create secret generic kite-config --from-file=config.yaml=./my-config.yaml
+  # Example: kubectl create secret generic kube-osprey-config --from-file=config.yaml=./my-config.yaml
   existingSecret: ""
   # --- Inline configuration (used when existingSecret is empty) ---
   # Super user configuration (created if the user doesn't exist, password updated on restart)
@@ -281,15 +281,15 @@ ingress:
   className: "nginx"
   annotations: {}
   hosts:
-    - host: kitehq.dev
+    - host: kube-osprey.example.com
       paths:
         - path: /
           pathType: ImplementationSpecific
   # tls:
   #  - hosts:
-  #      - kitehq.dev
+  #      - kube-osprey.example.com
 
-# Gateway API resources for exposing Kite
+# Gateway API resources for exposing KubeOsprey
 # Requires Gateway API CRDs to be installed in the cluster
 # For more information: https://gateway-api.sigs.k8s.io/
 gateway:
@@ -321,22 +321,22 @@ gateway:
     # - name: https
     #   port: 443
     #   protocol: HTTPS
-    #   hostname: "kite.example.com"
+    #   hostname: "kube-osprey.example.com"
     #   allowedRoutes:
     #     namespaces:
     #       from: Same
     #   tls:
     #     mode: Terminate
     #     certificateRefs:
-    #       - name: kite-tls-secret
+    #       - name: kube-osprey-tls-secret
   # HTTPRoute configuration (supports multiple routes)
   httpRoutes:
-    - name: kite
+    - name: kube-osprey
       # Annotations for the HTTPRoute
       annotations: {}
       # Hostnames to match (optional, matches all if empty)
       hostnames: []
-        # - kite.example.com
+        # - kube-osprey.example.com
       # Routing rules
       rules:
         - matches:
@@ -346,7 +346,7 @@ gateway:
           timeouts:
             request: "120s"
     # Example: additional route for different hostname/path
-    # - name: kite-api
+    # - name: kube-osprey-api
     #   annotations: {}
     #   hostnames:
     #     - api.example.com

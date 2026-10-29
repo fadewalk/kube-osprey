@@ -5,11 +5,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
 )
 
 func TestRBACMiddleware(t *testing.T) {
@@ -367,8 +367,8 @@ func TestRBACMiddleware(t *testing.T) {
 		{
 			name:       "base path all namespace list allowed",
 			method:     http.MethodGet,
-			url:        "/kite/api/v1/pods/_all",
-			base:       "/kite",
+			url:        "/kube-osprey/api/v1/pods/_all",
+			base:       "/kube-osprey",
 			cluster:    "prod",
 			username:   "alice",
 			roles:      []string{"pod-reader"},
@@ -378,8 +378,8 @@ func TestRBACMiddleware(t *testing.T) {
 		{
 			name:       "base path cluster pod watch allowed",
 			method:     http.MethodGet,
-			url:        "/kite/api/v1/_clusters/prod/pods/_all/watch",
-			base:       "/kite",
+			url:        "/kube-osprey/api/v1/_clusters/prod/pods/_all/watch",
+			base:       "/kube-osprey",
 			cluster:    "prod",
 			username:   "alice",
 			roles:      []string{"pod-reader"},

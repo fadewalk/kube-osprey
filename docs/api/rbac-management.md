@@ -14,7 +14,7 @@ Example:
 
 ```bash
 curl \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   https://kube-osprey.example.com/api/v1/admin/roles/
 ```
 
@@ -69,7 +69,7 @@ Example:
 ```bash
 curl \
   -X POST \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{
     "name":"namespace-editor",
@@ -102,7 +102,7 @@ Example:
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   https://kube-osprey.example.com/api/v1/admin/roles/3
 ```
 
@@ -143,7 +143,7 @@ Example:
 ```bash
 curl \
   -X POST \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"subjectType":"group","subject":"platform-team"}' \
   https://kube-osprey.example.com/api/v1/admin/roles/3/assign
@@ -160,6 +160,6 @@ Example:
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   "https://kube-osprey.example.com/api/v1/admin/roles/3/assign?subjectType=group&subject=platform-team"
 ```

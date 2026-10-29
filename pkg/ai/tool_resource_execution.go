@@ -11,10 +11,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/kube"
-	pkgmodel "github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
+	pkgmodel "github.com/fadewalk/kube-osprey/pkg/model"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -766,7 +766,7 @@ func executeApplyResource(ctx context.Context, cs *cluster.ClientSet, user pkgmo
 		return fmt.Sprintf("Error finding %s/%s: %v", resource.Kind, obj.GetName(), getErr), true
 	}
 
-	err = cs.K8sClient.Apply(ctx, client.ApplyConfigurationFromUnstructured(obj), client.FieldOwner("kite-ai-agent"))
+	err = cs.K8sClient.Apply(ctx, client.ApplyConfigurationFromUnstructured(obj), client.FieldOwner("kube-osprey-ai-agent"))
 	currentYAML := ""
 	if err == nil {
 		current := buildObjectForResource(resource)

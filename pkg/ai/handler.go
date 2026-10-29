@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
 )
 
 func HandleChat(c *gin.Context) {

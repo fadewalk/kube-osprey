@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	release "helm.sh/helm/v4/pkg/release/v1"
 	"k8s.io/klog/v2"
 )

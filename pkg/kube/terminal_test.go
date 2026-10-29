@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	"github.com/gorilla/websocket"
-	"github.com/zxh326/kite/pkg/wsutil"
 )
 
 func TestTerminalSessionTransportsInputOutputAndResize(t *testing.T) {

@@ -19,7 +19,7 @@ KubeOsprey 是一个单二进制 Kubernetes 工作空间，面向多集群运维
 <img width="1586" height="1167" alt="image" src="https://github.com/user-attachments/assets/a88a63b7-5b71-444d-8d98-66f147a68ef7" />
 
 > [!NOTE]
-> KubeOsprey 是 [Kite](https://github.com/kite-org/kite)（Apache-2.0）的独立维护 fork：持续吸收上游有价值的更新，但独立发展、不向上游回传改动。代码层标识（Go module 路径、`KITE_*` 环境变量、`charts/kite`）刻意保留原名，以保证上游变更可以持续干净地合并。KubeOsprey 是独立的社区项目，与 Kubernetes 项目及 CNCF 无隶属或背书关系。
+> KubeOsprey 是 [Kite](https://github.com/kite-org/kite)（Apache-2.0）的独立维护 fork：已与上游分叉，独立发展、不向上游回传改动。KubeOsprey 是独立的社区项目，与 Kubernetes 项目及 CNCF 无隶属或背书关系。
 
 ## 为什么选择 KubeOsprey
 
@@ -61,13 +61,12 @@ make build
 
 ### 安装发行版
 
-每个 tag 版本都会在 [Releases](https://github.com/fadewalk/kube-osprey/releases) 页面发布容器镜像、OCI Helm Chart 以及 Linux / macOS / Windows 独立二进制。Chart 沿用上游名称 `kite`，因此 `KITE_*` 环境变量与既有部署保持兼容；`fullnameOverride` 让部署出来的资源统一命名为 `kube-osprey`。
+每个 tag 版本都会在 [Releases](https://github.com/fadewalk/kube-osprey/releases) 页面发布容器镜像、OCI Helm Chart 以及 Linux / macOS / Windows 独立二进制。使用 release 名 `kube-osprey` 安装时，部署出来的所有资源统一命名为 `kube-osprey`。
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite \
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey \
   --namespace kube-osprey-system \
-  --create-namespace \
-  --set fullnameOverride=kube-osprey
+  --create-namespace
 ```
 
 ```bash
@@ -77,7 +76,7 @@ docker run -d --name kube-osprey \
   -p 8080:8080 \
   -v "$(pwd)/data:/data" \
   -e DB_DSN=/data/db.sqlite \
-  -e KITE_ENCRYPT_KEY="$(cat data/encrypt.key)" \
+  -e KUBE_OSPREY_ENCRYPT_KEY="$(cat data/encrypt.key)" \
   ghcr.io/fadewalk/kube-osprey:latest
 ```
 
@@ -91,7 +90,7 @@ docker run -d --name kube-osprey \
 | 安装与访问       | [安装指南](https://fadewalk.github.io/kube-osprey/zh/guide/installation)                                                                            |
 | 用户、认证和权限 | [用户管理](https://fadewalk.github.io/kube-osprey/zh/config/user-management) · [RBAC](https://fadewalk.github.io/kube-osprey/zh/config/rbac-config)                     |
 | 监控             | [Prometheus 配置](https://fadewalk.github.io/kube-osprey/zh/config/prometheus-setup) · [告警中心](https://fadewalk.github.io/kube-osprey/zh/guide/alert-center) · [健康诊断](https://fadewalk.github.io/kube-osprey/zh/guide/health-diagnostics)                                  |
-| 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/kite-cluster-agent) · [批量运维](https://fadewalk.github.io/kube-osprey/zh/guide/batch-operations)                             |
+| 运维             | [Helm 管理](https://fadewalk.github.io/kube-osprey/zh/guide/helm-management) · [Kite Cluster Agent](https://fadewalk.github.io/kube-osprey/zh/guide/cluster-agent) · [批量运维](https://fadewalk.github.io/kube-osprey/zh/guide/batch-operations)                             |
 | 变更管理         | [变更计划](https://fadewalk.github.io/kube-osprey/zh/guide/change-plans) · [通知渠道](https://fadewalk.github.io/kube-osprey/zh/config/notification-channels)                                                                                            |
 | 规模与搜索       | [资源同步](https://fadewalk.github.io/kube-osprey/zh/guide/resource-sync) · [全局搜索](https://fadewalk.github.io/kube-osprey/zh/guide/global-search)                                                                                                                   |
 | AI               | [AI 助手](https://fadewalk.github.io/kube-osprey/zh/guide/ai-assistant) · [MCP 服务器](https://fadewalk.github.io/kube-osprey/zh/guide/mcp-server)                                                                             |

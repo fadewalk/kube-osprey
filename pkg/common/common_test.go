@@ -7,20 +7,20 @@ import (
 )
 
 func TestValidateEncryptionKey(t *testing.T) {
-	oldKey := KiteEncryptKey
+	oldKey := EncryptKey
 	oldAllow := AllowInsecureDefaults
 	defer func() {
-		KiteEncryptKey = oldKey
+		EncryptKey = oldKey
 		AllowInsecureDefaults = oldAllow
 	}()
 
-	KiteEncryptKey = "too-short"
+	EncryptKey = "too-short"
 	AllowInsecureDefaults = false
 	if err := ValidateEncryptionKey(); err == nil {
 		t.Fatal("ValidateEncryptionKey() accepted a short key")
 	}
 
-	KiteEncryptKey = "kite-default-encryption-key-change-in-production"
+	EncryptKey = "kube-osprey-default-encryption-key-change-in-production"
 	if err := ValidateEncryptionKey(); err == nil {
 		t.Fatal("ValidateEncryptionKey() accepted the public default key")
 	}
@@ -30,7 +30,7 @@ func TestValidateEncryptionKey(t *testing.T) {
 		t.Fatalf("ValidateEncryptionKey() with explicit development override = %v", err)
 	}
 
-	KiteEncryptKey = "a-strong-development-encryption-key-123456"
+	EncryptKey = "a-strong-development-encryption-key-123456"
 	AllowInsecureDefaults = false
 	if err := ValidateEncryptionKey(); err != nil {
 		t.Fatalf("ValidateEncryptionKey() = %v", err)
@@ -42,9 +42,9 @@ func TestValidateWebSocketOrigin(t *testing.T) {
 	defer func() { CORSAllowedOrigins = oldOrigins }()
 	CORSAllowedOrigins = nil
 
-	req := httptest.NewRequest("GET", "https://kite.example.com/socket", nil)
-	req.Host = "kite.example.com"
-	req.Header.Set("Origin", "https://kite.example.com")
+	req := httptest.NewRequest("GET", "https://kube-osprey.example.com/socket", nil)
+	req.Host = "kube-osprey.example.com"
+	req.Header.Set("Origin", "https://kube-osprey.example.com")
 	if !ValidateWebSocketOrigin(req) {
 		t.Fatal("same-origin WebSocket request was rejected")
 	}
@@ -70,7 +70,7 @@ func TestLoadEnvs(t *testing.T) {
 		KubectlTerminalImage  string
 		DBDSN                 string
 		DBType                string
-		KiteEncryptKey        string
+		EncryptKey            string
 		AllowInsecureDefaults bool
 		AnonymousUserEnabled  bool
 		Host                  string
@@ -87,7 +87,7 @@ func TestLoadEnvs(t *testing.T) {
 		KubectlTerminalImage:  KubectlTerminalImage,
 		DBDSN:                 DBDSN,
 		DBType:                DBType,
-		KiteEncryptKey:        KiteEncryptKey,
+		EncryptKey:            EncryptKey,
 		AllowInsecureDefaults: AllowInsecureDefaults,
 		AnonymousUserEnabled:  AnonymousUserEnabled,
 		Host:                  Host,
@@ -105,7 +105,7 @@ func TestLoadEnvs(t *testing.T) {
 		KubectlTerminalImage = old.KubectlTerminalImage
 		DBDSN = old.DBDSN
 		DBType = old.DBType
-		KiteEncryptKey = old.KiteEncryptKey
+		EncryptKey = old.EncryptKey
 		AllowInsecureDefaults = old.AllowInsecureDefaults
 		AnonymousUserEnabled = old.AnonymousUserEnabled
 		Host = old.Host
@@ -127,12 +127,12 @@ func TestLoadEnvs(t *testing.T) {
 	t.Setenv("CLUSTER_AGENT_IMAGE", "test-cluster-agent-image")
 	t.Setenv("DB_DSN", "test.db")
 	t.Setenv("DB_TYPE", "mysql")
-	t.Setenv("KITE_ENCRYPT_KEY", "test-encrypt-key")
+	t.Setenv("KUBE_OSPREY_ENCRYPT_KEY", "test-encrypt-key")
 	t.Setenv("ANONYMOUS_USER_ENABLED", "true")
 	t.Setenv("HOST", "example.com")
 	t.Setenv("DISABLE_GZIP", "false")
 	t.Setenv("DISABLE_VERSION_CHECK", "true")
-	t.Setenv("KITE_BASE", "kite/")
+	t.Setenv("KUBE_OSPREY_BASE", "kube-osprey/")
 	t.Setenv("CORS_ALLOWED_ORIGINS", "http://localhost:5173, https://example.com ,,")
 	t.Setenv("TRUSTED_PROXIES", "10.42.0.0/16, 192.0.2.10 ,, ")
 
@@ -159,8 +159,8 @@ func TestLoadEnvs(t *testing.T) {
 	if DBType != "mysql" {
 		t.Fatalf("DBType = %q, want %q", DBType, "mysql")
 	}
-	if KiteEncryptKey != "test-encrypt-key" {
-		t.Fatalf("KiteEncryptKey = %q, want %q", KiteEncryptKey, "test-encrypt-key")
+	if EncryptKey != "test-encrypt-key" {
+		t.Fatalf("EncryptKey = %q, want %q", EncryptKey, "test-encrypt-key")
 	}
 	if !AnonymousUserEnabled {
 		t.Fatalf("AnonymousUserEnabled = %v, want true", AnonymousUserEnabled)
@@ -174,8 +174,8 @@ func TestLoadEnvs(t *testing.T) {
 	if EnableVersionCheck {
 		t.Fatalf("EnableVersionCheck = %v, want false", EnableVersionCheck)
 	}
-	if Base != "/kite" {
-		t.Fatalf("Base = %q, want %q", Base, "/kite")
+	if Base != "/kube-osprey" {
+		t.Fatalf("Base = %q, want %q", Base, "/kube-osprey")
 	}
 
 	wantOrigins := []string{"http://localhost:5173", "https://example.com"}
@@ -191,26 +191,26 @@ func TestLoadEnvs(t *testing.T) {
 
 func TestLoadEnvs_BaseAlreadyHasLeadingSlash(t *testing.T) {
 	old := struct {
-		KiteEncryptKey     string
+		EncryptKey         string
 		Base               string
 		CORSAllowedOrigins []string
 	}{
-		KiteEncryptKey:     KiteEncryptKey,
+		EncryptKey:         EncryptKey,
 		Base:               Base,
 		CORSAllowedOrigins: append([]string(nil), CORSAllowedOrigins...),
 	}
 	defer func() {
-		KiteEncryptKey = old.KiteEncryptKey
+		EncryptKey = old.EncryptKey
 		Base = old.Base
 		CORSAllowedOrigins = append([]string(nil), old.CORSAllowedOrigins...)
 	}()
 
-	t.Setenv("KITE_ENCRYPT_KEY", "test-encrypt-key")
-	t.Setenv("KITE_BASE", "/kite/")
+	t.Setenv("KUBE_OSPREY_ENCRYPT_KEY", "test-encrypt-key")
+	t.Setenv("KUBE_OSPREY_BASE", "/kube-osprey/")
 
 	LoadEnvs()
 
-	if Base != "/kite" {
-		t.Fatalf("Base = %q, want %q", Base, "/kite")
+	if Base != "/kube-osprey" {
+		t.Fatalf("Base = %q, want %q", Base, "/kube-osprey")
 	}
 }

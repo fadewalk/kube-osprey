@@ -3,7 +3,7 @@ package model
 import (
 	"testing"
 
-	"github.com/zxh326/kite/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 )
 
 func TestUserKey(t *testing.T) {
@@ -33,7 +33,7 @@ func TestUserGetAPIKey(t *testing.T) {
 		APIKey: SecretString("secret"),
 	}
 
-	if got, want := user.GetAPIKey(), "kite42-secret"; got != want {
+	if got, want := user.GetAPIKey(), "kubeosprey42-secret"; got != want {
 		t.Fatalf("GetAPIKey() = %q, want %q", got, want)
 	}
 }

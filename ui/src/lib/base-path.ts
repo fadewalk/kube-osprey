@@ -16,7 +16,7 @@ export function normalizeBasePath(basePath?: string): string {
 
   if (!basePathPattern.test(trimmedBasePath)) {
     throw new Error(
-      `Invalid KITE_BASE "${trimmedBasePath}": expected slash-separated path segments containing only letters, digits, '.', '_', '-', or '~'`
+      `Invalid KUBE_OSPREY_BASE "${trimmedBasePath}": expected slash-separated path segments containing only letters, digits, '.', '_', '-', or '~'`
     )
   }
 

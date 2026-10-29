@@ -12,9 +12,9 @@ import (
 
 	_ "net/http/pprof"
 
-	"github.com/zxh326/kite/pkg/clusteragent"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/version"
+	"github.com/fadewalk/kube-osprey/pkg/clusteragent"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 	"k8s.io/klog/v2"
 )
 

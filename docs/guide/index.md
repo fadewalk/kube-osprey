@@ -16,6 +16,7 @@ Install KubeOsprey with Helm, use port forwarding for the first visit, then conn
 
 ## Find the right guide
 
+- **See how the pieces fit together:** [Architecture](./architecture)
 - **Find any resource quickly:** [Global Search](./global-search)
 - **Understand a workload and its dependencies:** [Related Resources](./related-resources)
 - **Investigate a running Pod:** [Logs](./logs) and [Web Terminal](./web-terminal)
@@ -28,7 +29,7 @@ Install KubeOsprey with Helm, use port forwarding for the first visit, then conn
 - **Gate sensitive changes behind approval:** [Change Plans](./change-plans)
 - **Review resource changes:** [Resource History](./resource-history)
 - **Troubleshoot with an AI agent:** [AI Assistant](./ai-assistant)
-- **Connect private or remote clusters:** [KubeOsprey Cluster Agent](./kite-cluster-agent)
+- **Connect private or remote clusters:** [KubeOsprey Cluster Agent](./cluster-agent)
 
 ## Platform at a glance
 

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/version"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/version"
 )
 
 func TestRegisterBaseRoutes(t *testing.T) {
@@ -145,7 +145,7 @@ func TestSetupStatic(t *testing.T) {
 		common.Base = oldBase
 	}()
 
-	common.Base = "/kite"
+	common.Base = "/kube-osprey"
 
 	r := gin.New()
 	setupStatic(r)
@@ -158,13 +158,13 @@ func TestSetupStatic(t *testing.T) {
 		if rec.Code != http.StatusFound {
 			t.Fatalf("status = %d, want %d", rec.Code, http.StatusFound)
 		}
-		if location := rec.Header().Get("Location"); location != "/kite/" {
-			t.Fatalf("Location = %q, want %q", location, "/kite/")
+		if location := rec.Header().Get("Location"); location != "/kube-osprey/" {
+			t.Fatalf("Location = %q, want %q", location, "/kube-osprey/")
 		}
 	})
 
 	t.Run("serves index for ui routes with base injected", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/kite/overview", nil)
+		req := httptest.NewRequest(http.MethodGet, "/kube-osprey/overview", nil)
 		rec := httptest.NewRecorder()
 		r.ServeHTTP(rec, req)
 
@@ -172,13 +172,13 @@ func TestSetupStatic(t *testing.T) {
 			t.Fatalf("status = %d, want %d", rec.Code, http.StatusOK)
 		}
 		body := rec.Body.String()
-		if !strings.Contains(body, `window.__dynamic_base__="/kite"`) {
+		if !strings.Contains(body, `window.__dynamic_base__="/kube-osprey"`) {
 			t.Fatalf("body missing dynamic base injection")
 		}
 	})
 
 	t.Run("returns api 404 for missing api route", func(t *testing.T) {
-		req := httptest.NewRequest(http.MethodGet, "/kite/api/missing", nil)
+		req := httptest.NewRequest(http.MethodGet, "/kube-osprey/api/missing", nil)
 		rec := httptest.NewRecorder()
 		r.ServeHTTP(rec, req)
 

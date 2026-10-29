@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/prometheus"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/prometheus"
 )
 
 func TestExecuteQueryPrometheusRequiresClient(t *testing.T) {

@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "kite.name" -}}
+{{- define "kube-osprey.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "kite.fullname" -}}
+{{- define "kube-osprey.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "kite.chart" -}}
+{{- define "kube-osprey.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "kite.labels" -}}
-helm.sh/chart: {{ include "kite.chart" . }}
-{{ include "kite.selectorLabels" . }}
+{{- define "kube-osprey.labels" -}}
+helm.sh/chart: {{ include "kube-osprey.chart" . }}
+{{ include "kube-osprey.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,27 +45,27 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "kite.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "kite.name" . }}
+{{- define "kube-osprey.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kube-osprey.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "kite.serviceAccountName" -}}
+{{- define "kube-osprey.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "kite.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "kube-osprey.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
 
 
-{{- define "kite.secret" -}}
+{{- define "kube-osprey.secret" -}}
 {{- if .Values.secret.existingSecret }}
 {{- .Values.secret.existingSecret }}
 {{- else }}
-{{- printf "%s-secret" (include "kite.fullname" .) }}
+{{- printf "%s-secret" (include "kube-osprey.fullname" .) }}
 {{- end }}
 {{- end }}

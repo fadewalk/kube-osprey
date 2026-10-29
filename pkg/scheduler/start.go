@@ -3,7 +3,7 @@ package scheduler
 import (
 	"context"
 
-	"github.com/zxh326/kite/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
 )
 
 func Start(ctx context.Context, cm *cluster.ClusterManager) {

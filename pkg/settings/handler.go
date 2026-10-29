@@ -6,10 +6,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/syncengine"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/syncengine"
 )
 
 func HandleGetGeneralSetting(c *gin.Context) {

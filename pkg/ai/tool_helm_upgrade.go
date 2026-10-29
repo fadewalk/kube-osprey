@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/helmutil"
-	pkgmodel "github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	pkgmodel "github.com/fadewalk/kube-osprey/pkg/model"
 )
 
 // executeHelmUpgradeRelease upgrades a helm release from a change-plan step

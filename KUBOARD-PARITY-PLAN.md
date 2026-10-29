@@ -37,7 +37,7 @@ Kuboard v4（闭源商业 Kubernetes 面板）经逆向分析后，有三个值�
 | 决策点 | 结论 | 理由 |
 |---|---|---|
 | MCP Go SDK | 优先官方 `github.com/modelcontextprotocol/go-sdk`（Streamable HTTP）；若与 Gin 集成别扭则用 `github.com/mark3labs/mcp-go` | 两者都支持 Streamable HTTP（Kuboard 用的是 Spring AI 的实现，协议版本 2025-03-26）；开工前各花半天做 spike，二选一后写进本节 |
-| MCP 鉴权 | 复用现有 API Key：`Authorization: kite<apikey>` | `pkg/auth/middleware.go` 的 `RequireAPIKeyAuth` 已把 apikey 用户连同 `rbac.GetUserRoles` 结果注入 gin context，MCP 工具的 RBAC 检查零新增成本。**不引入** Kuboard 的 `Kb-Access-Key` 头 |
+| MCP 鉴权 | 复用现有 API Key：`Authorization: kubeosprey<apikey>` | `pkg/auth/middleware.go` 的 `RequireAPIKeyAuth` 已把 apikey 用户连同 `rbac.GetUserRoles` 结果注入 gin context，MCP 工具的 RBAC 检查零新增成本。**不引入** Kuboard 的 `Kb-Access-Key` 头 |
 | 工具 RBAC | 复用 `pkg/ai/tool_authorization.go` 的 `requiredToolPermissions` + `pkg/rbac.CanAccess` | 同一套权限语义管住 Web/AI/MCP 三个入口 |
 | MCP 传输 | 仅 Streamable HTTP（`POST /api/v1/mcp`，SSE 可选） | 2025-03-26 协议；Kuboard 团队踩过 SSE-only 的坑（tools/list 挂起），不要重蹈 |
 | 同步引擎实现 | client-go dynamic SharedInformerFactory，自定义 Store 落 GORM | 不引 controller-runtime manager（Kite 不是 controller，manager 太重）；informer 自带 watch 重连/退避 |
@@ -96,15 +96,15 @@ DELETE /api/v1/mcp        # session 终止（协议要求）
 
 **开关与配置**（AGENTS.md 要求三处同步）：
 
-- `internal/config.go`：`KITE_MCP_ENABLED`（默认 false）、`KITE_MCP_RATE_LIMIT_PER_MINUTE`（默认 60）；
+- `internal/config.go`：`KUBE_OSPREY_MCP_ENABLED`（默认 false）、`KUBE_OSPREY_MCP_RATE_LIMIT_PER_MINUTE`（默认 60）；
 - `pkg/settings`：UI 可改的同名 GeneralSetting，运行时生效；
-- `charts/kite`：values.yaml + deployment 模板加对应 env；
+- `charts/kube-osprey`：values.yaml + deployment 模板加对应 env；
 - 关闭时 `/api/v1/mcp` 返回明确的 JSON-RPC 错误（Kuboard 的做法：`code:-32001, "MCP endpoint is disabled"`）。
 
 ### 2.2 前端
 
 `ui/src/pages/settings.tsx` 增加 MCP 区块（开关 + 限流数字），开关打开后展示连接说明卡片：
-服务端 URL（当前 origin + `/api/v1/mcp`）、认证方式说明（`Authorization: kite<你的API Key>`）、
+服务端 URL（当前 origin + `/api/v1/mcp`）、认证方式说明（`Authorization: kubeosprey<你的API Key>`）、
 "去创建 API Key"链接跳现有 API Key 管理页。i18n 同步 `ui/src/i18n/locales/en.json` 与 `zh.json`。
 
 ### 2.3 验收标准
@@ -235,7 +235,7 @@ services, ingresses, configmaps, secrets(仅元数据不落 data 字段), nodes,
 
 - 本计划涉及的**状态机、token 消费、RBAC 拒绝路径、dry-run 语义**必须有表驱动测试；
 - MCP 协议层至少一条端到端集成测试（真实 HTTP 握手 → tools/list → tools/call）；
-- 每阶段完成跑 `make pre-commit` 全量；涉 chart 改动跑 `helm lint charts/kite` + `scripts/validate-chart.sh`；
+- 每阶段完成跑 `make pre-commit` 全量；涉 chart 改动跑 `helm lint charts/kube-osprey` + `scripts/validate-chart.sh`；
 - 真实集群验证用 Colima（`kubectl config use-context colima`，与 HANDOFF.md 第 8 条一致）。
 
 ## 7. 风险清单

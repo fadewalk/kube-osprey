@@ -1,13 +1,32 @@
 import { SearchResult } from '@/lib/api'
 import { getClusterScopedStorageKey } from '@/lib/current-cluster'
 
-const FAVORITES_STORAGE_KEY = 'kite-favorites'
+const FAVORITES_STORAGE_KEY = 'kube-osprey-favorites'
+const LEGACY_FAVORITES_STORAGE_KEY = 'kite-favorites'
+
+// One-time migration from the pre-rename storage key.
+const migrateLegacyFavorites = () => {
+  try {
+    const key = getClusterScopedStorageKey(FAVORITES_STORAGE_KEY)
+    const legacyKey = getClusterScopedStorageKey(LEGACY_FAVORITES_STORAGE_KEY)
+    if (localStorage.getItem(key) === null) {
+      const legacy = localStorage.getItem(legacyKey)
+      if (legacy !== null) {
+        localStorage.setItem(key, legacy)
+        localStorage.removeItem(legacyKey)
+      }
+    }
+  } catch {
+    // Storage unavailable; fall through and read nothing.
+  }
+}
 
 /**
  * Get favorites from localStorage
  */
 export const getFavorites = (): SearchResult[] => {
   try {
+    migrateLegacyFavorites()
     const favorites = localStorage.getItem(
       getClusterScopedStorageKey(FAVORITES_STORAGE_KEY)
     )

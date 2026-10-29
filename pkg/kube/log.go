@@ -8,7 +8,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/zxh326/kite/pkg/wsutil"
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/klog/v2"
 )

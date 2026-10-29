@@ -38,14 +38,14 @@ func GenerateManifestWithPermission(serverURL, token, publicKey, image, permissi
 	bindingManifest := fmt.Sprintf(`apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kite-cluster-agent
+  name: kube-osprey-cluster-agent
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: %s
 subjects:
   - kind: ServiceAccount
-    name: kite-cluster-agent
+    name: kube-osprey-cluster-agent
     namespace: kube-system`, roleNameJSON)
 	if roleManifest != "" {
 		bindingManifest = roleManifest + "\n---\n" + bindingManifest
@@ -54,7 +54,7 @@ subjects:
 	return fmt.Sprintf(`apiVersion: v1
 kind: Secret
 metadata:
-  name: kite-cluster-agent-token
+  name: kube-osprey-cluster-agent-token
   namespace: kube-system
 type: Opaque
 stringData:
@@ -63,7 +63,7 @@ stringData:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kite-cluster-agent
+  name: kube-osprey-cluster-agent
   namespace: kube-system
 ---
 %s
@@ -71,38 +71,38 @@ metadata:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kite-cluster-agent
+  name: kube-osprey-cluster-agent
   namespace: kube-system
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: kite-cluster-agent
+      app.kubernetes.io/name: kube-osprey-cluster-agent
   template:
     metadata:
       annotations:
-        kite.kubernetes.io/cluster-agent-token-hash: %s
+        kube-osprey.io/cluster-agent-token-hash: %s
       labels:
-        app.kubernetes.io/name: kite-cluster-agent
+        app.kubernetes.io/name: kube-osprey-cluster-agent
     spec:
-      serviceAccountName: kite-cluster-agent
+      serviceAccountName: kube-osprey-cluster-agent
       containers:
         - name: cluster-agent
           image: %s
           command:
-            - /app/kite
+            - /app/kube-osprey
           args:
             - cluster-agent
-            - --server=$(KITE_SERVER)
+            - --server=$(KUBE_OSPREY_SERVER)
             - --token=$(CLUSTER_AGENT_TOKEN)
             - --public-key=$(CLUSTER_AGENT_PUBLIC_KEY)
           env:
-            - name: KITE_SERVER
+            - name: KUBE_OSPREY_SERVER
               value: %s
             - name: CLUSTER_AGENT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: kite-cluster-agent-token
+                  name: kube-osprey-cluster-agent-token
                   key: token
             - name: CLUSTER_AGENT_PUBLIC_KEY
               value: %s
@@ -112,11 +112,11 @@ spec:
 func agentRole(permission, customRole string) (string, string) {
 	switch permission {
 	case "readOnly":
-		return "kite-cluster-agent-readonly", clusterRoleManifest("kite-cluster-agent-readonly", `- apiGroups: ["*"]
+		return "kube-osprey-cluster-agent-readonly", clusterRoleManifest("kube-osprey-cluster-agent-readonly", `- apiGroups: ["*"]
   resources: ["*"]
   verbs: ["get", "list", "watch"]`)
 	case "operator":
-		return "kite-cluster-agent-operator", clusterRoleManifest("kite-cluster-agent-operator", `- apiGroups: [""]
+		return "kube-osprey-cluster-agent-operator", clusterRoleManifest("kube-osprey-cluster-agent-operator", `- apiGroups: [""]
   resources: ["pods"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
 - apiGroups: [""]

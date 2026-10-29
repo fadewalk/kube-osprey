@@ -17,15 +17,15 @@ Using Helm provides flexibility for configuration and upgrades:
 Install from OCI registry:
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace
 ```
 
-The `fullnameOverride` keeps every deployed resource named `kube-osprey` (the chart itself is still published under its upstream-compatible name `kite`).
+Installing under the release name `kube-osprey` names every deployed resource `kube-osprey`.
 
 Or pin a chart version for reproducible installs:
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite --version 0.18.0 -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey --version <chart-version> -n kube-osprey-system --create-namespace
 ```
 
 #### Custom Installation
@@ -37,7 +37,7 @@ For complete configuration, refer to [Chart Values](../config/chart-values).
 Install with custom values:
 
 ```bash
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system -f values.yaml --set fullnameOverride=kube-osprey
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system -f values.yaml
 ```
 
 ### Method 2: YAML Manifest
@@ -129,7 +129,7 @@ basePath: "/kube-osprey"
 - Or with Helm CLI:
 
 ```fish
-helm install kube-osprey oci://ghcr.io/fadewalk/charts/kite -n kube-osprey-system --create-namespace --set fullnameOverride=kube-osprey --set basePath="/kube-osprey"
+helm install kube-osprey oci://ghcr.io/fadewalk/charts/kube-osprey -n kube-osprey-system --create-namespace --set basePath="/kube-osprey"
 ```
 
 Important notes:
@@ -147,7 +147,7 @@ ingress:
 ```
 
 - OAuth / redirects: if you enable OAuth (or any external redirect flows), update the redirect URLs in your OAuth provider to include the base path, e.g. `https://kube-osprey.example.com/kube-osprey/oauth/callback`.
-- Environment overrides: if you provide environment variables via `extraEnvs` or an existing secret, ensure `KITE_BASE` is set consistently with the `basePath` value (otherwise behavior may differ).
+- Environment overrides: if you provide environment variables via `extraEnvs` or an existing secret, ensure `KUBE_OSPREY_BASE` is set consistently with the `basePath` value (otherwise behavior may differ).
 
 ## Verifying Installation
 

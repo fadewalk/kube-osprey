@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/zxh326/kite/pkg/helmutil"
-	"github.com/zxh326/kite/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	repo "helm.sh/helm/v4/pkg/repo/v1"
 )
 

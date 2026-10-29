@@ -1,45 +1,45 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: kite
+  name: kube-osprey
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: cluster-admin
 subjects:
   - kind: ServiceAccount
-    name: kite
+    name: kube-osprey
     namespace: kube-system
 ---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
-  name: kite
+  name: kube-osprey
   namespace: kube-system
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: kite
-  name: kite
+    app: kube-osprey
+  name: kube-osprey
   namespace: kube-system
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kite
+      app: kube-osprey
   strategy: {}
   template:
     metadata:
       labels:
-        app: kite
+        app: kube-osprey
     spec:
-      serviceAccountName: kite
+      serviceAccountName: kube-osprey
       containers:
         - image: ghcr.io/kite-org/kite:latest
           imagePullPolicy: IfNotPresent
-          name: kite
+          name: kube-osprey
           resources:
             limits:
               cpu: 1000m
@@ -67,8 +67,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: kite
-  name: kite
+    app: kube-osprey
+  name: kube-osprey
   namespace: kube-system
 spec:
   ports:
@@ -77,5 +77,5 @@ spec:
       protocol: TCP
       targetPort: 8080
   selector:
-    app: kite
+    app: kube-osprey
   type: ClusterIP

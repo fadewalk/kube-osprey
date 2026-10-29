@@ -9,15 +9,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 )
 
-const kiteBasePlaceholder = "__KITE_BASE__"
+const basePlaceholder = "__KUBE_OSPREY_BASE__"
 
-func InjectKiteBase(htmlContent string, base string) string {
+func InjectBase(htmlContent string, base string) string {
 	assetBase := base
 	if assetBase == "/" {
 		assetBase = ""
 	}
 
-	htmlContent = strings.ReplaceAll(htmlContent, kiteBasePlaceholder, html.EscapeString(assetBase))
+	htmlContent = strings.ReplaceAll(htmlContent, basePlaceholder, html.EscapeString(assetBase))
 
 	baseScript := fmt.Sprintf(`<script>window.__dynamic_base__=%q;</script>`, assetBase)
 	re := regexp.MustCompile(`<head>`)

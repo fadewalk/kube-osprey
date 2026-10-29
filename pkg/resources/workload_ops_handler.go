@@ -11,10 +11,10 @@ import (
 	k8stypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 )
 
 // workloadKinds maps the URL kind to its apps/v1 Kind. Only scalable
@@ -154,7 +154,7 @@ func RestartWorkload(c *gin.Context) {
 		annotations = map[string]string{}
 	}
 	annotations[common.KubectlAnnotation] = ""
-	annotations["kite.kubernetes.io/restartedAt"] = time.Now().Format(time.RFC3339)
+	annotations["kube-osprey.io/restartedAt"] = time.Now().Format(time.RFC3339)
 	if err := unstructured.SetNestedStringMap(obj.Object, annotations, "spec", "template", "metadata", "annotations"); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

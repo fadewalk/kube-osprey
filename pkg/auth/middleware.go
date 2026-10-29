@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"k8s.io/klog/v2"
 )
 
 func (h *AuthHandler) RequireAPIKeyAuth(c *gin.Context, token string) {
@@ -65,7 +66,12 @@ func (h *AuthHandler) RequireAuth() gin.HandlerFunc {
 		}
 		authHeader := c.GetHeader("Authorization")
 		if authHeader != "" {
+			if after, ok := strings.CutPrefix(authHeader, "kubeosprey"); ok {
+				h.RequireAPIKeyAuth(c, after)
+				return
+			}
 			if after, ok := strings.CutPrefix(authHeader, "kite"); ok {
+				klog.Warningf("API keys with the legacy \"kite\" prefix are deprecated; re-issue the key to migrate to the \"kubeosprey\" prefix")
 				h.RequireAPIKeyAuth(c, after)
 				return
 			}

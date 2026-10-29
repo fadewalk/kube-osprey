@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/clusteragent"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/clusteragent"
-	"github.com/zxh326/kite/pkg/model"
 )
 
 func TestGetClusterAgentManifest(t *testing.T) {
@@ -55,7 +55,7 @@ func TestGetClusterAgentManifest(t *testing.T) {
 		"kind: ServiceAccount",
 		"kind: ClusterRoleBinding",
 		"kind: Deployment",
-		"kite-cluster-agent",
+		"kube-osprey-cluster-agent",
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("manifest missing %q:\n%s", want, body)
@@ -231,7 +231,7 @@ func TestCreateClusterAgentClusterServerURLDerivation(t *testing.T) {
 	body := strings.NewReader(`{"name":"agent-fwd","clusterAgent":true}`)
 	req := httptest.NewRequest(http.MethodPost, "/clusters", body)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Forwarded-Host", "kite.example.com")
+	req.Header.Set("X-Forwarded-Host", "kube-osprey.example.com")
 	req.Header.Set("X-Forwarded-Proto", "https")
 	router.ServeHTTP(rec, req)
 	if rec.Code != http.StatusCreated {
@@ -243,8 +243,8 @@ func TestCreateClusterAgentClusterServerURLDerivation(t *testing.T) {
 		t.Fatalf("decoding response: %v", err)
 	}
 	serverURL, _ := result["clusterAgentServer"].(string)
-	if !strings.HasPrefix(serverURL, "https://kite.example.com") {
-		t.Errorf("serverURL = %q, want https://kite.example.com prefix", serverURL)
+	if !strings.HasPrefix(serverURL, "https://kube-osprey.example.com") {
+		t.Errorf("serverURL = %q, want https://kube-osprey.example.com prefix", serverURL)
 	}
 }
 

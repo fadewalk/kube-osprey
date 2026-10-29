@@ -17,10 +17,10 @@ import (
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
 
-	"github.com/zxh326/kite/pkg/ai"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/notify"
+	"github.com/fadewalk/kube-osprey/pkg/ai"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/notify"
 )
 
 // DefaultServiceTTL matches the model default; overridable in tests.

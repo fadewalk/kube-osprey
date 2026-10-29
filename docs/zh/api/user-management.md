@@ -44,7 +44,7 @@ GET /api/v1/admin/users/
 
 ```bash
 curl \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   "https://kube-osprey.example.com/api/v1/admin/users/?page=1&size=20&search=alice&sortOrder=desc"
 ```
 
@@ -98,7 +98,7 @@ Content-Type: application/json
 ```bash
 curl \
   -X POST \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"username":"alice","password":"change-me","name":"Alice"}' \
   https://kube-osprey.example.com/api/v1/admin/users/
@@ -125,7 +125,7 @@ Content-Type: application/json
 ```bash
 curl \
   -X PUT \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   -H "Content-Type: application/json" \
   -d '{"name":"Alice Zhang"}' \
   https://kube-osprey.example.com/api/v1/admin/users/12
@@ -142,7 +142,7 @@ DELETE /api/v1/admin/users/:id
 ```bash
 curl \
   -X DELETE \
-  -H "Authorization: kite1-adminsecret" \
+  -H "Authorization: kubeosprey1-adminsecret" \
   https://kube-osprey.example.com/api/v1/admin/users/12
 ```
 

@@ -7,11 +7,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -115,13 +115,13 @@ func TestPasswordLoginHonorsMFAAndGlobalDisable(t *testing.T) {
 func setupAuthIntegrationDB(t *testing.T) *model.User {
 	t.Helper()
 	originalDB := model.DB
-	originalEncryptKey := common.KiteEncryptKey
+	originalEncryptKey := common.EncryptKey
 	originalJWTSecret := common.JwtSecret
 	originalVersionCheck := common.EnableVersionCheck
 	originalRBACConfig := rbac.RBACConfig
 	originalLimiter := credentialLoginAttempts
 
-	common.KiteEncryptKey = "auth-integration-test-key"
+	common.EncryptKey = "auth-integration-test-key"
 	common.JwtSecret = "auth-integration-test-jwt-secret"
 	common.EnableVersionCheck = true
 	credentialLoginAttempts = &credentialLoginAttemptLimiter{attempts: map[string]credentialLoginAttemptState{}}
@@ -171,7 +171,7 @@ func setupAuthIntegrationDB(t *testing.T) *model.User {
 			_ = sqlDB.Close()
 		}
 		model.DB = originalDB
-		common.KiteEncryptKey = originalEncryptKey
+		common.EncryptKey = originalEncryptKey
 		common.JwtSecret = originalJWTSecret
 		common.EnableVersionCheck = originalVersionCheck
 		rbac.RBACConfig = originalRBACConfig

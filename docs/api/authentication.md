@@ -113,13 +113,15 @@ When KubeOsprey runs behind an ingress or load balancer, the client IP used by t
 The full API key format is:
 
 ```text
-kite<ID>-<SECRET>
+kubeosprey<ID>-<SECRET>
 ```
 
 Use the full value directly in the `Authorization` header. Do not prepend `Bearer`.
 
+Keys issued before the `kubeosprey` prefix was introduced (`kite<ID>-<SECRET>`) keep working; re-issuing a key in **Settings -> API Keys** migrates it to the new prefix.
+
 ```http
-Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ## Where to configure it
@@ -143,7 +145,7 @@ Example:
 
 ```bash
 curl \
-  -H "Authorization: kite12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
+  -H "Authorization: kubeosprey12-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" \
   -H "x-cluster-name: demo-cluster" \
   https://kube-osprey.example.com/api/v1/pods/default
 ```

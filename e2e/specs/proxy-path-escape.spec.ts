@@ -16,8 +16,8 @@ import { kindClusterName } from '../env'
 //   2. kube/proxy.go passed the decoded path to url.JoinPath, which lexically
 //      cleans .. and lets the attacker escape the /proxy/ segment.
 //   3. The cleaned URL (e.g. /api/v1/namespaces/kube-system/secrets) is sent
-//      to the Kubernetes API server using Kite's own SA credentials
-//      (charts/kite/values.yaml grants resources:["*"], verbs:["*"]).
+//      to the Kubernetes API server using KubeOsprey's own SA credentials
+//      (charts/kube-osprey/values.yaml grants resources:["*"], verbs:["*"]).
 //   4. handler.go only checks pods/services:get on the source namespace,
 //      so a reader with pods:get in "default" can read secrets in kube-system.
 //
@@ -150,7 +150,7 @@ test('proxy path escape via encoded .. cannot bypass RBAC to read secrets', asyn
       data: {
         apiVersion: 'v1',
         kind: 'Pod',
-        metadata: { name: podName, labels: { 'e2e.kite.io/test': suffix } },
+        metadata: { name: podName, labels: { 'e2e.kube-osprey.io/test': suffix } },
         spec: {
           containers: [
             { name: 'pause', image: 'registry.k8s.io/pause:3.10.1' },
@@ -235,14 +235,14 @@ test('proxy path escape via encoded .. cannot bypass RBAC to read secrets', asyn
 
     // --- Exploit: encoded .. to escape /proxy/ → /api/v1/namespaces/kube-system/secrets
     //
-    // URL sent to Kite:
+    // URL sent to KubeOsprey:
     //   /api/v1/_clusters/<cluster>/namespaces/default/pods/<pod>/proxy/%2e%2e/%2e%2e/%2e%2e/%2e%2e/kube-system/secrets
     //
     // Gin exposes the decoded .. segments to kube/proxy.go, which previously
     // called url.JoinPath(host, "api/v1/namespaces", "default", "pods", <pod>,
     // "proxy", "/../../../../kube-system/secrets") and cleaned it to
     //   <k8s-api-host>/api/v1/namespaces/kube-system/secrets
-    // and is sent under Kite's SA (cluster-admin by default chart).
+    // and is sent under KubeOsprey's SA (cluster-admin by default chart).
     const dotdot = '%2e%2e'
     const escapeDepth = 4 // proxy -> pods -> default -> namespaces/
     const exploitPath = `${clusterPath}/namespaces/default/pods/${encodeURIComponent(
@@ -345,7 +345,7 @@ test('proxy path escape via encoded .. cannot bypass RBAC to read secrets', asyn
 
     // --- Sanity: a legitimate (non-escaping) proxy path is still usable ------
     // The pod runs pause, so Kubernetes may return an upstream 400/404/503.
-    // Verify the request was not rejected by Kite's proxy-path validation or
+    // Verify the request was not rejected by KubeOsprey's proxy-path validation or
     // RBAC before reaching Kubernetes.
     const legitimatePath = `${clusterPath}/namespaces/default/pods/${encodeURIComponent(
       podName

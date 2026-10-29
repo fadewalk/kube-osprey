@@ -398,7 +398,7 @@ export function AuthenticationManagement() {
                           bindDn: e.target.value,
                         }))
                       }
-                      placeholder="cn=svc-kite,ou=services,dc=example,dc=com"
+                      placeholder="cn=svc-kube-osprey,ou=services,dc=example,dc=com"
                     />
                   </div>
 

@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/mfa"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/passkey"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/mfa"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/passkey"
-	"github.com/zxh326/kite/pkg/rbac"
 	"gorm.io/gorm"
 	"k8s.io/klog/v2"
 )

@@ -9,8 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/model"
 	"k8s.io/klog/v2"
 )
 

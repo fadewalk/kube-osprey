@@ -7,10 +7,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -98,11 +98,11 @@ func TestHandleUpdateGeneralSettingRejectsUnsafeAIConfiguration(t *testing.T) {
 func setupGeneralSettingTestDB(t *testing.T, apiKey string) {
 	t.Helper()
 	originalDB := model.DB
-	originalEncryptKey := common.KiteEncryptKey
+	originalEncryptKey := common.EncryptKey
 	originalJWTSecret := common.JwtSecret
 	originalVersionCheck := common.EnableVersionCheck
 
-	common.KiteEncryptKey = "settings-handler-test-key"
+	common.EncryptKey = "settings-handler-test-key"
 	common.JwtSecret = "settings-handler-test-jwt-secret"
 	common.EnableVersionCheck = true
 
@@ -138,7 +138,7 @@ func setupGeneralSettingTestDB(t *testing.T, apiKey string) {
 			_ = sqlDB.Close()
 		}
 		model.DB = originalDB
-		common.KiteEncryptKey = originalEncryptKey
+		common.EncryptKey = originalEncryptKey
 		common.JwtSecret = originalJWTSecret
 		common.EnableVersionCheck = originalVersionCheck
 	})

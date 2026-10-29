@@ -9,10 +9,10 @@ KubeOsprey 不收集任何分析或遥测数据。上游 Kite 中可选的使用
 如果在访问资源时，遇到如下错误提示，
 
 ```txt
-用户 admin 没有权限在集群 in-cluster 的命名空间 kite 中执行 获取 configmaps
+用户 admin 没有权限在集群 in-cluster 的命名空间 kube-osprey 中执行 获取 configmaps
 ```
 
-表示用户 `admin` 没有权限访问 `kite` 命名空间中的 `configmaps` 资源。
+表示用户 `admin` 没有权限访问 `kube-osprey` 命名空间中的 `configmaps` 资源。
 
 你需要参考 [RBAC 配置指南](./config/rbac-config) 来配置用户的权限。
 

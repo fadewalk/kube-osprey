@@ -7,19 +7,19 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/kube"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/utils"
-	"github.com/zxh326/kite/pkg/wsutil"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/kube"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
+	"github.com/fadewalk/kube-osprey/pkg/wsutil"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/zxh326/kite/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/common"
 )
 
 const clusterAdminRole = "cluster-admin"
@@ -159,9 +159,9 @@ func (h *KubectlTerminalHandler) HandleKubectlTerminalWebSocket(c *gin.Context) 
 
 func (h *KubectlTerminalHandler) ensureSessionAccess(ctx context.Context, cs *cluster.ClientSet, serviceAccountName, sessionID, permissionMode, clusterRole string) error {
 	labels := map[string]string{
-		"app.kubernetes.io/managed-by": "kite",
-		"kite.io/component":            "kubectl-terminal",
-		"kite.io/kubectl-session":      sessionID,
+		"app.kubernetes.io/managed-by":   "kite",
+		"kube-osprey.io/component":       "kubectl-terminal",
+		"kube-osprey.io/kubectl-session": sessionID,
 	}
 	sa := &corev1.ServiceAccount{ObjectMeta: metav1.ObjectMeta{Name: serviceAccountName, Namespace: common.AgentPodNamespace, Labels: labels}}
 	if err := cs.K8sClient.Create(ctx, sa); err != nil {
@@ -228,9 +228,9 @@ func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *clu
 			Name:      podName,
 			Namespace: common.AgentPodNamespace,
 			Labels: map[string]string{
-				"app.kubernetes.io/managed-by": "kite",
-				"kite.io/component":            "kubectl-terminal",
-				"kite.io/kubectl-session":      instanceID,
+				"app.kubernetes.io/managed-by":   "kite",
+				"kube-osprey.io/component":       "kubectl-terminal",
+				"kube-osprey.io/kubectl-session": instanceID,
 			},
 		},
 		Spec: corev1.PodSpec{
@@ -263,10 +263,16 @@ func (h *KubectlTerminalHandler) createKubectlAgent(ctx context.Context, cs *clu
 // cleanupPod deletes only the per-session pod.
 func (h *KubectlTerminalHandler) cleanupPod(cs *cluster.ClientSet, instanceID string) error {
 	ctx := context.TODO()
-	opts := []client.DeleteAllOfOption{
+	base := []client.DeleteAllOfOption{
 		client.InNamespace(common.AgentPodNamespace),
-		client.MatchingLabels{"kite.io/kubectl-session": instanceID},
 		client.PropagationPolicy(metav1.DeletePropagationBackground),
 	}
-	return cs.K8sClient.DeleteAllOf(ctx, &corev1.Pod{}, opts...)
+	// Pods created before the identifier rename carry the legacy label.
+	for _, label := range []string{"kube-osprey.io/kubectl-session", "kite.io/kubectl-session"} {
+		opts := append(append([]client.DeleteAllOfOption{}, base...), client.MatchingLabels{label: instanceID})
+		if err := cs.K8sClient.DeleteAllOf(ctx, &corev1.Pod{}, opts...); err != nil {
+			return err
+		}
+	}
+	return nil
 }

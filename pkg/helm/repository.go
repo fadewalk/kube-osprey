@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/helmutil"
-	"github.com/zxh326/kite/pkg/model"
 	"helm.sh/helm/v4/pkg/registry"
 )
 

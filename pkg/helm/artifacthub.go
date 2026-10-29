@@ -250,7 +250,7 @@ func fetchArtifactHubWithHeaders(c *gin.Context, targetURL string) ([]byte, http
 	if err != nil {
 		return nil, nil, err
 	}
-	req.Header.Set("User-Agent", "kite")
+	req.Header.Set("User-Agent", "kube-osprey")
 
 	client := http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)

@@ -10,9 +10,9 @@ import (
 	"time"
 
 	semver "github.com/blang/semver/v4"
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/helmutil"
-	"github.com/zxh326/kite/pkg/model"
 	"helm.sh/helm/v4/pkg/chart/common"
 	chart "helm.sh/helm/v4/pkg/chart/v2"
 	chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
@@ -180,7 +180,7 @@ func (h *HelmChartHandler) ExportChart(c *gin.Context) {
 		return
 	}
 
-	tmpDir, err := os.MkdirTemp("", "kite-helm-export-")
+	tmpDir, err := os.MkdirTemp("", "kube-osprey-helm-export-")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create export workspace"})
 		return

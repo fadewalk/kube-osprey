@@ -3,10 +3,17 @@
 KubeOsprey is a single-binary Kubernetes console: Go backend, React/Vite frontend in
 `ui/`, and built frontend assets embedded from `static/`.
 
-It is a brand-level fork of `kite-org/kite`: the Go module path
-(`github.com/zxh326/kite`), `KITE_*` environment variables, and `charts/kite`
-keep their original names so upstream changes keep merging cleanly. Do not
-rename them.
+It began as a fork of `kite-org/kite` but has fully diverged: the Go module
+path is `github.com/fadewalk/kube-osprey`, environment variables use the
+`KUBE_OSPREY_*` prefix, and the chart lives at `charts/kube-osprey` (published
+as `oci://ghcr.io/fadewalk/charts/kube-osprey`). Do not reintroduce `kite`
+identifiers. A small set of compatibility shims and external contracts keep
+the legacy names and must stay: `KITE_*` env vars and the `kite<ID>-` API key
+prefix are still accepted (deprecation warning), `requires.kite` in plugin
+manifests and the SDK-pinned federation names (`@kite-dev/plugin-sdk`,
+`kite_plugin_*`, `kite-plugin-*` i18n namespace, host name `kite`) are read
+as-is, and `charts.kitehq.dev` / `plugins.kitehq.dev` are external upstream
+services.
 
 ## Scope
 

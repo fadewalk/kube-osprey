@@ -9,7 +9,7 @@ KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户
 向用户开放 KubeOsprey 前，请确认：
 
 - KubeOsprey、OAuth/OIDC 回调、Cluster Agent 连接和 WebSocket 流量均使用 HTTPS。
-- 设置高熵的 `KITE_ENCRYPT_KEY` 并存储在外部 Secret 中，不要使用开发文档中的公开示例值。
+- 设置高熵的 `KUBE_OSPREY_ENCRYPT_KEY` 并存储在外部 Secret 中，不要使用开发文档中的公开示例值。
 - 如果需要重启后或多副本之间保持会话稳定，请显式设置 `JWT_SECRET`。
 - 设置 `ANONYMOUS_USER_ENABLED=false`，并验证匿名访问已关闭。
 - 将 `TRUSTED_PROXIES` 限制为实际的反向代理地址，不要信任任意客户端转发头。
@@ -21,13 +21,13 @@ KubeOsprey 是 Kubernetes 控制面。它可以创建高权限 Kubernetes 客户
 
 ## 密钥与加密
 
-数据库中的 `SecretString` 字段包括 kubeconfig、OAuth/LDAP 密钥、Helm 仓库密码、API Key、MFA Secret 和 Cluster Agent 私钥等凭据，它们使用 `KITE_ENCRYPT_KEY` 加密。
+数据库中的 `SecretString` 字段包括 kubeconfig、OAuth/LDAP 密钥、Helm 仓库密码、API Key、MFA Secret 和 Cluster Agent 私钥等凭据，它们使用 `KUBE_OSPREY_ENCRYPT_KEY` 加密。
 
-启动时会校验 `KITE_ENCRYPT_KEY`：密钥不能为空、长度至少 32 个字符、且不能等于内置的开发用默认值，否则服务拒绝启动。仅本地开发环境可以设置 `KITE_ALLOW_INSECURE_DEFAULTS=true` 跳过默认值检查。
+启动时会校验 `KUBE_OSPREY_ENCRYPT_KEY`：密钥不能为空、长度至少 32 个字符、且不能等于内置的开发用默认值，否则服务拒绝启动。仅本地开发环境可以设置 `KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true` 跳过默认值检查。
 
 `TRUSTED_PROXIES` 建议配置为实际反向代理的网段或 IP；设置为 `none` 表示忽略所有客户端转发头。
 
-用户密码使用单向密码哈希保存，不能通过 `KITE_ENCRYPT_KEY` 恢复。
+用户密码使用单向密码哈希保存，不能通过 `KUBE_OSPREY_ENCRYPT_KEY` 恢复。
 
 建议使用已有 Kubernetes Secret：
 
@@ -70,7 +70,7 @@ Cluster Agent Manifest 支持权限档位：
 
 默认档位为 `admin`（向后兼容）；生产环境建议使用 `operator` 或 `readOnly`。注意 `operator` 档位可以读 Secrets（KubeOsprey 控制台的 Secret 页面和 Helm Release 浏览依赖 Secret 数据）；如不可接受请使用 `custom`。
 
-Kubernetes 中 ClusterRoleBinding 的 `roleRef` 不可修改。切换已有 Cluster Agent 的权限档位时，必须先删除 `kite-cluster-agent` ClusterRoleBinding，再应用新 Manifest。
+Kubernetes 中 ClusterRoleBinding 的 `roleRef` 不可修改。切换已有 Cluster Agent 的权限档位时，必须先删除已有的 Cluster Agent ClusterRoleBinding，再应用新 Manifest（新安装名为 `kube-osprey-cluster-agent`；从更名前版本升级的安装为 `kite-cluster-agent`）。
 
 ## 终端与 exec 能力
 
@@ -113,7 +113,7 @@ PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Pro
 - 怀疑泄露后及时轮换或吊销 Agent Token；
 - 应用 Manifest 前验证 Agent 镜像和 digest；
 - 应用前检查 ServiceAccount、ClusterRoleBinding、Secret 和 Deployment；
-- 切换权限档位时，先删除已有的 `kite-cluster-agent` ClusterRoleBinding（`roleRef` 无法原地更新）；
+- 切换权限档位时，先删除已有的 ClusterRoleBinding（`roleRef` 无法原地更新；新安装名为 `kube-osprey-cluster-agent`，从更名前版本升级的安装为 `kite-cluster-agent`）；
 - 确保反向代理支持 WebSocket Upgrade 和长连接；
 - 多副本部署前验证会话路由和共享状态。
 
@@ -122,8 +122,8 @@ PromQL Explorer 是集群级可观测性工具。只有允许查询配置的 Pro
 检查 Chart：
 
 ```bash
-helm lint charts/kite
-helm template kube-osprey charts/kite --namespace kube-osprey-system
+helm lint charts/kube-osprey
+helm template kube-osprey charts/kube-osprey --namespace kube-osprey-system
 bash scripts/validate-chart.sh
 ```
 

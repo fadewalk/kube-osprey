@@ -6,9 +6,9 @@ import { authFile } from './env'
 
 const e2eDir = dirname(fileURLToPath(import.meta.url))
 const repoRoot = resolve(e2eDir, '..')
-const port = process.env.KITE_E2E_PORT || '38080'
-const baseURL = process.env.KITE_E2E_BASE_URL || `http://127.0.0.1:${port}`
-const useSystemChrome = process.env.KITE_E2E_USE_SYSTEM_CHROME === 'true'
+const port = process.env.KUBE_OSPREY_E2E_PORT || '38080'
+const baseURL = process.env.KUBE_OSPREY_E2E_BASE_URL || `http://127.0.0.1:${port}`
+const useSystemChrome = process.env.KUBE_OSPREY_E2E_USE_SYSTEM_CHROME === 'true'
 
 export default defineConfig({
   testDir: '.',
@@ -32,7 +32,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: useSystemChrome ? 'off' : 'retain-on-failure',
   },
-  webServer: process.env.KITE_E2E_BASE_URL
+  webServer: process.env.KUBE_OSPREY_E2E_BASE_URL
     ? undefined
     : {
         command: './scripts/e2e-start-app.sh',

@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
 	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
-	"github.com/zxh326/kite/pkg/cluster"
 )
 
 func executeQueryPrometheus(ctx context.Context, cs *cluster.ClientSet, args map[string]interface{}) (string, bool) {

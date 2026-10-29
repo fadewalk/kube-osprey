@@ -279,7 +279,7 @@ export function ClusterManagement() {
       if (clusterAgentServer && clusterAgentToken && clusterAgentPublicKey) {
         setClusterAgentCopyError(null)
         setClusterAgentCommand(
-          `kite cluster-agent --server='${clusterAgentServer}' --token='${clusterAgentToken}' --public-key='${clusterAgentPublicKey}'`
+          `kube-osprey cluster-agent --server='${clusterAgentServer}' --token='${clusterAgentToken}' --public-key='${clusterAgentPublicKey}'`
         )
         setClusterAgentYaml('')
         setClusterAgentYamlError(null)
@@ -718,7 +718,7 @@ export function ClusterManagement() {
         resourceType="cluster"
         additionalNote={t(
           'clusterManagement.deleteConfirmation',
-          "This action will only remove the current cluster's configuration in kite and will not delete any cluster resources."
+          "This action will only remove the current cluster's configuration in KubeOsprey and will not delete any cluster resources."
         )}
       />
     </div>

@@ -14,11 +14,11 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 
-	"github.com/zxh326/kite/pkg/ai"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/ai"
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -810,14 +810,14 @@ func accessTools() []toolDef {
 		},
 		{
 			name:        "check_permission",
-			description: "Check whether the current user may perform a verb on a resource, evaluated against Kite RBAC.",
+			description: "Check whether the current user may perform a verb on a resource, evaluated against KubeOsprey RBAC.",
 			schema: `{"type":"object","properties":{` +
 				`"cluster":{"type":"string","description":"Cluster name. Omit for the default cluster."},` +
 				`"verb":{"type":"string","description":"Verb such as get, list, create, update, delete."},` +
 				`"resource":{"type":"string","description":"Resource plural, e.g. pods, deployments."},` +
 				`"namespace":{"type":"string","description":"Namespace scope. Omit for all namespaces."}},` +
 				`"required":["verb","resource"]}`,
-			// Kite RBAC is application-level; evaluating it must not require a
+			// KubeOsprey RBAC is application-level; evaluating it must not require a
 			// connected cluster.
 			permissions: func(context.Context, *toolContext, map[string]any) ([]toolPermission, error) {
 				return nil, nil

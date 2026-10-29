@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
 )
 
 func TestGetRequestHost(t *testing.T) {
@@ -18,7 +18,7 @@ func TestGetRequestHost(t *testing.T) {
 	})
 
 	t.Run("configured host overrides request", func(t *testing.T) {
-		common.Host = "https://kite.example.com"
+		common.Host = "https://kube-osprey.example.com"
 		c, _ := gin.CreateTestContext(httptest.NewRecorder())
 		c.Request = httptest.NewRequest(http.MethodGet, "http://ignored.local", nil)
 
@@ -32,29 +32,29 @@ func TestGetRequestHost(t *testing.T) {
 		c, _ := gin.CreateTestContext(httptest.NewRecorder())
 		req := httptest.NewRequest(http.MethodGet, "http://internal.local", nil)
 		req.Header.Set("X-Forwarded-Proto", "https")
-		req.Header.Set("X-Forwarded-Host", "kite.example.com")
+		req.Header.Set("X-Forwarded-Host", "kube-osprey.example.com")
 		c.Request = req
 
-		if got := getRequestHost(c); got != "https://kite.example.com" {
-			t.Fatalf("getRequestHost() = %q, want %q", got, "https://kite.example.com")
+		if got := getRequestHost(c); got != "https://kube-osprey.example.com" {
+			t.Fatalf("getRequestHost() = %q, want %q", got, "https://kube-osprey.example.com")
 		}
 	})
 
 	t.Run("request host and scheme", func(t *testing.T) {
 		common.Host = ""
 		c, _ := gin.CreateTestContext(httptest.NewRecorder())
-		req := httptest.NewRequest(http.MethodGet, "http://kite.local", nil)
+		req := httptest.NewRequest(http.MethodGet, "http://kube-osprey.local", nil)
 		c.Request = req
 
-		if got := getRequestHost(c); got != "http://kite.local" {
-			t.Fatalf("getRequestHost() = %q, want %q", got, "http://kite.local")
+		if got := getRequestHost(c); got != "http://kube-osprey.local" {
+			t.Fatalf("getRequestHost() = %q, want %q", got, "http://kube-osprey.local")
 		}
 	})
 
 	t.Run("fallback", func(t *testing.T) {
 		common.Host = ""
 		c, _ := gin.CreateTestContext(httptest.NewRecorder())
-		c.Request = httptest.NewRequest(http.MethodGet, "http://kite.local", nil)
+		c.Request = httptest.NewRequest(http.MethodGet, "http://kube-osprey.local", nil)
 		c.Request.Host = ""
 
 		if got := getRequestHost(c); got != "http://localhost" {
@@ -92,8 +92,8 @@ func TestGenerateAndValidateJWT(t *testing.T) {
 	if claims.RefreshToken != "refresh-token" {
 		t.Fatalf("ValidateJWT() refresh token = %q, want %q", claims.RefreshToken, "refresh-token")
 	}
-	if claims.Issuer != "Kite" {
-		t.Fatalf("ValidateJWT() issuer = %q, want %q", claims.Issuer, "Kite")
+	if claims.Issuer != "KubeOsprey" {
+		t.Fatalf("ValidateJWT() issuer = %q, want %q", claims.Issuer, "KubeOsprey")
 	}
 }
 

@@ -86,16 +86,16 @@ jobs:
       - name: Login Helm to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
 
-      # Chart version is stamped from the release tag so charts/kite/Chart.yaml
+      # Chart version is stamped from the release tag so charts/kube-osprey/Chart.yaml
       # stays as upstream ships it and keeps merging cleanly.
       - name: Package Helm chart
         run: |
           TAG_NAME=${{ steps.check_version.outputs.tag_name }}
-          helm package charts/kite/ --version "${TAG_NAME#v}" --app-version "$TAG_NAME"
+          helm package charts/kube-osprey/ --version "${TAG_NAME#v}" --app-version "$TAG_NAME"
 
       - name: Push Helm chart to OCI registry
         run: |
-          CHART_PACKAGE=$(ls kite-*.tgz)
+          CHART_PACKAGE=$(ls kube-osprey-*.tgz)
           helm push "$CHART_PACKAGE" oci://ghcr.io/${{ github.repository_owner }}/charts
 
       - name: Create Release
@@ -108,7 +108,7 @@ jobs:
           generate_release_notes: true
           files: |
             bin/kube-osprey-*-${{ steps.check_version.outputs.tag_name }}.tar.gz
-            kite-*.tgz
+            kube-osprey-*.tgz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -131,7 +131,7 @@ jobs:
           VERSION=$(echo $TAG_NAME | sed 's/^v//')
 
           # Download the helm chart from the release
-          gh release download $TAG_NAME --pattern "kite-$VERSION.tgz"
+          gh release download $TAG_NAME --pattern "kube-osprey-$VERSION.tgz"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

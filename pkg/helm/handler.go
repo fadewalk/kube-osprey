@@ -3,8 +3,8 @@ package helm
 import (
 	"sync"
 
+	"github.com/fadewalk/kube-osprey/pkg/helmutil"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/helmutil"
 )
 
 type HelmChartHandler struct {

@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/fadewalk/kube-osprey/pkg/model"
 	"github.com/go-ldap/ldap/v3"
-	"github.com/zxh326/kite/pkg/model"
 )
 
 var (

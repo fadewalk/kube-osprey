@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/fadewalk/kube-osprey/pkg/cluster"
+	"github.com/fadewalk/kube-osprey/pkg/common"
+	"github.com/fadewalk/kube-osprey/pkg/model"
+	"github.com/fadewalk/kube-osprey/pkg/rbac"
+	"github.com/fadewalk/kube-osprey/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/zxh326/kite/pkg/cluster"
-	"github.com/zxh326/kite/pkg/common"
-	"github.com/zxh326/kite/pkg/model"
-	"github.com/zxh326/kite/pkg/rbac"
-	"github.com/zxh326/kite/pkg/utils"
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -169,7 +169,7 @@ func (h *PodHandler) DebugCopy(c *gin.Context) {
 			Name:      req.CopyTo,
 			Namespace: namespace,
 			Annotations: map[string]string{
-				"kite.io/debug-container": req.TargetContainerName,
+				"kube-osprey.io/debug-container": req.TargetContainerName,
 			},
 		},
 		Spec: *pod.Spec.DeepCopy(),

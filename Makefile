@@ -1,19 +1,19 @@
-# Makefile for Kite project
+# Makefile for KubeOsprey project
 .PHONY: help dev build clean test docker-build docker-run frontend backend install deps e2e-install e2e-install-browser e2e-kind-up e2e-kind-down e2e-stop-app e2e-setup-ldap e2e-setup-dex e2e-run e2e-run-headed e2e-test e2e-test-headed
 
 # Variables
 BINARY_NAME=kube-osprey
 UI_DIR=ui
 E2E_DIR=e2e
-DOCKER_IMAGE=kite
+DOCKER_IMAGE=kube-osprey
 DOCKER_TAG=latest
-E2E_KIND_NAME ?= kite-e2e
+E2E_KIND_NAME ?= kube-osprey-e2e
 E2E_PORT ?= 38080
-E2E_KUBECONFIG ?= $(shell printf '%s' "$${TMPDIR:-/tmp/}kite-e2e.kubeconfig")
-E2E_AUTH_NETWORK ?= kite-e2e-auth
-E2E_LDAP_CONTAINER ?= kite-e2e-ldap
+E2E_KUBECONFIG ?= $(shell printf '%s' "$${TMPDIR:-/tmp/}kube-osprey-e2e.kubeconfig")
+E2E_AUTH_NETWORK ?= kube-osprey-e2e-auth
+E2E_LDAP_CONTAINER ?= kube-osprey-e2e-ldap
 E2E_LDAP_PORT ?= 3389
-E2E_DEX_CONTAINER ?= kite-e2e-dex
+E2E_DEX_CONTAINER ?= kube-osprey-e2e-dex
 E2E_OAUTH_PORT ?= 5556
 SPEC ?=
 
@@ -25,10 +25,10 @@ REPO_URL ?= $(shell scripts/get-repo-url.sh 2>/dev/null)
 
 # Build flags
 LDFLAGS=-ldflags "-s -w \
-	-X 'github.com/zxh326/kite/pkg/version.Version=$(VERSION)' \
-	-X 'github.com/zxh326/kite/pkg/version.BuildDate=$(BUILD_DATE)' \
-	-X 'github.com/zxh326/kite/pkg/version.CommitID=$(COMMIT_ID)' \
-	-X 'github.com/zxh326/kite/pkg/version.RepoURL=$(REPO_URL)'"
+	-X 'github.com/fadewalk/kube-osprey/pkg/version.Version=$(VERSION)' \
+	-X 'github.com/fadewalk/kube-osprey/pkg/version.BuildDate=$(BUILD_DATE)' \
+	-X 'github.com/fadewalk/kube-osprey/pkg/version.CommitID=$(COMMIT_ID)' \
+	-X 'github.com/fadewalk/kube-osprey/pkg/version.RepoURL=$(REPO_URL)'"
 
 # Default target
 .DEFAULT_GOAL := build
@@ -82,7 +82,7 @@ package-release:
 	@echo "🔄 Packaging..."
 	tar -czvf bin/$(BINARY_NAME)-$(shell git describe --tags --match 'v*' | grep -oE 'v[0-9]+\.[0-9][0-9]*(\.[0-9]+)?').tar.gz bin/*
 
-package-binaries: ## Package each kite binary file separately
+package-binaries: ## Package each kube-osprey binary file separately
 	@echo "🔄 Packaging kube-osprey binaries separately..."
 	@VERSION=$$(git describe --tags --match 'v*' | grep -oE 'v[0-9]+\.[0-9][0-9]*(\.[0-9]+)?'); \
 	for file in bin/kube-osprey-*; do \
@@ -115,7 +115,7 @@ dev: ## Run in development mode
 	@echo "🔄 Starting development mode..."
 	@echo "🚀 Starting $(BINARY_NAME) server..."
 	CGO_ENABLED=0 go build -trimpath $(LDFLAGS) -o $(BINARY_NAME) .
-	KITE_ALLOW_INSECURE_DEFAULTS=true ./$(BINARY_NAME) -v=5 & \
+	KUBE_OSPREY_ALLOW_INSECURE_DEFAULTS=true ./$(BINARY_NAME) -v=5 & \
 	BACKEND_PID=$$!; \
 	echo "Backend PID: $$BACKEND_PID"; \
 	trap 'echo "🛑 Stopping backend server..."; kill $$BACKEND_PID 2>/dev/null; exit' INT TERM; \
@@ -190,20 +190,20 @@ e2e-setup-ldap: ## Start the OpenLDAP service used by external-auth e2e
 		--network "$(E2E_AUTH_NETWORK)" \
 		--network-alias ldap \
 		-p "$(E2E_LDAP_PORT):389" \
-		-e LDAP_ORGANISATION="Kite E2E" \
-		-e LDAP_DOMAIN="kite.test" \
+		-e LDAP_ORGANISATION="KubeOsprey E2E" \
+		-e LDAP_DOMAIN="kube-osprey.test" \
 		-e LDAP_ADMIN_PASSWORD="admin" \
 		-e LDAP_CONFIG_PASSWORD="admin" \
 		-e LDAP_TLS="false" \
 		-v "$(CURDIR)/e2e/fixtures/openldap:/container/service/slapd/assets/config/bootstrap/ldif/custom:ro" \
 		osixia/openldap:1.5.0 --copy-service
 	@for i in $$(seq 1 60); do \
-		if docker exec "$(E2E_LDAP_CONTAINER)" ldapsearch -x -H ldap://localhost:389 -b dc=kite,dc=test -D "cn=admin,dc=kite,dc=test" -w admin >/dev/null 2>&1; then \
+		if docker exec "$(E2E_LDAP_CONTAINER)" ldapsearch -x -H ldap://localhost:389 -b dc=kube-osprey,dc=test -D "cn=admin,dc=kube-osprey,dc=test" -w admin >/dev/null 2>&1; then \
 			break; \
 		fi; \
 		sleep 1; \
 	done
-	docker exec "$(E2E_LDAP_CONTAINER)" ldapsearch -x -H ldap://localhost:389 -b dc=kite,dc=test -D "cn=admin,dc=kite,dc=test" -w admin >/dev/null
+	docker exec "$(E2E_LDAP_CONTAINER)" ldapsearch -x -H ldap://localhost:389 -b dc=kube-osprey,dc=test -D "cn=admin,dc=kube-osprey,dc=test" -w admin >/dev/null
 
 e2e-setup-dex: ## Start the Dex service used by external-auth e2e
 	@docker network inspect "$(E2E_AUTH_NETWORK)" >/dev/null 2>&1 || docker network create "$(E2E_AUTH_NETWORK)" >/dev/null
@@ -223,11 +223,11 @@ e2e-setup-dex: ## Start the Dex service used by external-auth e2e
 
 e2e-run: e2e-kind-up e2e-stop-app ## Run e2e tests against the local kind cluster
 	@echo "🧪 Running e2e tests..."
-	cd $(E2E_DIR) && KUBECONFIG="$(E2E_KUBECONFIG)" KITE_E2E_CLUSTER_NAME="$(E2E_KIND_NAME)" KITE_E2E_PORT="$(E2E_PORT)" pnpm exec playwright test $(SPEC)
+	cd $(E2E_DIR) && KUBECONFIG="$(E2E_KUBECONFIG)" KUBE_OSPREY_E2E_CLUSTER_NAME="$(E2E_KIND_NAME)" KUBE_OSPREY_E2E_PORT="$(E2E_PORT)" pnpm exec playwright test $(SPEC)
 
 e2e-run-headed: e2e-kind-up e2e-stop-app ## Run e2e tests in headed mode against the local kind cluster
 	@echo "🧪 Running headed e2e tests..."
-	cd $(E2E_DIR) && KUBECONFIG="$(E2E_KUBECONFIG)" KITE_E2E_CLUSTER_NAME="$(E2E_KIND_NAME)" KITE_E2E_PORT="$(E2E_PORT)" pnpm exec playwright test --headed $(SPEC)
+	cd $(E2E_DIR) && KUBECONFIG="$(E2E_KUBECONFIG)" KUBE_OSPREY_E2E_CLUSTER_NAME="$(E2E_KIND_NAME)" KUBE_OSPREY_E2E_PORT="$(E2E_PORT)" pnpm exec playwright test --headed $(SPEC)
 
 e2e-test: e2e-install e2e-install-browser e2e-run ## Run e2e tests against the local kind cluster
 
