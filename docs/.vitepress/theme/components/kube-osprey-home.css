@@ -3,7 +3,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url("/assets/fonts/cormorant-garamond-latin-400-normal.woff2")
+  src: url("../../../public/assets/fonts/cormorant-garamond-latin-400-normal.woff2")
     format("woff2");
 }
 
@@ -12,7 +12,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: url("/assets/fonts/dm-mono-latin-400-normal.woff2") format("woff2");
+  src: url("../../../public/assets/fonts/dm-mono-latin-400-normal.woff2") format("woff2");
 }
 
 @font-face {
@@ -20,7 +20,7 @@
   font-style: normal;
   font-display: swap;
   font-weight: 500;
-  src: url("/assets/fonts/dm-mono-latin-500-normal.woff2") format("woff2");
+  src: url("../../../public/assets/fonts/dm-mono-latin-500-normal.woff2") format("woff2");
 }
 
 .kite-home {
