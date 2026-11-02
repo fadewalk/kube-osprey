@@ -320,7 +320,7 @@ const copy = computed(() =>
 
         <div class="hero__visual" aria-hidden="true">
           <img
-            src="/assets/cluster-atlas-transparent.png"
+            src="/assets/cluster-atlas-transparent.svg"
             alt=""
             width="1254"
             height="1254"
