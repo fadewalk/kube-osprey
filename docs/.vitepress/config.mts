@@ -1,4 +1,4 @@
-import { defineConfig } from "vitepress";
+import { defineConfig, type HeadConfig } from "vitepress";
 
 // https://vitepress.dev/reference/site-config
 // BASE_PATH is set by the docs deploy workflow; GitHub Pages serves the
@@ -22,20 +22,20 @@ export default defineConfig({
 
   lastUpdated: true,
 
-  // Preload the home page fonts with the configured base; frontmatter head
-  // values are static and cannot express the base path.
+  // Static `head` entries cannot express the base path, so the favicon and the
+  // home page font preloads are emitted here from the normalized site base.
   transformHead: ({ pageData, siteConfig }) => {
-    if (!["index.md", "en/index.md"].includes(pageData.relativePath)) return [];
-    return ["cormorant-garamond-latin-400-normal", "dm-mono-latin-400-normal", "dm-mono-latin-500-normal"].map((font) => [
-      "link",
-      {
-        rel: "preload",
-        href: `${siteConfig.base}assets/fonts/${font}.woff2`,
-        as: "font",
-        type: "font/woff2",
-        crossorigin: "",
-      },
-    ]);
+    const base = siteConfig.site.base;
+    const head: HeadConfig[] = [["link", { rel: "icon", href: `${base}logo.svg` }]];
+    if (["index.md", "en/index.md"].includes(pageData.relativePath)) {
+      for (const font of ["cormorant-garamond-latin-400-normal", "dm-mono-latin-400-normal", "dm-mono-latin-500-normal"]) {
+        head.push([
+          "link",
+          { rel: "preload", href: `${base}assets/fonts/${font}.woff2`, as: "font", type: "font/woff2", crossorigin: "" },
+        ]);
+      }
+    }
+    return head;
   },
 
   locales: {
@@ -83,13 +83,6 @@ export default defineConfig({
       },
     },
   },
-
-  head: [
-    [
-      "link",
-      { rel: "icon", href: `${process.env.BASE_PATH || ""}/logo.svg` },
-    ],
-  ],
 
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
