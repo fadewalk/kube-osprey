@@ -19,6 +19,8 @@ import {
   createCluster,
   deleteCluster,
   importClusters,
+  revokeClusterAgentToken,
+  rotateClusterAgentToken,
   updateCluster,
   useClusterList,
 } from '@/lib/api'
@@ -224,6 +226,35 @@ export function ClusterManagement() {
     [getClusterTypeBadge, getStatusBadge, t]
   )
 
+  const rotateMutation = useMutation({
+    mutationFn: rotateClusterAgentToken,
+    onSuccess: async (result) => {
+      queryClient.invalidateQueries({ queryKey: ['cluster-list'] })
+      toast.success(t('clusterManagement.messages.tokenRotated', 'Agent token rotated'))
+      await presentAgentToken(result)
+    },
+    onError: (error: Error) => {
+      toast.error(
+        error.message ||
+          t('clusterManagement.messages.rotateError', 'Failed to rotate agent token')
+      )
+    },
+  })
+
+  const revokeMutation = useMutation({
+    mutationFn: revokeClusterAgentToken,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cluster-list'] })
+      toast.success(t('clusterManagement.messages.tokenRevoked', 'Agent token revoked'))
+    },
+    onError: (error: Error) => {
+      toast.error(
+        error.message ||
+          t('clusterManagement.messages.revokeError', 'Failed to revoke agent token')
+      )
+    },
+  })
+
   const actions = useMemo<Action<Cluster>[]>(
     () => [
       {
@@ -240,6 +271,26 @@ export function ClusterManagement() {
       },
       {
         label: (
+          <>{t('clusterManagement.actions.rotateToken', 'Rotate Token')}</>
+        ),
+        shouldDisable: (cluster) => !cluster.clusterAgent,
+        onClick: (cluster) => {
+          rotateMutation.mutate(cluster.id)
+        },
+      },
+      {
+        label: (
+          <div className="inline-flex items-center gap-2 text-destructive">
+            {t('clusterManagement.actions.revokeToken', 'Revoke Token')}
+          </div>
+        ),
+        shouldDisable: (cluster) => !cluster.clusterAgent,
+        onClick: (cluster) => {
+          revokeMutation.mutate(cluster.id)
+        },
+      },
+      {
+        label: (
           <div className="inline-flex items-center gap-2 text-destructive">
             <IconTrash className="h-4 w-4" />
             {t('common.actions.delete', 'Delete')}
@@ -251,73 +302,71 @@ export function ClusterManagement() {
         },
       },
     ],
+    [t, rotateMutation, revokeMutation]
+  )
+
+  const presentAgentToken = useCallback(
+    async (result: {
+      clusterAgentServer?: string
+      clusterAgentToken?: string
+      clusterAgentPublicKey?: string
+      clusterAgentManifestURL?: string
+    }) => {
+      if (!(result.clusterAgentServer && result.clusterAgentToken && result.clusterAgentPublicKey)) {
+        return
+      }
+      setClusterAgentCopyError(null)
+      setClusterAgentCommand(
+        `kube-osprey cluster-agent --server='${result.clusterAgentServer}' --token='${result.clusterAgentToken}' --public-key='${result.clusterAgentPublicKey}'`
+      )
+      setClusterAgentYaml('')
+      setClusterAgentYamlError(null)
+      setClusterAgentManifestURL(result.clusterAgentManifestURL || '')
+      setIsClusterAgentYamlLoading(true)
+      const requestID = ++clusterAgentYamlRequestID.current
+      try {
+        if (!result.clusterAgentManifestURL) throw new Error('Missing manifest URL')
+        const manifestURL = new URL(
+          result.clusterAgentManifestURL,
+          window.location.origin
+        )
+        const response = await fetch(
+          `${manifestURL.pathname}${manifestURL.search}`,
+          { cache: 'no-store' }
+        )
+        if (!response.ok) throw new Error(`HTTP ${response.status}`)
+        const yaml = await response.text()
+        if (requestID === clusterAgentYamlRequestID.current) {
+          setClusterAgentYaml(yaml)
+        }
+      } catch {
+        if (requestID === clusterAgentYamlRequestID.current) {
+          setClusterAgentYamlError(
+            t(
+              'clusterManagement.clusterAgent.loadYamlError',
+              'Failed to load YAML from the manifest URL.'
+            )
+          )
+        }
+      } finally {
+        if (requestID === clusterAgentYamlRequestID.current) {
+          setIsClusterAgentYamlLoading(false)
+        }
+      }
+    },
     [t]
   )
 
   const createMutation = useMutation({
     mutationFn: createCluster,
-    onSuccess: async (
-      {
-        clusterAgentServer,
-        clusterAgentToken,
-        clusterAgentPublicKey,
-        clusterAgentManifestURL,
-      }: {
-        clusterAgentServer?: string
-        clusterAgentToken?: string
-        clusterAgentPublicKey?: string
-        clusterAgentManifestURL?: string
-      },
-      cluster
-    ) => {
+    onSuccess: async (result, cluster) => {
       queryClient.invalidateQueries({ queryKey: ['cluster-list'] })
       void refreshClusters([cluster.name])
       toast.success(
         t('clusterManagement.messages.created', 'Cluster created successfully')
       )
       setShowClusterDialog(false)
-      if (clusterAgentServer && clusterAgentToken && clusterAgentPublicKey) {
-        setClusterAgentCopyError(null)
-        setClusterAgentCommand(
-          `kube-osprey cluster-agent --server='${clusterAgentServer}' --token='${clusterAgentToken}' --public-key='${clusterAgentPublicKey}'`
-        )
-        setClusterAgentYaml('')
-        setClusterAgentYamlError(null)
-        setClusterAgentManifestURL(clusterAgentManifestURL || '')
-        setIsClusterAgentYamlLoading(true)
-        const requestID = ++clusterAgentYamlRequestID.current
-        try {
-          if (!clusterAgentManifestURL) throw new Error('Missing manifest URL')
-          const manifestURL = new URL(
-            clusterAgentManifestURL,
-            window.location.origin
-          )
-          const response = await fetch(
-            `${manifestURL.pathname}${manifestURL.search}`,
-            {
-              cache: 'no-store',
-            }
-          )
-          if (!response.ok) throw new Error(`HTTP ${response.status}`)
-          const yaml = await response.text()
-          if (requestID === clusterAgentYamlRequestID.current) {
-            setClusterAgentYaml(yaml)
-          }
-        } catch {
-          if (requestID === clusterAgentYamlRequestID.current) {
-            setClusterAgentYamlError(
-              t(
-                'clusterManagement.clusterAgent.loadYamlError',
-                'Failed to load YAML from the manifest URL.'
-              )
-            )
-          }
-        } finally {
-          if (requestID === clusterAgentYamlRequestID.current) {
-            setIsClusterAgentYamlLoading(false)
-          }
-        }
-      }
+      await presentAgentToken(result)
     },
     onError: (error: Error) => {
       toast.error(

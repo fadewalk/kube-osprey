@@ -86,6 +86,33 @@ export const deleteCluster = async (
   return await apiClient.delete<{ message: string }>(`/admin/clusters/${id}`)
 }
 
+export interface ClusterAgentTokenRotationResponse {
+  id: number
+  message: string
+  clusterAgentServer?: string
+  clusterAgentToken?: string
+  clusterAgentPublicKey?: string
+  clusterAgentManifestURL?: string
+}
+
+export const rotateClusterAgentToken = async (
+  id: number
+): Promise<ClusterAgentTokenRotationResponse> => {
+  return await apiClient.post<ClusterAgentTokenRotationResponse>(
+    `/admin/clusters/${id}/token/rotate`,
+    {}
+  )
+}
+
+export const revokeClusterAgentToken = async (
+  id: number
+): Promise<{ message: string }> => {
+  return await apiClient.post<{ message: string }>(
+    `/admin/clusters/${id}/token/revoke`,
+    {}
+  )
+}
+
 // OAuth Provider Management
 export interface OAuthProviderCreateRequest {
   name: string

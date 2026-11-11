@@ -1130,7 +1130,11 @@
     "actions": {
       "add": "添加集群",
       "import": "导入集群",
-      "importing": "导入中..."
+      "importing": "导入中...",
+      "rotateToken": "轮换令牌",
+      "revokeToken": "吊销令牌",
+      "rotateTokenDesc": "轮换后旧令牌立即失效，需要用新令牌重新部署 Agent",
+      "revokeTokenDesc": "吊销后 Agent 将断开连接，直到轮换出新的令牌"
     },
     "table": {
       "prometheus": "Prometheus"
@@ -1176,7 +1180,11 @@
       "createError": "创建集群失败",
       "updateError": "更新集群失败",
       "deleteError": "删除集群失败",
-      "fileReadError": "无法读取 kubeconfig 文件"
+      "fileReadError": "无法读取 kubeconfig 文件",
+      "tokenRotated": "Agent 令牌已轮换",
+      "tokenRevoked": "Agent 令牌已吊销",
+      "rotateError": "轮换 Agent 令牌失败",
+      "revokeError": "吊销 Agent 令牌失败"
     },
     "errors": {
       "loadFailed": "加载集群失败"

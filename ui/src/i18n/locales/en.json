@@ -1124,7 +1124,11 @@
     "actions": {
       "add": "Add Cluster",
       "import": "Import Clusters",
-      "importing": "Importing..."
+      "importing": "Importing...",
+      "rotateToken": "Rotate Token",
+      "revokeToken": "Revoke Token",
+      "rotateTokenDesc": "The old token stops working immediately after rotation; redeploy the agent with the new token",
+      "revokeTokenDesc": "The agent disconnects until you rotate a new token"
     },
     "table": {
       "prometheus": "Prometheus"
@@ -1170,7 +1174,11 @@
       "createError": "Failed to create cluster",
       "updateError": "Failed to update cluster",
       "deleteError": "Failed to delete cluster",
-      "fileReadError": "Failed to read kubeconfig file"
+      "fileReadError": "Failed to read kubeconfig file",
+      "tokenRotated": "Agent token rotated",
+      "tokenRevoked": "Agent token revoked",
+      "rotateError": "Failed to rotate agent token",
+      "revokeError": "Failed to revoke agent token"
     },
     "errors": {
       "loadFailed": "Failed to load clusters"
