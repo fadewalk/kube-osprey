@@ -61,3 +61,4 @@ kube-osprey
 .playwright-mcp/
 .auto/
 autoresearch-dashboard.html
+.v2c/
