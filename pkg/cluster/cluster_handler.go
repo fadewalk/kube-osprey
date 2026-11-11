@@ -96,6 +96,8 @@ func (cm *ClusterManager) GetClusterList(c *gin.Context) {
 		}
 		if cluster.ClusterAgent {
 			clusterInfo["clusterAgentVersion"] = cm.clusterAgentManager.Version(cluster.ID)
+			clusterInfo["clusterAgentTokenExpiresAt"] = cluster.ClusterAgentTokenExpiresAt
+			clusterInfo["clusterAgentTokenRevokedAt"] = cluster.ClusterAgentTokenRevokedAt
 		}
 
 		if clientSet, exists := clusterState[cluster.Name]; exists {

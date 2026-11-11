@@ -125,6 +125,12 @@ func resolveToken(token string) (*model.Cluster, error) {
 	if !cluster.ClusterAgent || !cluster.Enable {
 		return nil, nil
 	}
+	if cluster.ClusterAgentTokenRevokedAt != nil {
+		return nil, nil
+	}
+	if cluster.ClusterAgentTokenExpiresAt != nil && time.Now().After(*cluster.ClusterAgentTokenExpiresAt) {
+		return nil, nil
+	}
 	return cluster, nil
 }
 

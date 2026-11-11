@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 const (
 	ClusterAgentPermissionReadOnly = "readOnly"
 	ClusterAgentPermissionOperator = "operator"
@@ -9,20 +11,22 @@ const (
 
 type Cluster struct {
 	Model
-	Name                   string       `json:"name" gorm:"type:varchar(100);uniqueIndex;not null"`
-	Description            string       `json:"description" gorm:"type:text"`
-	Config                 SecretString `json:"config" gorm:"type:text"`
-	PrometheusURL          string       `json:"prometheus_url,omitempty" gorm:"type:text"`
-	AlertManagerURL        string       `json:"alert_manager_url,omitempty" gorm:"type:text"`
-	InCluster              bool         `json:"in_cluster" gorm:"type:boolean;default:false"`
-	ClusterAgent           bool         `json:"clusterAgent" gorm:"type:boolean;default:false"`
-	ClusterAgentPermission string       `json:"clusterAgentPermission,omitempty" gorm:"type:varchar(20);default:'admin'"`
-	ClusterAgentRole       string       `json:"clusterAgentRole,omitempty" gorm:"type:varchar(253)"`
-	ClusterAgentTokenHash  string       `json:"-" gorm:"type:varchar(64);index"`
-	ClusterAgentPublicKey  string       `json:"-" gorm:"type:varchar(64)"`
-	ClusterAgentPrivateKey SecretString `json:"-" gorm:"type:text"`
-	IsDefault              bool         `json:"is_default" gorm:"type:boolean;default:false"`
-	Enable                 bool         `json:"enable" gorm:"type:boolean;default:true"`
+	Name                       string       `json:"name" gorm:"type:varchar(100);uniqueIndex;not null"`
+	Description                string       `json:"description" gorm:"type:text"`
+	Config                     SecretString `json:"config" gorm:"type:text"`
+	PrometheusURL              string       `json:"prometheus_url,omitempty" gorm:"type:text"`
+	AlertManagerURL            string       `json:"alert_manager_url,omitempty" gorm:"type:text"`
+	InCluster                  bool         `json:"in_cluster" gorm:"type:boolean;default:false"`
+	ClusterAgent               bool         `json:"clusterAgent" gorm:"type:boolean;default:false"`
+	ClusterAgentPermission     string       `json:"clusterAgentPermission,omitempty" gorm:"type:varchar(20);default:'admin'"`
+	ClusterAgentRole           string       `json:"clusterAgentRole,omitempty" gorm:"type:varchar(253)"`
+	ClusterAgentTokenHash      string       `json:"-" gorm:"type:varchar(64);index"`
+	ClusterAgentTokenExpiresAt *time.Time   `json:"clusterAgentTokenExpiresAt,omitempty" gorm:"type:datetime"`
+	ClusterAgentTokenRevokedAt *time.Time   `json:"clusterAgentTokenRevokedAt,omitempty" gorm:"type:datetime"`
+	ClusterAgentPublicKey      string       `json:"-" gorm:"type:varchar(64)"`
+	ClusterAgentPrivateKey     SecretString `json:"-" gorm:"type:text"`
+	IsDefault                  bool         `json:"is_default" gorm:"type:boolean;default:false"`
+	Enable                     bool         `json:"enable" gorm:"type:boolean;default:true"`
 }
 
 func AddCluster(cluster *Cluster) error {
