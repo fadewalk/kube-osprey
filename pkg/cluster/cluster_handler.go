@@ -468,6 +468,44 @@ func (cm *ClusterManager) RotateClusterAgentToken(c *gin.Context) {
 	})
 }
 
+// RevokeClusterAgentToken invalidates the cluster's agent token immediately
+// and disconnects any live session. Rotate the token to restore access.
+func (cm *ClusterManager) RevokeClusterAgentToken(c *gin.Context) {
+	if common.IsSectionManaged("clusters") {
+		c.JSON(http.StatusForbidden, gin.H{"error": common.ManagedSectionError})
+		return
+	}
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid cluster id"})
+		return
+	}
+	cluster, err := model.GetClusterByID(uint(id64))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !cluster.ClusterAgent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cluster agent is not enabled"})
+		return
+	}
+	now := time.Now()
+	updates := map[string]interface{}{
+		"cluster_agent_token_revoked_at": &now,
+	}
+	if err := model.UpdateCluster(cluster, updates); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	cm.clusterAgentManager.Disconnect(cluster.ID)
+	c.JSON(http.StatusOK, gin.H{"id": cluster.ID, "message": "cluster agent token revoked"})
+}
+
 func (cm *ClusterManager) ImportClustersFromKubeconfig(c *gin.Context) {
 	if common.IsSectionManaged("clusters") {
 		c.JSON(http.StatusForbidden, gin.H{"error": common.ManagedSectionError})

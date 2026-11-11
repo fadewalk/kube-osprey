@@ -127,6 +127,7 @@ func registerAdminRoutes(r *gin.RouterGroup, authHandler *auth.AuthHandler, cm *
 	clusterAPI.POST("/", cm.CreateCluster)
 	clusterAPI.POST("/import", cm.ImportClustersFromKubeconfig)
 	clusterAPI.POST("/:id/token/rotate", cm.RotateClusterAgentToken)
+	clusterAPI.POST("/:id/token/revoke", cm.RevokeClusterAgentToken)
 	clusterAPI.PUT("/:id", cm.UpdateCluster)
 	clusterAPI.DELETE("/:id", cm.DeleteCluster)
 
