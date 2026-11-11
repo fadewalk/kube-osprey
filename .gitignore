@@ -59,6 +59,5 @@ kube-osprey
 /kuboard-reference/
 /architecture-diagrams/
 .playwright-mcp/
-.auto/
 autoresearch-dashboard.html
 .v2c/
