@@ -547,7 +547,23 @@ Kuboard v4.3 走查加固：
 | ~~G6 审计策略页~~ | **v1 已交付（`b9607a3`，实测）**：保留期可配置 + 按模块跳过（Settings → Audit 策略卡）；MCP 调用审计刻意不做（工具全只读） |
 | 对象锚定 Related 关系图 | Kuboard 式深度滑块图；Kite 已有 related 列表 Tab + 全局拓扑页，价值重叠——**明确不做，除非真实需求出现** |
 | 终端命令历史面板 | 判定 YAGNI：shell 自带历史（方向键）——**不再入队** |
-| 上游同步 | 单向同步（2026-10-15 起）：仅 `git fetch upstream` 拉取吸收，不回传 PR；品牌已更名 KubeOsprey，代码层标识（module/KUBE_OSPREY_*/charts/kite）保留上游原名以便合并；每周一 09:00 有自动化只报告上游新提交（不合并）。截至 2026-10-23 upstream 零新提交 |
+| 上游同步 | 单向同步：仅 `git fetch upstream` 拉取吸收，不回传 PR。**2026-10-29 起与上游彻底分叉**（module/环境变量/chart 全量改名），上游代码不再能盲合，每条改动需对照评估后移植。每周一 09:00 自动化只报告上游新提交（不合并） |
+
+### 上游吸收轮（2026-11-11，v0.19.1 已发布）
+
+> 本轮对照评估了上游 10-25 以来的 13 个提交，逐项结论：
+
+| 上游变更 | 结论 |
+| --- | --- |
+| #779 metrics 路由标签基数爆炸（`df3b4c5`） | **已吸收**：未匹配路由标签归一化为 `unknown`，unlogPath 改在请求路径上匹配；含上游同款单测 |
+| #778 静态目录列举禁用（`ac1ce26`） | **自移植**（上游 PR 未合并）：`neuteredFileSystem` 包装，目录 Open 返回 ErrNotExist；8081 实例实测 `/assets/` → 404、真实资源 → 200 |
+| #770 Helm 升级加载完整 chart 包 | 无需动作——**已于 10-25 提前吸收**（`69d5626`，RunUpgrade 的 repository 重载 fallback） |
+| #771 User-Agent 版本 + exec user | 无需动作——**已提前吸收**（`client.go:154` kube-osprey/<version>，userKey 管道齐全） |
+| #780 GetGeneralSetting fail-closed | 无需动作——我们的 fail-closed（`a8f8a73`）更早且等价 |
+| #781 NOTES.txt 默认 key 警告 | 跳过——chart 已随机生成 key + fail-closed |
+| Kite Desktop beta（#782/#785，`desktop` 分支） | **不跟进，观察**——server-first 定位；desktop 在独立分支未进 main，等上游验证后再评估 |
+
+本轮以 **v0.19.1** 发布（`ac1ce26`，dev/main/tag 三方对齐）：CI/E2E 绿，Release workflow 绿，产物匿名验证（OCI chart `oci://ghcr.io/fadewalk/charts/kube-osprey:0.19.1` 拉取成功、appVersion 盖戳正确、多架构 amd64+arm64 镜像、4 平台二进制）。本地 8081 临时实例冒烟通过（healthz/assets 目录列举/真实资源）。**下一个高价值项：Cluster Agent Token 轮换/吊销/过期**（P1 供应链清单首位）。
 
 ### 发布链路（2026-10-17 建立）
 
