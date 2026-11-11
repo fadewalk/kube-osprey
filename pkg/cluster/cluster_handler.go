@@ -3,6 +3,7 @@ package cluster
 import (
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -394,6 +395,77 @@ func (cm *ClusterManager) GetClusterAgentManifest(c *gin.Context) {
 	c.Header("Cache-Control", "no-store")
 	c.Header("Content-Disposition", `attachment; filename="kube-osprey-cluster-agent.yaml"`)
 	c.Data(http.StatusOK, "text/yaml; charset=utf-8", []byte(manifest))
+}
+
+// RotateClusterAgentToken mints a fresh agent token for the cluster, clearing
+// any revocation and optionally setting a new expiry (expiresInSeconds > 0).
+// The plaintext token appears once, in this response.
+func (cm *ClusterManager) RotateClusterAgentToken(c *gin.Context) {
+	if common.IsSectionManaged("clusters") {
+		c.JSON(http.StatusForbidden, gin.H{"error": common.ManagedSectionError})
+		return
+	}
+	idStr := c.Param("id")
+	id64, err := strconv.ParseUint(idStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid cluster id"})
+		return
+	}
+	cluster, err := model.GetClusterByID(uint(id64))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	if !cluster.ClusterAgent {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "cluster agent is not enabled"})
+		return
+	}
+	var req struct {
+		ExpiresInSeconds int `json:"expiresInSeconds"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil && !errors.Is(err, io.EOF) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var expiresAt *time.Time
+	if req.ExpiresInSeconds > 0 {
+		t := time.Now().Add(time.Duration(req.ExpiresInSeconds) * time.Second)
+		expiresAt = &t
+	}
+	token, tokenHash, err := clusteragent.NewToken()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	updates := map[string]interface{}{
+		"cluster_agent_token_hash":       tokenHash,
+		"cluster_agent_token_expires_at": expiresAt,
+		"cluster_agent_token_revoked_at": nil,
+	}
+	if err := model.UpdateCluster(cluster, updates); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	cm.clusterAgentManager.Disconnect(cluster.ID)
+	grant, err := cm.clusterAgentManager.CreateManifestGrant(token)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	serverURL := clusterAgentServerURL(c)
+	c.JSON(http.StatusOK, gin.H{
+		"id":                         cluster.ID,
+		"message":                    "cluster agent token rotated",
+		"clusterAgentServer":         serverURL,
+		"clusterAgentToken":          token,
+		"clusterAgentPublicKey":      cluster.ClusterAgentPublicKey,
+		"clusterAgentManifestURL":    fmt.Sprintf("%s/api/v1/cluster-agent/manifest?grant=%s", strings.TrimRight(serverURL, "/"), grant),
+		"clusterAgentTokenExpiresAt": expiresAt,
+	})
 }
 
 func (cm *ClusterManager) ImportClustersFromKubeconfig(c *gin.Context) {
