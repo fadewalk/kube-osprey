@@ -230,13 +230,18 @@ export function ClusterManagement() {
     mutationFn: rotateClusterAgentToken,
     onSuccess: async (result) => {
       queryClient.invalidateQueries({ queryKey: ['cluster-list'] })
-      toast.success(t('clusterManagement.messages.tokenRotated', 'Agent token rotated'))
+      toast.success(
+        t('clusterManagement.messages.tokenRotated', 'Agent token rotated')
+      )
       await presentAgentToken(result)
     },
     onError: (error: Error) => {
       toast.error(
         error.message ||
-          t('clusterManagement.messages.rotateError', 'Failed to rotate agent token')
+          t(
+            'clusterManagement.messages.rotateError',
+            'Failed to rotate agent token'
+          )
       )
     },
   })
@@ -245,12 +250,17 @@ export function ClusterManagement() {
     mutationFn: revokeClusterAgentToken,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cluster-list'] })
-      toast.success(t('clusterManagement.messages.tokenRevoked', 'Agent token revoked'))
+      toast.success(
+        t('clusterManagement.messages.tokenRevoked', 'Agent token revoked')
+      )
     },
     onError: (error: Error) => {
       toast.error(
         error.message ||
-          t('clusterManagement.messages.revokeError', 'Failed to revoke agent token')
+          t(
+            'clusterManagement.messages.revokeError',
+            'Failed to revoke agent token'
+          )
       )
     },
   })
@@ -312,7 +322,11 @@ export function ClusterManagement() {
       clusterAgentPublicKey?: string
       clusterAgentManifestURL?: string
     }) => {
-      if (!(result.clusterAgentServer && result.clusterAgentToken && result.clusterAgentPublicKey)) {
+      if (!(
+        result.clusterAgentServer &&
+        result.clusterAgentToken &&
+        result.clusterAgentPublicKey
+      )) {
         return
       }
       setClusterAgentCopyError(null)
@@ -325,7 +339,8 @@ export function ClusterManagement() {
       setIsClusterAgentYamlLoading(true)
       const requestID = ++clusterAgentYamlRequestID.current
       try {
-        if (!result.clusterAgentManifestURL) throw new Error('Missing manifest URL')
+        if (!result.clusterAgentManifestURL)
+          throw new Error('Missing manifest URL')
         const manifestURL = new URL(
           result.clusterAgentManifestURL,
           window.location.origin
